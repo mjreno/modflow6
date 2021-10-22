@@ -2387,7 +2387,7 @@ Here is the call graph for this function:</div>
 <div class="line"><a name="l02340"></a><span class="lineno"> 2340</span>&#160;    <span class="keywordflow">else</span></div>
 <div class="line"><a name="l02341"></a><span class="lineno"> 2341</span>&#160;      <span class="comment">! Integer can&#39;t be read from strng; it&#39;s presumed to be an exchange</span></div>
 <div class="line"><a name="l02342"></a><span class="lineno"> 2342</span>&#160;      <span class="comment">! boundary name (already converted to uppercase)</span></div>
-<div class="line"><a name="l02343"></a><span class="lineno"> 2343</span>&#160;      obsrv%FeatureName = strng(istart:istop)</div>
+<div class="line"><a name="l02343"></a><span class="lineno"> 2343</span>&#160;      obsrv%FeatureName = trim(adjustl(strng))</div>
 <div class="line"><a name="l02344"></a><span class="lineno"> 2344</span>&#160;      <span class="comment">! -- Observation may require summing rates from multiple exchange</span></div>
 <div class="line"><a name="l02345"></a><span class="lineno"> 2345</span>&#160;      <span class="comment">!    boundaries, so assign intPak1 as a value that indicates observation</span></div>
 <div class="line"><a name="l02346"></a><span class="lineno"> 2346</span>&#160;      <span class="comment">!    is for a named exchange boundary or group of exchange boundaries.</span></div>
@@ -3807,7 +3807,7 @@ Here is the call graph for this function:</div>
 <div class="ttc" id="astructobservemodule_1_1observetype_html"><div class="ttname"><a href="structobservemodule_1_1observetype.html">observemodule::observetype</a></div><div class="ttdef"><b>Definition:</b> <a href="_observe_8f90_source.html#l00032">Observe.f90:32</a></div></div>
 <div class="ttc" id="anamespacebudgetmodule_html_a917d4897942de165ea88d0c1f0850d8e"><div class="ttname"><a href="namespacebudgetmodule.html#a917d4897942de165ea88d0c1f0850d8e">budgetmodule::rate_accumulator</a></div><div class="ttdeci">subroutine, public rate_accumulator(flow, rin, rout)</div><div class="ttdoc">@ brief Rate accumulator subroutine</div><div class="ttdef"><b>Definition:</b> <a href="_budget_8f90_source.html#l00646">Budget.f90:646</a></div></div>
 <div class="ttc" id="anamespacegwfnpfmodule_html_a043778a29f31835c4167e493e79df0ef"><div class="ttname"><a href="namespacegwfnpfmodule.html#a043778a29f31835c4167e493e79df0ef">gwfnpfmodule::thksatnm</a></div><div class="ttdeci">real(dp) function, public thksatnm(ibdn, ibdm, ictn, ictm, inwtup, ihc, iusg, hn, hm, satn, satm, topn, topm, botn, botm, satomega, satminopt)</div><div class="ttdef"><b>Definition:</b> <a href="gwf3npf8_8f90_source.html#l03635">gwf3npf8.f90:3635</a></div></div>
-<div class="ttc" id="anamespaceinputoutputmodule_html_a12462c53c53955327093c22ab7b89d99"><div class="ttname"><a href="namespaceinputoutputmodule.html#a12462c53c53955327093c22ab7b89d99">inputoutputmodule::urdaux</a></div><div class="ttdeci">subroutine, public urdaux(naux, inunit, iout, lloc, istart, istop, auxname, line, text)</div><div class="ttdef"><b>Definition:</b> <a href="_input_output_8f90_source.html#l01785">InputOutput.f90:1785</a></div></div>
+<div class="ttc" id="anamespaceinputoutputmodule_html_a12462c53c53955327093c22ab7b89d99"><div class="ttname"><a href="namespaceinputoutputmodule.html#a12462c53c53955327093c22ab7b89d99">inputoutputmodule::urdaux</a></div><div class="ttdeci">subroutine, public urdaux(naux, inunit, iout, lloc, istart, istop, auxname, line, text)</div><div class="ttdef"><b>Definition:</b> <a href="_input_output_8f90_source.html#l01794">InputOutput.f90:1794</a></div></div>
 <div class="ttc" id="anamespacesimmodule_html_a4c46e49de78d4498dd4ec106357775e6"><div class="ttname"><a href="namespacesimmodule.html#a4c46e49de78d4498dd4ec106357775e6">simmodule::count_errors</a></div><div class="ttdeci">integer(i4b) function, public count_errors()</div><div class="ttdoc">Return number of errors.</div><div class="ttdef"><b>Definition:</b> <a href="_sim_8f90_source.html#l00059">Sim.f90:59</a></div></div>
 <div class="ttc" id="anamespaceconstantsmodule_html_aba95664cbd721a2d72df12ac8bb78da8"><div class="ttname"><a href="namespaceconstantsmodule.html#aba95664cbd721a2d72df12ac8bb78da8">constantsmodule::dem6</a></div><div class="ttdeci">real(dp), parameter dem6</div><div class="ttdoc">real constant 1e-6</div><div class="ttdef"><b>Definition:</b> <a href="_constants_8f90_source.html#l00091">Constants.f90:91</a></div></div>
 <div class="ttc" id="anamespaceghostnodemodule_html"><div class="ttname"><a href="namespaceghostnodemodule.html">ghostnodemodule</a></div><div class="ttdef"><b>Definition:</b> <a href="_ghost_node_8f90_source.html#l00001">GhostNode.f90:1</a></div></div>
@@ -3852,7 +3852,7 @@ Here is the call graph for this function:</div>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="namespacegwfgwfexchangemodule.html">gwfgwfexchangemodule</a></li>
-    <li class="footer">Generated on Tue Oct 19 2021 17:21:47 for MODFLOW 6 by
+    <li class="footer">Generated on Fri Oct 22 2021 03:44:34 for MODFLOW 6 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.17 </li>
   </ul>

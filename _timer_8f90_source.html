@@ -232,13 +232,13 @@ $(document).ready(function(){initNavTree('_timer_8f90_source.html',''); initResi
 <div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;      elsec = elsec+(iedt(8)-<a class="code" href="namespacetimermodule.html#a87b723757727d161d5d128609d3ed0d5">ibdt</a>(8))*0.001</div>
 <div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;<span class="comment">!</span></div>
 <div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;<span class="comment">!     CONVERT SECONDS TO DAYS, HOURS, MINUTES, AND SECONDS</span></div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;      ndays = elsec/nspd</div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;      ndays = int(elsec/nspd)</div>
 <div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;      rsecs = mod(elsec, 86400.0_dp)</div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;      nhours = rsecs/3600.0</div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;      nhours = int(rsecs/3600.0)</div>
 <div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;      rsecs = mod(rsecs,3600.0_dp)</div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;      nmins = rsecs/60.0</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;      nmins = int(rsecs/60.0)</div>
 <div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;      rsecs = mod(rsecs,60.0_dp)</div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;      nsecs = rsecs</div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;      nsecs = int(rsecs)</div>
 <div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;      rsecs = mod(rsecs,1.0_dp)</div>
 <div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;      msecs = nint(rsecs*1000.0)</div>
 <div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;      nrsecs = nsecs</div>
@@ -327,7 +327,7 @@ $(document).ready(function(){initNavTree('_timer_8f90_source.html',''); initResi
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="dir_ff383ddf1aa4eab0c4ce7910366d05a5.html">Utilities</a></li><li class="navelem"><a class="el" href="_timer_8f90.html">Timer.f90</a></li>
-    <li class="footer">Generated on Thu Oct 28 2021 19:40:11 for MODFLOW 6 by
+    <li class="footer">Generated on Thu Oct 28 2021 20:25:56 for MODFLOW 6 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.17 </li>
   </ul>

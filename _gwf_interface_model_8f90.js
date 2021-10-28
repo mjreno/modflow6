@@ -3,7 +3,6 @@ var _gwf_interface_model_8f90 =
     [ "gwfinterfacemodeltype", "structgwfinterfacemodelmodule_1_1gwfinterfacemodeltype.html", "structgwfinterfacemodelmodule_1_1gwfinterfacemodeltype" ],
     [ "allocateandreadmodel", "_gwf_interface_model_8f90.html#a9f50194e4066de592f3f628f152299db", null ],
     [ "builddiscretization", "_gwf_interface_model_8f90.html#a3fcaa9ecf91a57afe3aeead6655ed0d2", null ],
-    [ "castasgwfinterfacemodelclass", "_gwf_interface_model_8f90.html#a97bec7f83d7bbc8da30c855cb70a4307", null ],
     [ "castasgwfmodelclass", "_gwf_interface_model_8f90.html#a6a41377649cb4fb4406fcd4397e256e1", null ],
     [ "construct", "_gwf_interface_model_8f90.html#a6e864b4325fd2e9777d40a1aa1fb0fc5", null ],
     [ "createmodel", "_gwf_interface_model_8f90.html#aca5d8f065ea2095afc49c8600f35b2af", null ],

@@ -629,7 +629,7 @@ Here is the call graph for this function:</div>
         <tr>
           <td class="memname">integer(kind=c_int) function mf6xmi::xmi_prepare_time_step </td>
           <td>(</td>
-          <td class="paramtype">double precision, intent(in)&#160;</td>
+          <td class="paramtype">real(kind=c_double), intent(in)&#160;</td>
           <td class="paramname"><em>dt</em></td><td>)</td>
           <td></td>
         </tr>
@@ -646,7 +646,7 @@ Here is the call graph for this function:</div>
 <p class="definition">Definition at line <a class="el" href="mf6xmi_8f90_source.html#l00107">107</a> of file <a class="el" href="mf6xmi_8f90_source.html">mf6xmi.f90</a>.</p>
 <div class="fragment"><div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;    <span class="comment">!DIR$ ATTRIBUTES DLLEXPORT :: xmi_prepare_time_step</span></div>
 <div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;    <span class="comment">! -- dummy variables</span></div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;    <span class="keywordtype">double precision</span>, <span class="keywordtype">intent(in)</span> :: dt<span class="comment">  !&lt; time step</span></div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;<span class="keywordtype">    real</span>(kind=c_double), <span class="keywordtype">intent(in)</span> :: dt  <span class="comment">!&lt; time step</span></div>
 <div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;    <span class="keywordtype">integer(kind=c_int)</span> :: bmi_status<span class="comment">   !&lt; BMI status code</span></div>
 <div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160; </div>
 <div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;    <span class="keyword">call </span>mf6preparetimestep()</div>
@@ -799,7 +799,7 @@ Here is the call graph for this function:</div>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="namespacemf6xmi.html">mf6xmi</a></li>
-    <li class="footer">Generated on Thu Oct 28 2021 19:40:21 for MODFLOW 6 by
+    <li class="footer">Generated on Thu Oct 28 2021 20:26:04 for MODFLOW 6 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.17 </li>
   </ul>

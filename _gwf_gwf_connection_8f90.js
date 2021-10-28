@@ -3,7 +3,6 @@ var _gwf_gwf_connection_8f90 =
     [ "gwfgwfconnectiontype", "structgwfgwfconnectionmodule_1_1gwfgwfconnectiontype.html", "structgwfgwfconnectionmodule_1_1gwfgwfconnectiontype" ],
     [ "allocatescalars", "_gwf_gwf_connection_8f90.html#a90b6da38ce4d4a0e3de35d1955ac6107", null ],
     [ "casttogwfmodel", "_gwf_gwf_connection_8f90.html#a0bb9cc08b84556850223c10c998b8d7a", null ],
-    [ "gwfgwfcon_ad", "_gwf_gwf_connection_8f90.html#a1d4bd0ac8079d488ca11911da22b67ff", null ],
     [ "gwfgwfcon_ar", "_gwf_gwf_connection_8f90.html#abd590e4db247b3fe4c740c69d1c380e1", null ],
     [ "gwfgwfcon_bd", "_gwf_gwf_connection_8f90.html#a5098604ec18f1655baf0451967cb183b", null ],
     [ "gwfgwfcon_cq", "_gwf_gwf_connection_8f90.html#a32b44363e6ef3ae95fb7311896ff8438", null ],

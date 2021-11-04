@@ -1907,7 +1907,7 @@ Here is the call graph for this function:</div>
 <div class="line"><a name="l00849"></a><span class="lineno">  849</span>&#160;    <span class="keywordflow">if</span> ( this%linmeth == 1 )<span class="keywordflow">then</span></div>
 <div class="line"><a name="l00850"></a><span class="lineno">  850</span>&#160;      <span class="keyword">allocate</span>(this%imslinear)</div>
 <div class="line"><a name="l00851"></a><span class="lineno">  851</span>&#160;      <span class="keyword">WRITE</span>(<a class="code" href="namespacesimvariablesmodule.html#a70ea2f76b35a03119367efdd0dd88ccc">iout</a>,*) <span class="stringliteral">&#39;***IMS LINEAR SOLVER WILL BE USED***&#39;</span></div>
-<div class="line"><a name="l00852"></a><span class="lineno">  852</span>&#160;      <span class="keyword">call </span>this%imslinear%imslinear_allocate(this%name, this%iu, <a class="code" href="namespacesimvariablesmodule.html#a70ea2f76b35a03119367efdd0dd88ccc">iout</a>,           &amp;</div>
+<div class="line"><a name="l00852"></a><span class="lineno">  852</span>&#160;      <span class="keyword">call </span>this%imslinear%imslinear_allocate(this%name, this%parser, <a class="code" href="namespacesimvariablesmodule.html#a70ea2f76b35a03119367efdd0dd88ccc">iout</a>,       &amp;</div>
 <div class="line"><a name="l00853"></a><span class="lineno">  853</span>&#160;                                             this%iprims, this%mxiter,           &amp;</div>
 <div class="line"><a name="l00854"></a><span class="lineno">  854</span>&#160;                                             ifdparam, imslinear,                &amp;</div>
 <div class="line"><a name="l00855"></a><span class="lineno">  855</span>&#160;                                             this%neq, this%nja, this%ia,        &amp;</div>
@@ -4961,7 +4961,7 @@ Here is the call graph for this function:</div>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="namespacenumericalsolutionmodule.html">numericalsolutionmodule</a></li>
-    <li class="footer">Generated on Wed Nov 3 2021 13:32:32 for MODFLOW 6 by
+    <li class="footer">Generated on Thu Nov 4 2021 19:34:19 for MODFLOW 6 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.17 </li>
   </ul>

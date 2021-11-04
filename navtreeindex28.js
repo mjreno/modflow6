@@ -1,5 +1,6 @@
 var NAVTREEINDEX28 =
 {
+"structuzfmodule_1_1uzftype.html#a7bb809628adaa153b37ae18385392679":[2,0,119,0,31],
 "structuzfmodule_1_1uzftype.html#a7eab9f1a9de4a4481313f0cadfc1a409":[2,0,119,0,44],
 "structuzfmodule_1_1uzftype.html#a7f98c18d7aa7a613c4d212e0b6b9a726":[2,0,119,0,53],
 "structuzfmodule_1_1uzftype.html#a812ea9ee10b5f26dc7757db87858a765":[2,0,119,0,86],

@@ -1,5 +1,6 @@
 var NAVTREEINDEX13 =
 {
+"namespacemembers_func.html":[1,1,1,0],
 "namespacemembers_func.html":[1,1,1],
 "namespacemembers_func_b.html":[1,1,1,1],
 "namespacemembers_func_c.html":[1,1,1,2],
@@ -248,6 +249,5 @@ var NAVTREEINDEX13 =
 "structbasedismodule_1_1disbasetype.html#ab80a8855200679bed036d524fa5825ae":[2,0,3,0,62],
 "structbasedismodule_1_1disbasetype.html#ab8911e35cc9e6d5c4fd3365ef1730d0e":[2,0,3,0,59],
 "structbasedismodule_1_1disbasetype.html#ab9f36275c3a3630692d4982546459382":[2,0,3,0,35],
-"structbasedismodule_1_1disbasetype.html#aba6fea95df5bd3877546e76797450fa8":[2,0,3,0,64],
-"structbasedismodule_1_1disbasetype.html#abacc5825254d8334bc9cae4c07b7ee07":[2,0,3,0,11]
+"structbasedismodule_1_1disbasetype.html#aba6fea95df5bd3877546e76797450fa8":[2,0,3,0,64]
 };

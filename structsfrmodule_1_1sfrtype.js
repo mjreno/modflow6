@@ -29,12 +29,12 @@ var structsfrmodule_1_1sfrtype =
     [ "sfr_allocate_scalars", "structsfrmodule_1_1sfrtype.html#afea84918f56bba7ab727b07a79883d58", null ],
     [ "sfr_calc_cond", "structsfrmodule_1_1sfrtype.html#a1f7ab9eb1a616420409197662777103f", null ],
     [ "sfr_calc_div", "structsfrmodule_1_1sfrtype.html#a7ca4dae71bf8b85eec14fcd488403262", null ],
-    [ "sfr_calc_npoint_depth", "structsfrmodule_1_1sfrtype.html#a75e91206b684d1aa4a476064d3fa5ea9", null ],
     [ "sfr_calc_qd", "structsfrmodule_1_1sfrtype.html#a0c6cd27593f54ce6fa4ea478e38752c1", null ],
     [ "sfr_calc_qgwf", "structsfrmodule_1_1sfrtype.html#aeb04393a011c52753a9a2d8f174f0911", null ],
     [ "sfr_calc_qman", "structsfrmodule_1_1sfrtype.html#ac8825d0e13bfda56f9d03953c2138887", null ],
     [ "sfr_calc_qsource", "structsfrmodule_1_1sfrtype.html#a1745f124e854ce3f5aaea711028cb271", null ],
     [ "sfr_calc_reach_depth", "structsfrmodule_1_1sfrtype.html#acf07707c954afde9ff7543624392d1e2", null ],
+    [ "sfr_calc_xs_depth", "structsfrmodule_1_1sfrtype.html#a19fe87c481e0c8b842b157511023afd8", null ],
     [ "sfr_calculate_density_exchange", "structsfrmodule_1_1sfrtype.html#a551f784a9af968d5fee472f6bcd19a78", null ],
     [ "sfr_check_connections", "structsfrmodule_1_1sfrtype.html#a7dec735d8ae8c0ced0f503a729daa389", null ],
     [ "sfr_check_diversions", "structsfrmodule_1_1sfrtype.html#a9b77f4515bea52252c26f4c27bb7cbb5", null ],
@@ -123,5 +123,6 @@ var structsfrmodule_1_1sfrtype =
     [ "usflow0", "structsfrmodule_1_1sfrtype.html#a719532b1a799a6a6d3d7e306b0447e39", null ],
     [ "ustrf", "structsfrmodule_1_1sfrtype.html#acba29adb825273ad86f17e624fd6becd", null ],
     [ "width", "structsfrmodule_1_1sfrtype.html#a4e4112efdcdc1421fd3ff1eb815b954c", null ],
-    [ "xsdepths", "structsfrmodule_1_1sfrtype.html#aa9c7dfefb7558e5754b270ca49bca6a4", null ]
+    [ "xsheight", "structsfrmodule_1_1sfrtype.html#a6c32197505104460a174d26c1ee26f05", null ],
+    [ "xsrough", "structsfrmodule_1_1sfrtype.html#ac2d1116ff2bb09417b4985794c38c820", null ]
 ];

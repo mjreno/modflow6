@@ -74,6 +74,7 @@ var structnumericalsolutionmodule_1_1numericalsolutiontype =
     [ "iprims", "structnumericalsolutionmodule_1_1numericalsolutiontype.html#a76270617a6917ce20c4bbb93ffe7818e", null ],
     [ "iptcopt", "structnumericalsolutionmodule_1_1numericalsolutiontype.html#a16306c8af202b7788688df3143228896", null ],
     [ "iptcout", "structnumericalsolutionmodule_1_1numericalsolutiontype.html#a1bdca3c1d4bc028f9b0ee077bc6b6740", null ],
+    [ "isymmetric", "structnumericalsolutionmodule_1_1numericalsolutiontype.html#a3eaeca99e0895ab648743eb60e6b960e", null ],
     [ "itertot_sim", "structnumericalsolutionmodule_1_1numericalsolutiontype.html#a4549cffc4d2c702bdf097660f2169f72", null ],
     [ "itertot_timestep", "structnumericalsolutionmodule_1_1numericalsolutiontype.html#ace86b4f4632c625caafbae95892ed249", null ],
     [ "itinner", "structnumericalsolutionmodule_1_1numericalsolutiontype.html#af211d232800d6e99045f0441ea5e4475", null ],

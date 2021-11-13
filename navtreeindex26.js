@@ -1,5 +1,6 @@
 var NAVTREEINDEX26 =
 {
+"structsfrmodule_1_1sfrtype.html#a6aa6380add60d21e67d3d0d263597cdf":[2,0,97,0,77],
 "structsfrmodule_1_1sfrtype.html#a6c32197505104460a174d26c1ee26f05":[2,0,97,0,123],
 "structsfrmodule_1_1sfrtype.html#a6e173006eba61a88cb897083809c00aa":[2,0,97,0,113],
 "structsfrmodule_1_1sfrtype.html#a7163bd951193f7bdb7ee9158ea5e5173":[2,0,97,0,6],
@@ -248,6 +249,5 @@ var NAVTREEINDEX26 =
 "structtimearrayseriesmodule_1_1timearrayseriestype.html#ae722a1380c64f16a5a7373be27ed5d4d":[2,0,108,0,5],
 "structtimeseriesfilelistmodule_1_1timeseriesfilelisttype.html":[2,0,109,0],
 "structtimeseriesfilelistmodule_1_1timeseriesfilelisttype.html#a6352416857f3d65de2702e169d33d82b":[2,0,109,0,1],
-"structtimeseriesfilelistmodule_1_1timeseriesfilelisttype.html#a6f48c0f08b844f51985a87da37f33f56":[2,0,109,0,8],
-"structtimeseriesfilelistmodule_1_1timeseriesfilelisttype.html#a8d21b4b43b111c53e6ec2ce7e77d0c5b":[2,0,109,0,2]
+"structtimeseriesfilelistmodule_1_1timeseriesfilelisttype.html#a6f48c0f08b844f51985a87da37f33f56":[2,0,109,0,8]
 };

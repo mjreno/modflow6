@@ -89,6 +89,7 @@ var structsfrmodule_1_1sfrtype =
     [ "inflow", "structsfrmodule_1_1sfrtype.html#ade7017e78d18d8e5c9ae3310b6f9ed7d", null ],
     [ "ipakcsv", "structsfrmodule_1_1sfrtype.html#abf8d084a7ede16c2da719521ca089221", null ],
     [ "iprhed", "structsfrmodule_1_1sfrtype.html#a412fb98915ef5dbe36c0827dc9cbd740", null ],
+    [ "isfrorder", "structsfrmodule_1_1sfrtype.html#aa6899076797cb82068bc47b67c7bd735", null ],
     [ "istageout", "structsfrmodule_1_1sfrtype.html#a46cd4ca5ccbeae750d7be1ce19ec634c", null ],
     [ "ja", "structsfrmodule_1_1sfrtype.html#a3eac142799d981136f4dd5ba7d7352c9", null ],
     [ "length", "structsfrmodule_1_1sfrtype.html#af6f683bb9ac2b85f2822cac5157009a8", null ],

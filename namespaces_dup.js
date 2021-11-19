@@ -24,6 +24,7 @@ var namespaces_dup =
     [ "connectionsmodule", "namespaceconnectionsmodule.html", null ],
     [ "constantsmodule", "namespaceconstantsmodule.html", null ],
     [ "csrutilsmodule", "namespacecsrutilsmodule.html", null ],
+    [ "dag_module", "namespacedag__module.html", null ],
     [ "definedmacros", "namespacedefinedmacros.html", null ],
     [ "disconnexchangemodule", "namespacedisconnexchangemodule.html", null ],
     [ "disvgeom", "namespacedisvgeom.html", null ],

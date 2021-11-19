@@ -19,6 +19,7 @@ var annotated_dup =
     [ "circulargeometrymodule", "namespacecirculargeometrymodule.html", "namespacecirculargeometrymodule" ],
     [ "connectionbuildermodule", "namespaceconnectionbuildermodule.html", "namespaceconnectionbuildermodule" ],
     [ "connectionsmodule", "namespaceconnectionsmodule.html", "namespaceconnectionsmodule" ],
+    [ "dag_module", "namespacedag__module.html", "namespacedag__module" ],
     [ "disconnexchangemodule", "namespacedisconnexchangemodule.html", "namespacedisconnexchangemodule" ],
     [ "disvgeom", "namespacedisvgeom.html", "namespacedisvgeom" ],
     [ "drnmodule", "namespacedrnmodule.html", "namespacedrnmodule" ],

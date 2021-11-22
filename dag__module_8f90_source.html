@@ -520,7 +520,7 @@ $(document).ready(function(){initNavTree('dag__module_8f90_source.html',''); ini
 <div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;    <span class="keywordtype">integer</span> :: iunit, istat</div>
 <div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160;    <span class="keywordtype">character(len=:)</span>,<span class="keywordtype">allocatable</span> :: diagraph</div>
 <div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160; </div>
-<div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160;    diagraph = me%generate_digraph(rankdir,dpi)</div>
+<div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160;    diagraph = me%generate_digraph(rankdir,dpi,edge)</div>
 <div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160; </div>
 <div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160;    <span class="keyword">open</span>(newunit=iunit,file=filename,status=<span class="stringliteral">&#39;REPLACE&#39;</span>,iostat=istat)</div>
 <div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160; </div>
@@ -585,7 +585,7 @@ $(document).ready(function(){initNavTree('dag__module_8f90_source.html',''); ini
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="dir_ff383ddf1aa4eab0c4ce7910366d05a5.html">Utilities</a></li><li class="navelem"><a class="el" href="dir_76727a82825ca0d418abe34ad8eeab6e.html">Libraries</a></li><li class="navelem"><a class="el" href="dir_b424ce558bc488cd6e27b0419afed5a2.html">daglib</a></li><li class="navelem"><a class="el" href="dag__module_8f90.html">dag_module.f90</a></li>
-    <li class="footer">Generated on Sun Nov 21 2021 22:02:26 for MODFLOW 6 by
+    <li class="footer">Generated on Mon Nov 22 2021 03:42:29 for MODFLOW 6 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.17 </li>
   </ul>

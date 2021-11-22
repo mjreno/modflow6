@@ -599,7 +599,7 @@ Here is the call graph for this function:</div>
 <div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;    <span class="keywordtype">integer</span> :: iunit, istat</div>
 <div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160;    <span class="keywordtype">character(len=:)</span>,<span class="keywordtype">allocatable</span> :: diagraph</div>
 <div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160; </div>
-<div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160;    diagraph = me%generate_digraph(rankdir,dpi)</div>
+<div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160;    diagraph = me%generate_digraph(rankdir,dpi,edge)</div>
 <div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160; </div>
 <div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160;    <span class="keyword">open</span>(newunit=iunit,file=filename,status=<span class="stringliteral">&#39;REPLACE&#39;</span>,iostat=istat)</div>
 <div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160; </div>
@@ -1024,7 +1024,7 @@ Here is the caller graph for this function:</div>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="namespacedag__module.html">dag_module</a></li>
-    <li class="footer">Generated on Sun Nov 21 2021 22:02:27 for MODFLOW 6 by
+    <li class="footer">Generated on Mon Nov 22 2021 03:42:30 for MODFLOW 6 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.17 </li>
   </ul>

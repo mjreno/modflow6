@@ -79,7 +79,6 @@ var namespaces_dup =
     [ "headfilereadermodule", "namespaceheadfilereadermodule.html", null ],
     [ "imslinearbasemodule", "namespaceimslinearbasemodule.html", null ],
     [ "imslinearmodule", "namespaceimslinearmodule.html", null ],
-    [ "imslinearsparsekitmodule", "namespaceimslinearsparsekitmodule.html", null ],
     [ "imsreorderingmodule", "namespaceimsreorderingmodule.html", null ],
     [ "inputoutputmodule", "namespaceinputoutputmodule.html", null ],
     [ "iunitmodule", "namespaceiunitmodule.html", null ],

@@ -183,6 +183,10 @@ Private Member Functions</h2></td></tr>
 <tr class="separator:a1b36025d0522011d2298e45e6b583e01"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a230b228acfc89bc465155f4f24b4b8bb"><td class="memItemLeft" align="right" valign="top">procedure&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgwtfmimodule_1_1gwtfmitype.html#a230b228acfc89bc465155f4f24b4b8bb">finalize_hfr</a></td></tr>
 <tr class="separator:a230b228acfc89bc465155f4f24b4b8bb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa48f16b754b45e644be4c07ccf796998"><td class="memItemLeft" align="right" valign="top">procedure&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgwtfmimodule_1_1gwtfmitype.html#aa48f16b754b45e644be4c07ccf796998">initialize_gwfterms_from_bfr</a></td></tr>
+<tr class="separator:aa48f16b754b45e644be4c07ccf796998"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a08e3fd7a18a1e85907ffc991f8feebf9"><td class="memItemLeft" align="right" valign="top">procedure&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgwtfmimodule_1_1gwtfmitype.html#a08e3fd7a18a1e85907ffc991f8feebf9">initialize_gwfterms_from_gwfbndlist</a></td></tr>
+<tr class="separator:a08e3fd7a18a1e85907ffc991f8feebf9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acb4cd13d5f04d912994c791a54d3c333"><td class="memItemLeft" align="right" valign="top">procedure&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgwtfmimodule_1_1gwtfmitype.html#acb4cd13d5f04d912994c791a54d3c333">allocate_gwfpackages</a></td></tr>
 <tr class="separator:acb4cd13d5f04d912994c791a54d3c333"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a59b6cfc11a429753ec7a48441eaa62d1"><td class="memItemLeft" align="right" valign="top">procedure&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgwtfmimodule_1_1gwtfmitype.html#a59b6cfc11a429753ec7a48441eaa62d1">get_package_index</a></td></tr>
@@ -252,6 +256,9 @@ Private Attributes</h2></td></tr>
 <tr class="memitem:a0f6b823fa032a93677316c089426236d"><td class="memItemLeft" align="right" valign="top">integer(i4b), pointer&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgwtfmimodule_1_1gwtfmitype.html#a0f6b823fa032a93677316c089426236d">nflowpack</a> =&gt; null()</td></tr>
 <tr class="memdesc:a0f6b823fa032a93677316c089426236d"><td class="mdescLeft">&#160;</td><td class="mdescRight">number of GWF flow packages  <a href="structgwtfmimodule_1_1gwtfmitype.html#a0f6b823fa032a93677316c089426236d">More...</a><br /></td></tr>
 <tr class="separator:a0f6b823fa032a93677316c089426236d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae6cd6ffa838c431f615057dc5bb07ce5"><td class="memItemLeft" align="right" valign="top">integer(i4b), dimension(:), pointer, contiguous&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgwtfmimodule_1_1gwtfmitype.html#ae6cd6ffa838c431f615057dc5bb07ce5">igwfmvrterm</a> =&gt; null()</td></tr>
+<tr class="memdesc:ae6cd6ffa838c431f615057dc5bb07ce5"><td class="mdescLeft">&#160;</td><td class="mdescRight">flag to indicate that gwf package is a mover term  <a href="structgwtfmimodule_1_1gwtfmitype.html#ae6cd6ffa838c431f615057dc5bb07ce5">More...</a><br /></td></tr>
+<tr class="separator:ae6cd6ffa838c431f615057dc5bb07ce5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa934823482cd2f66c03530466782ee43"><td class="memItemLeft" align="right" valign="top">type(budgetfilereadertype)&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgwtfmimodule_1_1gwtfmitype.html#aa934823482cd2f66c03530466782ee43">bfr</a></td></tr>
 <tr class="memdesc:aa934823482cd2f66c03530466782ee43"><td class="mdescLeft">&#160;</td><td class="mdescRight">budget file reader  <a href="structgwtfmimodule_1_1gwtfmitype.html#aa934823482cd2f66c03530466782ee43">More...</a><br /></td></tr>
 <tr class="separator:aa934823482cd2f66c03530466782ee43"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -297,7 +304,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="gwt1fmi1_8f90_source.html#l00079">79</a> of file <a class="el" href="gwt1fmi1_8f90_source.html">gwt1fmi1.f90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="gwt1fmi1_8f90_source.html#l00080">80</a> of file <a class="el" href="gwt1fmi1_8f90_source.html">gwt1fmi1.f90</a>.</p>
 
 </div>
 </div>
@@ -321,7 +328,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="gwt1fmi1_8f90_source.html#l00082">82</a> of file <a class="el" href="gwt1fmi1_8f90_source.html">gwt1fmi1.f90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="gwt1fmi1_8f90_source.html#l00083">83</a> of file <a class="el" href="gwt1fmi1_8f90_source.html">gwt1fmi1.f90</a>.</p>
 
 </div>
 </div>
@@ -345,7 +352,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="gwt1fmi1_8f90_source.html#l00074">74</a> of file <a class="el" href="gwt1fmi1_8f90_source.html">gwt1fmi1.f90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="gwt1fmi1_8f90_source.html#l00075">75</a> of file <a class="el" href="gwt1fmi1_8f90_source.html">gwt1fmi1.f90</a>.</p>
 
 </div>
 </div>
@@ -369,7 +376,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="gwt1fmi1_8f90_source.html#l00084">84</a> of file <a class="el" href="gwt1fmi1_8f90_source.html">gwt1fmi1.f90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="gwt1fmi1_8f90_source.html#l00087">87</a> of file <a class="el" href="gwt1fmi1_8f90_source.html">gwt1fmi1.f90</a>.</p>
 
 </div>
 </div>
@@ -393,7 +400,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="gwt1fmi1_8f90_source.html#l00073">73</a> of file <a class="el" href="gwt1fmi1_8f90_source.html">gwt1fmi1.f90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="gwt1fmi1_8f90_source.html#l00074">74</a> of file <a class="el" href="gwt1fmi1_8f90_source.html">gwt1fmi1.f90</a>.</p>
 
 </div>
 </div>
@@ -417,7 +424,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="gwt1fmi1_8f90_source.html#l00080">80</a> of file <a class="el" href="gwt1fmi1_8f90_source.html">gwt1fmi1.f90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="gwt1fmi1_8f90_source.html#l00081">81</a> of file <a class="el" href="gwt1fmi1_8f90_source.html">gwt1fmi1.f90</a>.</p>
 
 </div>
 </div>
@@ -441,7 +448,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="gwt1fmi1_8f90_source.html#l00083">83</a> of file <a class="el" href="gwt1fmi1_8f90_source.html">gwt1fmi1.f90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="gwt1fmi1_8f90_source.html#l00084">84</a> of file <a class="el" href="gwt1fmi1_8f90_source.html">gwt1fmi1.f90</a>.</p>
 
 </div>
 </div>
@@ -465,7 +472,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="gwt1fmi1_8f90_source.html#l00067">67</a> of file <a class="el" href="gwt1fmi1_8f90_source.html">gwt1fmi1.f90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="gwt1fmi1_8f90_source.html#l00068">68</a> of file <a class="el" href="gwt1fmi1_8f90_source.html">gwt1fmi1.f90</a>.</p>
 
 </div>
 </div>
@@ -489,7 +496,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="gwt1fmi1_8f90_source.html#l00065">65</a> of file <a class="el" href="gwt1fmi1_8f90_source.html">gwt1fmi1.f90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="gwt1fmi1_8f90_source.html#l00066">66</a> of file <a class="el" href="gwt1fmi1_8f90_source.html">gwt1fmi1.f90</a>.</p>
 
 </div>
 </div>
@@ -513,7 +520,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="gwt1fmi1_8f90_source.html#l00070">70</a> of file <a class="el" href="gwt1fmi1_8f90_source.html">gwt1fmi1.f90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="gwt1fmi1_8f90_source.html#l00071">71</a> of file <a class="el" href="gwt1fmi1_8f90_source.html">gwt1fmi1.f90</a>.</p>
 
 </div>
 </div>
@@ -537,7 +544,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="gwt1fmi1_8f90_source.html#l00069">69</a> of file <a class="el" href="gwt1fmi1_8f90_source.html">gwt1fmi1.f90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="gwt1fmi1_8f90_source.html#l00070">70</a> of file <a class="el" href="gwt1fmi1_8f90_source.html">gwt1fmi1.f90</a>.</p>
 
 </div>
 </div>
@@ -561,7 +568,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="gwt1fmi1_8f90_source.html#l00072">72</a> of file <a class="el" href="gwt1fmi1_8f90_source.html">gwt1fmi1.f90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="gwt1fmi1_8f90_source.html#l00073">73</a> of file <a class="el" href="gwt1fmi1_8f90_source.html">gwt1fmi1.f90</a>.</p>
 
 </div>
 </div>
@@ -585,7 +592,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="gwt1fmi1_8f90_source.html#l00064">64</a> of file <a class="el" href="gwt1fmi1_8f90_source.html">gwt1fmi1.f90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="gwt1fmi1_8f90_source.html#l00065">65</a> of file <a class="el" href="gwt1fmi1_8f90_source.html">gwt1fmi1.f90</a>.</p>
 
 </div>
 </div>
@@ -609,7 +616,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="gwt1fmi1_8f90_source.html#l00068">68</a> of file <a class="el" href="gwt1fmi1_8f90_source.html">gwt1fmi1.f90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="gwt1fmi1_8f90_source.html#l00069">69</a> of file <a class="el" href="gwt1fmi1_8f90_source.html">gwt1fmi1.f90</a>.</p>
 
 </div>
 </div>
@@ -633,7 +640,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="gwt1fmi1_8f90_source.html#l00071">71</a> of file <a class="el" href="gwt1fmi1_8f90_source.html">gwt1fmi1.f90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="gwt1fmi1_8f90_source.html#l00072">72</a> of file <a class="el" href="gwt1fmi1_8f90_source.html">gwt1fmi1.f90</a>.</p>
 
 </div>
 </div>
@@ -657,7 +664,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="gwt1fmi1_8f90_source.html#l00066">66</a> of file <a class="el" href="gwt1fmi1_8f90_source.html">gwt1fmi1.f90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="gwt1fmi1_8f90_source.html#l00067">67</a> of file <a class="el" href="gwt1fmi1_8f90_source.html">gwt1fmi1.f90</a>.</p>
 
 </div>
 </div>
@@ -681,7 +688,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="gwt1fmi1_8f90_source.html#l00085">85</a> of file <a class="el" href="gwt1fmi1_8f90_source.html">gwt1fmi1.f90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="gwt1fmi1_8f90_source.html#l00088">88</a> of file <a class="el" href="gwt1fmi1_8f90_source.html">gwt1fmi1.f90</a>.</p>
 
 </div>
 </div>
@@ -705,7 +712,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="gwt1fmi1_8f90_source.html#l00075">75</a> of file <a class="el" href="gwt1fmi1_8f90_source.html">gwt1fmi1.f90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="gwt1fmi1_8f90_source.html#l00076">76</a> of file <a class="el" href="gwt1fmi1_8f90_source.html">gwt1fmi1.f90</a>.</p>
 
 </div>
 </div>
@@ -729,7 +736,55 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="gwt1fmi1_8f90_source.html#l00078">78</a> of file <a class="el" href="gwt1fmi1_8f90_source.html">gwt1fmi1.f90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="gwt1fmi1_8f90_source.html#l00079">79</a> of file <a class="el" href="gwt1fmi1_8f90_source.html">gwt1fmi1.f90</a>.</p>
+
+</div>
+</div>
+<a id="aa48f16b754b45e644be4c07ccf796998"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa48f16b754b45e644be4c07ccf796998">&#9670;&nbsp;</a></span>initialize_gwfterms_from_bfr()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">procedure gwtfmimodule::gwtfmitype::initialize_gwfterms_from_bfr</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="gwt1fmi1_8f90_source.html#l00085">85</a> of file <a class="el" href="gwt1fmi1_8f90_source.html">gwt1fmi1.f90</a>.</p>
+
+</div>
+</div>
+<a id="a08e3fd7a18a1e85907ffc991f8feebf9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a08e3fd7a18a1e85907ffc991f8feebf9">&#9670;&nbsp;</a></span>initialize_gwfterms_from_gwfbndlist()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">procedure gwtfmimodule::gwtfmitype::initialize_gwfterms_from_gwfbndlist</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="gwt1fmi1_8f90_source.html#l00086">86</a> of file <a class="el" href="gwt1fmi1_8f90_source.html">gwt1fmi1.f90</a>.</p>
 
 </div>
 </div>
@@ -753,7 +808,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="gwt1fmi1_8f90_source.html#l00081">81</a> of file <a class="el" href="gwt1fmi1_8f90_source.html">gwt1fmi1.f90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="gwt1fmi1_8f90_source.html#l00082">82</a> of file <a class="el" href="gwt1fmi1_8f90_source.html">gwt1fmi1.f90</a>.</p>
 
 </div>
 </div>
@@ -777,7 +832,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="gwt1fmi1_8f90_source.html#l00076">76</a> of file <a class="el" href="gwt1fmi1_8f90_source.html">gwt1fmi1.f90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="gwt1fmi1_8f90_source.html#l00077">77</a> of file <a class="el" href="gwt1fmi1_8f90_source.html">gwt1fmi1.f90</a>.</p>
 
 </div>
 </div>
@@ -801,7 +856,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="gwt1fmi1_8f90_source.html#l00077">77</a> of file <a class="el" href="gwt1fmi1_8f90_source.html">gwt1fmi1.f90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="gwt1fmi1_8f90_source.html#l00078">78</a> of file <a class="el" href="gwt1fmi1_8f90_source.html">gwt1fmi1.f90</a>.</p>
 
 </div>
 </div>
@@ -825,7 +880,7 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="gwt1fmi1_8f90_source.html#l00086">86</a> of file <a class="el" href="gwt1fmi1_8f90_source.html">gwt1fmi1.f90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="gwt1fmi1_8f90_source.html#l00089">89</a> of file <a class="el" href="gwt1fmi1_8f90_source.html">gwt1fmi1.f90</a>.</p>
 
 </div>
 </div>
@@ -850,8 +905,8 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="gwt1fmi1_8f90_source.html#l00061">61</a> of file <a class="el" href="gwt1fmi1_8f90_source.html">gwt1fmi1.f90</a>.</p>
-<div class="fragment"><div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;    <span class="keywordtype">type</span>(BudObjPtrArray), <span class="keywordtype">dimension(:)</span>, <span class="keywordtype">allocatable</span> :: aptbudobj<span class="comment">                 !&lt; flow budget objects for the advanced packages</span></div>
+<p class="definition">Definition at line <a class="el" href="gwt1fmi1_8f90_source.html#l00062">62</a> of file <a class="el" href="gwt1fmi1_8f90_source.html">gwt1fmi1.f90</a>.</p>
+<div class="fragment"><div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    <span class="keywordtype">type</span>(BudObjPtrArray), <span class="keywordtype">dimension(:)</span>, <span class="keywordtype">allocatable</span> :: aptbudobj<span class="comment">                 !&lt; flow budget objects for the advanced packages</span></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -875,8 +930,8 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="gwt1fmi1_8f90_source.html#l00055">55</a> of file <a class="el" href="gwt1fmi1_8f90_source.html">gwt1fmi1.f90</a>.</p>
-<div class="fragment"><div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    <span class="keywordtype">type</span>(BudgetFileReaderType)                      :: bfr<span class="comment">                       !&lt; budget file reader</span></div>
+<p class="definition">Definition at line <a class="el" href="gwt1fmi1_8f90_source.html#l00056">56</a> of file <a class="el" href="gwt1fmi1_8f90_source.html">gwt1fmi1.f90</a>.</p>
+<div class="fragment"><div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    <span class="keywordtype">type</span>(BudgetFileReaderType)                      :: bfr<span class="comment">                       !&lt; budget file reader</span></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -900,8 +955,8 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="gwt1fmi1_8f90_source.html#l00059">59</a> of file <a class="el" href="gwt1fmi1_8f90_source.html">gwt1fmi1.f90</a>.</p>
-<div class="fragment"><div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    <span class="keywordtype">type</span>(DataAdvancedPackageType), <span class="keywordtype">dimension(:)</span>, <span class="keywordtype">pointer</span>, <span class="keywordtype">contiguous</span> :: datp =&gt; null()</div>
+<p class="definition">Definition at line <a class="el" href="gwt1fmi1_8f90_source.html#l00060">60</a> of file <a class="el" href="gwt1fmi1_8f90_source.html">gwt1fmi1.f90</a>.</p>
+<div class="fragment"><div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    <span class="keywordtype">type</span>(DataAdvancedPackageType), <span class="keywordtype">dimension(:)</span>, <span class="keywordtype">pointer</span>, <span class="keywordtype">contiguous</span> :: datp =&gt; null()</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -950,8 +1005,8 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="gwt1fmi1_8f90_source.html#l00060">60</a> of file <a class="el" href="gwt1fmi1_8f90_source.html">gwt1fmi1.f90</a>.</p>
-<div class="fragment"><div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    <span class="keywordtype">character(len=16)</span>, <span class="keywordtype">dimension(:)</span>, <span class="keywordtype">allocatable</span>    :: flowpacknamearray<span class="comment">         !&lt; array of boundary package names (e.g. LAK-1, SFR-3, etc.)</span></div>
+<p class="definition">Definition at line <a class="el" href="gwt1fmi1_8f90_source.html#l00061">61</a> of file <a class="el" href="gwt1fmi1_8f90_source.html">gwt1fmi1.f90</a>.</p>
+<div class="fragment"><div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;    <span class="keywordtype">character(len=16)</span>, <span class="keywordtype">dimension(:)</span>, <span class="keywordtype">allocatable</span>    :: flowpacknamearray<span class="comment">         !&lt; array of boundary package names (e.g. LAK-1, SFR-3, etc.)</span></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1075,8 +1130,8 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="gwt1fmi1_8f90_source.html#l00057">57</a> of file <a class="el" href="gwt1fmi1_8f90_source.html">gwt1fmi1.f90</a>.</p>
-<div class="fragment"><div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    <span class="keywordtype">type</span>(PackageBudgetType), <span class="keywordtype">dimension(:)</span>, <span class="keywordtype">allocatable</span> :: gwfpackages<span class="comment">            !&lt; used to get flows between a package and gwf</span></div>
+<p class="definition">Definition at line <a class="el" href="gwt1fmi1_8f90_source.html#l00058">58</a> of file <a class="el" href="gwt1fmi1_8f90_source.html">gwt1fmi1.f90</a>.</p>
+<div class="fragment"><div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    <span class="keywordtype">type</span>(PackageBudgetType), <span class="keywordtype">dimension(:)</span>, <span class="keywordtype">allocatable</span> :: gwfpackages<span class="comment">            !&lt; used to get flows between a package and gwf</span></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1200,8 +1255,8 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="gwt1fmi1_8f90_source.html#l00056">56</a> of file <a class="el" href="gwt1fmi1_8f90_source.html">gwt1fmi1.f90</a>.</p>
-<div class="fragment"><div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    <span class="keywordtype">type</span>(HeadFileReaderType)                        :: hfr<span class="comment">                       !&lt; head file reader</span></div>
+<p class="definition">Definition at line <a class="el" href="gwt1fmi1_8f90_source.html#l00057">57</a> of file <a class="el" href="gwt1fmi1_8f90_source.html">gwt1fmi1.f90</a>.</p>
+<div class="fragment"><div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    <span class="keywordtype">type</span>(HeadFileReaderType)                        :: hfr<span class="comment">                       !&lt; head file reader</span></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1327,6 +1382,31 @@ Private Attributes</h2></td></tr>
 
 <p class="definition">Definition at line <a class="el" href="gwt1fmi1_8f90_source.html#l00038">38</a> of file <a class="el" href="gwt1fmi1_8f90_source.html">gwt1fmi1.f90</a>.</p>
 <div class="fragment"><div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    <span class="keywordtype">integer(I4B)</span>, <span class="keywordtype">pointer</span>                           :: iflowsupdated =&gt; null()   <span class="comment">!&lt; flows were updated for this time step</span></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="ae6cd6ffa838c431f615057dc5bb07ce5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae6cd6ffa838c431f615057dc5bb07ce5">&#9670;&nbsp;</a></span>igwfmvrterm</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">integer(i4b), dimension(:), pointer, contiguous gwtfmimodule::gwtfmitype::igwfmvrterm =&gt; null()</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="gwt1fmi1_8f90_source.html#l00055">55</a> of file <a class="el" href="gwt1fmi1_8f90_source.html">gwt1fmi1.f90</a>.</p>
+<div class="fragment"><div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    <span class="keywordtype">integer(I4B)</span>, <span class="keywordtype">dimension(:)</span>, <span class="keywordtype">pointer</span>, <span class="keywordtype">contiguous</span> :: igwfmvrterm =&gt; null()     <span class="comment">!&lt; flag to indicate that gwf package is a mover term</span></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1475,8 +1555,8 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="gwt1fmi1_8f90_source.html#l00058">58</a> of file <a class="el" href="gwt1fmi1_8f90_source.html">gwt1fmi1.f90</a>.</p>
-<div class="fragment"><div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    <span class="keywordtype">type</span>(BudgetObjectType), <span class="keywordtype">pointer</span>                 :: mvrbudobj    =&gt; null()    <span class="comment">!&lt; pointer to the mover budget budget object</span></div>
+<p class="definition">Definition at line <a class="el" href="gwt1fmi1_8f90_source.html#l00059">59</a> of file <a class="el" href="gwt1fmi1_8f90_source.html">gwt1fmi1.f90</a>.</p>
+<div class="fragment"><div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    <span class="keywordtype">type</span>(BudgetObjectType), <span class="keywordtype">pointer</span>                 :: mvrbudobj    =&gt; null()    <span class="comment">!&lt; pointer to the mover budget budget object</span></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1514,7 +1594,7 @@ Private Attributes</h2></td></tr>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="namespacegwtfmimodule.html">gwtfmimodule</a></li><li class="navelem"><a class="el" href="structgwtfmimodule_1_1gwtfmitype.html">gwtfmitype</a></li>
-    <li class="footer">Generated on Wed Dec 1 2021 23:23:33 for MODFLOW 6 by
+    <li class="footer">Generated on Sun Dec 5 2021 13:03:28 for MODFLOW 6 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.17 </li>
   </ul>

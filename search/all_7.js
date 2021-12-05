@@ -16,7 +16,7 @@ var searchData=
   ['hashtabletype_1702',['hashtabletype',['../structhashtablemodule_1_1hashtabletype.html',1,'hashtablemodule']]],
   ['hasimeth1flowja_1703',['hasimeth1flowja',['../structbudgetfilereadermodule_1_1budgetfilereadertype.html#abab28a5fff31f2fef9b1801d23990ec8',1,'budgetfilereadermodule::budgetfilereadertype']]],
   ['hchold_1704',['hchold',['../structnumericalsolutionmodule_1_1numericalsolutiontype.html#a59c6a90eadfd7909832fc800760f0246',1,'numericalsolutionmodule::numericalsolutiontype']]],
-  ['hcof_1705',['hcof',['../structbndmodule_1_1bndtype.html#ac0e119a745fae6beb8a8ae23d6f1b877',1,'bndmodule::bndtype::hcof()'],['../structpackagebudgetmodule_1_1packagebudgettype.html#ab31060a98ad288d37195de5d4dc12929',1,'packagebudgetmodule::packagebudgettype::hcof()']]],
+  ['hcof_1705',['hcof',['../structbndmodule_1_1bndtype.html#ac0e119a745fae6beb8a8ae23d6f1b877',1,'bndmodule::bndtype']]],
   ['hcond_1706',['hcond',['../namespacegwfnpfmodule.html#a7fc55c137cbf452e811e7bda474af209',1,'gwfnpfmodule']]],
   ['hdry_1707',['hdry',['../structgwfnpfmodule_1_1gwfnpftype.html#ad1a5ca18ef0b1ec14ff54ffdfab7df33',1,'gwfnpfmodule::gwfnpftype']]],
   ['head_1708',['head',['../structheadfilereadermodule_1_1headfilereadertype.html#aa5f0e5d9cecbe79e26a1521ae1c9cbfe',1,'headfilereadermodule::headfilereadertype']]],

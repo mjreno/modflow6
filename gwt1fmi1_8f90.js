@@ -8,6 +8,7 @@ var gwt1fmi1_8f90 =
     [ "allocate_arrays", "gwt1fmi1_8f90.html#a652ffbccba3382de1689167b5ef492e8", null ],
     [ "allocate_gwfpackages", "gwt1fmi1_8f90.html#ad75478e0fafc4cfacea9b3800eaf144b", null ],
     [ "allocate_scalars", "gwt1fmi1_8f90.html#a6102c5b05e7b24de946bbf12c3dbe249", null ],
+    [ "deallocate_gwfpackages", "gwt1fmi1_8f90.html#a11f3f5d327199ec4d294308878f4ae64", null ],
     [ "finalize_bfr", "gwt1fmi1_8f90.html#a3093c55cd658d113ee9e60b0c314fc81", null ],
     [ "finalize_hfr", "gwt1fmi1_8f90.html#ad288e5542c712712f6da4e9e46088a4d", null ],
     [ "fmi_ad", "gwt1fmi1_8f90.html#a4ab1d6d69cfe33ddf06c5faff806d844", null ],

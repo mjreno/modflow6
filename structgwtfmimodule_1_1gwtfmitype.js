@@ -5,6 +5,7 @@ var structgwtfmimodule_1_1gwtfmitype =
     [ "allocate_arrays", "structgwtfmimodule_1_1gwtfmitype.html#aeecd91189d089b92074eb38b656a0d3f", null ],
     [ "allocate_gwfpackages", "structgwtfmimodule_1_1gwtfmitype.html#acb4cd13d5f04d912994c791a54d3c333", null ],
     [ "allocate_scalars", "structgwtfmimodule_1_1gwtfmitype.html#a2b893d409d613b4ffacc55938571f667", null ],
+    [ "deallocate_gwfpackages", "structgwtfmimodule_1_1gwtfmitype.html#aeb4f62c605d3ae01dd785789fb3e42e2", null ],
     [ "finalize_bfr", "structgwtfmimodule_1_1gwtfmitype.html#adbd309efc1e683d04278827d3c46e3b8", null ],
     [ "finalize_hfr", "structgwtfmimodule_1_1gwtfmitype.html#a230b228acfc89bc465155f4f24b4b8bb", null ],
     [ "fmi_ad", "structgwtfmimodule_1_1gwtfmitype.html#a0de836a1885ac92be9e58cd38bae8796", null ],

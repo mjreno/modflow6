@@ -146,28 +146,28 @@ $(document).ready(function(){initNavTree('_grid_sorting_8f90_source.html',''); i
 <div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;          <span class="keywordtype">logical(LGP)</span> :: isless</div>
 <div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;          <span class="comment">! local</span></div>
 <div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;          <span class="keywordtype">type</span>(<a class="code" href="structtopologymodule_1_1globalcelltype.html">globalcelltype</a>), <span class="keywordtype">pointer</span> :: gcn, gcm</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="keywordtype">          real</span>(dp) :: xn, yn, zn, xm, ym, zm</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;            </div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;          <span class="comment">! get coordinates</span></div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;          gcn =&gt; idxtoglobal(array(n))</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;          gcm =&gt; idxtoglobal(array(m))</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;  </div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;          <span class="keyword">call </span>gcn%model%dis%get_cellxy(gcn%index, xn, yn)</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;          xn = xn + gcn%model%dis%xorigin</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;          yn = yn + gcn%model%dis%yorigin</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;          zn = <a class="code" href="namespaceconstantsmodule.html#a9262b16d485352c5d369c6cb86232c60">dhalf</a>*(gcn%model%dis%top(gcn%index) + gcn%model%dis%bot(gcn%index))</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;  </div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;          <span class="keyword">call </span>gcm%model%dis%get_cellxy(gcm%index, xm, ym)</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;          xm = xm + gcm%model%dis%xorigin</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;          ym = ym + gcm%model%dis%yorigin</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="keywordtype">          real</span>(dp) :: xnloc, ynloc, xmloc, ymloc</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;<span class="keywordtype">          real</span>(dp) :: xn, yn, zn, xm, ym, zm</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;            </div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;          <span class="comment">! get coordinates</span></div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;          gcn =&gt; idxtoglobal(array(n))</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;          gcm =&gt; idxtoglobal(array(m))</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;  </div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;          <span class="comment">! convert coordinates</span></div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;          <span class="keyword">call </span>gcn%model%dis%get_cellxy(gcn%index, xnloc, ynloc)</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;          <span class="keyword">call </span>gcn%model%dis%transform_xy(xnloc, ynloc, xn, yn)</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;          zn = <a class="code" href="namespaceconstantsmodule.html#a9262b16d485352c5d369c6cb86232c60">dhalf</a>*(gcn%model%dis%top(gcn%index) + gcn%model%dis%bot(gcn%index))</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;  </div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;          <span class="keyword">call </span>gcm%model%dis%get_cellxy(gcm%index, xmloc, ymloc)</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;          <span class="keyword">call </span>gcm%model%dis%transform_xy(xmloc, ymloc, xm, ym)</div>
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;          zm = <a class="code" href="namespaceconstantsmodule.html#a9262b16d485352c5d369c6cb86232c60">dhalf</a>*(gcm%model%dis%top(gcm%index) + gcm%model%dis%bot(gcm%index))</div>
 <div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;  </div>
 <div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;          <span class="comment">! compare</span></div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;          <span class="keywordflow">if</span> (.not. <a class="code" href="namespacegenericutilitiesmodule.html#a07ca2a69ed3488dc534c388ad305a876">is_same</a>(zn, zm, epsilon(zn))) <span class="keywordflow">then</span></div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;          <span class="keywordflow">if</span> (.not. <a class="code" href="namespacegenericutilitiesmodule.html#a07ca2a69ed3488dc534c388ad305a876">is_same</a>(zn, zm, 10*epsilon(zn))) <span class="keywordflow">then</span></div>
 <div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;            isless = zn &gt; zm</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;          <span class="keywordflow">else</span> <span class="keywordflow">if</span> (.not. <a class="code" href="namespacegenericutilitiesmodule.html#a07ca2a69ed3488dc534c388ad305a876">is_same</a>(yn, ym, epsilon(yn))) <span class="keywordflow">then</span></div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;          <span class="keywordflow">else</span> <span class="keywordflow">if</span> (.not. <a class="code" href="namespacegenericutilitiesmodule.html#a07ca2a69ed3488dc534c388ad305a876">is_same</a>(yn, ym, 10*epsilon(yn))) <span class="keywordflow">then</span></div>
 <div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;            isless = yn &gt; ym</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;          <span class="keywordflow">else</span> <span class="keywordflow">if</span> (.not. <a class="code" href="namespacegenericutilitiesmodule.html#a07ca2a69ed3488dc534c388ad305a876">is_same</a>(xn, xm, epsilon(xn))) <span class="keywordflow">then</span></div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;          <span class="keywordflow">else</span> <span class="keywordflow">if</span> (.not. <a class="code" href="namespacegenericutilitiesmodule.html#a07ca2a69ed3488dc534c388ad305a876">is_same</a>(xn, xm, 10*epsilon(xn))) <span class="keywordflow">then</span></div>
 <div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;            isless = xn &lt; xm</div>
 <div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;          <span class="keywordflow">else</span></div>
 <div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;            isless = .false.</div>
@@ -207,7 +207,7 @@ $(document).ready(function(){initNavTree('_grid_sorting_8f90_source.html',''); i
 <div class="ttc" id="a_grid_sorting_8f90_html_a83a097d1386c9badb264dd7f5e0ca541"><div class="ttname"><a href="_grid_sorting_8f90.html#a83a097d1386c9badb264dd7f5e0ca541">rshift</a></div><div class="ttdeci">subroutine rshift(left, right)</div><div class="ttdef"><b>Definition:</b> <a href="_grid_sorting_8f90_source.html#l00075">GridSorting.f90:75</a></div></div>
 <div class="ttc" id="anamespacegenericutilitiesmodule_html_a07ca2a69ed3488dc534c388ad305a876"><div class="ttname"><a href="namespacegenericutilitiesmodule.html#a07ca2a69ed3488dc534c388ad305a876">genericutilitiesmodule::is_same</a></div><div class="ttdeci">logical(lgp) function, public is_same(a, b, eps)</div><div class="ttdoc">Function to determine if two reals are the same.</div><div class="ttdef"><b>Definition:</b> <a href="genericutils_8f90_source.html#l00351">genericutils.f90:351</a></div></div>
 <div class="ttc" id="anamespacegenericutilitiesmodule_html"><div class="ttname"><a href="namespacegenericutilitiesmodule.html">genericutilitiesmodule</a></div><div class="ttdoc">This module contains generic utilties.</div><div class="ttdef"><b>Definition:</b> <a href="genericutils_8f90_source.html#l00007">genericutils.f90:7</a></div></div>
-<div class="ttc" id="astructtopologymodule_1_1globalcelltype_html"><div class="ttname"><a href="structtopologymodule_1_1globalcelltype.html">topologymodule::globalcelltype</a></div><div class="ttdoc">Data structure to hold a global cell identifier, using a pointer to the model and its local cell.</div><div class="ttdef"><b>Definition:</b> <a href="_topology_8f90_source.html#l00010">Topology.f90:10</a></div></div>
+<div class="ttc" id="astructtopologymodule_1_1globalcelltype_html"><div class="ttname"><a href="structtopologymodule_1_1globalcelltype.html">topologymodule::globalcelltype</a></div><div class="ttdoc">Data structure to hold a global cell identifier, using a pointer to the model and its local cell.</div><div class="ttdef"><b>Definition:</b> <a href="_topology_8f90_source.html#l00012">Topology.f90:12</a></div></div>
 <div class="ttc" id="a_grid_sorting_8f90_html_a1fdb4bd62fa33f4c8cf6beccbf315118"><div class="ttname"><a href="_grid_sorting_8f90.html#a1fdb4bd62fa33f4c8cf6beccbf315118">swap</a></div><div class="ttdeci">subroutine swap(a, b)</div><div class="ttdef"><b>Definition:</b> <a href="_grid_sorting_8f90_source.html#l00064">GridSorting.f90:64</a></div></div>
 <div class="ttc" id="anamespaceconstantsmodule_html"><div class="ttname"><a href="namespaceconstantsmodule.html">constantsmodule</a></div><div class="ttdoc">This module contains simulation constants.</div><div class="ttdef"><b>Definition:</b> <a href="_constants_8f90_source.html#l00009">Constants.f90:9</a></div></div>
 <div class="ttc" id="a_grid_sorting_8f90_html_a528d005319a5aca834a0ed205fd1a770"><div class="ttname"><a href="_grid_sorting_8f90.html#a528d005319a5aca834a0ed205fd1a770">lessthan</a></div><div class="ttdeci">logical(lgp) function lessthan(n, m)</div><div class="ttdef"><b>Definition:</b> <a href="_grid_sorting_8f90_source.html#l00028">GridSorting.f90:28</a></div></div>
@@ -217,7 +217,7 @@ $(document).ready(function(){initNavTree('_grid_sorting_8f90_source.html',''); i
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="dir_32e188284d239da8bb14ec1dabb0c35f.html">Model</a></li><li class="navelem"><a class="el" href="dir_4602b8d0a0ef27d9d0b14db2c16038ea.html">Connection</a></li><li class="navelem"><a class="el" href="_grid_sorting_8f90.html">GridSorting.f90</a></li>
-    <li class="footer">Generated on Thu Dec 16 2021 13:02:06 for MODFLOW 6 by
+    <li class="footer">Generated on Wed Dec 22 2021 16:26:28 for MODFLOW 6 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.17 </li>
   </ul>

@@ -1,5 +1,6 @@
 var NAVTREEINDEX17 =
 {
+"structgridconnectionmodule_1_1gridconnectiontype.html#a5d08326cf798b4037f90809aec82163a":[2,0,26,0,8],
 "structgridconnectionmodule_1_1gridconnectiontype.html#a60b6a1fc3e022e817d3f700082ffddb5":[2,0,26,0,0],
 "structgridconnectionmodule_1_1gridconnectiontype.html#a6262513c0c992932ac30b9e17197f30f":[2,0,26,0,38],
 "structgridconnectionmodule_1_1gridconnectiontype.html#a6a31a33e77ed1f8527a71e65e32df769":[2,0,26,0,25],
@@ -248,6 +249,5 @@ var NAVTREEINDEX17 =
 "structgwfcsubmodule_1_1gwfcsubtype.html#ae27a6eb4ce04a278c3afae1a9069cc26":[2,0,28,0,114],
 "structgwfcsubmodule_1_1gwfcsubtype.html#ae2936eafc19dd7cb7d3280dfaeef1f14":[2,0,28,0,67],
 "structgwfcsubmodule_1_1gwfcsubtype.html#ae35ef8a18137ae7fd6c28ad3e67b7612":[2,0,28,0,152],
-"structgwfcsubmodule_1_1gwfcsubtype.html#ae489bfe99b01f7ed16dca7d8ce2d0ec2":[2,0,28,0,138],
-"structgwfcsubmodule_1_1gwfcsubtype.html#ae4be5b2dedf7616b03432e3b648738b8":[2,0,28,0,170]
+"structgwfcsubmodule_1_1gwfcsubtype.html#ae489bfe99b01f7ed16dca7d8ce2d0ec2":[2,0,28,0,138]
 };

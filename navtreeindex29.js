@@ -1,5 +1,7 @@
 var NAVTREEINDEX29 =
 {
+"structuzfmodule_1_1uzftype.html#a5af8910b50cbaa2d556d5a0d411c2e13":[2,0,126,0,40],
+"structuzfmodule_1_1uzftype.html#a64774e28faba9e91094602ecde35374d":[2,0,126,0,18],
 "structuzfmodule_1_1uzftype.html#a67af10bd2bda5a396aefed1ada2b9f35":[2,0,126,0,39],
 "structuzfmodule_1_1uzftype.html#a6acf2c15e37bd5d2d2c827e105bed199":[2,0,126,0,65],
 "structuzfmodule_1_1uzftype.html#a6b698353986fcd77195e2ca43ca2ab09":[2,0,126,0,9],

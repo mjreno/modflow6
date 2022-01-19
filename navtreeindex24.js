@@ -1,5 +1,7 @@
 var NAVTREEINDEX24 =
 {
+"structlistmodule_1_1listtype.html#ac8947857ad2da549a075b1860f5f8e25":[2,0,76,2,21],
+"structlistmodule_1_1listtype.html#acc1110df9149d92bbe62a90b9f9df705":[2,0,76,2,20],
 "structlistmodule_1_1listtype.html#ad775b2b619c3c53d3d4f33d9fcdce788":[2,0,76,2,19],
 "structlistmodule_1_1listtype.html#adc88a9f714caffc167456514dd02bc08":[2,0,76,2,2],
 "structlistmodule_1_1listtype.html#adf690f03daabde18835745763bdf706c":[2,0,76,2,22],
@@ -247,7 +249,5 @@ var NAVTREEINDEX24 =
 "structnamefilemodule_1_1namefiletype.html#adfaa7bf80ec49f7782e40596a0d64054":[2,0,85,0,9],
 "structnamefilemodule_1_1namefiletype.html#aec722816183cb5054e2fbda9d50c60e4":[2,0,85,0,12],
 "structnumericalexchangemodule_1_1numericalexchangetype.html":[2,0,86,0],
-"structnumericalexchangemodule_1_1numericalexchangetype.html#a1578aa72214a2458661254da9e393b4e":[2,0,86,0,4],
-"structnumericalexchangemodule_1_1numericalexchangetype.html#a1dbc09188a45578689368f1b09ca4b3a":[2,0,86,0,1],
-"structnumericalexchangemodule_1_1numericalexchangetype.html#a1fee256ab9bd4ab22486a7ed66468481":[2,0,86,0,13]
+"structnumericalexchangemodule_1_1numericalexchangetype.html#a1578aa72214a2458661254da9e393b4e":[2,0,86,0,4]
 };

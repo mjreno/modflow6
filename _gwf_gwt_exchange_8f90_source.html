@@ -492,124 +492,126 @@ $(document).ready(function(){initNavTree('_gwf_gwt_exchange_8f90_source.html',''
 <div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160;    <span class="keywordtype">class</span>(<a class="code" href="structgwtgwtconnectionmodule_1_1gwtgwtconnectiontype.html">gwtgwtconnectiontype</a>), <span class="keywordtype">pointer</span> :: gwtConn<span class="comment"> !&lt; GWT connection</span></div>
 <div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160;    <span class="keywordtype">class</span>(<a class="code" href="structgwfgwfconnectionmodule_1_1gwfgwfconnectiontype.html">gwfgwfconnectiontype</a>), <span class="keywordtype">pointer</span> :: gwfConn<span class="comment"> !&lt; GWF connection</span></div>
 <div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160; </div>
-<div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;    gwtconn%exgflowja =&gt; gwfconn%exgflowja</div>
-<div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160; </div>
-<div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;    <span class="comment">! fmi flows are not read from file</span></div>
-<div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;    gwtconn%gwtInterfaceModel%fmi%flows_from_file = .false.</div>
-<div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160; </div>
-<div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;    <span class="comment">! set concentration pointer for buoyancy</span></div>
-<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;    <span class="keyword">call </span>gwfconn%gwfInterfaceModel%buy%set_concentration_pointer(               &amp;</div>
-<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;                        gwtconn%gwtModel%name,                                  &amp;</div>
-<div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;                        gwtconn%conc,                                           &amp;</div>
-<div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;                        gwtconn%icbound)</div>
-<div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160; </div>
-<div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;  <span class="keyword">end subroutine </span><a class="code" href="namespacegwfgwtexchangemodule.html#a700b4705e1c40d1a9b33e2913df149e8">link_connections</a></div>
+<div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;    <span class="comment">!gwtConn%exgflowja =&gt; gwfConn%exgflowja</span></div>
+<div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;    gwtconn%exgflowja =&gt; gwfconn%gwfExchange%simvals</div>
+<div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;    <span class="keywordflow">if</span> (<span class="keyword">associated</span>(gwfconn%gwfExchange%model2, gwfconn%owner)) gwtconn%exgflowSign = -1</div>
+<div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160; </div>
+<div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;    <span class="comment">! fmi flows are not read from file</span></div>
+<div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;    gwtconn%gwtInterfaceModel%fmi%flows_from_file = .false.</div>
+<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160; </div>
+<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;    <span class="comment">! set concentration pointer for buoyancy</span></div>
+<div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;    <span class="keyword">call </span>gwfconn%gwfInterfaceModel%buy%set_concentration_pointer(               &amp;</div>
+<div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;                        gwtconn%gwtModel%name,                                  &amp;</div>
+<div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;                        gwtconn%conc,                                           &amp;</div>
+<div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;                        gwtconn%icbound)</div>
 <div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160; </div>
-<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;  </div>
-<div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;  <span class="keyword">subroutine </span><a class="code" href="namespacegwfgwtexchangemodule.html#a156a43e0390eb269bf16fac228b0b2c2">exg_da</a>(this)</div>
-<div class="line"><a name="l00394"></a><span class="lineno"><a class="line" href="namespacegwfgwtexchangemodule.html#a156a43e0390eb269bf16fac228b0b2c2">  394</a></span>&#160;<span class="comment">! ******************************************************************************</span></div>
-<div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;<span class="comment">! allocate_scalars</span></div>
-<div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;<span class="comment">! ******************************************************************************</span></div>
-<div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;<span class="comment">!</span></div>
-<div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;<span class="comment">!    SPECIFICATIONS:</span></div>
-<div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;<span class="comment">! ------------------------------------------------------------------------------</span></div>
-<div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;    <span class="comment">! -- modules</span></div>
-<div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;    <span class="keywordtype">use </span><a class="code" href="namespacememorymanagermodule.html">memorymanagermodule</a>, <span class="keywordtype">only</span>: <a class="code" href="interfacememorymanagermodule_1_1mem__deallocate.html">mem_deallocate</a></div>
-<div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;    <span class="comment">! -- dummy</span></div>
-<div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160;    <span class="keywordtype">class</span>(<a class="code" href="structgwfgwtexchangemodule_1_1gwfgwtexchangetype.html">gwfgwtexchangetype</a>) :: this</div>
-<div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;    <span class="comment">! -- local</span></div>
-<div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160;<span class="comment">! ------------------------------------------------------------------------------</span></div>
-<div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160;    <span class="comment">!</span></div>
-<div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160;    <span class="keyword">call </span><a class="code" href="interfacememorymanagermodule_1_1mem__deallocate.html">mem_deallocate</a>(this%m1id)</div>
-<div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160;    <span class="keyword">call </span><a class="code" href="interfacememorymanagermodule_1_1mem__deallocate.html">mem_deallocate</a>(this%m2id)</div>
-<div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160;    <span class="comment">!</span></div>
-<div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160;    <span class="comment">! -- return</span></div>
-<div class="line"><a name="l00411"></a><span class="lineno">  411</span>&#160;    <span class="keywordflow">return</span></div>
-<div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160;  <span class="keyword">end subroutine </span><a class="code" href="namespacegwfgwtexchangemodule.html#a156a43e0390eb269bf16fac228b0b2c2">exg_da</a></div>
-<div class="line"><a name="l00413"></a><span class="lineno">  413</span>&#160; </div>
-<div class="line"><a name="l00414"></a><span class="lineno">  414</span>&#160;  <span class="keyword">subroutine </span><a class="code" href="namespacegwfgwtexchangemodule.html#ae007a0b4a614c75aa3f055778cdaa1ce">allocate_scalars</a>(this)</div>
-<div class="line"><a name="l00415"></a><span class="lineno"><a class="line" href="namespacegwfgwtexchangemodule.html#ae007a0b4a614c75aa3f055778cdaa1ce">  415</a></span>&#160;<span class="comment">! ******************************************************************************</span></div>
-<div class="line"><a name="l00416"></a><span class="lineno">  416</span>&#160;<span class="comment">! allocate_scalars</span></div>
-<div class="line"><a name="l00417"></a><span class="lineno">  417</span>&#160;<span class="comment">! ******************************************************************************</span></div>
-<div class="line"><a name="l00418"></a><span class="lineno">  418</span>&#160;<span class="comment">!</span></div>
-<div class="line"><a name="l00419"></a><span class="lineno">  419</span>&#160;<span class="comment">!    SPECIFICATIONS:</span></div>
-<div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;<span class="comment">! ------------------------------------------------------------------------------</span></div>
-<div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160;    <span class="comment">! -- modules</span></div>
-<div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160;    <span class="keywordtype">use </span><a class="code" href="namespacememorymanagermodule.html">memorymanagermodule</a>, <span class="keywordtype">only</span>: <a class="code" href="interfacememorymanagermodule_1_1mem__allocate.html">mem_allocate</a></div>
-<div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160;    <span class="comment">! -- dummy</span></div>
-<div class="line"><a name="l00424"></a><span class="lineno">  424</span>&#160;    <span class="keywordtype">class</span>(<a class="code" href="structgwfgwtexchangemodule_1_1gwfgwtexchangetype.html">gwfgwtexchangetype</a>) :: this</div>
-<div class="line"><a name="l00425"></a><span class="lineno">  425</span>&#160;    <span class="comment">! -- local</span></div>
-<div class="line"><a name="l00426"></a><span class="lineno">  426</span>&#160;<span class="comment">! ------------------------------------------------------------------------------</span></div>
-<div class="line"><a name="l00427"></a><span class="lineno">  427</span>&#160;    <span class="comment">!</span></div>
-<div class="line"><a name="l00428"></a><span class="lineno">  428</span>&#160;    <span class="keyword">call </span><a class="code" href="interfacememorymanagermodule_1_1mem__allocate.html">mem_allocate</a>(this%m1id, <span class="stringliteral">&#39;M1ID&#39;</span>, this%memoryPath)</div>
-<div class="line"><a name="l00429"></a><span class="lineno">  429</span>&#160;    <span class="keyword">call </span><a class="code" href="interfacememorymanagermodule_1_1mem__allocate.html">mem_allocate</a>(this%m2id, <span class="stringliteral">&#39;M2ID&#39;</span>, this%memoryPath)</div>
-<div class="line"><a name="l00430"></a><span class="lineno">  430</span>&#160;    this%m1id = 0</div>
-<div class="line"><a name="l00431"></a><span class="lineno">  431</span>&#160;    this%m2id = 0</div>
-<div class="line"><a name="l00432"></a><span class="lineno">  432</span>&#160;    <span class="comment">!</span></div>
-<div class="line"><a name="l00433"></a><span class="lineno">  433</span>&#160;    <span class="comment">! -- return</span></div>
-<div class="line"><a name="l00434"></a><span class="lineno">  434</span>&#160;    <span class="keywordflow">return</span></div>
-<div class="line"><a name="l00435"></a><span class="lineno">  435</span>&#160;  <span class="keyword">end subroutine </span><a class="code" href="namespacegwfgwtexchangemodule.html#ae007a0b4a614c75aa3f055778cdaa1ce">allocate_scalars</a></div>
-<div class="line"><a name="l00436"></a><span class="lineno">  436</span>&#160; </div>
-<div class="line"><a name="l00437"></a><span class="lineno">  437</span>&#160;  <span class="keyword">subroutine </span><a class="code" href="namespacegwfgwtexchangemodule.html#abbedb30b5491b6d003c17354417c6e47">gwfbnd2gwtfmi</a>(this)</div>
-<div class="line"><a name="l00438"></a><span class="lineno"><a class="line" href="namespacegwfgwtexchangemodule.html#abbedb30b5491b6d003c17354417c6e47">  438</a></span>&#160;<span class="comment">! ******************************************************************************</span></div>
-<div class="line"><a name="l00439"></a><span class="lineno">  439</span>&#160;<span class="comment">! gwfbnd2gwtfmi</span></div>
-<div class="line"><a name="l00440"></a><span class="lineno">  440</span>&#160;<span class="comment">! ******************************************************************************</span></div>
-<div class="line"><a name="l00441"></a><span class="lineno">  441</span>&#160;<span class="comment">!</span></div>
-<div class="line"><a name="l00442"></a><span class="lineno">  442</span>&#160;<span class="comment">!    SPECIFICATIONS:</span></div>
-<div class="line"><a name="l00443"></a><span class="lineno">  443</span>&#160;<span class="comment">! ------------------------------------------------------------------------------</span></div>
-<div class="line"><a name="l00444"></a><span class="lineno">  444</span>&#160;    <span class="comment">! -- modules</span></div>
-<div class="line"><a name="l00445"></a><span class="lineno">  445</span>&#160;    <span class="comment">! -- dummy</span></div>
-<div class="line"><a name="l00446"></a><span class="lineno">  446</span>&#160;    <span class="keywordtype">class</span>(<a class="code" href="structgwfgwtexchangemodule_1_1gwfgwtexchangetype.html">gwfgwtexchangetype</a>) :: this</div>
-<div class="line"><a name="l00447"></a><span class="lineno">  447</span>&#160;    <span class="comment">! -- local</span></div>
-<div class="line"><a name="l00448"></a><span class="lineno">  448</span>&#160;    <span class="keywordtype">integer(I4B)</span> :: ngwfpack, ip, iterm, imover</div>
-<div class="line"><a name="l00449"></a><span class="lineno">  449</span>&#160;    <span class="keywordtype">class</span>(basemodeltype), <span class="keywordtype">pointer</span> :: mb =&gt; null()</div>
-<div class="line"><a name="l00450"></a><span class="lineno">  450</span>&#160;    <span class="keywordtype">type</span>(gwfmodeltype), <span class="keywordtype">pointer</span> :: gwfmodel =&gt; null()</div>
-<div class="line"><a name="l00451"></a><span class="lineno">  451</span>&#160;    <span class="keywordtype">type</span>(gwtmodeltype), <span class="keywordtype">pointer</span> :: gwtmodel =&gt; null()</div>
-<div class="line"><a name="l00452"></a><span class="lineno">  452</span>&#160;    <span class="keywordtype">class</span>(bndtype), <span class="keywordtype">pointer</span> :: packobj =&gt; null()</div>
-<div class="line"><a name="l00453"></a><span class="lineno">  453</span>&#160;<span class="comment">! ------------------------------------------------------------------------------</span></div>
-<div class="line"><a name="l00454"></a><span class="lineno">  454</span>&#160;    <span class="comment">!</span></div>
-<div class="line"><a name="l00455"></a><span class="lineno">  455</span>&#160;    <span class="comment">! -- set gwfmodel</span></div>
-<div class="line"><a name="l00456"></a><span class="lineno">  456</span>&#160;    mb =&gt; <a class="code" href="namespacebasemodelmodule.html#a79adefc92f4f7d0d032babb551c571f8">getbasemodelfromlist</a>(<a class="code" href="namespacelistsmodule.html#a3b242f17eecc25a4acea6ab6e3c5ae7b">basemodellist</a>, this%m1id)</div>
-<div class="line"><a name="l00457"></a><span class="lineno">  457</span>&#160;    <span class="keywordflow">select type</span> (mb)</div>
-<div class="line"><a name="l00458"></a><span class="lineno">  458</span>&#160;<span class="keywordflow">    type is</span> (gwfmodeltype)</div>
-<div class="line"><a name="l00459"></a><span class="lineno">  459</span>&#160;      gwfmodel =&gt; mb</div>
-<div class="line"><a name="l00460"></a><span class="lineno">  460</span>&#160;<span class="keywordflow">    end select</span></div>
-<div class="line"><a name="l00461"></a><span class="lineno">  461</span>&#160;    <span class="comment">!</span></div>
-<div class="line"><a name="l00462"></a><span class="lineno">  462</span>&#160;    <span class="comment">! -- set gwtmodel</span></div>
-<div class="line"><a name="l00463"></a><span class="lineno">  463</span>&#160;    mb =&gt; <a class="code" href="namespacebasemodelmodule.html#a79adefc92f4f7d0d032babb551c571f8">getbasemodelfromlist</a>(<a class="code" href="namespacelistsmodule.html#a3b242f17eecc25a4acea6ab6e3c5ae7b">basemodellist</a>, this%m2id)</div>
-<div class="line"><a name="l00464"></a><span class="lineno">  464</span>&#160;    <span class="keywordflow">select type</span> (mb)</div>
-<div class="line"><a name="l00465"></a><span class="lineno">  465</span>&#160;<span class="keywordflow">    type is</span> (gwtmodeltype)</div>
-<div class="line"><a name="l00466"></a><span class="lineno">  466</span>&#160;      gwtmodel =&gt; mb</div>
-<div class="line"><a name="l00467"></a><span class="lineno">  467</span>&#160;<span class="keywordflow">    end select</span></div>
-<div class="line"><a name="l00468"></a><span class="lineno">  468</span>&#160;    <span class="comment">!</span></div>
-<div class="line"><a name="l00469"></a><span class="lineno">  469</span>&#160;    <span class="comment">! -- Call routines in FMI that will set pointers to the necessary flow</span></div>
-<div class="line"><a name="l00470"></a><span class="lineno">  470</span>&#160;    <span class="comment">!    data (SIMVALS and SIMTOMVR) stored within each GWF flow package</span></div>
-<div class="line"><a name="l00471"></a><span class="lineno">  471</span>&#160;    ngwfpack = gwfmodel%bndlist%Count()</div>
-<div class="line"><a name="l00472"></a><span class="lineno">  472</span>&#160;    iterm = 1</div>
-<div class="line"><a name="l00473"></a><span class="lineno">  473</span>&#160;    <span class="keywordflow">do</span> ip = 1, ngwfpack</div>
-<div class="line"><a name="l00474"></a><span class="lineno">  474</span>&#160;      packobj =&gt; <a class="code" href="namespacebndmodule.html#a7ac2e1c143722a28d1f0ecb4c67a4a0a">getbndfromlist</a>(gwfmodel%bndlist, ip)</div>
-<div class="line"><a name="l00475"></a><span class="lineno">  475</span>&#160;      <span class="keyword">call </span>gwtmodel%fmi%gwfpackages(iterm)%set_pointers(                       &amp;</div>
-<div class="line"><a name="l00476"></a><span class="lineno">  476</span>&#160;                                                        <span class="stringliteral">&#39;SIMVALS&#39;</span>,             &amp;</div>
-<div class="line"><a name="l00477"></a><span class="lineno">  477</span>&#160;                                                         packobj%memoryPath)</div>
-<div class="line"><a name="l00478"></a><span class="lineno">  478</span>&#160;      iterm = iterm + 1</div>
-<div class="line"><a name="l00479"></a><span class="lineno">  479</span>&#160;      <span class="comment">!</span></div>
-<div class="line"><a name="l00480"></a><span class="lineno">  480</span>&#160;      <span class="comment">! -- If a mover is active for this package, then establish a separate</span></div>
-<div class="line"><a name="l00481"></a><span class="lineno">  481</span>&#160;      <span class="comment">!    pointer link for the mover flows stored in SIMTOMVR</span></div>
-<div class="line"><a name="l00482"></a><span class="lineno">  482</span>&#160;      imover = packobj%imover</div>
-<div class="line"><a name="l00483"></a><span class="lineno">  483</span>&#160;      <span class="keywordflow">if</span> (packobj%isadvpak /= 0) imover = 0</div>
-<div class="line"><a name="l00484"></a><span class="lineno">  484</span>&#160;      <span class="keywordflow">if</span> (imover /= 0) <span class="keywordflow">then</span></div>
-<div class="line"><a name="l00485"></a><span class="lineno">  485</span>&#160;        <span class="keyword">call </span>gwtmodel%fmi%gwfpackages(iterm)%set_pointers(                     &amp;</div>
-<div class="line"><a name="l00486"></a><span class="lineno">  486</span>&#160;                                                          <span class="stringliteral">&#39;SIMTOMVR&#39;</span>,          &amp;</div>
-<div class="line"><a name="l00487"></a><span class="lineno">  487</span>&#160;                                                          packobj%memoryPath)</div>
-<div class="line"><a name="l00488"></a><span class="lineno">  488</span>&#160;        iterm = iterm + 1</div>
-<div class="line"><a name="l00489"></a><span class="lineno">  489</span>&#160;<span class="keywordflow">      end if</span></div>
-<div class="line"><a name="l00490"></a><span class="lineno">  490</span>&#160;<span class="keywordflow">    end do</span></div>
-<div class="line"><a name="l00491"></a><span class="lineno">  491</span>&#160;    <span class="comment">!</span></div>
-<div class="line"><a name="l00492"></a><span class="lineno">  492</span>&#160;    <span class="comment">! -- return</span></div>
-<div class="line"><a name="l00493"></a><span class="lineno">  493</span>&#160;    <span class="keywordflow">return</span></div>
-<div class="line"><a name="l00494"></a><span class="lineno">  494</span>&#160;  <span class="keyword">end subroutine </span><a class="code" href="namespacegwfgwtexchangemodule.html#abbedb30b5491b6d003c17354417c6e47">gwfbnd2gwtfmi</a></div>
-<div class="line"><a name="l00495"></a><span class="lineno">  495</span>&#160; </div>
-<div class="line"><a name="l00496"></a><span class="lineno">  496</span>&#160;<span class="keyword">end module </span>GwfGwtExchangeModule</div>
+<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;  <span class="keyword">end subroutine </span><a class="code" href="namespacegwfgwtexchangemodule.html#a700b4705e1c40d1a9b33e2913df149e8">link_connections</a></div>
+<div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160; </div>
+<div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160;  </div>
+<div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;  <span class="keyword">subroutine </span><a class="code" href="namespacegwfgwtexchangemodule.html#a156a43e0390eb269bf16fac228b0b2c2">exg_da</a>(this)</div>
+<div class="line"><a name="l00396"></a><span class="lineno"><a class="line" href="namespacegwfgwtexchangemodule.html#a156a43e0390eb269bf16fac228b0b2c2">  396</a></span>&#160;<span class="comment">! ******************************************************************************</span></div>
+<div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;<span class="comment">! allocate_scalars</span></div>
+<div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;<span class="comment">! ******************************************************************************</span></div>
+<div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;<span class="comment">!</span></div>
+<div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;<span class="comment">!    SPECIFICATIONS:</span></div>
+<div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;<span class="comment">! ------------------------------------------------------------------------------</span></div>
+<div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;    <span class="comment">! -- modules</span></div>
+<div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160;    <span class="keywordtype">use </span><a class="code" href="namespacememorymanagermodule.html">memorymanagermodule</a>, <span class="keywordtype">only</span>: <a class="code" href="interfacememorymanagermodule_1_1mem__deallocate.html">mem_deallocate</a></div>
+<div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;    <span class="comment">! -- dummy</span></div>
+<div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160;    <span class="keywordtype">class</span>(<a class="code" href="structgwfgwtexchangemodule_1_1gwfgwtexchangetype.html">gwfgwtexchangetype</a>) :: this</div>
+<div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160;    <span class="comment">! -- local</span></div>
+<div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160;<span class="comment">! ------------------------------------------------------------------------------</span></div>
+<div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160;    <span class="comment">!</span></div>
+<div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160;    <span class="keyword">call </span><a class="code" href="interfacememorymanagermodule_1_1mem__deallocate.html">mem_deallocate</a>(this%m1id)</div>
+<div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160;    <span class="keyword">call </span><a class="code" href="interfacememorymanagermodule_1_1mem__deallocate.html">mem_deallocate</a>(this%m2id)</div>
+<div class="line"><a name="l00411"></a><span class="lineno">  411</span>&#160;    <span class="comment">!</span></div>
+<div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160;    <span class="comment">! -- return</span></div>
+<div class="line"><a name="l00413"></a><span class="lineno">  413</span>&#160;    <span class="keywordflow">return</span></div>
+<div class="line"><a name="l00414"></a><span class="lineno">  414</span>&#160;  <span class="keyword">end subroutine </span><a class="code" href="namespacegwfgwtexchangemodule.html#a156a43e0390eb269bf16fac228b0b2c2">exg_da</a></div>
+<div class="line"><a name="l00415"></a><span class="lineno">  415</span>&#160; </div>
+<div class="line"><a name="l00416"></a><span class="lineno">  416</span>&#160;  <span class="keyword">subroutine </span><a class="code" href="namespacegwfgwtexchangemodule.html#ae007a0b4a614c75aa3f055778cdaa1ce">allocate_scalars</a>(this)</div>
+<div class="line"><a name="l00417"></a><span class="lineno"><a class="line" href="namespacegwfgwtexchangemodule.html#ae007a0b4a614c75aa3f055778cdaa1ce">  417</a></span>&#160;<span class="comment">! ******************************************************************************</span></div>
+<div class="line"><a name="l00418"></a><span class="lineno">  418</span>&#160;<span class="comment">! allocate_scalars</span></div>
+<div class="line"><a name="l00419"></a><span class="lineno">  419</span>&#160;<span class="comment">! ******************************************************************************</span></div>
+<div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;<span class="comment">!</span></div>
+<div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160;<span class="comment">!    SPECIFICATIONS:</span></div>
+<div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160;<span class="comment">! ------------------------------------------------------------------------------</span></div>
+<div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160;    <span class="comment">! -- modules</span></div>
+<div class="line"><a name="l00424"></a><span class="lineno">  424</span>&#160;    <span class="keywordtype">use </span><a class="code" href="namespacememorymanagermodule.html">memorymanagermodule</a>, <span class="keywordtype">only</span>: <a class="code" href="interfacememorymanagermodule_1_1mem__allocate.html">mem_allocate</a></div>
+<div class="line"><a name="l00425"></a><span class="lineno">  425</span>&#160;    <span class="comment">! -- dummy</span></div>
+<div class="line"><a name="l00426"></a><span class="lineno">  426</span>&#160;    <span class="keywordtype">class</span>(<a class="code" href="structgwfgwtexchangemodule_1_1gwfgwtexchangetype.html">gwfgwtexchangetype</a>) :: this</div>
+<div class="line"><a name="l00427"></a><span class="lineno">  427</span>&#160;    <span class="comment">! -- local</span></div>
+<div class="line"><a name="l00428"></a><span class="lineno">  428</span>&#160;<span class="comment">! ------------------------------------------------------------------------------</span></div>
+<div class="line"><a name="l00429"></a><span class="lineno">  429</span>&#160;    <span class="comment">!</span></div>
+<div class="line"><a name="l00430"></a><span class="lineno">  430</span>&#160;    <span class="keyword">call </span><a class="code" href="interfacememorymanagermodule_1_1mem__allocate.html">mem_allocate</a>(this%m1id, <span class="stringliteral">&#39;M1ID&#39;</span>, this%memoryPath)</div>
+<div class="line"><a name="l00431"></a><span class="lineno">  431</span>&#160;    <span class="keyword">call </span><a class="code" href="interfacememorymanagermodule_1_1mem__allocate.html">mem_allocate</a>(this%m2id, <span class="stringliteral">&#39;M2ID&#39;</span>, this%memoryPath)</div>
+<div class="line"><a name="l00432"></a><span class="lineno">  432</span>&#160;    this%m1id = 0</div>
+<div class="line"><a name="l00433"></a><span class="lineno">  433</span>&#160;    this%m2id = 0</div>
+<div class="line"><a name="l00434"></a><span class="lineno">  434</span>&#160;    <span class="comment">!</span></div>
+<div class="line"><a name="l00435"></a><span class="lineno">  435</span>&#160;    <span class="comment">! -- return</span></div>
+<div class="line"><a name="l00436"></a><span class="lineno">  436</span>&#160;    <span class="keywordflow">return</span></div>
+<div class="line"><a name="l00437"></a><span class="lineno">  437</span>&#160;  <span class="keyword">end subroutine </span><a class="code" href="namespacegwfgwtexchangemodule.html#ae007a0b4a614c75aa3f055778cdaa1ce">allocate_scalars</a></div>
+<div class="line"><a name="l00438"></a><span class="lineno">  438</span>&#160; </div>
+<div class="line"><a name="l00439"></a><span class="lineno">  439</span>&#160;  <span class="keyword">subroutine </span><a class="code" href="namespacegwfgwtexchangemodule.html#abbedb30b5491b6d003c17354417c6e47">gwfbnd2gwtfmi</a>(this)</div>
+<div class="line"><a name="l00440"></a><span class="lineno"><a class="line" href="namespacegwfgwtexchangemodule.html#abbedb30b5491b6d003c17354417c6e47">  440</a></span>&#160;<span class="comment">! ******************************************************************************</span></div>
+<div class="line"><a name="l00441"></a><span class="lineno">  441</span>&#160;<span class="comment">! gwfbnd2gwtfmi</span></div>
+<div class="line"><a name="l00442"></a><span class="lineno">  442</span>&#160;<span class="comment">! ******************************************************************************</span></div>
+<div class="line"><a name="l00443"></a><span class="lineno">  443</span>&#160;<span class="comment">!</span></div>
+<div class="line"><a name="l00444"></a><span class="lineno">  444</span>&#160;<span class="comment">!    SPECIFICATIONS:</span></div>
+<div class="line"><a name="l00445"></a><span class="lineno">  445</span>&#160;<span class="comment">! ------------------------------------------------------------------------------</span></div>
+<div class="line"><a name="l00446"></a><span class="lineno">  446</span>&#160;    <span class="comment">! -- modules</span></div>
+<div class="line"><a name="l00447"></a><span class="lineno">  447</span>&#160;    <span class="comment">! -- dummy</span></div>
+<div class="line"><a name="l00448"></a><span class="lineno">  448</span>&#160;    <span class="keywordtype">class</span>(<a class="code" href="structgwfgwtexchangemodule_1_1gwfgwtexchangetype.html">gwfgwtexchangetype</a>) :: this</div>
+<div class="line"><a name="l00449"></a><span class="lineno">  449</span>&#160;    <span class="comment">! -- local</span></div>
+<div class="line"><a name="l00450"></a><span class="lineno">  450</span>&#160;    <span class="keywordtype">integer(I4B)</span> :: ngwfpack, ip, iterm, imover</div>
+<div class="line"><a name="l00451"></a><span class="lineno">  451</span>&#160;    <span class="keywordtype">class</span>(basemodeltype), <span class="keywordtype">pointer</span> :: mb =&gt; null()</div>
+<div class="line"><a name="l00452"></a><span class="lineno">  452</span>&#160;    <span class="keywordtype">type</span>(gwfmodeltype), <span class="keywordtype">pointer</span> :: gwfmodel =&gt; null()</div>
+<div class="line"><a name="l00453"></a><span class="lineno">  453</span>&#160;    <span class="keywordtype">type</span>(gwtmodeltype), <span class="keywordtype">pointer</span> :: gwtmodel =&gt; null()</div>
+<div class="line"><a name="l00454"></a><span class="lineno">  454</span>&#160;    <span class="keywordtype">class</span>(bndtype), <span class="keywordtype">pointer</span> :: packobj =&gt; null()</div>
+<div class="line"><a name="l00455"></a><span class="lineno">  455</span>&#160;<span class="comment">! ------------------------------------------------------------------------------</span></div>
+<div class="line"><a name="l00456"></a><span class="lineno">  456</span>&#160;    <span class="comment">!</span></div>
+<div class="line"><a name="l00457"></a><span class="lineno">  457</span>&#160;    <span class="comment">! -- set gwfmodel</span></div>
+<div class="line"><a name="l00458"></a><span class="lineno">  458</span>&#160;    mb =&gt; <a class="code" href="namespacebasemodelmodule.html#a79adefc92f4f7d0d032babb551c571f8">getbasemodelfromlist</a>(<a class="code" href="namespacelistsmodule.html#a3b242f17eecc25a4acea6ab6e3c5ae7b">basemodellist</a>, this%m1id)</div>
+<div class="line"><a name="l00459"></a><span class="lineno">  459</span>&#160;    <span class="keywordflow">select type</span> (mb)</div>
+<div class="line"><a name="l00460"></a><span class="lineno">  460</span>&#160;<span class="keywordflow">    type is</span> (gwfmodeltype)</div>
+<div class="line"><a name="l00461"></a><span class="lineno">  461</span>&#160;      gwfmodel =&gt; mb</div>
+<div class="line"><a name="l00462"></a><span class="lineno">  462</span>&#160;<span class="keywordflow">    end select</span></div>
+<div class="line"><a name="l00463"></a><span class="lineno">  463</span>&#160;    <span class="comment">!</span></div>
+<div class="line"><a name="l00464"></a><span class="lineno">  464</span>&#160;    <span class="comment">! -- set gwtmodel</span></div>
+<div class="line"><a name="l00465"></a><span class="lineno">  465</span>&#160;    mb =&gt; <a class="code" href="namespacebasemodelmodule.html#a79adefc92f4f7d0d032babb551c571f8">getbasemodelfromlist</a>(<a class="code" href="namespacelistsmodule.html#a3b242f17eecc25a4acea6ab6e3c5ae7b">basemodellist</a>, this%m2id)</div>
+<div class="line"><a name="l00466"></a><span class="lineno">  466</span>&#160;    <span class="keywordflow">select type</span> (mb)</div>
+<div class="line"><a name="l00467"></a><span class="lineno">  467</span>&#160;<span class="keywordflow">    type is</span> (gwtmodeltype)</div>
+<div class="line"><a name="l00468"></a><span class="lineno">  468</span>&#160;      gwtmodel =&gt; mb</div>
+<div class="line"><a name="l00469"></a><span class="lineno">  469</span>&#160;<span class="keywordflow">    end select</span></div>
+<div class="line"><a name="l00470"></a><span class="lineno">  470</span>&#160;    <span class="comment">!</span></div>
+<div class="line"><a name="l00471"></a><span class="lineno">  471</span>&#160;    <span class="comment">! -- Call routines in FMI that will set pointers to the necessary flow</span></div>
+<div class="line"><a name="l00472"></a><span class="lineno">  472</span>&#160;    <span class="comment">!    data (SIMVALS and SIMTOMVR) stored within each GWF flow package</span></div>
+<div class="line"><a name="l00473"></a><span class="lineno">  473</span>&#160;    ngwfpack = gwfmodel%bndlist%Count()</div>
+<div class="line"><a name="l00474"></a><span class="lineno">  474</span>&#160;    iterm = 1</div>
+<div class="line"><a name="l00475"></a><span class="lineno">  475</span>&#160;    <span class="keywordflow">do</span> ip = 1, ngwfpack</div>
+<div class="line"><a name="l00476"></a><span class="lineno">  476</span>&#160;      packobj =&gt; <a class="code" href="namespacebndmodule.html#a7ac2e1c143722a28d1f0ecb4c67a4a0a">getbndfromlist</a>(gwfmodel%bndlist, ip)</div>
+<div class="line"><a name="l00477"></a><span class="lineno">  477</span>&#160;      <span class="keyword">call </span>gwtmodel%fmi%gwfpackages(iterm)%set_pointers(                       &amp;</div>
+<div class="line"><a name="l00478"></a><span class="lineno">  478</span>&#160;                                                        <span class="stringliteral">&#39;SIMVALS&#39;</span>,             &amp;</div>
+<div class="line"><a name="l00479"></a><span class="lineno">  479</span>&#160;                                                         packobj%memoryPath)</div>
+<div class="line"><a name="l00480"></a><span class="lineno">  480</span>&#160;      iterm = iterm + 1</div>
+<div class="line"><a name="l00481"></a><span class="lineno">  481</span>&#160;      <span class="comment">!</span></div>
+<div class="line"><a name="l00482"></a><span class="lineno">  482</span>&#160;      <span class="comment">! -- If a mover is active for this package, then establish a separate</span></div>
+<div class="line"><a name="l00483"></a><span class="lineno">  483</span>&#160;      <span class="comment">!    pointer link for the mover flows stored in SIMTOMVR</span></div>
+<div class="line"><a name="l00484"></a><span class="lineno">  484</span>&#160;      imover = packobj%imover</div>
+<div class="line"><a name="l00485"></a><span class="lineno">  485</span>&#160;      <span class="keywordflow">if</span> (packobj%isadvpak /= 0) imover = 0</div>
+<div class="line"><a name="l00486"></a><span class="lineno">  486</span>&#160;      <span class="keywordflow">if</span> (imover /= 0) <span class="keywordflow">then</span></div>
+<div class="line"><a name="l00487"></a><span class="lineno">  487</span>&#160;        <span class="keyword">call </span>gwtmodel%fmi%gwfpackages(iterm)%set_pointers(                     &amp;</div>
+<div class="line"><a name="l00488"></a><span class="lineno">  488</span>&#160;                                                          <span class="stringliteral">&#39;SIMTOMVR&#39;</span>,          &amp;</div>
+<div class="line"><a name="l00489"></a><span class="lineno">  489</span>&#160;                                                          packobj%memoryPath)</div>
+<div class="line"><a name="l00490"></a><span class="lineno">  490</span>&#160;        iterm = iterm + 1</div>
+<div class="line"><a name="l00491"></a><span class="lineno">  491</span>&#160;<span class="keywordflow">      end if</span></div>
+<div class="line"><a name="l00492"></a><span class="lineno">  492</span>&#160;<span class="keywordflow">    end do</span></div>
+<div class="line"><a name="l00493"></a><span class="lineno">  493</span>&#160;    <span class="comment">!</span></div>
+<div class="line"><a name="l00494"></a><span class="lineno">  494</span>&#160;    <span class="comment">! -- return</span></div>
+<div class="line"><a name="l00495"></a><span class="lineno">  495</span>&#160;    <span class="keywordflow">return</span></div>
+<div class="line"><a name="l00496"></a><span class="lineno">  496</span>&#160;  <span class="keyword">end subroutine </span><a class="code" href="namespacegwfgwtexchangemodule.html#abbedb30b5491b6d003c17354417c6e47">gwfbnd2gwtfmi</a></div>
+<div class="line"><a name="l00497"></a><span class="lineno">  497</span>&#160; </div>
+<div class="line"><a name="l00498"></a><span class="lineno">  498</span>&#160;<span class="keyword">end module </span>GwfGwtExchangeModule</div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <div class="ttc" id="anamespacebndmodule_html"><div class="ttname"><a href="namespacebndmodule.html">bndmodule</a></div><div class="ttdoc">This module contains the base boundary package.</div><div class="ttdef"><b>Definition:</b> <a href="_boundary_package_8f90_source.html#l00008">BoundaryPackage.f90:8</a></div></div>
@@ -632,7 +634,7 @@ $(document).ready(function(){initNavTree('_gwf_gwt_exchange_8f90_source.html',''
 <div class="ttc" id="anamespacelistsmodule_html"><div class="ttname"><a href="namespacelistsmodule.html">listsmodule</a></div><div class="ttdef"><b>Definition:</b> <a href="mf6lists_8f90_source.html#l00001">mf6lists.f90:1</a></div></div>
 <div class="ttc" id="anamespacegwfmodule_html"><div class="ttname"><a href="namespacegwfmodule.html">gwfmodule</a></div><div class="ttdef"><b>Definition:</b> <a href="gwf3_8f90_source.html#l00001">gwf3.f90:1</a></div></div>
 <div class="ttc" id="astructgwfgwfconnectionmodule_1_1gwfgwfconnectiontype_html"><div class="ttname"><a href="structgwfgwfconnectionmodule_1_1gwfgwfconnectiontype.html">gwfgwfconnectionmodule::gwfgwfconnectiontype</a></div><div class="ttdoc">Connecting a GWF model to other models in space, implements NumericalExchangeType so the solution can...</div><div class="ttdef"><b>Definition:</b> <a href="_gwf_gwf_connection_8f90_source.html#l00030">GwfGwfConnection.f90:30</a></div></div>
-<div class="ttc" id="anamespacegwfgwtexchangemodule_html_a156a43e0390eb269bf16fac228b0b2c2"><div class="ttname"><a href="namespacegwfgwtexchangemodule.html#a156a43e0390eb269bf16fac228b0b2c2">gwfgwtexchangemodule::exg_da</a></div><div class="ttdeci">subroutine exg_da(this)</div><div class="ttdef"><b>Definition:</b> <a href="_gwf_gwt_exchange_8f90_source.html#l00394">GwfGwtExchange.f90:394</a></div></div>
+<div class="ttc" id="anamespacegwfgwtexchangemodule_html_a156a43e0390eb269bf16fac228b0b2c2"><div class="ttname"><a href="namespacegwfgwtexchangemodule.html#a156a43e0390eb269bf16fac228b0b2c2">gwfgwtexchangemodule::exg_da</a></div><div class="ttdeci">subroutine exg_da(this)</div><div class="ttdef"><b>Definition:</b> <a href="_gwf_gwt_exchange_8f90_source.html#l00396">GwfGwtExchange.f90:396</a></div></div>
 <div class="ttc" id="ainterfacememorymanagermodule_1_1mem__allocate_html"><div class="ttname"><a href="interfacememorymanagermodule_1_1mem__allocate.html">memorymanagermodule::mem_allocate</a></div><div class="ttdef"><b>Definition:</b> <a href="_memory_manager_8f90_source.html#l00049">MemoryManager.f90:49</a></div></div>
 <div class="ttc" id="anamespacespatialmodelconnectionmodule_html"><div class="ttname"><a href="namespacespatialmodelconnectionmodule.html">spatialmodelconnectionmodule</a></div><div class="ttdef"><b>Definition:</b> <a href="_spatial_model_connection_8f90_source.html#l00001">SpatialModelConnection.f90:1</a></div></div>
 <div class="ttc" id="anamespacegwfgwtexchangemodule_html_a186c9181959e0a9abaa5eca74675574a"><div class="ttname"><a href="namespacegwfgwtexchangemodule.html#a186c9181959e0a9abaa5eca74675574a">gwfgwtexchangemodule::gwfconn2gwtconn</a></div><div class="ttdeci">subroutine gwfconn2gwtconn(this, gwfModel, gwtModel)</div><div class="ttdoc">Link GWT connections to GWF connections or exchanges.</div><div class="ttdef"><b>Definition:</b> <a href="_gwf_gwt_exchange_8f90_source.html#l00272">GwfGwtExchange.f90:272</a></div></div>
@@ -644,7 +646,7 @@ $(document).ready(function(){initNavTree('_gwf_gwt_exchange_8f90_source.html',''
 <div class="ttc" id="anamespacebndmodule_html_a7ac2e1c143722a28d1f0ecb4c67a4a0a"><div class="ttname"><a href="namespacebndmodule.html#a7ac2e1c143722a28d1f0ecb4c67a4a0a">bndmodule::getbndfromlist</a></div><div class="ttdeci">class(bndtype) function, pointer, public getbndfromlist(list, idx)</div><div class="ttdoc">Get boundary from package list.</div><div class="ttdef"><b>Definition:</b> <a href="_boundary_package_8f90_source.html#l01781">BoundaryPackage.f90:1781</a></div></div>
 <div class="ttc" id="anamespacegwfgwtexchangemodule_html"><div class="ttname"><a href="namespacegwfgwtexchangemodule.html">gwfgwtexchangemodule</a></div><div class="ttdef"><b>Definition:</b> <a href="_gwf_gwt_exchange_8f90_source.html#l00001">GwfGwtExchange.f90:1</a></div></div>
 <div class="ttc" id="anamespacespatialmodelconnectionmodule_html_ab03c81ae159b53ae92e07d83d48cca29"><div class="ttname"><a href="namespacespatialmodelconnectionmodule.html#ab03c81ae159b53ae92e07d83d48cca29">spatialmodelconnectionmodule::getspatialmodelconnectionfromlist</a></div><div class="ttdeci">class(spatialmodelconnectiontype) function, pointer, public getspatialmodelconnectionfromlist(list, idx)</div><div class="ttdoc">Get the connection from a list.</div><div class="ttdef"><b>Definition:</b> <a href="_spatial_model_connection_8f90_source.html#l00517">SpatialModelConnection.f90:517</a></div></div>
-<div class="ttc" id="anamespacegwfgwtexchangemodule_html_ae007a0b4a614c75aa3f055778cdaa1ce"><div class="ttname"><a href="namespacegwfgwtexchangemodule.html#ae007a0b4a614c75aa3f055778cdaa1ce">gwfgwtexchangemodule::allocate_scalars</a></div><div class="ttdeci">subroutine allocate_scalars(this)</div><div class="ttdef"><b>Definition:</b> <a href="_gwf_gwt_exchange_8f90_source.html#l00415">GwfGwtExchange.f90:415</a></div></div>
+<div class="ttc" id="anamespacegwfgwtexchangemodule_html_ae007a0b4a614c75aa3f055778cdaa1ce"><div class="ttname"><a href="namespacegwfgwtexchangemodule.html#ae007a0b4a614c75aa3f055778cdaa1ce">gwfgwtexchangemodule::allocate_scalars</a></div><div class="ttdeci">subroutine allocate_scalars(this)</div><div class="ttdef"><b>Definition:</b> <a href="_gwf_gwt_exchange_8f90_source.html#l00417">GwfGwtExchange.f90:417</a></div></div>
 <div class="ttc" id="anamespacesimvariablesmodule_html_a70ea2f76b35a03119367efdd0dd88ccc"><div class="ttname"><a href="namespacesimvariablesmodule.html#a70ea2f76b35a03119367efdd0dd88ccc">simvariablesmodule::iout</a></div><div class="ttdeci">integer(i4b) iout</div><div class="ttdoc">file unit number for simulation output</div><div class="ttdef"><b>Definition:</b> <a href="_sim_variables_8f90_source.html#l00022">SimVariables.f90:22</a></div></div>
 <div class="ttc" id="anamespaceconstantsmodule_html"><div class="ttname"><a href="namespaceconstantsmodule.html">constantsmodule</a></div><div class="ttdoc">This module contains simulation constants.</div><div class="ttdef"><b>Definition:</b> <a href="_constants_8f90_source.html#l00009">Constants.f90:9</a></div></div>
 <div class="ttc" id="anamespacegwfgwtexchangemodule_html_ae7df87968c62eebdd785510342852679"><div class="ttname"><a href="namespacegwfgwtexchangemodule.html#ae7df87968c62eebdd785510342852679">gwfgwtexchangemodule::set_model_pointers</a></div><div class="ttdeci">subroutine set_model_pointers(this)</div><div class="ttdef"><b>Definition:</b> <a href="_gwf_gwt_exchange_8f90_source.html#l00087">GwfGwtExchange.f90:87</a></div></div>
@@ -655,13 +657,13 @@ $(document).ready(function(){initNavTree('_gwf_gwt_exchange_8f90_source.html',''
 <div class="ttc" id="anamespacememorymanagermodule_html"><div class="ttname"><a href="namespacememorymanagermodule.html">memorymanagermodule</a></div><div class="ttdef"><b>Definition:</b> <a href="_memory_manager_8f90_source.html#l00001">MemoryManager.f90:1</a></div></div>
 <div class="ttc" id="anamespacelistsmodule_html_a3b242f17eecc25a4acea6ab6e3c5ae7b"><div class="ttname"><a href="namespacelistsmodule.html#a3b242f17eecc25a4acea6ab6e3c5ae7b">listsmodule::basemodellist</a></div><div class="ttdeci">type(listtype), public basemodellist</div><div class="ttdef"><b>Definition:</b> <a href="mf6lists_8f90_source.html#l00016">mf6lists.f90:16</a></div></div>
 <div class="ttc" id="anamespacebaseexchangemodule_html_a67919a88cc5ebe70bb4a38eaf9ef9144"><div class="ttname"><a href="namespacebaseexchangemodule.html#a67919a88cc5ebe70bb4a38eaf9ef9144">baseexchangemodule::addbaseexchangetolist</a></div><div class="ttdeci">subroutine, public addbaseexchangetolist(list, exchange)</div><div class="ttdef"><b>Definition:</b> <a href="_base_exchange_8f90_source.html#l00169">BaseExchange.f90:169</a></div></div>
-<div class="ttc" id="anamespacegwfgwtexchangemodule_html_abbedb30b5491b6d003c17354417c6e47"><div class="ttname"><a href="namespacegwfgwtexchangemodule.html#abbedb30b5491b6d003c17354417c6e47">gwfgwtexchangemodule::gwfbnd2gwtfmi</a></div><div class="ttdeci">subroutine gwfbnd2gwtfmi(this)</div><div class="ttdef"><b>Definition:</b> <a href="_gwf_gwt_exchange_8f90_source.html#l00438">GwfGwtExchange.f90:438</a></div></div>
+<div class="ttc" id="anamespacegwfgwtexchangemodule_html_abbedb30b5491b6d003c17354417c6e47"><div class="ttname"><a href="namespacegwfgwtexchangemodule.html#abbedb30b5491b6d003c17354417c6e47">gwfgwtexchangemodule::gwfbnd2gwtfmi</a></div><div class="ttdeci">subroutine gwfbnd2gwtfmi(this)</div><div class="ttdef"><b>Definition:</b> <a href="_gwf_gwt_exchange_8f90_source.html#l00440">GwfGwtExchange.f90:440</a></div></div>
 <div class="ttc" id="anamespacegwtgwtconnectionmodule_html"><div class="ttname"><a href="namespacegwtgwtconnectionmodule.html">gwtgwtconnectionmodule</a></div><div class="ttdef"><b>Definition:</b> <a href="_gwt_gwt_connection_8f90_source.html#l00001">GwtGwtConnection.f90:1</a></div></div>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="dir_95d5cc30a66cc7502f2f5157978bb5c3.html">Exchange</a></li><li class="navelem"><a class="el" href="_gwf_gwt_exchange_8f90.html">GwfGwtExchange.f90</a></li>
-    <li class="footer">Generated on Thu Feb 10 2022 09:47:36 for MODFLOW 6 by
+    <li class="footer">Generated on Fri Feb 11 2022 01:36:52 for MODFLOW 6 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.17 </li>
   </ul>

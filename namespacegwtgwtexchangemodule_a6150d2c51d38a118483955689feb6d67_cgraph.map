@@ -1,5 +1,5 @@
 <map id="gwtgwtexchangemodule::validate_exchange" name="gwtgwtexchangemodule::validate_exchange">
-<area shape="rect" id="node1" title="validate exchange configuration after reading" alt="" coords="5,61,188,102"/>
+<area shape="rect" id="node1" title="validate exchange data after reading" alt="" coords="5,61,188,102"/>
 <area shape="rect" id="node2" href="$namespacesimmodule.html#a21870712a1166225fdcd5b60bffb353e" title="Store error message." alt="" coords="236,68,411,95"/>
 <area shape="rect" id="node3" href="$namespacesimmodule.html#a0be97214c1d4fcf42bc4ddc27b111b61" title="Stop the simulation." alt="" coords="459,68,597,95"/>
 <area shape="rect" id="node4" href="$namespacesimmodule.html#aa04e734eebf95836b2f37839b65bcae9" title="Print the final messages." alt="" coords="645,27,813,69"/>

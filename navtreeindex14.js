@@ -1,5 +1,9 @@
 var NAVTREEINDEX14 =
 {
+"namespacesimulationcreatemodule.html":[2,0,132],
+"namespacesimvariablesmodule.html":[2,0,133],
+"namespacesmoothingmodule.html":[2,0,134],
+"namespacesolutiongroupmodule.html":[2,0,135],
 "namespacesolutiongroupmodule.html":[3,0,107],
 "namespacesortmodule.html":[2,0,136],
 "namespacesortmodule.html":[3,0,108],
@@ -245,9 +249,5 @@ var NAVTREEINDEX14 =
 "structbasesolutionmodule_1_1basesolutiontype.html#a1bc8c6fde27afd4e0b18e372a0583a3f":[3,0,7,1,0],
 "structbasesolutionmodule_1_1basesolutiontype.html#a369061d3ae57f848e1fb45bdc0189a42":[3,0,7,1,7],
 "structbasesolutionmodule_1_1basesolutiontype.html#a4917035eed8dd760d328f7d8e488d2e8":[3,0,7,1,2],
-"structbasesolutionmodule_1_1basesolutiontype.html#a611c657c76796670e70a83d7277d129c":[3,0,7,1,8],
-"structbasesolutionmodule_1_1basesolutiontype.html#a704b3b847346bdd9be651f412993e846":[3,0,7,1,10],
-"structbasesolutionmodule_1_1basesolutiontype.html#a85dd33d3c65125ab13796e3a571032f1":[3,0,7,1,5],
-"structbasesolutionmodule_1_1basesolutiontype.html#a8b1bb32e88070deb24f110970ccfb653":[3,0,7,1,3],
-"structbasesolutionmodule_1_1basesolutiontype.html#a934fbd8bae34472c67f16c253160c4e0":[3,0,7,1,9]
+"structbasesolutionmodule_1_1basesolutiontype.html#a611c657c76796670e70a83d7277d129c":[3,0,7,1,8]
 };

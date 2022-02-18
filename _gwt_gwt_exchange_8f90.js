@@ -22,6 +22,7 @@ var _gwt_gwt_exchange_8f90 =
     [ "gwt_gwt_save_simvals", "_gwt_gwt_exchange_8f90.html#a79d575aaa06a5a8c235897914dd29973", null ],
     [ "gwtexchange_create", "_gwt_gwt_exchange_8f90.html#ae326da47e670112aed71b3b9111b0e59", null ],
     [ "parse_option", "_gwt_gwt_exchange_8f90.html#a18679192b7bf35223fc014cc929afdff", null ],
+    [ "read_mvt", "_gwt_gwt_exchange_8f90.html#a25f96a0a2de07e69aca31467100bad16", null ],
     [ "read_options", "_gwt_gwt_exchange_8f90.html#aaf7a3ad93f5518a83a25af2c949c8d67", null ],
     [ "use_interface_model", "_gwt_gwt_exchange_8f90.html#af3a3b20464d12d444e508a41dbbbc9a9", null ],
     [ "validate_exchange", "_gwt_gwt_exchange_8f90.html#a6150d2c51d38a118483955689feb6d67", null ]

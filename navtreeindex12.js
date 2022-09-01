@@ -1,5 +1,14 @@
 var NAVTREEINDEX12 =
 {
+"interfacebmif_1_1bmif__get__value__at__indices__int.html#a2c84b7d9ffb6373a973cdffe5a5244d9":[2,0,9,23,0],
+"interfacebmif_1_1bmif__get__value__double.html":[2,0,9,24],
+"interfacebmif_1_1bmif__get__value__double.html#a6d3b679afac42554cd1fbe1d66ad240e":[2,0,9,24,0],
+"interfacebmif_1_1bmif__get__value__float.html":[2,0,9,25],
+"interfacebmif_1_1bmif__get__value__float.html#a28208f37ea78afda91db4333fce672c1":[2,0,9,25,0],
+"interfacebmif_1_1bmif__get__value__int.html":[2,0,9,26],
+"interfacebmif_1_1bmif__get__value__int.html#a289f7bd42a7cff3f6d68b021127f2c91":[2,0,9,26,0],
+"interfacebmif_1_1bmif__get__value__ptr__double.html":[2,0,9,27],
+"interfacebmif_1_1bmif__get__value__ptr__double.html#aba7012778b438afe029f5d0e4c6d0fe8":[2,0,9,27,0],
 "interfacebmif_1_1bmif__get__value__ptr__float.html":[2,0,9,28],
 "interfacebmif_1_1bmif__get__value__ptr__float.html#ad226b7f3464055fe6060ef261eb23539":[2,0,9,28,0],
 "interfacebmif_1_1bmif__get__value__ptr__int.html":[2,0,9,29],
@@ -240,14 +249,5 @@ var NAVTREEINDEX12 =
 "namespacearrayreadersmodule.html":[2,0,2],
 "namespacebasedismodule.html":[2,0,3],
 "namespacebasedismodule.html":[1,0,4],
-"namespacebaseexchangemodule.html":[2,0,4],
-"namespacebaseexchangemodule.html":[1,0,5],
-"namespacebasegeometrymodule.html":[2,0,5],
-"namespacebasegeometrymodule.html":[1,0,6],
-"namespacebasemodelmodule.html":[2,0,6],
-"namespacebasemodelmodule.html":[1,0,7],
-"namespacebasesolutionmodule.html":[2,0,7],
-"namespacebasesolutionmodule.html":[1,0,8],
-"namespaceblockparsermodule.html":[2,0,8],
-"namespaceblockparsermodule.html":[1,0,9]
+"namespacebaseexchangemodule.html":[2,0,4]
 };

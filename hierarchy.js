@@ -402,6 +402,7 @@ var hierarchy =
     [ "DHNOFLO", null, null ],
     [ "DHUNDRED", null, null ],
     [ "dis_cr", null, null ],
+    [ "dis_transform_xy", null, null ],
     [ "DisBaseType", null, null ],
     [ "DisConnExchangeType", null, null ],
     [ "disu_cr", null, null ],

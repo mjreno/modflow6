@@ -367,6 +367,7 @@ var namespaces_dup =
     ] ],
     [ "loadmf6filetypemodule", "namespaceloadmf6filetypemodule.html", "namespaceloadmf6filetypemodule" ],
     [ "mappedvariablemodule", "namespacemappedvariablemodule.html", "namespacemappedvariablemodule" ],
+    [ "matrixmodule", "namespacematrixmodule.html", "namespacematrixmodule" ],
     [ "mawmodule", "namespacemawmodule.html", "namespacemawmodule" ],
     [ "memoryhelpermodule", "namespacememoryhelpermodule.html", [
       [ "create_mem_address", "namespacememoryhelpermodule.html#abda60b8cd05bba132ea82b23bf12c36c", null ],
@@ -596,6 +597,7 @@ var namespaces_dup =
     ] ],
     [ "solutiongroupmodule", "namespacesolutiongroupmodule.html", "namespacesolutiongroupmodule" ],
     [ "sortmodule", "namespacesortmodule.html", "namespacesortmodule" ],
+    [ "sparsematrixmodule", "namespacesparsematrixmodule.html", "namespacesparsematrixmodule" ],
     [ "sparsemodule", "namespacesparsemodule.html", "namespacesparsemodule" ],
     [ "spatialmodelconnectionmodule", "namespacespatialmodelconnectionmodule.html", "namespacespatialmodelconnectionmodule" ],
     [ "stringlistmodule", "namespacestringlistmodule.html", [

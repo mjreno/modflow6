@@ -1,5 +1,5 @@
-<map id="gwfgwfexchangemodule::gwf_gwf_set_spdis" name="gwfgwfexchangemodule::gwf_gwf_set_spdis">
-<area shape="rect" id="node1" title="Calculate specific discharge from flow rates." alt="" coords="5,86,188,127"/>
+<map id="gwfgwfexchangemodule::gwf_gwf_set_simvals_to_npf" name="gwfgwfexchangemodule::gwf_gwf_set_simvals_to_npf">
+<area shape="rect" id="node1" title="Calculate specific discharge from flow rates." alt="" coords="5,79,188,135"/>
 <area shape="rect" id="node2" href="$namespacesimmodule.html#a21870712a1166225fdcd5b60bffb353e" title="Store error message." alt="" coords="242,68,417,95"/>
 <area shape="rect" id="node8" href="$namespacegwfnpfmodule.html#a043778a29f31835c4167e493e79df0ef" title=" " alt="" coords="236,119,423,145"/>
 <area shape="rect" id="node3" href="$namespacesimmodule.html#a0be97214c1d4fcf42bc4ddc27b111b61" title="Stop the simulation." alt="" coords="543,68,681,95"/>

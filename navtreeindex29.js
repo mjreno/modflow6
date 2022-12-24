@@ -1,5 +1,7 @@
 var NAVTREEINDEX29 =
 {
+"structbmif_1_1bmi.html#a7eadd59e540967474b88db65e68903f9":[2,0,10,0,21],
+"structbmif_1_1bmi.html#a8487ef45df941880464dc65d8b8138e0":[2,0,10,0,43],
 "structbmif_1_1bmi.html#a93ce235376a2c4b0e244b89cfc657fd0":[2,0,10,0,25],
 "structbmif_1_1bmi.html#a93db74accc8aeebf5387fe07eadb553f":[2,0,10,0,9],
 "structbmif_1_1bmi.html#a9d55b6a173cab516705729e927735301":[2,0,10,0,18],
@@ -247,7 +249,5 @@ var NAVTREEINDEX29 =
 "structbudgettermmodule_1_1budgettermtype.html#a6b82975ac99e6a6317acfba7238414c8":[2,0,15,0,17],
 "structbudgettermmodule_1_1budgettermtype.html#a7319ebdc36df9ceaa9f320c8994beb89":[2,0,15,0,10],
 "structbudgettermmodule_1_1budgettermtype.html#a80c662ec4d398334692105fd1ebf72f1":[2,0,15,0,8],
-"structbudgettermmodule_1_1budgettermtype.html#a86a482c89917be11524d065372f4ffa0":[2,0,15,0,30],
-"structbudgettermmodule_1_1budgettermtype.html#a88e0a832fa2d1de4186588034cf21b78":[2,0,15,0,27],
-"structbudgettermmodule_1_1budgettermtype.html#a9d2f73f842285c993f626d5754b6ed4b":[2,0,15,0,26]
+"structbudgettermmodule_1_1budgettermtype.html#a86a482c89917be11524d065372f4ffa0":[2,0,15,0,30]
 };

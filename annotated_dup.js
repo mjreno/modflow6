@@ -339,6 +339,7 @@ var annotated_dup =
       [ "idm_log_var", "interfaceidmloggermodule_1_1idm__log__var.html", "interfaceidmloggermodule_1_1idm__log__var" ]
     ] ],
     [ "idmmf6fileloadermodule", "namespaceidmmf6fileloadermodule.html", [
+      [ "input_load", "interfaceidmmf6fileloadermodule_1_1input__load.html", "interfaceidmmf6fileloadermodule_1_1input__load" ],
       [ "packageload", "structidmmf6fileloadermodule_1_1packageload.html", "structidmmf6fileloadermodule_1_1packageload" ],
       [ "IPackageLoad", "interfaceidmmf6fileloadermodule_1_1_i_package_load.html", "interfaceidmmf6fileloadermodule_1_1_i_package_load" ]
     ] ],

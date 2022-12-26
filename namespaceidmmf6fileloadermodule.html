@@ -138,6 +138,9 @@ Functions/Subroutines</h2></td></tr>
 <tr class="memitem:aff1a84b395b8d71da3b0fc893c58b95e"><td class="memItemLeft" align="right" valign="top">subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceidmmf6fileloadermodule.html#aff1a84b395b8d71da3b0fc893c58b95e">input_load_blockparser</a> (parser, filetype, component_type, subcomponent_type, component_name, subcomponent_name, iout)</td></tr>
 <tr class="memdesc:aff1a84b395b8d71da3b0fc893c58b95e"><td class="mdescLeft">&#160;</td><td class="mdescRight">main entry to mf6 input load  <a href="namespaceidmmf6fileloadermodule.html#aff1a84b395b8d71da3b0fc893c58b95e">More...</a><br /></td></tr>
 <tr class="separator:aff1a84b395b8d71da3b0fc893c58b95e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab5bf7fbfe9260d49df6fb4a59c7b3fcc"><td class="memItemLeft" align="right" valign="top">subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceidmmf6fileloadermodule.html#ab5bf7fbfe9260d49df6fb4a59c7b3fcc">input_load_generic</a> (filetype, component_type, subcomponent_type, component_name, subcomponent_name, inunit, iout)</td></tr>
+<tr class="memdesc:ab5bf7fbfe9260d49df6fb4a59c7b3fcc"><td class="mdescLeft">&#160;</td><td class="mdescRight">main entry to mf6 input load  <a href="namespaceidmmf6fileloadermodule.html#ab5bf7fbfe9260d49df6fb4a59c7b3fcc">More...</a><br /></td></tr>
+<tr class="separator:ab5bf7fbfe9260d49df6fb4a59c7b3fcc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>This module contains the high-level routines for loading a MODFLOW input file into the <b>INPUT</b> memory manager space. </p>
@@ -200,8 +203,9 @@ Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="namespaceidmmf6fileloadermodule_a4538adc2bc36308a6b195a162aa74998_icgraph.png" border="0" usemap="#anamespaceidmmf6fileloadermodule_a4538adc2bc36308a6b195a162aa74998_icgraph" alt=""/></div>
 <map name="anamespaceidmmf6fileloadermodule_a4538adc2bc36308a6b195a162aa74998_icgraph" id="anamespaceidmmf6fileloadermodule_a4538adc2bc36308a6b195a162aa74998_icgraph">
-<area shape="rect" title="generic procedure to MODFLOW 6 load routine" alt="" coords="236,13,419,54"/>
+<area shape="rect" title="generic procedure to MODFLOW 6 load routine" alt="" coords="236,53,419,94"/>
 <area shape="rect" href="interfaceidmmf6fileloadermodule_1_1input__load.html#a9a38650fac749aaaf183c6abc8e961be" title="main entry to mf6 input load" alt="" coords="5,5,188,61"/>
+<area shape="rect" href="interfaceidmmf6fileloadermodule_1_1input__load.html#af783d4b7242be642aaadb2e646da1d58" title="main entry to mf6 input load" alt="" coords="5,85,188,141"/>
 </map>
 </div>
 
@@ -304,13 +308,125 @@ Here is the caller graph for this function:</div>
 </div><!-- fragment -->
 </div>
 </div>
+<a id="ab5bf7fbfe9260d49df6fb4a59c7b3fcc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab5bf7fbfe9260d49df6fb4a59c7b3fcc">&#9670;&nbsp;</a></span>input_load_generic()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">subroutine idmmf6fileloadermodule::input_load_generic </td>
+          <td>(</td>
+          <td class="paramtype">character(len=*), intent(in)&#160;</td>
+          <td class="paramname"><em>filetype</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">character(len=*), intent(in)&#160;</td>
+          <td class="paramname"><em>component_type</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">character(len=*), intent(in)&#160;</td>
+          <td class="paramname"><em>subcomponent_type</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">character(len=*), intent(in)&#160;</td>
+          <td class="paramname"><em>component_name</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">character(len=*), intent(in)&#160;</td>
+          <td class="paramname"><em>subcomponent_name</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer(i4b), intent(in)&#160;</td>
+          <td class="paramname"><em>inunit</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer(i4b), intent(in)&#160;</td>
+          <td class="paramname"><em>iout</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">filetype</td><td>file type to load, such as DIS6, DISV6, NPF6 </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">component_type</td><td>component type, such as GWF or GWT </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">subcomponent_type</td><td>subcomponent type, such as DIS or NPF </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">component_name</td><td>component name, such as MYGWFMODEL </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">subcomponent_name</td><td>subcomponent name, such as MYWELLPACKAGE </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">inunit</td><td>unit number for input </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">iout</td><td>unit number for output </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="_idm_mf6_file_loader_8f90_source.html#l00097">97</a> of file <a class="el" href="_idm_mf6_file_loader_8f90_source.html">IdmMf6FileLoader.f90</a>.</p>
+<div class="fragment"><div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;    <span class="keywordtype">character(len=*)</span>, <span class="keywordtype">intent(in)</span> :: filetype<span class="comment"> !&lt; file type to load, such as DIS6, DISV6, NPF6</span></div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;    <span class="keywordtype">character(len=*)</span>, <span class="keywordtype">intent(in)</span> :: component_type<span class="comment"> !&lt; component type, such as GWF or GWT</span></div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;    <span class="keywordtype">character(len=*)</span>, <span class="keywordtype">intent(in)</span> :: subcomponent_type<span class="comment"> !&lt; subcomponent type, such as DIS or NPF</span></div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;    <span class="keywordtype">character(len=*)</span>, <span class="keywordtype">intent(in)</span> :: component_name<span class="comment"> !&lt; component name, such as MYGWFMODEL</span></div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;    <span class="keywordtype">character(len=*)</span>, <span class="keywordtype">intent(in)</span> :: subcomponent_name<span class="comment"> !&lt; subcomponent name, such as MYWELLPACKAGE</span></div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;    <span class="keywordtype">integer(I4B)</span>, <span class="keywordtype">intent(in)</span> :: inunit<span class="comment"> !&lt; unit number for input</span></div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;    <span class="keywordtype">integer(I4B)</span>, <span class="keywordtype">intent(in)</span> :: iout<span class="comment"> !&lt; unit number for output</span></div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;    <span class="keywordtype">type</span>(BlockParserType), <span class="keywordtype">allocatable</span> :: parser<span class="comment"> !&lt; block parser</span></div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;    <span class="keywordtype">type</span>(ModflowInputType) :: mf6_input</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;    <span class="keywordtype">type</span>(PackageLoad) :: pkgloader</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;    <span class="comment">!</span></div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;    <span class="comment">! -- create description of input</span></div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;    mf6_input = getmodflowinput(filetype, component_type, &amp;</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;                                subcomponent_type, component_name, &amp;</div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;                                subcomponent_name)</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;    <span class="comment">!</span></div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;    <span class="comment">! -- set mf6 parser based package loader by file type</span></div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;    <span class="keywordflow">select case</span> (filetype)</div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;<span class="keywordflow">    case default</span></div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;      <span class="keyword">allocate</span> (parser)</div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;      <span class="keyword">call </span>parser%Initialize(inunit, iout)</div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;      pkgloader%load_package =&gt; generic_mf6_load</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;<span class="keywordflow">    end select</span></div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;    <span class="comment">!</span></div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;    <span class="comment">! -- invoke the selected load routine</span></div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;    <span class="keyword">call </span>pkgloader%load_package(parser, mf6_input, iout)</div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;    <span class="comment">!</span></div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;    <span class="comment">! -- deallocate</span></div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;    <span class="keywordflow">if</span> (<span class="keyword">allocated</span>(parser)) <span class="keyword">deallocate</span> (parser)</div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;    <span class="comment">!</span></div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;    <span class="comment">! -- return</span></div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;    <span class="keywordflow">return</span></div>
+</div><!-- fragment -->
+</div>
+</div>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="namespaceidmmf6fileloadermodule.html">idmmf6fileloadermodule</a></li>
-    <li class="footer">Generated on Sat Dec 24 2022 00:16:47 for MODFLOW 6 by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
+    <li class="footer">Generated on Mon Dec 26 2022 17:13:22 for MODFLOW 6 by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1 </li>
   </ul>
 </div>
 </body>

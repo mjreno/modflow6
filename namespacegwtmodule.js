@@ -17,6 +17,7 @@ var namespacegwtmodule =
     [ "gwt_df", "namespacegwtmodule.html#aa8a2c3beb0e2fe4bd28929c010414a29", null ],
     [ "gwt_fc", "namespacegwtmodule.html#a0770fce615a06686a37a356e86c79ebe", null ],
     [ "gwt_get_iasym", "namespacegwtmodule.html#a970ccf3c0dca5082e0d6a5c371ba85f9", null ],
+    [ "gwt_load_input_context", "namespacegwtmodule.html#a1fdfa6fd840ad673726568242a968742", null ],
     [ "gwt_mc", "namespacegwtmodule.html#a36da134dc9046eaea07877fa8022a0a9", null ],
     [ "gwt_ot", "namespacegwtmodule.html#a5bb691ab8acc30d878a8e9aafb8f1d50", null ],
     [ "gwt_ot_bdsummary", "namespacegwtmodule.html#a0bc5c7638a212eaba70a487f4580f15b", null ],

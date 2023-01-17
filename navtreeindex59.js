@@ -1,5 +1,9 @@
 var NAVTREEINDEX59 =
 {
+"structxt3dmodule_1_1xt3dtype.html#a7c33effc1f2b7c476b4d25c1222c6608":[2,0,156,0,59],
+"structxt3dmodule_1_1xt3dtype.html#a7eb5ba8f3e9fbe40cd697a2c1e1193ea":[2,0,156,0,57],
+"structxt3dmodule_1_1xt3dtype.html#a814713915f82c71a88c83ec231686c1a":[2,0,156,0,19],
+"structxt3dmodule_1_1xt3dtype.html#a82afae335ae9992f29039ce37df691bf":[2,0,156,0,14],
 "structxt3dmodule_1_1xt3dtype.html#a82bc6d9c3b247aba45e7e6b82cd6ee4b":[2,0,156,0,42],
 "structxt3dmodule_1_1xt3dtype.html#a86a077f7f9a45d322bd4fc7d5251f04e":[2,0,156,0,16],
 "structxt3dmodule_1_1xt3dtype.html#a8839b16f13b64463347c6c416fef92d1":[2,0,156,0,26],

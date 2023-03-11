@@ -1,5 +1,6 @@
 var NAVTREEINDEX18 =
 {
+"namespacedisconnexchangemodule.html#a59dc1e08cc6e80a11ea063c6c8451067":[1,0,29,3],
 "namespacedisconnexchangemodule.html#a63ac91d936c8b44104f8e091a81e7ac2":[1,0,29,6],
 "namespacedisconnexchangemodule.html#a88195129e30c0a2e36ebb9e7144bd006":[1,0,29,2],
 "namespacedisconnexchangemodule.html#a95967c0226c1c8c56c9bbf3615914661":[1,0,29,7],
@@ -248,6 +249,5 @@ var NAVTREEINDEX18 =
 "namespacegwfcsubmodule.html#abfc23a9d6539f4b29458036dcbfd2dbb":[1,0,43,14],
 "namespacegwfcsubmodule.html#ac35837b7432d5c546ff39b5ae5b0822b":[1,0,43,15],
 "namespacegwfcsubmodule.html#ad317ed87eb5b8b4ad72359c7cfd0d2c1":[1,0,43,23],
-"namespacegwfcsubmodule.html#ad3a91474ff56376b37f51630c6a94bf3":[1,0,43,41],
-"namespacegwfcsubmodule.html#ad4a2c469e98478f9265e269615bc3bed":[1,0,43,43]
+"namespacegwfcsubmodule.html#ad3a91474ff56376b37f51630c6a94bf3":[1,0,43,41]
 };

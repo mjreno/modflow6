@@ -1,5 +1,7 @@
 var NAVTREEINDEX28 =
 {
+"namespacesparsematrixmodule.html#a086fa316c4250a92fbb5e35895d4c4d1":[1,0,186,5],
+"namespacesparsematrixmodule.html#a0e3ded525ed87fee43d065453e3512b8":[1,0,186,13],
 "namespacesparsematrixmodule.html#a4dcefc9730b5aa0e97dd40776a2311d0":[1,0,186,2],
 "namespacesparsematrixmodule.html#a6189a434249398cb3c7bd6f280a39674":[1,0,186,1],
 "namespacesparsematrixmodule.html#a621fbf606ad9651db5b3806ff44a85f8":[1,0,186,15],
@@ -247,7 +249,5 @@ var NAVTREEINDEX28 =
 "namespacetimeseriesmodule.html#ae6a5d7cdcbcb15215a14ec17449d0527":[1,0,204,15],
 "namespacetimeseriesmodule.html#ae96a64323349c35aed3d68daf0fac0a5":[1,0,204,28],
 "namespacetimeseriesmodule.html#aec4dcf996d2a104eb574e3c38a02bb53":[1,0,204,10],
-"namespacetimeseriesrecordmodule.html":[1,0,205],
-"namespacetimeseriesrecordmodule.html#a185effb48a5a3302a159fe89acee2c2e":[1,0,205,1],
-"namespacetimeseriesrecordmodule.html#a75e5aa778cef4e6dc4d8926a50abd9f1":[1,0,205,3]
+"namespacetimeseriesrecordmodule.html":[1,0,205]
 };

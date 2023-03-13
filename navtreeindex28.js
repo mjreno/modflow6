@@ -1,5 +1,9 @@
 var NAVTREEINDEX28 =
 {
+"namespacesortmodule.html#ac7aa18e701f79275c901aadc3a6ca2be":[1,0,185,4],
+"namespacesortmodule.html#ad7ae31f19d4fcfcf513ff8f451564259":[1,0,185,2],
+"namespacesparsematrixmodule.html":[1,0,186],
+"namespacesparsematrixmodule.html#a02ff607ec0b30e527cb233dc59fdcb7c":[1,0,186,12],
 "namespacesparsematrixmodule.html#a086fa316c4250a92fbb5e35895d4c4d1":[1,0,186,5],
 "namespacesparsematrixmodule.html#a0e3ded525ed87fee43d065453e3512b8":[1,0,186,13],
 "namespacesparsematrixmodule.html#a4dcefc9730b5aa0e97dd40776a2311d0":[1,0,186,2],
@@ -245,9 +249,5 @@ var NAVTREEINDEX28 =
 "namespacetimeseriesmodule.html#ad902be5e88e100cd3e8c4fbe3f3c28ef":[1,0,204,19],
 "namespacetimeseriesmodule.html#adc50bb3b922e29864c95ebedf9aa1966":[1,0,204,4],
 "namespacetimeseriesmodule.html#adf21e4bceac8a07ff5591d2c6440bb65":[1,0,204,31],
-"namespacetimeseriesmodule.html#ae27b50b309681e8043b03c2a72de85e8":[1,0,204,32],
-"namespacetimeseriesmodule.html#ae6a5d7cdcbcb15215a14ec17449d0527":[1,0,204,15],
-"namespacetimeseriesmodule.html#ae96a64323349c35aed3d68daf0fac0a5":[1,0,204,28],
-"namespacetimeseriesmodule.html#aec4dcf996d2a104eb574e3c38a02bb53":[1,0,204,10],
-"namespacetimeseriesrecordmodule.html":[1,0,205]
+"namespacetimeseriesmodule.html#ae27b50b309681e8043b03c2a72de85e8":[1,0,204,32]
 };

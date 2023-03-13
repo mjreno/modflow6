@@ -1,5 +1,9 @@
 var NAVTREEINDEX27 =
 {
+"namespacerectangulargeometrymodule.html#a6822bf89e419aeed9caec9e37475f5d9":[1,0,167,6],
+"namespacerectangulargeometrymodule.html#a6f623d42989e341d43668a91cb48b841":[1,0,167,5],
+"namespacerectangulargeometrymodule.html#a73912353525d19ee8c486181f9c56048":[1,0,167,1],
+"namespacerectangulargeometrymodule.html#ace4d1b45bd33ebdf2e02afbbf6b06fcb":[1,0,167,2],
 "namespacerivmodule.html":[1,0,168],
 "namespacerivmodule.html#a0c64045a09b00a86f365ae4279749f79":[1,0,168,7],
 "namespacerivmodule.html#a34b470fa86fa279bae77a185b43ef966":[1,0,168,2],
@@ -245,9 +249,5 @@ var NAVTREEINDEX27 =
 "namespacesortmodule.html#a410ef285b88b326b020757fa6fb71080":[1,0,185,3],
 "namespacesortmodule.html#a45570623b0025d95da6c2d816c32af44":[1,0,185,6],
 "namespacesortmodule.html#a5b63ea70396195fd13413a1c44daf0bc":[1,0,185,5],
-"namespacesortmodule.html#aa75bf15fe97d741f7e9f8c71e3ccc13f":[1,0,185,7],
-"namespacesortmodule.html#ac7aa18e701f79275c901aadc3a6ca2be":[1,0,185,4],
-"namespacesortmodule.html#ad7ae31f19d4fcfcf513ff8f451564259":[1,0,185,2],
-"namespacesparsematrixmodule.html":[1,0,186],
-"namespacesparsematrixmodule.html#a02ff607ec0b30e527cb233dc59fdcb7c":[1,0,186,12]
+"namespacesortmodule.html#aa75bf15fe97d741f7e9f8c71e3ccc13f":[1,0,185,7]
 };

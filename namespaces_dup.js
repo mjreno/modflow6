@@ -123,6 +123,7 @@ var namespaces_dup =
       [ "iuserformatstrip", "namespaceconstantsmodule.html#a6d366b0fb2a7bb591d1700fe614ae384", null ],
       [ "iuserformatwrap", "namespaceconstantsmodule.html#a7b8d677e1ca983dd9bdaaed17dd8fbd9", null ],
       [ "iustart", "namespaceconstantsmodule.html#a4c97c83c0354b0d18b16ed8ff425aaa4", null ],
+      [ "iwetlake", "namespaceconstantsmodule.html#a35de7f143d28e3643eb55c6c9f9311f5", null ],
       [ "izero", "namespaceconstantsmodule.html#aae7c048de23e9b2f66a7514ad2004cff", null ],
       [ "lenauxname", "namespaceconstantsmodule.html#a9ee3f8405321b057b32648a5dc031e20", null ],
       [ "lenbigline", "namespaceconstantsmodule.html#a5a5bc481197413bb50013a92490ffa14", null ],
@@ -151,6 +152,7 @@ var namespaces_dup =
       [ "lentimeseriestext", "namespaceconstantsmodule.html#a8128a47da98d91469cdc370e09bb0111", null ],
       [ "lenvarname", "namespaceconstantsmodule.html#a8a23c620a738ea7c5a9b5c4893b6bfbb", null ],
       [ "linelength", "namespaceconstantsmodule.html#a060d310ded5535ce2dc85bd1ca1afd3d", null ],
+      [ "maxadpit", "namespaceconstantsmodule.html#a87319a52501f195d9999270a5cef155a", null ],
       [ "maxcharlen", "namespaceconstantsmodule.html#ac9c1da291f7c6bfb35a47957c588ab20", null ],
       [ "maxmemrank", "namespaceconstantsmodule.html#a9ec08a833e9347ea3239bc60b9b129b8", null ],
       [ "maxobstypes", "namespaceconstantsmodule.html#a7bc1680f8ee7a7b1b5d8ad6927951da7", null ],
@@ -170,6 +172,8 @@ var namespaces_dup =
     [ "double2dreadermodule", "namespacedouble2dreadermodule.html", "namespacedouble2dreadermodule" ],
     [ "drnmodule", "namespacedrnmodule.html", "namespacedrnmodule" ],
     [ "evtmodule", "namespaceevtmodule.html", "namespaceevtmodule" ],
+    [ "explicitmodelmodule", "namespaceexplicitmodelmodule.html", "namespaceexplicitmodelmodule" ],
+    [ "explicitsolutionmodule", "namespaceexplicitsolutionmodule.html", "namespaceexplicitsolutionmodule" ],
     [ "genericutilitiesmodule", "namespacegenericutilitiesmodule.html", [
       [ "is_same", "namespacegenericutilitiesmodule.html#a07ca2a69ed3488dc534c388ad305a876", null ],
       [ "sim_message", "namespacegenericutilitiesmodule.html#a34492cca79f70174fd015808be8b7ebf", null ],
@@ -697,6 +701,7 @@ var namespaces_dup =
       [ "svangenuchtensaturation", "namespacesmoothingmodule.html#a061163f3dbacf1167b06f1bae89411f4", null ]
     ] ],
     [ "solutionfactorymodule", "namespacesolutionfactorymodule.html", [
+      [ "create_ems_solution", "namespacesolutionfactorymodule.html#a6bfa978c034f3df706e1852f177a275b", null ],
       [ "create_ims_solution", "namespacesolutionfactorymodule.html#a1976b31eb3bae12786b11bf9e96d2044", null ]
     ] ],
     [ "solutiongroupmodule", "namespacesolutiongroupmodule.html", "namespacesolutiongroupmodule" ],

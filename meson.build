@@ -169,6 +169,24 @@ else
   with_mpi = false
 endif
 
+if build_machine.system() != 'windows'
+  netcdf = dependency('netcdf', language : 'fortran', required : false)
+else
+  nc_dir = meson.project_source_root() / '..' / 'ncf' / 'netcdf-fortran-4.6.1' / 'fortran'
+  message('nc_dir:', nc_dir)
+  netcdf = fc.find_library('netcdff', dirs: [ nc_dir ], required : true, static : false)
+  nc_incdir = include_directories([ nc_dir ])
+endif
+if netcdf.found()
+  with_netcdf = true
+  #add_project_dependencies(netcdf, language: 'fortran')
+  extra_cmp_args += [ '-D__WITH_NETCDF__' ]
+  dependencies += [ netcdf ]
+else
+  with_netcdf = false
+endif
+message('with_netcdf:', with_netcdf)
+
 compile_args += extra_cmp_args
 
 add_project_arguments(fc.get_supported_arguments(compile_args), language: 'fortran')

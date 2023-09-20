@@ -1,0 +1,358 @@
+name: MODFLOW 6 continuous integration
+on:
+  push:
+    branches:
+      - master
+      - develop
+      - ci-diagnose*
+      - ncci2
+    paths-ignore:
+      - '**.md'
+      - 'doc/**'
+  pull_request:
+    branches:
+      - master
+      - develop
+    paths-ignore:
+      - '**.md'
+      - 'doc/**'
+jobs:
+
+  netcdf_test_win:
+    name: netcdf4 testing
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ windows-2022 ]
+        #hdf5: [ 1.12.2 ]
+        #netcdf: [ v4.7.4, v4.8.1, v4.9.0, main ]
+        #netcdf: [ v4.9.0, main ]
+    defaults:
+      run:
+        shell: bash -l {0}
+    env:
+      FC: gfortran
+      GCC_V: 12
+    steps:
+
+      - name: Checkout modflow6
+        uses: actions/checkout@v3
+        with:
+          path: modflow6
+
+      - name: Setup MSYS2
+        uses: msys2/setup-msys2@v2
+        with:
+          update: true
+          install: |
+            git
+            make
+            mingw-w64-x86_64-gcc
+            mingw-w64-x86_64-python
+            mingw-w64-x86_64-python-pip
+            mingw-w64-x86_64-python-pytest
+
+      - name: Setup GNU Fortran ${{ env.GCC_V }}
+        uses: awvwgk/setup-fortran@main
+        with:
+          compiler: gcc
+          version: ${{ env.GCC_V }}
+
+      - name: Install System dependencies
+        shell: msys2 {0}
+        run: |
+          pacman -Syu
+          pacman -S --noconfirm --needed base-devel unzip mingw-w64-x86_64-toolchain mingw-w64-x86_64-libtool mingw-w64-x86_64-cmake
+
+      - name: Setup Micromamba
+        uses: mamba-org/setup-micromamba@v1
+        with:
+          environment-file: modflow6/environment.yml
+          create-args: >-
+            pkg-config
+          init-shell: >-
+            bash
+            powershell
+          cache-environment: true
+          cache-downloads: true
+          log-level: 'trace'
+
+      - name: Prepare netcdf build
+        run: |
+          mkdir ncc
+          mkdir ncf
+
+      - name: Install hdf5 and netcdf-c
+        shell: msys2 {0}
+        working-directory: ncc
+        run: |
+          pacman -U --noconfirm https://repo.msys2.org/mingw/mingw64/mingw-w64-x86_64-hdf5-1.12.2-2-any.pkg.tar.zst
+          wget https://github.com/Unidata/netcdf-c/archive/refs/tags/v4.9.2.zip
+          unzip v4.9.2.zip
+          cd netcdf-c-4.9.2
+          LDFLAGS="-Wl,-no-undefined,--export-all-symbols" ./configure --enable-shared --disable-dap --disable-testsets --disable-examples --disable-libxml2
+          echo "LD_LIBRARY_PATH=/d/a/_temp/msys64/mingw64/lib" >> $GITHUB_ENV
+          echo "PATH=/usr/bin:/d/a/_temp/msys64/mingw64/usr/bin:/d/a/_temp/msys64/mingw64/bin:/d/a/modflow6/modflow6/ncc/include:/d/a/modflow6/modflow6/ncf/netcdf-fortran-4.6.1/fortran/.libs:/d/a/modflow6/modflow6/modflow6/bin" >> $GITHUB_ENV
+          sed -i.bak -e "s/\(allow_undefined=\)yes/\1no/" libtool
+          make install
+          ls /mingw64/bin | grep netcdf
+          ldd /mingw64/bin/libnetcdf-19.dll
+          nc-config --all
+
+      - name: Make netcdf-f
+        shell: msys2 {0}
+        working-directory: ncf
+        run: |
+          wget https://github.com/Unidata/netcdf-fortran/archive/refs/tags/v4.6.1.zip
+          unzip v4.6.1.zip
+          cd netcdf-fortran-4.6.1
+          LDFLAGS="-Wl,-no-undefined" LIBS="$(nc-config --libs)" ./configure --enable-shared
+          sed -i.bak -e "s/\(allow_undefined=\)yes/\1no/" libtool
+          make install
+
+      - name: Build modflow6
+        working-directory: modflow6
+        run: |
+          meson setup builddir -Ddebug=false --prefix=$(pwd) --libdir=bin
+          meson install -C builddir
+
+      - name: Show Meson logs
+        if: failure()
+        working-directory: modflow6
+        run: cat builddir/meson-logs/meson-log.txt
+
+      - name: Check exe
+        working-directory: modflow6/autotest
+        env:
+          REPOS_PATH: ${{ github.workspace }}
+        run: |
+          echo "FILE:"
+          file /d/a/modflow6/modflow6/modflow6/bin/mf6.exe
+          echo "LDD1:"
+          ldd /d/a/modflow6/modflow6/modflow6/bin/mf6.exe
+          echo "LDD nc:"
+          ldd /d/a/_temp/msys64/mingw64/bin/libnetcdf-19.dll
+          echo "LDD ncf:"
+          ldd /d/a/_temp/msys64/mingw64/bin/libnetcdff-7.dll
+          which mf6.exe
+          mf6.exe --version
+
+      - name: Update flopy
+        working-directory: modflow6/autotest
+        run: python update_flopy.py
+
+      - name: Get executables
+        working-directory: modflow6/autotest
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: pytest -v --durations 0 get_exes.py
+
+      - name: Test nc4 program
+        working-directory: modflow6/autotest
+        env:
+          REPOS_PATH: ${{ github.workspace }}
+        run: |
+          pytest -v test_gwf_chd01.py -s --keep temp
+          cat temp/test_mf6model[chd01]0/mfsim.lst | grep -i netcdf
+
+      - name: Test programs
+        working-directory: modflow6/autotest
+        env:
+          REPOS_PATH: ${{ github.workspace }}
+        run: |
+          branch="${{ github.ref_name }}"
+          marker="not large"
+          markers=$([ "$branch" == "master" ] && echo "$marker and not developmode" || echo "$marker")
+          pytest -v -n auto --durations 0 -m "$markers"
+
+  parallel_test:
+    name: Parallel testing
+    #needs:
+      #- lint
+      #- build
+      #- smoke_test
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu-22.04, macos-12 ] #, windows-2022 ]
+    defaults:
+      run:
+        shell: bash -l {0}
+    env:
+      FC: gfortran
+      GCC_V: 12
+    steps:
+
+      - name: Checkout modflow6
+        uses: actions/checkout@v4
+        with:
+          path: modflow6
+
+      - name: Setup MSYS2
+        if: runner.os == 'Windows'
+        uses: msys2/setup-msys2@v2
+        with:
+          update: true
+          install: |
+            git
+            make
+            mingw-w64-x86_64-gcc
+            mingw-w64-x86_64-python
+            mingw-w64-x86_64-python-pip
+            mingw-w64-x86_64-python-pytest
+
+      - name: Setup MPI
+        if: runner.os == 'Windows'
+        uses: mpi4py/setup-mpi@v1
+        with:
+          mpi: msmpi
+
+      - name: Setup GNU Fortran ${{ env.GCC_V }}
+        uses: awvwgk/setup-fortran@main
+        with:
+          compiler: gcc
+          version: ${{ env.GCC_V }}
+
+      - name: Cache PETSc
+        id: cache-petsc
+        uses: actions/cache@v3
+        with:
+          path: petsc
+          key: ${{ runner.os }}-petsc
+
+      - name: Clone PETSc
+        if: runner.os != 'Windows' && steps.cache-petsc.outputs.cache-hit != 'true'
+        run: git clone -b release https://gitlab.com/petsc/petsc.git petsc
+
+      - name: Download PETSc
+        if: runner.os == 'Windows'
+        run: |
+          curl https://ftp.mcs.anl.gov/pub/petsc/release-snapshots/petsc-3.18.4.tar.gz -O -J
+          mkdir petsc
+          tar -xzf petsc-3.18.4.tar.gz -C petsc --strip-components=1
+
+      - name: Configure environment
+        if: runner.os == 'Linux'
+        run: |
+          echo "PKG_CONFIG_PATH=$GITHUB_WORKSPACE/petsc/linux-gnu/lib/pkgconfig" >> $GITHUB_ENV
+          echo "$GITHUB_WORKSPACE/petsc/linux-gnu/bin" >> $GITHUB_PATH
+
+      - name: Configure environment
+        if: runner.os == 'macOS'
+        run: |
+          echo "PKG_CONFIG_PATH=$GITHUB_WORKSPACE/petsc/arch-darwin-gcc-debug/lib/pkgconfig" >> $GITHUB_ENV
+          echo "$GITHUB_WORKSPACE/petsc/arch-darwin-gcc-debug/bin" >> $GITHUB_PATH
+
+      - name: Configure PETSc
+        if: runner.os == 'Linux'
+        working-directory: petsc
+        run: |
+          sudo ./configure PETSC_ARCH=linux-gnu --download-fblaslapack --download-openmpi
+          sudo make all
+
+      - name: Configure PETSc
+        if: runner.os == 'macOS'
+        working-directory: petsc
+        run: |
+          sudo ./configure PETSC_DIR="$GITHUB_WORKSPACE/petsc" PETSC_ARCH=arch-darwin-gcc-debug --download-fblaslapack --download-openmpi
+          sudo make all
+
+      - name: Configure PETSc
+        if: runner.os == 'Windows'
+        shell: msys2 {0}
+        working-directory: petsc
+        run: |
+          pacman -Syu
+          pacman -Sy --noconfirm autoconf automake-wrapper bison bsdcpio make git \
+            mingw-w64-x86_64-toolchain patch python flex \
+            pkg-config pkgfile tar unzip mingw-w64-x86_64-cmake \
+            mingw-w64-x86_64-msmpi mingw-w64-x86_64-openblas mingw-w64-x86_64-jq
+          /usr/bin/python ./configure --with-mpiexec='/C/Program\ Files/Microsoft\ MPI/Bin/mpiexec' --with-shared-libraries=0
+          make all
+
+      - name: Setup Micromamba
+        uses: mamba-org/setup-micromamba@v1
+        with:
+          environment-file: modflow6/environment.yml
+          create-args: >-
+            netcdf-fortran
+            pkg-config
+          init-shell: >-
+            bash
+            powershell
+          cache-environment: true
+          cache-downloads: true
+
+      - name: Edit netcdf-fortran.pc
+        if: runner.os == 'Linux'
+        working-directory: modflow6
+        run: sed -i "s|libdir=/home/runner/micromamba/envs/modflow6//home/runner/micromamba/envs/modflow6/lib|libdir=/home/runner/micromamba/envs/modflow6/lib|g" /home/runner/micromamba/envs/modflow6/lib/pkgconfig/netcdf-fortran.pc
+
+      - name: Edit netcdf-fortran.pc
+        if: runner.os == 'macOS'
+        working-directory: modflow6
+        run: sed -i '' -e "s|libdir=/Users/runner/micromamba/envs/modflow6//Users/runner/micromamba/envs/modflow6/lib|libdir=/Users/runner/micromamba/envs/modflow6/lib|g" /Users/runner/micromamba/envs/modflow6/lib/pkgconfig/netcdf-fortran.pc
+
+      - name: Build modflow6
+        working-directory: modflow6
+        run: |
+          meson setup builddir -Ddebug=false -Dparallel=true --prefix=$(pwd) --libdir=bin
+          meson install -C builddir
+          meson test --verbose --no-rebuild -C builddir
+
+      - name: Show Meson logs
+        if: failure()
+        working-directory: modflow6
+        run: cat builddir/meson-logs/meson-log.txt
+
+      - name: Check exe
+        if: runner.os == 'Linux'
+        working-directory: modflow6/autotest
+        env:
+          REPOS_PATH: ${{ github.workspace }}
+        run: |
+          ldd /home/runner/work/modflow6/modflow6/modflow6/bin/mf6
+          /home/runner/work/modflow6/modflow6/modflow6/bin/mf6 --version
+
+      - name: Check exe
+        if: runner.os == 'macOS'
+        working-directory: modflow6/autotest
+        env:
+          REPOS_PATH: ${{ github.workspace }}
+        run: |
+          ldd /Users/runner/work/modflow6/modflow6/modflow6/bin/mf6
+          /Users/runner/work/modflow6/modflow6/modflow6/bin/mf6 --version
+
+      - name: Update flopy
+        working-directory: modflow6/autotest
+        run: python update_flopy.py
+
+      - name: Get executables
+        working-directory: modflow6/autotest
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: pytest -v --durations 0 get_exes.py
+
+      - name: Test nc4 program
+        working-directory: modflow6/autotest
+        env:
+          REPOS_PATH: ${{ github.workspace }}
+        run: |
+          pytest -v test_gwf_chd01.py -s --keep temp
+          ls -l temp
+          ls -l temp/test_mf6model[chd01]0
+          cat temp/test_mf6model[chd01]0/mfsim.lst | grep -i netcdf
+          #ls -l /tmp
+
+      - name: Test programs (parallel)
+        working-directory: modflow6/autotest
+        env:
+          REPOS_PATH: ${{ github.workspace }}
+        run: |
+          branch="${{ github.ref_name }}"
+          marker="not large"
+          markers=$([ "$branch" == "master" ] && echo "$marker and not developmode" || echo "$marker")
+          pytest -v -n auto --parallel --durations 0 -m "$markers"
+

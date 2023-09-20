@@ -208,10 +208,19 @@ contains
   subroutine simnam_load(paramlog)
     use SimVariablesModule, only: simfile
     use GenericUtilitiesModule, only: sim_message
+#if defined(__WITH_NETCDF__)
+    use netcdf
+#endif
     integer(I4B), intent(inout) :: paramlog
     integer(I4B) :: inunit
     logical :: lexist
     character(len=LINELENGTH) :: line
+    !
+#if defined(__WITH_NETCDF__)
+    !print *, 'MF6 NETCDF'
+    !print *, trim(nf90_inq_libvers())
+    write(iout, '(a)') 'MF6 NETCDF: '//trim(nf90_inq_libvers())
+#endif
     !
     ! -- load mfsim.nam if it exists
     inquire (file=trim(adjustl(simfile)), exist=lexist)

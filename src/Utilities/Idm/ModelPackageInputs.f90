@@ -18,10 +18,11 @@ module ModelPackageInputsModule
   implicit none
   private
   public :: ModelPackageInputsType
+  public :: LoadablePackageType
 
-  !> @brief derived type for loadable package type
+  !> @brief type for loadable package type
   !!
-  !!  This derived type is used to store package instance
+  !!  This type is used to store package instance
   !!  desriptions for a supported package type.
   !!
   !<
@@ -43,9 +44,9 @@ module ModelPackageInputsModule
     procedure :: destroy => pkgtype_destroy
   end type LoadablePackageType
 
-  !> @brief derived type for model package inputs type
+  !> @brief type for model package inputs type
   !!
-  !!  This derived type is used to define input package
+  !!  This type is used to define input package
   !!  descriptors for a model and load to managed memory.
   !!
   !<

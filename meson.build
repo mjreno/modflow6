@@ -180,11 +180,22 @@ if is_extended_build
     with_netcdf = true
     extra_cmp_args += [ '-D__WITH_NETCDF__' ]
     dependencies += [ netcdf ]    
+  else
+    with_netcdf = false
   endif
 else
   with_netcdf = false
   with_petsc = false
   with_mpi = false
+endif
+
+netcdf = dependency('netcdf', language : 'fortran', required : true)
+if netcdf.found()
+  with_netcdf = true
+  extra_cmp_args += [ '-D__WITH_NETCDF__' ]
+  dependencies += [ netcdf ]
+else
+  with_netcdf = false
 endif
 
 compile_args += extra_cmp_args

@@ -5,7 +5,7 @@ class TestFramework:
     # tell pytest this isn't a test class, don't collect it
     __test__ = False
 
-    def build(self, build_function, idx, exdir):
+    def build(self, build_function, idx, exdir, netcdf=None):
         """
         Build base and regression MODFLOW 6 models
 
@@ -22,7 +22,10 @@ class TestFramework:
             path to regression model files
         """
         base, regression = build_function(idx, exdir)
-        base.write_simulation()
+        if netcdf:
+          base.write_simulation(write_netcdf=True)
+        else:
+          base.write_simulation()
         if regression is not None:
             if isinstance(regression, flopy.mf6.MFSimulation):
                 regression.write_simulation()

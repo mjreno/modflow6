@@ -88,7 +88,7 @@ jobs:
           cache-environment: true
           cache-downloads: true
 
-       - name: Edit netcdf-fortran.pc
+      - name: Edit netcdf-fortran.pc
         if: runner.os == 'Linux'
         working-directory: modflow6
         run: sed -i "s|libdir=/home/runner/micromamba/envs/modflow6//home/runner/micromamba/envs/modflow6/lib|libdir=/home/runner/micromamba/envs/modflow6/lib|g" /home/runner/micromamba/envs/modflow6/lib/pkgconfig/netcdf-fortran.pc
@@ -172,7 +172,7 @@ jobs:
           cache-environment: true
           cache-downloads: true
 
-       - name: Edit netcdf-fortran.pc
+      - name: Edit netcdf-fortran.pc
         if: runner.os == 'Linux'
         working-directory: modflow6
         run: sed -i "s|libdir=/home/runner/micromamba/envs/modflow6//home/runner/micromamba/envs/modflow6/lib|libdir=/home/runner/micromamba/envs/modflow6/lib|g" /home/runner/micromamba/envs/modflow6/lib/pkgconfig/netcdf-fortran.pc

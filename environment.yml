@@ -17,6 +17,7 @@ dependencies:
   - numpy
   - pyshp
   - shapely
+  - netcdf4
   - pip
   - pip:
       #- git+https://github.com/modflowpy/flopy.git

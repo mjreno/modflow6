@@ -91,6 +91,8 @@ jobs:
       - name: Build modflow6
         working-directory: modflow6
         run: |
+          nc-config --all
+          nf-config
           meson setup builddir -Ddebug=false --prefix=$(pwd) --libdir=bin
           meson install -C builddir
 
@@ -173,6 +175,8 @@ jobs:
       - name: Build modflow6
         working-directory: modflow6
         run: |
+          nc-config --all
+          nf-config
           meson setup builddir -Ddebug=false --prefix=$(pwd) --libdir=bin
           meson install -C builddir
 

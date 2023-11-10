@@ -29,7 +29,7 @@ module LoadNetCDFDataModule
   public input_load, nc4_rp_list, nc4_rp_array
   public nc4_pkg_context
 
-  integer(I4B), parameter :: IDM_NETCDF4_MAX_DIM = 6
+  integer(I4B), parameter :: NETCDF4_MAX_DIM = 6
 
 contains
 
@@ -64,10 +64,10 @@ contains
     return
   end subroutine nc_fclose
 
-  subroutine input_load(mf6_input, nc4pkg, ncid, nc_fname, iout)
+  subroutine input_load(mf6_input, ncpkg, ncid, nc_fname, iout)
     ! -- dummy
     type(ModflowInputType), intent(in) :: mf6_input
-    type(NC4ModelPackageInputType), pointer, intent(in) :: nc4pkg
+    type(NC4ModelPackageInputType), pointer, intent(in) :: ncpkg
     integer(I4B), intent(in) :: ncid
     character(len=*), intent(in) :: nc_fname
     integer(I4B), intent(in) :: iout
@@ -87,20 +87,20 @@ contains
                         mf6_input%subcomponent_name, iout)
     !
     ! -- load blocks until period
-    do iblock = 1, size(nc4pkg%blocklist)
-      if (nc4pkg%blocklist(iblock)%blockname == 'PERIOD') then
+    do iblock = 1, size(ncpkg%blocklist)
+      if (ncpkg%blocklist(iblock)%blockname == 'PERIOD') then
         !
         exit
         !
       else
         !
-        if (nc4pkg%blocklist(iblock)%aggregate) then
+        if (ncpkg%blocklist(iblock)%aggregate) then
           ! -- load list stype input
-          call load_aggregate_block(mf6_input, nc4pkg, mshape, &
+          call load_aggregate_block(mf6_input, ncpkg, mshape, &
                                     iblock, ncid, nc_fname, iout)
         else
           ! -- load block variables
-          call load_block_var(mf6_input, nc4pkg, mshape, &
+          call load_block_var(mf6_input, ncpkg, mshape, &
                               iblock, ncid, nc_fname, iout)
         end if
         !
@@ -115,12 +115,12 @@ contains
     return
   end subroutine input_load
 
-  subroutine load_aggregate_block(mf6_input, nc4pkg, mshape, &
+  subroutine load_aggregate_block(mf6_input, ncpkg, mshape, &
                                   iblock, ncid, nc_fname, iout)
     use InputOutputModule, only: parseline
     ! -- dummy
     type(ModflowInputType), intent(in) :: mf6_input
-    type(NC4ModelPackageInputType), pointer, intent(in) :: nc4pkg
+    type(NC4ModelPackageInputType), pointer, intent(in) :: ncpkg
     integer(I4B), dimension(:), contiguous, pointer, intent(in) :: mshape
     integer(I4B), intent(in) :: iblock
     integer(I4B), intent(in) :: ncid
@@ -147,7 +147,7 @@ contains
     ! -- Skip first col which is RECARRAY
     do icol = 2, nwords
       !
-      found = load_aggregate_var(mf6_input, nc4pkg, mshape, iblock, idta, &
+      found = load_aggregate_var(mf6_input, ncpkg, mshape, iblock, idta, &
                                  words(icol), ncid, nc_fname, iout)
       !
       ! -- ensure required params found
@@ -155,7 +155,7 @@ contains
         if (idt%required) then
           errmsg = 'Required input parameter "'//trim(idt%tagname)// &
                    '" not found for package "'// &
-                   trim(nc4pkg%subcomponent_name)//'".'
+                   trim(ncpkg%subcomponent_name)//'".'
           call store_error(errmsg)
           call store_error_filename(nc_fname)
         end if
@@ -171,11 +171,11 @@ contains
     return
   end subroutine load_aggregate_block
 
-  function load_aggregate_var(mf6_input, nc4pkg, mshape, iblock, idta, &
+  function load_aggregate_var(mf6_input, ncpkg, mshape, iblock, idta, &
                               tagname, ncid, nc_fname, iout) result(found)
     ! -- dummy
     type(ModflowInputType), intent(in) :: mf6_input
-    type(NC4ModelPackageInputType), pointer, intent(in) :: nc4pkg
+    type(NC4ModelPackageInputType), pointer, intent(in) :: ncpkg
     integer(I4B), dimension(:), contiguous, pointer, intent(in) :: mshape
     integer(I4B), intent(in) :: iblock
     type(InputParamDefinitionType), pointer, intent(in) :: idta
@@ -193,16 +193,16 @@ contains
     ! -- initialize
     found = .false.
     !
-    do iparam = 1, nc4pkg%blocklist(iblock)%varnum
+    do iparam = 1, ncpkg%blocklist(iblock)%varnum
       !
       ! -- set param definition
       idt => get_param_definition_type(mf6_input%param_dfns, &
                                        mf6_input%component_type, &
                                        mf6_input%subcomponent_type, &
-                                       nc4pkg%blocklist(iblock)%blockname, &
+                                       ncpkg%blocklist(iblock)%blockname, &
                                        tagname, nc_fname)
 
-      if (nc4pkg%blocklist(iblock)%varnames(iparam) == trim(tagname)) then
+      if (ncpkg%blocklist(iblock)%varnames(iparam) == trim(tagname)) then
         !
         ! -- set found
         found = .true.
@@ -214,10 +214,10 @@ contains
         ! -- load
         if (idt%datatype == 'IRREGINT1D') then
           call load_varint1d_type(mf6_input, mshape, idt, ncid, &
-                                  nc4pkg%blocklist(iblock)%varids(iparam), iout)
+                                  ncpkg%blocklist(iblock)%varids(iparam), iout)
         else
           call load_static_var(mf6_input, idt, mshape, ncid, &
-                               nc4pkg%blocklist(iblock)%varids(iparam), &
+                               ncpkg%blocklist(iblock)%varids(iparam), &
                                nc_fname, iout)
         end if
         !
@@ -229,12 +229,12 @@ contains
     return
   end function load_aggregate_var
 
-  subroutine load_block_var(mf6_input, nc4pkg, mshape, &
+  subroutine load_block_var(mf6_input, ncpkg, mshape, &
                             iblock, ncid, nc_fname, iout)
     use SourceCommonModule, only: set_model_shape, mem_allocate_naux
     ! -- dummy
     type(ModflowInputType), intent(in) :: mf6_input
-    type(NC4ModelPackageInputType), pointer, intent(in) :: nc4pkg
+    type(NC4ModelPackageInputType), pointer, intent(in) :: ncpkg
     integer(I4B), dimension(:), contiguous, pointer, intent(inout) :: mshape
     integer(I4B), intent(in) :: iblock
     integer(I4B), intent(in) :: ncid
@@ -245,25 +245,25 @@ contains
     integer(I4B) :: iparam
     !
     ! -- load variables in block order
-    do iparam = 1, nc4pkg%blocklist(iblock)%varnum
+    do iparam = 1, ncpkg%blocklist(iblock)%varnum
       !
       ! -- TODO: ensure nc file mf6_param is always using tagname
       idt => &
         get_param_definition_type(mf6_input%param_dfns, &
                                   mf6_input%component_type, &
                                   mf6_input%subcomponent_type, &
-                                  nc4pkg%blocklist(iblock)%blockname, &
-                                  nc4pkg%blocklist(iblock)%varnames(iparam), &
+                                  ncpkg%blocklist(iblock)%blockname, &
+                                  ncpkg%blocklist(iblock)%varnames(iparam), &
                                   nc_fname)
       ! -- load the variable data
       call load_static_var(mf6_input, idt, mshape, ncid, &
-                           nc4pkg%blocklist(iblock)%varids(iparam), &
+                           ncpkg%blocklist(iblock)%varids(iparam), &
                            nc_fname, iout)
       !
     end do
     !
     ! -- block post processing
-    select case (nc4pkg%blocklist(iblock)%blockname)
+    select case (ncpkg%blocklist(iblock)%blockname)
     case ('OPTIONS')
       ! -- allocate naux and set to 0 if not allocated
       do iparam = 1, size(mf6_input%param_dfns)
@@ -562,7 +562,7 @@ contains
     integer(I4B), pointer :: naux
     character(len=LINELENGTH) :: varname, dimname
     integer(I4B) :: vartype, ndims, nattr, n
-    integer(I4B), dimension(IDM_NETCDF4_MAX_DIM) :: dimids, dimlens
+    integer(I4B), dimension(NETCDF4_MAX_DIM) :: dimids, dimlens
     !
     ! -- inquire for variable info
     call nf_verify(nf90_inquire_variable(ncid, varid, varname, vartype, ndims, &
@@ -728,8 +728,8 @@ contains
     ! -- local
     integer(I4B), dimension(:), pointer, contiguous :: int1d, intvector_shape
     character(len=LINELENGTH) :: varname, dimname
-    integer(I4B) :: vartype, ndims, nattr, n, numvals
-    integer(I4B), dimension(IDM_NETCDF4_MAX_DIM) :: dimids, dimlens
+    integer(I4B) :: vartype, ndims, nattr, n
+    integer(I4B), dimension(NETCDF4_MAX_DIM) :: dimids, dimlens
     !
     ! -- inquire for variable info
     call nf_verify(nf90_inquire_variable(ncid, varid, varname, vartype, ndims, &
@@ -744,11 +744,6 @@ contains
     !
     ! -- set pointer to shape array
     call mem_setptr(intvector_shape, idt%shape, mf6_input%mempath)
-    !
-    ! -- set total number of values
-    numvals = sum(intvector_shape)
-    !
-    ! -- TODO check numvals against dimlens(1)?
     !
     ! -- allocate managed memory
     call mem_allocate(int1d, dimlens(1), idt%mf6varname, mf6_input%mempath)
@@ -1080,7 +1075,7 @@ contains
     integer(I4B) :: n
     character(len=LINELENGTH) :: varname, dimname
     integer(I4B) :: vartype, ndims, nattr
-    integer(I4B), dimension(IDM_NETCDF4_MAX_DIM) :: dimids, dimlens
+    integer(I4B), dimension(NETCDF4_MAX_DIM) :: dimids, dimlens
     !
     ! -- initialize
     nbound = 0
@@ -1137,7 +1132,7 @@ contains
     integer(I4B), intent(in) :: ncid
     type(InputParamDefinitionType), pointer, intent(in) :: idt
     integer(I4B), dimension(:), contiguous, pointer, intent(in) :: mshape
-    integer(I4B), dimension(IDM_NETCDF4_MAX_DIM), intent(in) :: dimlens
+    integer(I4B), dimension(NETCDF4_MAX_DIM), intent(in) :: dimlens
     integer(I4B), intent(in) :: varid
     integer(I4B), intent(in) :: iiper
     integer(I4B), intent(in) :: iout
@@ -1190,7 +1185,7 @@ contains
     integer(I4B), intent(in) :: ncid
     type(InputParamDefinitionType), pointer, intent(in) :: idt
     integer(I4B), dimension(:), contiguous, pointer, intent(in) :: mshape
-    integer(I4B), dimension(IDM_NETCDF4_MAX_DIM), intent(in) :: dimlens
+    integer(I4B), dimension(NETCDF4_MAX_DIM), intent(in) :: dimlens
     integer(I4B), intent(in) :: varid
     integer(I4B), intent(in) :: iiper
     integer(I4B), intent(in) :: iout
@@ -1232,7 +1227,7 @@ contains
     integer(I4B), intent(in) :: ncid
     type(InputParamDefinitionType), pointer, intent(in) :: idt
     integer(I4B), dimension(:), contiguous, pointer, intent(in) :: mshape
-    integer(I4B), dimension(IDM_NETCDF4_MAX_DIM), intent(in) :: dimlens
+    integer(I4B), dimension(NETCDF4_MAX_DIM), intent(in) :: dimlens
     integer(I4B), intent(in) :: varid
     integer(I4B), intent(in) :: iiper
     integer(I4B), intent(in) :: iout
@@ -1275,7 +1270,7 @@ contains
     integer(I4B), intent(in) :: ncid
     type(InputParamDefinitionType), pointer, intent(in) :: idt
     integer(I4B), dimension(:), contiguous, pointer, intent(in) :: mshape
-    integer(I4B), dimension(IDM_NETCDF4_MAX_DIM), intent(in) :: dimlens
+    integer(I4B), dimension(NETCDF4_MAX_DIM), intent(in) :: dimlens
     integer(I4B), intent(in) :: varid
     integer(I4B), intent(in) :: iiper
     integer(I4B), intent(in) :: iout
@@ -1316,7 +1311,7 @@ contains
     integer(I4B), intent(in) :: ncid
     type(InputParamDefinitionType), pointer, intent(in) :: idt
     integer(I4B), dimension(:), contiguous, pointer, intent(in) :: mshape
-    integer(I4B), dimension(IDM_NETCDF4_MAX_DIM), intent(in) :: dimlens
+    integer(I4B), dimension(NETCDF4_MAX_DIM), intent(in) :: dimlens
     integer(I4B), intent(in) :: varid
     integer(I4B), intent(in) :: iiper
     integer(I4B), intent(in) :: iout
@@ -1358,7 +1353,7 @@ contains
     use SourceCommonModule, only: ReadStateVarType
     ! -- dummy
     type(ModflowInputType), intent(in) :: mf6_input
-    type(NC4ModelPackageInputType), intent(in) :: ncpkg
+    type(NC4ModelPackageInputType), pointer, intent(in) :: ncpkg
     character(len=LENVARNAME), dimension(:), &
       allocatable :: param_names !< dynamic param names
     type(ReadStateVarType), dimension(:), allocatable :: param_reads
@@ -1387,7 +1382,7 @@ contains
                                       mf6_input%subcomponent_type, &
                                       'PERIOD', tagname, nc_fname)
           !
-          call load_var_rp_array(mf6_input, param_names, &
+          call load_var_rp_array(mf6_input, ncpkg, param_names, &
                                  param_reads, ncid, idt, varid, &
                                  nc_fname, iout)
         end do
@@ -1398,13 +1393,14 @@ contains
     return
   end subroutine nc4_rp_array
 
-  subroutine load_var_rp_array(mf6_input, param_names, param_reads, &
+  subroutine load_var_rp_array(mf6_input, ncpkg, param_names, param_reads, &
                                ncid, idt, varid, nc_fname, iout)
     use TdisModule, only: kper
     use BoundInputContextModule, only: BoundInputContextType
     use SourceCommonModule, only: ReadStateVarType
     ! -- dummy
     type(ModflowInputType), intent(in) :: mf6_input
+    type(NC4ModelPackageInputType), pointer, intent(in) :: ncpkg
     character(len=LENVARNAME), dimension(:), &
       allocatable :: param_names !< dynamic param names
     type(ReadStateVarType), dimension(:), allocatable :: param_reads
@@ -1417,7 +1413,7 @@ contains
     integer(I4B) :: n, load_idx, len
     character(len=LINELENGTH) :: varname, dimname
     integer(I4B) :: vartype, ndims, nattr
-    integer(I4B), dimension(IDM_NETCDF4_MAX_DIM) :: dimids, dimlens
+    integer(I4B), dimension(NETCDF4_MAX_DIM) :: dimids, dimlens
     integer(I4B), dimension(:), allocatable :: ipers
     !
     ! -- index for loading kper data
@@ -1450,6 +1446,11 @@ contains
             ! -- load, save index
             load_idx = n
             exit
+            !do m = 1, size(ncpkg%ipers)
+            !  if (ipers(n) == ncpkg%ipers(m)) then
+            !    load_idx = m
+            !  end if
+            !end do
           end if
         end do
       end if
@@ -1458,9 +1459,9 @@ contains
     ! -- read and load variable data if load_idx defined
     if (load_idx > 0) then
       select case (idt%datatype)
-        !case ('INTEGER1D')
-        !  call load_int3d_rp_array(mf6_input, ncid, idt, &
-        !                           dimlens, varid, load_idx, iout)
+      case ('INTEGER1D')
+        call load_int3d_rp_array(mf6_input, ncid, param_names, param_reads, &
+                                 idt, dimlens, varid, load_idx, iout)
         !
       case ('DOUBLE1D')
         call load_dbl3d_rp_array(mf6_input, ncid, param_names, param_reads, &
@@ -1478,22 +1479,67 @@ contains
     return
   end subroutine load_var_rp_array
 
-!  subroutine load_int3d_rp_array(mf6_input, ncid, idt, &
-!                                 dimlens, varid, load_idx, iout)
-!    ! -- dummy
-!    type(ModflowInputType), intent(in) :: mf6_input
-!    integer(I4B), intent(in) :: ncid
-!    type(InputParamDefinitionType), pointer, intent(in) :: idt
-!    integer(I4B), dimension(IDM_NETCDF4_MAX_DIM), intent(in)  :: dimlens
-!    integer(I4B), intent(in) :: varid
-!    integer(I4B), intent(in) :: load_idx
-!    integer(I4B), intent(in) :: iout
-!    ! -- local
-!    integer(I4B), dimension(:), pointer, contiguous :: int1d
-!    !
-!    ! -- return
-!    return
-!  end subroutine load_int3d_rp_array
+  subroutine load_int3d_rp_array(mf6_input, ncid, param_names, param_reads, &
+                                 idt, dimlens, varid, load_idx, iout)
+    ! -- modules
+    use SourceCommonModule, only: ReadStateVarType
+    use ArrayHandlersModule, only: ifind
+    use SourceCommonModule, only: ifind_charstr
+    ! -- dummy
+    type(ModflowInputType), intent(in) :: mf6_input
+    integer(I4B), intent(in) :: ncid
+    character(len=LENVARNAME), dimension(:), &
+      allocatable :: param_names !< dynamic param names
+    type(ReadStateVarType), dimension(:), allocatable :: param_reads
+    type(InputParamDefinitionType), pointer, intent(in) :: idt
+    integer(I4B), dimension(NETCDF4_MAX_DIM), intent(in) :: dimlens
+    integer(I4B), intent(in) :: varid
+    integer(I4B), intent(in) :: load_idx
+    integer(I4B), intent(in) :: iout
+    ! -- local
+    integer(I4B), dimension(:), pointer, contiguous :: int1d
+    integer(I4B), dimension(:, :, :), pointer, contiguous :: int3d
+    integer(I4B) :: k, j, i, n, iparam
+    !
+    ! -- set iparam to name index
+    iparam = ifind(param_names, idt%tagname)
+    !
+    ! -- set pointer to managed memory variable
+    call mem_setptr(int1d, idt%mf6varname, mf6_input%mempath)
+    !
+    ! -- allocate local array
+    allocate (int3d(dimlens(3), dimlens(2), dimlens(1)))
+    !
+    ! -- read and load data to local array
+    ! -- dims: (1: ncol, 2: nrow, 3: nlay, 4: iper)
+    n = 0
+    call nf_verify(nf90_get_var(ncid, varid, int3d, &
+                                start=(/1, 1, 1, load_idx/), &
+                                count=(/dimlens(1), dimlens(2), &
+                                        dimlens(3), 1/)), ncid, iout)
+    outer: do k = 1, size(int3d, dim=3)
+      do j = 1, size(int3d, dim=2)
+        do i = 1, size(int3d, dim=1)
+          n = n + 1
+          if (int3d(i, j, k) /= INODATA) then
+            int1d(n) = int3d(i, j, k) + 1
+          else
+            exit outer
+          end if
+        end do
+      end do
+    end do outer
+    !
+    ! -- set read state vars
+    if (iparam > 0) then
+      param_reads(iparam)%invar = 1
+    end if
+    !
+    deallocate (int3d)
+    !
+    ! -- return
+    return
+  end subroutine load_int3d_rp_array
 
   subroutine load_dbl3d_rp_array(mf6_input, ncid, param_names, param_reads, &
                                  idt, dimlens, varid, load_idx, iout)
@@ -1508,28 +1554,17 @@ contains
       allocatable :: param_names !< dynamic param names
     type(ReadStateVarType), dimension(:), allocatable :: param_reads
     type(InputParamDefinitionType), pointer, intent(in) :: idt
-    integer(I4B), dimension(IDM_NETCDF4_MAX_DIM), intent(in) :: dimlens
+    integer(I4B), dimension(NETCDF4_MAX_DIM), intent(in) :: dimlens
     integer(I4B), intent(in) :: varid
     integer(I4B), intent(in) :: load_idx
     integer(I4B), intent(in) :: iout
     ! -- local
     real(DP), dimension(:), pointer, contiguous :: dbl1d
     real(DP), dimension(:, :, :), pointer, contiguous :: dbl3d
-    integer(I4B), dimension(:), pointer, contiguous :: ialayer
-    integer(I4B) :: n, i, j, k, layer, iparam, ilayer
+    integer(I4B) :: n, i, j, k, iparam
     !
     ! -- initialize
     n = 0
-    layer = 1
-    ilayer = 0
-    nullify (ialayer)
-    !
-    ! -- TEMP set layer index array
-    ilayer = ifind(param_names, 'IRCH')
-    if (ilayer <= 0) iparam = ifind(param_names, 'IEVT')
-    if (ilayer > 0) then
-      call mem_setptr(ialayer, param_names(ilayer), mf6_input%mempath)
-    end if
     !
     ! -- set iparam to name index
     iparam = ifind(param_names, idt%tagname)
@@ -1548,29 +1583,22 @@ contains
                                         dimlens(3), 1/)), ncid, iout)
     !
     ! -- copy data from local array to managed memory
-    do k = 1, size(dbl3d, dim=3)
+    outer: do k = 1, size(dbl3d, dim=3)
       do j = 1, size(dbl3d, dim=2)
         do i = 1, size(dbl3d, dim=1)
-          if (n < size(dbl1d)) then
-            n = n + 1
-          else
-            n = 1
-            layer = layer + 1
-          end if
           if (dbl3d(i, j, k) /= DNODATA) then
+            n = n + 1
             dbl1d(n) = dbl3d(i, j, k)
-            if (ilayer > 0) ialayer(n) = layer
+          else
+            exit outer
           end if
         end do
       end do
-    end do
+    end do outer
     !
     ! -- set read state vars
     if (iparam > 0) then
       param_reads(iparam)%invar = 1
-    end if
-    if (ilayer > 0) then
-      param_reads(ilayer)%invar = 1
     end if
     !
     ! -- deallocate local array
@@ -1666,8 +1694,8 @@ contains
     !
     if (.not. associated(ncpkg)) then
       errmsg = 'NC package context not found:'//trim(modelname)//'/'//trim(scname)
-      call store_error(errmsg)
-      call store_error_filename(nc4_context%modelfname)
+      !call store_error(errmsg)
+      !call store_error_filename(nc4_context%modelfname)
     else
       if (ncpkg%subcomponent_type /= sctype) then
         ! -- pkgtype (EVT6 or RCH6) used in namefile packages block-
@@ -1707,8 +1735,8 @@ contains
     return
   end function read_as_arrays
 
-  subroutine add_block_var(ncpkg, ncid, varid, varname, ctype, sctype, &
-                           mempath, modelfname, iout)
+  subroutine add_context_blkvar(ncpkg, ncid, varid, varname, ctype, sctype, &
+                                mempath, modelfname, iout)
     ! -- modules
     use IdmDfnSelectorModule, only: param_definitions
     ! -- dummy
@@ -1756,7 +1784,7 @@ contains
     !
     ! -- return
     return
-  end subroutine add_block_var
+  end subroutine add_context_blkvar
 
   subroutine create_pkg_ipers(ncpkg, ncid, varid, varname, iout)
     ! -- modules
@@ -1768,7 +1796,7 @@ contains
     integer(I4B), intent(in) :: iout
     ! -- local
     integer(I4B) :: vartype, ndims, nattr
-    integer(I4B), dimension(IDM_NETCDF4_MAX_DIM) :: dimids, dimlens
+    integer(I4B), dimension(NETCDF4_MAX_DIM) :: dimids, dimlens
     character(len=LINELENGTH) :: dimname
     !
     ! -- inquire for IPER variable info
@@ -1788,7 +1816,7 @@ contains
     return
   end subroutine create_pkg_ipers
 
-  subroutine add_package_var(nc4_context, modelname, varid, iout)
+  subroutine add_context_pkgvar(nc4_context, modelname, varid, iout)
     ! -- modules
     use MemoryHelperModule, only: split_mem_path
     use SourceCommonModule, only: idm_subcomponent_type
@@ -1838,15 +1866,17 @@ contains
         ncpkg => get_nc4_package(nc4_context, component, scname, &
                                  pkgtype, sctype, iout)
         !
-        if (varname == 'IPER') then
-          ! -- allocate and set package ipers
-          call create_pkg_ipers(ncpkg, ncid, varid, varname, iout)
-          !
-        else
-          ! -- track package parameter
-          call add_block_var(ncpkg, ncid, varid, varname, &
-                             nc4_context%component_type, sctype, &
-                             mempath, nc4_context%modelfname, iout)
+        if (associated(ncpkg)) then
+          if (varname == 'IPER') then
+            ! -- allocate and set package ipers
+            call create_pkg_ipers(ncpkg, ncid, varid, varname, iout)
+            !
+          else
+            ! -- track package parameter
+            call add_context_blkvar(ncpkg, ncid, varid, varname, &
+                                    nc4_context%component_type, sctype, &
+                                    mempath, nc4_context%modelfname, iout)
+          end if
         end if
       else
         ! TODO: invalid mf6_input string
@@ -1855,7 +1885,7 @@ contains
     !
     ! -- return
     return
-  end subroutine add_package_var
+  end subroutine add_context_pkgvar
 
   subroutine nc4_pkg_context(nc4_context, iout)
     use InputOutputModule, only: lowcase, upcase
@@ -1919,7 +1949,7 @@ contains
     ! -- identify package variables; build block variable lists
     do iparam = 1, nvar
       !
-      call add_package_var(nc4_context, modelname, varids(iparam), iout)
+      call add_context_pkgvar(nc4_context, modelname, varids(iparam), iout)
       !
     end do
     !

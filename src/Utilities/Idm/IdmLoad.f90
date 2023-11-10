@@ -141,18 +141,18 @@ contains
   !<
   subroutine load_model_pkgs(model_pkg_inputs, iout)
     use ModelPackageInputsModule, only: ModelPackageInputsType
-    use SourceLoadModule, only: open_source_file, create_context
+    use SourceLoadModule, only: open_source_file, create_model_context
     use IdmDfnSelectorModule, only: idm_integrated
     type(ModelPackageInputsType), intent(inout) :: model_pkg_inputs
     integer(i4B), intent(in) :: iout
     integer(I4B) :: itype, ipkg
     !
-    ! -- create package context object
-    call create_context(model_pkg_inputs%modeltype, &
-                        model_pkg_inputs%component_type, &
-                        model_pkg_inputs%modelname, &
-                        model_pkg_inputs%modelfname, &
-                        model_pkg_inputs%pkglist, iout)
+    ! -- create model context
+    call create_model_context(model_pkg_inputs%modeltype, &
+                              model_pkg_inputs%component_type, &
+                              model_pkg_inputs%modelname, &
+                              model_pkg_inputs%modelfname, &
+                              model_pkg_inputs%pkglist, iout)
     !
     ! -- load package instances by type
     do itype = 1, size(model_pkg_inputs%pkglist)
@@ -284,7 +284,7 @@ contains
     ! -- initialize
     nullify (model_dynamic_input)
     !
-    ! -- assign model loader object if found
+    ! -- assign model loader if found
     do id = 1, model_dynamic_pkgs%Count()
       temp => GetDynamicModelFromList(model_dynamic_pkgs, id)
       if (temp%modelname == modelname) then

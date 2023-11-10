@@ -1,7 +1,7 @@
 !> @brief This module contains the SourceLoadModule
 !!
 !! This module contains the routines needed to generate
-!! a loader object for an input source and routines
+!! loaders for an input source and routines
 !! that distribute processing to a particular source.
 !!
 !<
@@ -19,7 +19,7 @@ module SourceLoadModule
   public :: create_pkg_loader
   public :: open_source_file
   public :: load_modelnam, load_simnam
-  public :: create_context
+  public :: create_model_context
 
 contains
 
@@ -217,8 +217,8 @@ contains
 
   !> @brief create model context
   !<
-  subroutine create_context(modeltype, component_type, modelname, &
-                            modelfname, pkglist, iout)
+  subroutine create_model_context(modeltype, component_type, modelname, &
+                                  modelfname, pkglist, iout)
     ! -- modules
     use ModelPackageInputsModule, only: LoadablePackageType
     ! -- drummy
@@ -237,7 +237,7 @@ contains
     !
     ! -- return
     return
-  end subroutine create_context
+  end subroutine create_model_context
 
   !> @brief create model netcdf4 context
   !<
@@ -265,7 +265,7 @@ contains
     integer(I4B) :: ncid
 #endif
     !
-    ! -- allocate context object
+    ! -- allocate model context
     allocate (nc4_context)
     !
     ! -- set model nc filename if provided
@@ -277,7 +277,7 @@ contains
       ! -- open nc4 input file
       ncid = open_ncfile(nc4_fname, iout)
       !
-      ! -- init model context object
+      ! -- init model context
       call nc4_context%init(modeltype, component_type, modelname, nc4_fname, ncid)
       !
       ! -- add NETCDF4 packages to context
@@ -297,7 +297,7 @@ contains
 #endif
     else
       !
-      ! -- initialize object
+      ! -- initialize empty context
       call nc4_context%init(modeltype, component_type, modelname, '', 0)
       !
     end if
@@ -336,7 +336,7 @@ contains
           !
           if (idm_integrated(component_type, pkglist(n)%subcomponent_type)) then
             !
-            ! -- add pkg instance to context object
+            ! -- add pkg instance to context
             call nc4_context%add(pkglist(n)%pkgtype, &
                                  pkglist(n)%pkgnames(m), &
                                  pkglist(n)%subcomponent_type)

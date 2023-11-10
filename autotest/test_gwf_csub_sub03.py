@@ -8,6 +8,7 @@ from framework import TestFramework
 from simulation import TestSimulation
 
 ex = ["csub_sub03a", "csub_sub03b"]
+g_tc0 = []
 cmppth = "mf6_regression"
 cvopt = [None, None, None]
 constantcv = [True, True]
@@ -354,8 +355,9 @@ def build_model(idx, dir):
     return sim, mc
 
 
-def eval_comp(sim):
+def eval_comp(sim, idx, netcdf=None):
     print("evaluating compaction...")
+    global g_tc0
 
     # MODFLOW 6 total compaction results
     fpth = os.path.join(sim.simpath, "csub_obs.csv")
@@ -365,11 +367,15 @@ def eval_comp(sim):
         assert False, f'could not load data from "{fpth}"'
 
     # Comparision total compaction results
-    fpth = os.path.join(sim.simpath, cmppth, "csub_obs.csv")
-    try:
-        tc0 = np.genfromtxt(fpth, names=True, delimiter=",")
-    except:
-        assert False, f'could not load data from "{fpth}"'
+    if netcdf:
+        tc0 = g_tc0[idx]
+    else:
+        fpth = os.path.join(sim.simpath, cmppth, "csub_obs.csv")
+        try:
+            tc0 = np.genfromtxt(fpth, names=True, delimiter=",")
+            g_tc0.append(tc0)
+        except:
+            assert False, f'could not load data from "{fpth}"'
 
     # calculate maximum absolute error
     diff = tc["TCOMP3"] - tc0["TCOMP3"]
@@ -446,9 +452,29 @@ def test_mf6model(idx, name, function_tmpdir, targets):
         TestSimulation(
             name=name,
             exe_dict=targets,
-            exfunc=eval_comp,
+            exfunc=lambda s: eval_comp(s, idx, False),
             htol=htol[idx],
             mf6_regression=True,
         ),
         str(function_tmpdir),
+    )
+
+@pytest.mark.netcdf
+@pytest.mark.parametrize(
+    "idx, name",
+    list(enumerate(ex)),
+)
+def test_mf6model_nc(idx, name, function_tmpdir, targets):
+    ws = str(function_tmpdir)
+    test = TestFramework()
+    test.build(build_model, idx, ws, True)
+    test.run(
+        TestSimulation(
+            name=name,
+            exe_dict=targets,
+            exfunc=lambda s: eval_comp(s, idx, True),
+            htol=htol[idx],
+            make_comparison=False,
+        ),
+        ws,
     )

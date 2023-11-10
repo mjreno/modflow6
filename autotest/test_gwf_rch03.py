@@ -173,3 +173,19 @@ def test_mf6model(idx, name, function_tmpdir, targets):
         ),
         ws,
     )
+
+@pytest.mark.netcdf
+@pytest.mark.parametrize(
+    "idx, name",
+    list(enumerate(ex)),
+)
+def test_mf6model_nc(idx, name, function_tmpdir, targets):
+    ws = str(function_tmpdir)
+    test = TestFramework()
+    test.build(build_model, idx, ws, True)
+    test.run(
+        TestSimulation(
+            name=name, exe_dict=targets, exfunc=eval_model, idxsim=idx
+        ),
+        ws,
+    )

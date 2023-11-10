@@ -306,7 +306,7 @@ contains
     return
   end subroutine dynamic_destroy
 
-  !> @brief build the type list with all model package instances
+  !> @brief Open netcdf file
   !<
   function open_ncfile(nc_fname, iout) result(ncid)
     ! -- modules

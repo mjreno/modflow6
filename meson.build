@@ -81,6 +81,7 @@ elif fc_id == 'intel'
   compile_args += ['-fpe0',              # Activate all floating point exceptions
                    '-no-heap-arrays',
                    '-traceback',
+                   '-fpp',
                    '-diag-disable:7416',  # f2008 warning
                    '-diag-disable:7025',  # f2008 warning
                    '-diag-disable:5268',  # Line too long
@@ -194,7 +195,7 @@ if netcdf.found()
   with_netcdf = true
   extra_cmp_args += [ '-D__WITH_NETCDF__' ]
   dependencies += [ netcdf ]
-  add_project_dependencies(netcdf, language: 'fortran')
+  #add_project_dependencies(netcdf, language: 'fortran')
 else
   with_netcdf = false
 endif

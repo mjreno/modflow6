@@ -194,6 +194,7 @@ if netcdf.found()
   with_netcdf = true
   extra_cmp_args += [ '-D__WITH_NETCDF__' ]
   dependencies += [ netcdf ]
+  add_project_dependencies(netcdf, language: 'fortran')
 else
   with_netcdf = false
 endif

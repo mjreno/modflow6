@@ -30,16 +30,12 @@ module StressGridInputModule
   !<
   type, extends(AsciiDynamicPkgLoadBaseType) :: StressGridInputType
     integer(I4B) :: tas_active !< Are TAS6 inputs defined
-    integer(I4B) :: nparam !< number of dynamic parameters other than AUX
     type(CharacterStringType), dimension(:), contiguous, &
-      pointer :: aux_tasnames => null() !< array of AUXVAR TAS names
+      pointer :: aux_tasnames !< array of AUXVAR TAS names
     type(CharacterStringType), dimension(:), contiguous, &
-      pointer :: param_tasnames => null() !< array of dynamic param TAS names
-    character(len=LENVARNAME), dimension(:), &
-      allocatable :: param_names !< dynamic param names
+      pointer :: param_tasnames !< array of dynamic param TAS names
     type(ReadStateVarType), dimension(:), allocatable :: param_reads !< read states for current load
-    type(TimeArraySeriesManagerType), pointer :: tasmanager => null() !< TAS manager object
-    type(BoundInputContextType) :: bndctx !< boundary package input context
+    type(TimeArraySeriesManagerType), pointer :: tasmanager !< TAS manager
   contains
     procedure :: init => ingrid_init
     procedure :: df => ingrid_df
@@ -73,6 +69,8 @@ contains
     call this%DynamicPkgLoadType%init(mf6_input, modelname, modelfname, &
                                       source, iperblock, iout)
     ! -- initialize
+    nullify (this%aux_tasnames)
+    nullify (this%param_tasnames)
     this%tas_active = 0
     this%nparam = 0
     this%iout = iout

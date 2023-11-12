@@ -36,7 +36,7 @@ module IdmMf6FileModule
   !!
   !<
   type :: PackageLoad
-    procedure(IPackageLoad), nopass, pointer, public :: load_package => null() !< procedure pointer to the load routine
+    procedure(IPackageLoad), nopass, pointer, public :: load_package !< procedure pointer to the load routine
   end type PackageLoad
 
   abstract interface
@@ -63,9 +63,9 @@ module IdmMf6FileModule
   !<
   type, extends(DynamicPkgLoadBaseType) :: Mf6FileDynamicPkgLoadType
     type(BlockParserType), pointer :: parser !< parser for MF6File period blocks
-    integer(I4B), pointer :: iper => null()
-    integer(I4B), pointer :: ionper => null()
-    class(AsciiDynamicPkgLoadBaseType), pointer :: block_loader => null()
+    integer(I4B), pointer :: iper
+    integer(I4B), pointer :: ionper
+    class(AsciiDynamicPkgLoadBaseType), pointer :: rp_loader
   contains
     procedure :: init => dynamic_init
     procedure :: df => dynamic_df
@@ -103,6 +103,9 @@ contains
     type(BlockParserType), allocatable, target :: parser !< block parser
     type(PackageLoad) :: pkgloader
     integer(I4B) :: inunit
+    !
+    ! -- initialize
+    nullify (pkgloader%load_package)
     !
     ! -- set parser based package loader by file type
     select case (mf6_input%pkgtype)
@@ -156,15 +159,17 @@ contains
 
   !> @brief load routine for static loader
   !<
-  function static_load(this, iout) result(period_loader)
+  function static_load(this, iout) result(rp_loader)
     class(Mf6FileStaticPkgLoadType), intent(inout) :: this
     integer(I4B), intent(in) :: iout
-    class(DynamicPkgLoadBaseType), pointer :: period_loader
-    class(Mf6FileDynamicPkgLoadType), pointer :: mf6_loader => null()
-    type(BlockParserType), pointer :: parser => null()
+    class(DynamicPkgLoadBaseType), pointer :: rp_loader
+    class(Mf6FileDynamicPkgLoadType), pointer :: mf6_loader
+    type(BlockParserType), pointer :: parser
     !
     ! -- initialize
-    nullify (period_loader)
+    nullify (rp_loader)
+    nullify (mf6_loader)
+    nullify (parser)
     !
     ! -- load model package to input context
     if (this%iperblock > 0) then
@@ -185,7 +190,7 @@ contains
       call mf6_loader%set(parser)
       !
       ! -- set return pointer to base dynamic loader
-      period_loader => mf6_loader
+      rp_loader => mf6_loader
       !
     else
       !
@@ -228,6 +233,8 @@ contains
     call mem_allocate(this%iper, 'IPER', this%mf6_input%mempath)
     call mem_allocate(this%ionper, 'IONPER', this%mf6_input%mempath)
     !
+    ! -- initialize package
+    nullify (this%rp_loader)
     this%iper = 0
     this%ionper = 0
     !
@@ -261,7 +268,7 @@ contains
     ! -- read first iper
     call this%read_ionper()
     !
-    call this%block_loader%df()
+    call this%rp_loader%df()
     !
     ! -- return
     return
@@ -272,7 +279,7 @@ contains
   subroutine dynamic_ad(this)
     class(Mf6FileDynamicPkgLoadType), intent(inout) :: this
     !
-    call this%block_loader%ad()
+    call this%rp_loader%ad()
     !
     ! -- return
     return
@@ -283,7 +290,6 @@ contains
   subroutine dynamic_rp(this)
     ! -- modules
     use TdisModule, only: kper, nper
-    use MemoryManagerModule, only: mem_setptr
     ! -- dummy
     class(Mf6FileDynamicPkgLoadType), intent(inout) :: this
     ! -- locals
@@ -292,7 +298,7 @@ contains
     if (this%ionper /= kper) return
     !
     ! -- dynamic load
-    call this%block_loader%rp(this%parser)
+    call this%rp_loader%rp(this%parser)
     !
     ! -- update loaded iper
     this%iper = kper
@@ -372,19 +378,19 @@ contains
     ! -- allocate and set loader
     if (this%readasarrays) then
       allocate (grid_loader)
-      this%block_loader => grid_loader
+      this%rp_loader => grid_loader
     else
       allocate (list_loader)
-      this%block_loader => list_loader
+      this%rp_loader => list_loader
     end if
     !
     ! -- initialize loader
-    call this%block_loader%init(this%mf6_input, &
-                                this%modelname, &
-                                this%modelfname, &
-                                this%sourcename, &
-                                this%iperblock, &
-                                this%iout)
+    call this%rp_loader%init(this%mf6_input, &
+                             this%modelname, &
+                             this%modelfname, &
+                             this%sourcename, &
+                             this%iperblock, &
+                             this%iout)
     !
     ! -- return
     return
@@ -396,8 +402,8 @@ contains
     class(Mf6FileDynamicPkgLoadType), intent(inout) :: this
     !
     ! -- deallocate loader
-    call this%block_loader%destroy()
-    deallocate (this%block_loader)
+    call this%rp_loader%destroy()
+    deallocate (this%rp_loader)
     !
     ! -- deallocate parser
     call this%parser%clear()

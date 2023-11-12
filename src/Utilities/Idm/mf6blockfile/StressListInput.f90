@@ -32,12 +32,9 @@ module StressListInputModule
     integer(I4B) :: ts_active
     integer(I4B) :: ibinary
     integer(I4B) :: oc_inunit
-    integer(I4B) :: ncol
     integer(I4B) :: iboundname
-    character(len=LENVARNAME), dimension(:), allocatable :: cols
-    type(TimeSeriesManagerType), pointer :: tsmanager => null()
+    type(TimeSeriesManagerType), pointer :: tsmanager
     type(StructArrayType), pointer :: structarray
-    type(BoundInputContextType) :: bndctx
   contains
     procedure :: init => inlist_init
     procedure :: df => inlist_df
@@ -99,7 +96,7 @@ contains
     call this%bndctx%init(mf6_input, .false.)
     !
     ! -- set SA cols in scope for list input
-    call this%bndctx%filtered_params(this%cols, this%ncol)
+    call this%bndctx%filtered_params(this%param_names, this%nparam)
     !
     ! -- construct and set up the struct array object
     call this%create_structarray()
@@ -180,7 +177,7 @@ contains
     ! -- modules
     class(StressListInputType), intent(inout) :: this !< StressListInputType
     !
-    deallocate (this%cols)
+    deallocate (this%param_names)
     deallocate (this%tsmanager)
     call destructStructArray(this%structarray)
     call this%bndctx%destroy()
@@ -211,16 +208,16 @@ contains
     type(StructVectorType), pointer, intent(in) :: structvector
     type(TSStringLocType), pointer, intent(in) :: ts_strloc
     ! -- locals
-    real(DP), pointer :: bndElem => null()
-    type(TimeSeriesLinkType), pointer :: tsLinkBnd => null()
-    type(TimeSeriesLinkType), pointer :: tsLinkAux => null()
+    real(DP), pointer :: bndElem
+    type(TimeSeriesLinkType), pointer :: tsLinkBnd
+    type(TimeSeriesLinkType), pointer :: tsLinkAux
     type(StructVectorType), pointer :: sv_bound
     character(len=LENBOUNDNAME) :: boundname
     !
     select case (structvector%memtype)
     case (2)
       !
-      tsLinkBnd => NULL()
+      nullify (tsLinkBnd)
       !
       ! -- set bound element
       bndElem => structvector%dbl1d(ts_strloc%row)
@@ -250,7 +247,7 @@ contains
       !
     case (6)
       !
-      tsLinkAux => NULL()
+      nullify (tsLinkAux)
       !
       ! -- set bound element
       bndElem => structvector%dbl2d(ts_strloc%col, ts_strloc%row)
@@ -325,18 +322,18 @@ contains
     integer(I4B) :: icol
     !
     ! -- construct and set up the struct array object
-    this%structarray => constructStructArray(this%ncol, this%bndctx%maxbound, &
+    this%structarray => constructStructArray(this%nparam, this%bndctx%maxbound, &
                                              0, this%mf6_input%mempath, &
                                              this%mf6_input%component_mempath)
     !
     ! -- set up struct array
-    do icol = 1, this%ncol
+    do icol = 1, this%nparam
       !
       idt => get_param_definition_type(this%mf6_input%param_dfns, &
                                        this%mf6_input%component_type, &
                                        this%mf6_input%subcomponent_type, &
                                        'PERIOD', &
-                                       this%cols(icol), this%sourcename)
+                                       this%param_names(icol), this%sourcename)
       !
       ! -- allocate variable in memory manager
       call this%structarray%mem_create_vector(icol, idt)

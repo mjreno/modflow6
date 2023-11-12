@@ -8,8 +8,10 @@
 module AsciiInputLoadTypeModule
 
   use KindModule, only: DP, I4B, LGP
+  use ConstantsModule, only: LENVARNAME
   use InputLoadTypeModule, only: DynamicPkgLoadType
   use BlockParserModule, only: BlockParserType
+  use BoundInputContextModule, only: BoundInputContextType
 
   implicit none
   private
@@ -19,6 +21,10 @@ module AsciiInputLoadTypeModule
   !!
   !<
   type, abstract, extends(DynamicPkgLoadType) :: AsciiDynamicPkgLoadBaseType
+    integer(I4B) :: nparam
+    character(len=LENVARNAME), dimension(:), &
+      allocatable :: param_names !< dynamic param names
+    type(BoundInputContextType) :: bndctx
   contains
     procedure(ascii_period_load_if), deferred :: rp
   end type AsciiDynamicPkgLoadBaseType

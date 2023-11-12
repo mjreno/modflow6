@@ -23,7 +23,7 @@ module InputModelContextModule
 
   !> @brief type for storing model context
   !!
-  !! This type is used to store a list of context objects
+  !! This type is used to store a set of context objects
   !! associated with a model. Add additional context types as
   !! appropriate.
   !!
@@ -31,7 +31,7 @@ module InputModelContextModule
   type :: ModelContextType
     character(len=LENMODELNAME) :: modelname !< name of model
     character(len=LINELENGTH) :: modelfname !< name of model input file
-    type(NC4ModelInputsType), pointer :: nc4_context
+    type(NC4ModelInputsType), pointer :: nc4_context !< model netcdf context
   contains
     procedure :: init => modelctx_init
     procedure :: destroy => modelctx_destroy
@@ -148,7 +148,11 @@ contains
     return
   end subroutine ModelContextDestroy
 
-  !> @brief get model context object from list
+  !> @brief add netcdf context to model context object
+  !!
+  !! Add netcdf context to a model on the model context list.
+  !! If model context object does not exist, create and add
+  !! to the model context list.
   !!
   !<
   subroutine AddModelNC4Context(modelname, modelfname, nc4_context)
@@ -177,7 +181,10 @@ contains
     return
   end subroutine AddModelNC4Context
 
-  !> @brief get model context object from list
+  !> @brief get netcdf context associated with model
+  !!
+  !! Retrieve and return netcdf context associated with a model
+  !! context object on the model context list.
   !!
   !<
   function GetModelNC4Context(modelname) result(nc4_context)

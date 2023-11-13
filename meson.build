@@ -196,6 +196,16 @@ if netcdf.found()
   extra_cmp_args += [ '-D__WITH_NETCDF__' ]
   dependencies += [ netcdf ]
   #add_project_dependencies(netcdf, language: 'fortran')
+  code = '''
+  program meson_netcdf_link_test
+    use netcdf
+    print *, trim(nf90_inq_libvers())
+  end program meson_netcdf_link_test
+  '''
+  result = fc.links(code, dependencies : netcdf, name : 'NetCDF link check')
+  if result == false
+    message('Linking against NetCDF failed!')
+  endif
 else
   with_netcdf = false
 endif

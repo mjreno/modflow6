@@ -98,8 +98,8 @@ jobs:
           #cat /home/runner/micromamba/envs/modflow6/lib/pkgconfig/netcdf-fortran.pc
           sed -i "s|libdir=/home/runner/micromamba/envs/modflow6//home/runner/micromamba/envs/modflow6/lib|libdir=/home/runner/micromamba/envs/modflow6/lib|g" /home/runner/micromamba/envs/modflow6/lib/pkgconfig/netcdf-fortran.pc
           #cat /home/runner/micromamba/envs/modflow6/lib/pkgconfig/netcdf-fortran.pc
-          pkg-config --cflags netcdf-fortran
-          pkg-config --libs netcdf-fortran
+          /home/runner/micromamba/envs/modflow6/bin/pkg-config --cflags netcdf-fortran
+          /home/runner/micromamba/envs/modflow6/bin/pkg-config --libs netcdf-fortran
 
       - name: Edit netcdf-fortran.pc
         if: runner.os == 'macOS'
@@ -111,16 +111,16 @@ jobs:
           #cat /home/runner/micromamba/envs/modflow6/lib/pkgconfig/netcdf-fortran.pc
           sed -i '' -e "s|libdir=/Users/runner/micromamba/envs/modflow6//Users/runner/micromamba/envs/modflow6/lib|libdir=/Users/runner/micromamba/envs/modflow6/lib|g" /Users/runner/micromamba/envs/modflow6/lib/pkgconfig/netcdf-fortran.pc
           #cat /home/runner/micromamba/envs/modflow6/lib/pkgconfig/netcdf-fortran.pc
-          pkg-config --cflags netcdf-fortran
-          pkg-config --libs netcdf-fortran
+          /home/runner/micromamba/envs/modflow6/bin/pkg-config --cflags netcdf-fortran
+          /home/runner/micromamba/envs/modflow6/bin/pkg-config --libs netcdf-fortran
 
       - name: Build modflow6
         working-directory: modflow6
         run: |
           nc-config --all
           nf-config
-          pkg-config --cflags netcdf-fortran
-          pkg-config --libs netcdf-fortran
+          /home/runner/micromamba/envs/modflow6/bin/pkg-config --cflags netcdf-fortran
+          /home/runner/micromamba/envs/modflow6/bin/pkg-config --libs netcdf-fortran
           meson setup builddir -Ddebug=false --prefix=$(pwd) --libdir=bin
           meson install -C builddir
 

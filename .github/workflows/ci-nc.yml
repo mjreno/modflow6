@@ -38,212 +38,6 @@ on:
       - 'doc/**.xlsx'
       - '.hpc/**'
 jobs:
-  test_gfortran:
-    name: Test gnu fortran
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ ubuntu-22.04, macos-12 ]
-    defaults:
-      run:
-        shell: bash -l {0}
-    env:
-      FC: gfortran
-      GCC: 13
-    steps:
-      - name: Checkout modflow6
-        uses: actions/checkout@v4
-        with:
-          path: modflow6
-
-      - name: Checkout modflow6-testmodels
-        uses: actions/checkout@v4
-        with:
-          repository: MODFLOW-USGS/modflow6-testmodels
-          path: modflow6-testmodels
-      
-      - name: Checkout modflow6-examples
-        uses: actions/checkout@v4
-        with:
-          repository: MODFLOW-USGS/modflow6-examples
-          path: modflow6-examples
-      
-      - name: Setup GNU Fortran ${{ env.GCC }}
-        uses: fortran-lang/setup-fortran@v1
-        with:
-          compiler: gcc
-          version: ${{ env.GCC }}
-
-      - name: Setup Micromamba
-        uses: mamba-org/setup-micromamba@v1
-        with:
-          environment-file: modflow6/environment.yml
-          create-args: >-
-            pkg-config
-            netcdf-fortran
-          init-shell: >-
-            bash
-            powershell
-          cache-environment: true
-          cache-downloads: true
-
-      - name: Edit netcdf-fortran.pc
-        if: runner.os == 'Linux'
-        working-directory: modflow6
-        run: |
-          ls -l /home/runner/micromamba/envs/modflow6/include
-          ls -l /home/runner/micromamba/envs/modflow6/lib
-          find /home/runner/micromamba/envs/modflow6 | grep netcdf-fortran.pc
-          #cat /home/runner/micromamba/envs/modflow6/lib/pkgconfig/netcdf-fortran.pc
-          sed -i "s|libdir=/home/runner/micromamba/envs/modflow6//home/runner/micromamba/envs/modflow6/lib|libdir=/home/runner/micromamba/envs/modflow6/lib|g" /home/runner/micromamba/envs/modflow6/lib/pkgconfig/netcdf-fortran.pc
-          #cat /home/runner/micromamba/envs/modflow6/lib/pkgconfig/netcdf-fortran.pc
-          /home/runner/micromamba/envs/modflow6/bin/pkg-config --cflags netcdf-fortran
-          /home/runner/micromamba/envs/modflow6/bin/pkg-config --libs netcdf-fortran
-
-      - name: Edit netcdf-fortran.pc
-        if: runner.os == 'macOS'
-        working-directory: modflow6
-        run: |
-          ls -l /home/runner/micromamba/envs/modflow6/include
-          ls -l /home/runner/micromamba/envs/modflow6/lib
-          find /home/runner/micromamba/envs/modflow6 | grep netcdf-fortran.pc
-          #cat /home/runner/micromamba/envs/modflow6/lib/pkgconfig/netcdf-fortran.pc
-          sed -i '' -e "s|libdir=/Users/runner/micromamba/envs/modflow6//Users/runner/micromamba/envs/modflow6/lib|libdir=/Users/runner/micromamba/envs/modflow6/lib|g" /Users/runner/micromamba/envs/modflow6/lib/pkgconfig/netcdf-fortran.pc
-          #cat /home/runner/micromamba/envs/modflow6/lib/pkgconfig/netcdf-fortran.pc
-          /home/runner/micromamba/envs/modflow6/bin/pkg-config --cflags netcdf-fortran
-          /home/runner/micromamba/envs/modflow6/bin/pkg-config --libs netcdf-fortran
-
-      - name: Build modflow6
-        working-directory: modflow6
-        run: |
-          nc-config --all
-          nf-config
-          /home/runner/micromamba/envs/modflow6/bin/pkg-config --cflags netcdf-fortran
-          /home/runner/micromamba/envs/modflow6/bin/pkg-config --libs netcdf-fortran
-          meson setup builddir -Ddebug=false --prefix=$(pwd) --libdir=bin
-          meson install -C builddir
-
-      - name: Show build log
-        #if: failure()
-        working-directory: modflow6
-        run: cat builddir/meson-logs/meson-log.txt
-      
-      - name: Unit test programs
-        working-directory: modflow6
-        run: meson test --verbose --no-rebuild -C builddir
-
-      - name: Update flopy
-        working-directory: modflow6/autotest
-        run: python update_flopy.py
-
-      - name: Get executables
-        working-directory: modflow6/autotest
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-        run: |
-          pytest -v --durations 0 get_exes.py
-
-      - name: Test modflow6
-        working-directory: modflow6/autotest
-        env:
-          REPOS_PATH: ${{ github.workspace }}
-        run: |
-          pytest -v --durations 0 test_gwf_chd01.py --netcdf
-      
-  test_intel_fortran:
-    name: Test intel fortran
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - {os: ubuntu-22.04, compiler: intel-classic, version: 2021.7}
-          - {os: macos-12, compiler: intel-classic, version: 2021.7}
-
-    defaults:
-      run:
-        shell: bash -l {0}
-    steps:
-
-      - name: Checkout modflow6
-        uses: actions/checkout@v4
-        with:
-          path: modflow6
-
-      - name: Checkout modflow6-testmodels
-        uses: actions/checkout@v4
-        with:
-          repository: MODFLOW-USGS/modflow6-testmodels
-          path: modflow6-testmodels
-
-      - name: Setup Micromamba
-        uses: mamba-org/setup-micromamba@v1
-        with:
-          environment-file: modflow6/environment.yml
-          create-args: >-
-            pkg-config
-            netcdf-fortran
-          init-shell: >-
-            bash
-            powershell
-          cache-environment: true
-          cache-downloads: true
-
-      - name: Edit netcdf-fortran.pc
-        if: runner.os == 'Linux'
-        working-directory: modflow6
-        run: sed -i "s|libdir=/home/runner/micromamba/envs/modflow6//home/runner/micromamba/envs/modflow6/lib|libdir=/home/runner/micromamba/envs/modflow6/lib|g" /home/runner/micromamba/envs/modflow6/lib/pkgconfig/netcdf-fortran.pc
-
-      - name: Edit netcdf-fortran.pc
-        if: runner.os == 'macOS'
-        working-directory: modflow6
-        run: sed -i '' -e "s|libdir=/Users/runner/micromamba/envs/modflow6//Users/runner/micromamba/envs/modflow6/lib|libdir=/Users/runner/micromamba/envs/modflow6/lib|g" /Users/runner/micromamba/envs/modflow6/lib/pkgconfig/netcdf-fortran.pc
-
-      - name: Setup Intel Fortran
-        uses: fortran-lang/setup-fortran@v1
-        with:
-          compiler: ${{ matrix.compiler }}
-          version: ${{ matrix.version }}
-
-      - name: Update version files
-        working-directory: modflow6/distribution
-        run: python update_version.py
-
-      - name: Build modflow6
-        working-directory: modflow6
-        run: |
-          nc-config --all
-          nf-config
-          meson setup builddir -Ddebug=false --prefix=$(pwd) --libdir=bin
-          meson install -C builddir
-
-      - name: Show build log
-        if: failure()
-        working-directory: modflow6
-        run: cat builddir/meson-logs/meson-log.txt
-
-      - name: Unit test programs
-        working-directory: modflow6
-        run: meson test --verbose --no-rebuild -C builddir
-
-      - name: Update flopy
-        working-directory: modflow6/autotest
-        run: python update_flopy.py
-
-      - name: Get executables
-        working-directory: modflow6/autotest
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-        run: pytest -v --durations 0 get_exes.py
-
-      - name: Test programs
-        working-directory: modflow6/autotest
-        env:
-          REPOS_PATH: ${{ github.workspace }}
-        run: |
-          pytest -v --durations 0 test_gwf_chd01.py --netcdf
-
   parallel_test:
     name: Parallel testing
 #    needs:
@@ -362,6 +156,22 @@ jobs:
             powershell
           cache-environment: true
           cache-downloads: true
+
+      - name: Edit netcdf-fortran.pc
+        if: runner.os == 'Linux'
+        working-directory: modflow6
+        run: |
+          sed -i "s|libdir=/home/runner/micromamba/envs/modflow6//home/runner/micromamba/envs/modflow6/lib|libdir=/home/runner/micromamba/envs/modflow6/lib|g" /home/runner/micromamba/envs/modflow6/lib/pkgconfig/netcdf-fortran.pc
+          /home/runner/micromamba/envs/modflow6/bin/pkg-config --cflags netcdf-fortran
+          /home/runner/micromamba/envs/modflow6/bin/pkg-config --libs netcdf-fortran
+
+      - name: Edit netcdf-fortran.pc
+        if: runner.os == 'macOS'
+        working-directory: modflow6
+        run: |
+          sed -i '' -e "s|libdir=/Users/runner/micromamba/envs/modflow6//Users/runner/micromamba/envs/modflow6/lib|libdir=/Users/runner/micromamba/envs/modflow6/lib|g" /Users/runner/micromamba/envs/modflow6/lib/pkgconfig/netcdf-fortran.pc
+          /Users/runner/micromamba/envs/modflow6/bin/pkg-config --cflags netcdf-fortran
+          /Users/runner/micromamba/envs/modflow6/bin/pkg-config --libs netcdf-fortran
 
       - name: Build modflow6
         working-directory: modflow6

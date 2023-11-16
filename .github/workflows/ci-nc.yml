@@ -201,8 +201,9 @@ jobs:
           REPOS_PATH: ${{ github.workspace }}
         run: |
           pytest test_gwf_chd01.py --keep temp
-          ls -l temp
-          cat temp/test_*/mfsim.lst
+#          ls -l temp
+#          cat temp/test_*/mfsim.lst
+          grep -F "MF6 NETCDF-C VERSION" temp/test_mf6model[chd01]0/mfsim.lst
 
       - name: Test programs (parallel)
         working-directory: modflow6/autotest

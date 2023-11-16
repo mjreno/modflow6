@@ -243,7 +243,15 @@ contains
   !<
   subroutine simnam_load(paramlog)
     use SourceLoadModule, only: load_simnam
+#if defined(__WITH_NETCDF__)
+    use SimVariablesModule, only: iout
+    use netcdf
+#endif
     integer(I4B), intent(inout) :: paramlog
+    !
+#if defined(__WITH_NETCDF__)
+    write(iout, '(a)') 'MF6 NETCDF-C VERSION: '//trim(nf90_inq_libvers())
+#endif
     !
     ! -- load sim nam file
     call load_simnam()

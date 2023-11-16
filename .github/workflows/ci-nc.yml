@@ -149,29 +149,12 @@ jobs:
         with:
           environment-file: modflow6/environment.yml
           create-args: >-
-            pkg-config
             netcdf-fortran
           init-shell: >-
             bash
             powershell
           cache-environment: true
           cache-downloads: true
-
-      - name: Edit netcdf-fortran.pc
-        if: runner.os == 'Linux'
-        working-directory: modflow6
-        run: |
-          sed -i "s|libdir=/home/runner/micromamba/envs/modflow6//home/runner/micromamba/envs/modflow6/lib|libdir=/home/runner/micromamba/envs/modflow6/lib|g" /home/runner/micromamba/envs/modflow6/lib/pkgconfig/netcdf-fortran.pc
-          /home/runner/micromamba/envs/modflow6/bin/pkg-config --cflags netcdf-fortran
-          /home/runner/micromamba/envs/modflow6/bin/pkg-config --libs netcdf-fortran
-
-      - name: Edit netcdf-fortran.pc
-        if: runner.os == 'macOS'
-        working-directory: modflow6
-        run: |
-          sed -i '' -e "s|libdir=/Users/runner/micromamba/envs/modflow6//Users/runner/micromamba/envs/modflow6/lib|libdir=/Users/runner/micromamba/envs/modflow6/lib|g" /Users/runner/micromamba/envs/modflow6/lib/pkgconfig/netcdf-fortran.pc
-          /Users/runner/micromamba/envs/modflow6/bin/pkg-config --cflags netcdf-fortran
-          /Users/runner/micromamba/envs/modflow6/bin/pkg-config --libs netcdf-fortran
 
       - name: Build modflow6
         working-directory: modflow6

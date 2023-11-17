@@ -195,13 +195,14 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
         run: pytest -v --durations 0 get_exes.py
 
-      - name: Test netcdf build (parallel)
+      - name: Test netcdf build
         working-directory: modflow6/autotest
         env:
           REPOS_PATH: ${{ github.workspace }}
         run: |
           pytest test_gwf_chd01.py --keep temp
           grep -Fx "    NetCDF, network Common Data Form software library" temp/test_mf6model[chd01]0/mfsim.lst
+          grep -Fx "    NetCDF, network Common Data Form software library" temp/test_*chd01*/mfsim.lst
 
       - name: Test programs (parallel)
         working-directory: modflow6/autotest

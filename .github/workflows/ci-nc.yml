@@ -198,8 +198,10 @@ jobs:
           if grep -Fx "    NetCDF, network Common Data Form software library" temp/test_mf6model[chd01]0/mfsim.lst
           then
             echo "NetCDF dependency confirmed."
+            exit 1
           else
             echo "NetCDF dependency not found."
+            exit 1
           fi
 
       - name: Test programs (parallel)

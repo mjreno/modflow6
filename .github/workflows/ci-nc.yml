@@ -159,6 +159,8 @@ jobs:
       - name: Fix pc file and set PKG_CONFIG_PATH
         working-directory: modflow6
         run: |
+          echo "$CMAKE_INSTALL_PREFIX"
+          echo "$CMAKE_INSTALL_LIBDIR"
           if [ "$RUNNER_OS" == "Linux" ]; then
             sed -i "s|libdir=/home/runner/micromamba/envs/modflow6//home/runner/micromamba/envs/modflow6/lib|libdir=/home/runner/micromamba/envs/modflow6/lib|g" /home/runner/micromamba/envs/modflow6/lib/pkgconfig/netcdf-fortran.pc
             echo "PKG_CONFIG_PATH=/home/runner/micromamba/envs/modflow6/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV

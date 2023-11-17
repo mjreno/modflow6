@@ -197,6 +197,7 @@ jobs:
           pytest test_gwf_chd01.py --keep temp
           grep -Fx "    NetCDF, network Common Data Form software library" temp/test_mf6model[chd01]0/mfsim.lst
           grep -Fx "    NetCDF, network Common Data Form software library" temp/test_*chd01*/mfsim.lst
+          grep -Fx "TESTING FAIL" temp/test_mf6model[chd01]0/mfsim.lst
 
       - name: Test programs (parallel)
         working-directory: modflow6/autotest

@@ -148,15 +148,15 @@ jobs:
         uses: mamba-org/setup-micromamba@v1
         with:
           environment-file: modflow6/environment.yml
-#          create-args: >-
-#            netcdf-fortran
+          create-args: >-
+            netcdf-fortran
           init-shell: >-
             bash
             powershell
           cache-environment: true
           cache-downloads: true
 
-      - name: Edit netcdf-fortran.pc
+      - name: Fix pc file and set PKG_CONFIG_PATH
         working-directory: modflow6
         run: |
           if [ "$RUNNER_OS" == "Linux" ]; then
@@ -189,7 +189,7 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
         run: pytest -v --durations 0 get_exes.py
 
-      - name: Test netcdf build
+      - name: Confirm netcdf build
         working-directory: modflow6/autotest
         env:
           REPOS_PATH: ${{ github.workspace }}

@@ -160,11 +160,13 @@ jobs:
       - name: Edit netcdf-fortran.pc
         working-directory: modflow6
         run: |
-         if [ "$RUNNER_OS" == "Linux" ]; then
-           sed -i "s|libdir=/home/runner/micromamba/envs/modflow6//home/runner/micromamba/envs/modflow6/lib|libdir=/home/runner/micromamba/envs/modflow6/lib|g" /home/runner/micromamba/envs/modflow6/lib/pkgconfig/netcdf-fortran.pc
-         elif [ "$RUNNER_OS" == "macOS" ]; then
-           sed -i '' -e "s|libdir=/Users/runner/micromamba/envs/modflow6//Users/runner/micromamba/envs/modflow6/lib|libdir=/Users/runner/micromamba/envs/modflow6/lib|g" /Users/runner/micromamba/envs/modflow6/lib/pkgconfig/netcdf-fortran.pc
-         fi
+          if [ "$RUNNER_OS" == "Linux" ]; then
+            echo "PKG_CONFIG_PATH=/home/runner/micromamba/envs/modflow6/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
+#            sed -i "s|libdir=/home/runner/micromamba/envs/modflow6//home/runner/micromamba/envs/modflow6/lib|libdir=/home/runner/micromamba/envs/modflow6/lib|g" /home/runner/micromamba/envs/modflow6/lib/pkgconfig/netcdf-fortran.pc
+          elif [ "$RUNNER_OS" == "macOS" ]; then
+            echo "PKG_CONFIG_PATH=/Users/runner/micromamba/envs/modflow6/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
+#            sed -i '' -e "s|libdir=/Users/runner/micromamba/envs/modflow6//Users/runner/micromamba/envs/modflow6/lib|libdir=/Users/runner/micromamba/envs/modflow6/lib|g" /Users/runner/micromamba/envs/modflow6/lib/pkgconfig/netcdf-fortran.pc
+          fi
 
       - name: Build modflow6
         working-directory: modflow6

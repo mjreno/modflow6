@@ -149,6 +149,7 @@ jobs:
         with:
           environment-file: modflow6/environment.yml
           create-args: >-
+            pkg-config
             netcdf-fortran
           init-shell: >-
             bash

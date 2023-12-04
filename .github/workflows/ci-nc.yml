@@ -161,9 +161,11 @@ jobs:
         run: |
           if [ "$RUNNER_OS" == "Linux" ]; then
             cat /home/runner/micromamba/envs/modflow6/lib/pkgconfig/netcdf-fortran.pc
+            echo $CONDA_PREFIX
             echo "PKG_CONFIG_PATH=/home/runner/micromamba/envs/modflow6/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
           elif [ "$RUNNER_OS" == "macOS" ]; then
             cat /Users/runner/micromamba/envs/modflow6/lib/pkgconfig/netcdf-fortran.pc
+            echo $CONDA_PREFIX
             echo "PKG_CONFIG_PATH=/Users/runner/micromamba/envs/modflow6/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
           fi
 

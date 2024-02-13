@@ -6,6 +6,7 @@ include ./makedefaults
 # Define the source file directories
 SOURCEDIR1=../src
 SOURCEDIR2=../src/Exchange
+<<<<<<< HEAD
 SOURCEDIR3=../src/Distributed
 SOURCEDIR4=../src/Solution
 SOURCEDIR5=../src/Solution/LinearMethods
@@ -36,6 +37,39 @@ SOURCEDIR29=../src/Model/GroundWaterFlow
 SOURCEDIR30=../src/Model/TransportModel
 SOURCEDIR31=../src/Model/Geometry
 SOURCEDIR32=../src/Model/GroundWaterEnergy
+=======
+SOURCEDIR3=../src/Timing
+SOURCEDIR4=../src/Model
+SOURCEDIR5=../src/Model/Connection
+SOURCEDIR6=../src/Model/ModelUtilities
+SOURCEDIR7=../src/Model/GroundWaterFlow
+SOURCEDIR8=../src/Model/Geometry
+SOURCEDIR9=../src/Model/TransportModel
+SOURCEDIR10=../src/Model/GroundWaterTransport
+SOURCEDIR11=../src/Model/GroundWaterEnergy
+SOURCEDIR12=../src/Solution
+SOURCEDIR13=../src/Solution/LinearMethods
+SOURCEDIR14=../src/Solution/PETSc
+SOURCEDIR15=../src/Distributed
+SOURCEDIR16=../src/Utilities
+SOURCEDIR17=../src/Utilities/TimeSeries
+SOURCEDIR18=../src/Utilities/Idm
+SOURCEDIR19=../src/Utilities/Idm/selector
+SOURCEDIR20=../src/Utilities/Idm/netcdf
+SOURCEDIR21=../src/Utilities/Idm/mf6blockfile
+SOURCEDIR22=../src/Utilities/ArrayRead
+SOURCEDIR23=../src/Utilities/Memory
+SOURCEDIR24=../src/Utilities/Matrix
+SOURCEDIR25=../src/Utilities/Vector
+SOURCEDIR26=../src/Utilities/Observation
+SOURCEDIR27=../src/Utilities/OutputControl
+SOURCEDIR28=../src/Utilities/Libraries
+SOURCEDIR29=../src/Utilities/Libraries/rcm
+SOURCEDIR30=../src/Utilities/Libraries/sparskit2
+SOURCEDIR31=../src/Utilities/Libraries/sparsekit
+SOURCEDIR32=../src/Utilities/Libraries/blas
+SOURCEDIR33=../src/Utilities/Libraries/daglib
+>>>>>>> 301055a8b1 (rebuild makefiles)
 
 VPATH = \
 ${SOURCEDIR1} \
@@ -69,7 +103,8 @@ ${SOURCEDIR28} \
 ${SOURCEDIR29} \
 ${SOURCEDIR30} \
 ${SOURCEDIR31} \
-${SOURCEDIR32} 
+${SOURCEDIR32} \
+${SOURCEDIR33} 
 
 .SUFFIXES: .f90 .F90 .o
 
@@ -207,6 +242,8 @@ $(OBJDIR)/GwfVscInputData.o \
 $(OBJDIR)/gwf3ghb8.o \
 $(OBJDIR)/gwf3drn8.o \
 $(OBJDIR)/IndexMap.o \
+$(OBJDIR)/NCModelInputs.o \
+$(OBJDIR)/ArrayReaderBase.o \
 $(OBJDIR)/VirtualModel.o \
 $(OBJDIR)/BaseExchange.o \
 $(OBJDIR)/tsp1fmi1.o \
@@ -224,7 +261,8 @@ $(OBJDIR)/InterfaceMap.o \
 $(OBJDIR)/SeqVector.o \
 $(OBJDIR)/ImsLinearSettings.o \
 $(OBJDIR)/ConvergenceSummary.o \
-$(OBJDIR)/ArrayReaderBase.o \
+$(OBJDIR)/SourceContext.o \
+$(OBJDIR)/Integer2dReader.o \
 $(OBJDIR)/CellWithNbrs.o \
 $(OBJDIR)/NumericalExchange.o \
 $(OBJDIR)/tsp1ssm1.o \
@@ -253,7 +291,10 @@ $(OBJDIR)/LinearSolverBase.o \
 $(OBJDIR)/ims8reordering.o \
 $(OBJDIR)/ModflowInput.o \
 $(OBJDIR)/IdmLogger.o \
-$(OBJDIR)/Integer2dReader.o \
+$(OBJDIR)/StructVector.o \
+$(OBJDIR)/Integer1dReader.o \
+$(OBJDIR)/Double2dReader.o \
+$(OBJDIR)/Double1dReader.o \
 $(OBJDIR)/VirtualExchange.o \
 $(OBJDIR)/GridSorting.o \
 $(OBJDIR)/DisConnExchange.o \
@@ -291,12 +332,10 @@ $(OBJDIR)/gwe1cnd1.o \
 $(OBJDIR)/RouterBase.o \
 $(OBJDIR)/ImsLinearSolver.o \
 $(OBJDIR)/ims8base.o \
-$(OBJDIR)/StructVector.o \
-$(OBJDIR)/DefinitionSelect.o \
 $(OBJDIR)/InputLoadType.o \
-$(OBJDIR)/Integer1dReader.o \
-$(OBJDIR)/Double2dReader.o \
-$(OBJDIR)/Double1dReader.o \
+$(OBJDIR)/DefinitionSelect.o \
+$(OBJDIR)/StructArray.o \
+$(OBJDIR)/LayeredArrayReader.o \
 $(OBJDIR)/GridConnection.o \
 $(OBJDIR)/DistributedVariable.o \
 $(OBJDIR)/gwt1.o \
@@ -308,10 +347,12 @@ $(OBJDIR)/Timer.o \
 $(OBJDIR)/LinearSolverFactory.o \
 $(OBJDIR)/ims8linear.o \
 $(OBJDIR)/BaseSolution.o \
-$(OBJDIR)/StructArray.o \
+$(OBJDIR)/NCInputLoadType.o \
+$(OBJDIR)/LoadNCFile.o \
+$(OBJDIR)/DynamicParamFilter.o \
 $(OBJDIR)/BoundInputContext.o \
+$(OBJDIR)/LoadMf6File.o \
 $(OBJDIR)/AsciiInputLoadType.o \
-$(OBJDIR)/LayeredArrayReader.o \
 $(OBJDIR)/ExplicitModel.o \
 $(OBJDIR)/SpatialModelConnection.o \
 $(OBJDIR)/GwtInterfaceModel.o \
@@ -323,17 +364,21 @@ $(OBJDIR)/GweGweExchange.o \
 $(OBJDIR)/RouterFactory.o \
 $(OBJDIR)/NumericalSolution.o \
 $(OBJDIR)/MappedMemory.o \
-$(OBJDIR)/StressListInput.o \
-$(OBJDIR)/StressGridInput.o \
-$(OBJDIR)/LoadMf6File.o \
+$(OBJDIR)/ModelPackageInput.o \
+$(OBJDIR)/NCFileListInput.o \
+$(OBJDIR)/NCFileGridInput.o \
+$(OBJDIR)/Mf6FileListInput.o \
+$(OBJDIR)/Mf6FileGridInput.o \
 $(OBJDIR)/ExplicitSolution.o \
 $(OBJDIR)/GwtGwtConnection.o \
 $(OBJDIR)/GwfGwfConnection.o \
 $(OBJDIR)/GweGweConnection.o \
 $(OBJDIR)/VirtualDataManager.o \
 $(OBJDIR)/Mapper.o \
+$(OBJDIR)/NCContextBuild.o \
+$(OBJDIR)/ModelPackageInputs.o \
+$(OBJDIR)/IdmNCFile.o \
 $(OBJDIR)/IdmMf6File.o \
-$(OBJDIR)/ModelPackageInput.o \
 $(OBJDIR)/VirtualGwtModel.o \
 $(OBJDIR)/VirtualGwtExchange.o \
 $(OBJDIR)/VirtualGwfModel.o \
@@ -346,7 +391,6 @@ $(OBJDIR)/GwfGwtExchange.o \
 $(OBJDIR)/GwfGweExchange.o \
 $(OBJDIR)/RunControl.o \
 $(OBJDIR)/SourceLoad.o \
-$(OBJDIR)/ModelPackageInputs.o \
 $(OBJDIR)/SimulationCreate.o \
 $(OBJDIR)/RunControlFactory.o \
 $(OBJDIR)/IdmLoad.o \

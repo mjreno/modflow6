@@ -397,7 +397,9 @@ contains
     ! -- local
     character(len=LINELENGTH) :: nc_fname
     type(NCModelInputsType), pointer :: nc_context
+#if defined(__WITH_NETCDF__)
     integer(I4B) :: ncid
+#endif
     !
     ! -- allocate context object
     allocate (nc_context)
@@ -443,6 +445,7 @@ contains
     return
   end subroutine create_nc_context
 
+#if defined(__WITH_NETCDF__)
   subroutine set_nc_pkglist(component_type, modelfname, pkglist, &
                             nc_context, nc_fname)
     use SourceCommonModule, only: package_source_type
@@ -487,6 +490,7 @@ contains
     ! -- return
     return
   end subroutine set_nc_pkglist
+#endif
 
   !> @brief set model netcdf4 input filename
   !<

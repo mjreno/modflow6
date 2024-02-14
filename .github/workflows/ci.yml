@@ -761,7 +761,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ ubuntu-22.04, macos-12 ] #, windows-2022 ]
+        os: [ ubuntu-22.04 ] #, macos-12 ] #, windows-2022 ]
     defaults:
       run:
         shell: bash -l {0}
@@ -857,38 +857,16 @@ jobs:
           /usr/bin/python ./configure --with-mpiexec='/C/Program\ Files/Microsoft\ MPI/Bin/mpiexec' --with-shared-libraries=0
           make all
 
-      - name: Prepare netcdf build
+      - name: Install netcdf
+        if: runner.os == 'Linux'
         run: |
-          mkdir ncc
-          mkdir ncf
-
-      - name: Install hdf5 and netcdf-c
-        shell: msys2 {0}
-        working-directory: ncc
-        run: |
-          pacman -U --noconfirm https://repo.msys2.org/mingw/mingw64/mingw-w64-x86_64-hdf5-1.12.2-2-any.pkg.tar.zst
-          wget https://github.com/Unidata/netcdf-c/archive/refs/tags/v4.9.2.zip
-          unzip v4.9.2.zip
-          cd netcdf-c-4.9.2
-          LDFLAGS="-Wl,-no-undefined,--export-all-symbols" ./configure --enable-shared --disable-dap --disable-testsets --disable-examples --disable-libxml2
-          echo "LD_LIBRARY_PATH=/d/a/_temp/msys64/mingw64/lib" >> $GITHUB_ENV
-          echo "PATH=/usr/bin:/d/a/_temp/msys64/mingw64/usr/bin:/d/a/_temp/msys64/mingw64/bin:/d/a/modflow6/modflow6/ncc/include:/d/a/modflow6/modflow6/ncf/netcdf-fortran-4.6.1/fortran/.libs:/d/a/modflow6/modflow6/modflow6/bin" >> $GITHUB_ENV
-          sed -i.bak -e "s/\(allow_undefined=\)yes/\1no/" libtool
-          make install
-          ls /mingw64/bin | grep netcdf
-          ldd /mingw64/bin/libnetcdf-19.dll
+          sudo apt-get update
+          sudo apt-get install build-essential \
+            libnetcdf-dev \
+            libnetcdff-dev \
+            netcdf-bin
           nc-config --all
-
-      - name: Make netcdf-f
-        shell: msys2 {0}
-        working-directory: ncf
-        run: |
-          wget https://github.com/Unidata/netcdf-fortran/archive/refs/tags/v4.6.1.zip
-          unzip v4.6.1.zip
-          cd netcdf-fortran-4.6.1
-          LDFLAGS="-Wl,-no-undefined" LIBS="$(nc-config --libs)" ./configure --enable-shared
-          sed -i.bak -e "s/\(allow_undefined=\)yes/\1no/" libtool
-          make install
+          nf-config --all
 
       - name: Setup Micromamba
         uses: mamba-org/setup-micromamba@v1

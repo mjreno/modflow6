@@ -7,6 +7,7 @@ include ./makedefaults
 SOURCEDIR1=../src
 SOURCEDIR2=../src/Exchange
 <<<<<<< HEAD
+<<<<<<< HEAD
 SOURCEDIR3=../src/Distributed
 SOURCEDIR4=../src/Solution
 SOURCEDIR5=../src/Solution/LinearMethods
@@ -47,6 +48,8 @@ SOURCEDIR30=../src/Model/TransportModel
 SOURCEDIR31=../src/Model/Geometry
 SOURCEDIR32=../src/Model/GroundWaterEnergy
 =======
+=======
+>>>>>>> 10b5ed7cb3 (rebuild makefiles)
 SOURCEDIR3=../src/Timing
 SOURCEDIR4=../src/Model
 SOURCEDIR5=../src/Model/Connection
@@ -78,8 +81,11 @@ SOURCEDIR30=../src/Utilities/Libraries/sparskit2
 SOURCEDIR31=../src/Utilities/Libraries/sparsekit
 SOURCEDIR32=../src/Utilities/Libraries/blas
 SOURCEDIR33=../src/Utilities/Libraries/daglib
+<<<<<<< HEAD
 >>>>>>> 301055a8b1 (rebuild makefiles)
 >>>>>>> 617f37a82b (rebuild makefiles)
+=======
+>>>>>>> 10b5ed7cb3 (rebuild makefiles)
 
 VPATH = \
 ${SOURCEDIR1} \

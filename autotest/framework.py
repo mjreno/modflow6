@@ -152,7 +152,7 @@ def write_input(
                 )
             if netcdf:
                 print("write_netcdf")
-                sim.write_simulation(write_netcdf=netcdf)
+                sim.write_simulation(write_netcdf=True)
             else:
                 sim.write_simulation()
         elif isinstance(sim, flopy.mbase.BaseModel):

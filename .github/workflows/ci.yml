@@ -410,6 +410,7 @@ jobs:
   parallel_test:
     name: Parallel testing
     needs:
+      - lint
       - build
       - smoke_test
     runs-on: ${{ matrix.os }}
@@ -873,8 +874,6 @@ jobs:
         uses: mamba-org/setup-micromamba@v1
         with:
           environment-file: modflow6/environment-nctest.yml
-          create-args: >-
-            netcdf4
           init-shell: >-
             bash
             powershell

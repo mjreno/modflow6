@@ -151,6 +151,7 @@ def write_input(
                     f"Writing mf6 simulation '{sim.name}' to: {sim.sim_path}"
                 )
             if netcdf:
+                print("write_netcdf")
                 sim.write_simulation(write_netcdf=netcdf)
             else:
                 sim.write_simulation()

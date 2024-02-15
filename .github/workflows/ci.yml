@@ -870,6 +870,14 @@ jobs:
           nc-config --all
           nf-config --all
 
+      - name: Install netcdf
+        if: runner.os == 'macOS'
+        run: |
+          brew update
+          brew install netcdf netcdf-fortran
+          nc-config --all
+          nf-config --all
+
       - name: Setup Micromamba
         uses: mamba-org/setup-micromamba@v1
         with:

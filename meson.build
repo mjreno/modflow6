@@ -170,7 +170,7 @@ if is_extended_build
   # find netcdf
   if build_machine.system() != 'windows'
     hdf5 = dependency('hdf5', language: 'fortran', required : true)
-    netcdf = dependency('netcdf', language : 'c', required : true)
+    #netcdf = dependency('netcdf', language : 'c', required : true)
     netcdff = dependency('netcdf', language : 'fortran', required : true)
   else
     # For CI testing only; Windows not yet supported
@@ -180,7 +180,7 @@ if is_extended_build
   endif
   with_netcdf = true
   extra_cmp_args += [ '-D__WITH_NETCDF__' ]
-  dependencies += [ hdf5, netcdf, netcdff ]
+  dependencies += [ hdf5, netcdff ]
 else
   with_netcdf = false
   with_petsc = false

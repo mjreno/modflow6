@@ -937,13 +937,11 @@ jobs:
 
       - name: Test programs (netcdf2)
         working-directory: modflow6/autotest
-        env:
-          REPOS_PATH: ${{ github.workspace }}
         run: |
           micromamba info
           micromamba list
           pytest -v test_gwf_boundname01.py --netcdf --durations 0 --keep-failed .failed
-          pytest -v test_gwf_chd01.py --netcdf --durations 0 --keep-failed .failed
+          pytest -v test_gwf_chd01.py --netcdf
           pytest -v test_gwf_csub_sub03.py --netcdf --durations 0 --keep-failed .failed
           pytest -v test_gwf_csub_zdisp01.py --netcdf --durations 0 -keep-failed .failed
           pytest -v test_gwf_disv_uzf.py --netcdf --durations 0 --keep-failed .failed

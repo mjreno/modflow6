@@ -154,6 +154,7 @@ def write_input(
                 print("write_netcdf")
                 sim.write_simulation(write_netcdf=True)
             else:
+                print("NO write_netcdf")
                 sim.write_simulation()
         elif isinstance(sim, flopy.mbase.BaseModel):
             workspace = Path(sim.model_ws)
@@ -164,6 +165,7 @@ def write_input(
                 print(
                     f"Writing {type(sim)} model '{sim.name}' to: {sim.model_ws}"
                 )
+            print(f"calling sim write_input netcdf={netcdf}")
             sim.write_input()
         else:
             raise ValueError(f"Unsupported simulation/model type: {type(sim)}")

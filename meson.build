@@ -146,7 +146,7 @@ extra_cmp_args = [ ]
 if is_extended_build
   # find petsc
   if build_machine.system() != 'windows'
-    petsc = dependency('PETSc', required : true, static: true)
+    petsc = dependency('PETSc', required : true)
   else
     # directly look for petsc
     petsc_compiled = petsc_dir / petsc_arch

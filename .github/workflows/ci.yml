@@ -907,6 +907,8 @@ jobs:
         env:
           REPOS_PATH: ${{ github.workspace }}
         run: |
+          micromamba info
+          micromamba list
           pytest -v test_gwf_boundname01.py --netcdf --durations 0 --keep-failed .failed
           pytest -v test_gwf_chd01.py --netcdf --durations 0 --keep-failed .failed
           pytest -v test_gwf_csub_sub03.py --netcdf --durations 0 --keep-failed .failed

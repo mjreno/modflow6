@@ -874,7 +874,7 @@ jobs:
         if: runner.os == 'macOS'
         run: |
           brew update
-          brew install netcdf netcdf-fortran
+          brew install hdf5 netcdf netcdf-fortran
           nc-config --all
           nf-config --all
 
@@ -893,6 +893,7 @@ jobs:
         run: |
           python nc_test.py
           ls -l
+          file test.nc
           ncinfo test.nc
 
       - name: Build modflow6

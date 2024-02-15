@@ -146,7 +146,7 @@ extra_cmp_args = [ ]
 if is_extended_build
   # find petsc
   if build_machine.system() != 'windows'
-    petsc = dependency('PETSc', required : true)
+    petsc = dependency('PETSc', required : true, static: true)
   else
     # directly look for petsc
     petsc_compiled = petsc_dir / petsc_arch
@@ -169,7 +169,7 @@ if is_extended_build
 
   # find netcdf
   if build_machine.system() != 'windows'
-    netcdf = dependency('netcdf', language : 'fortran', required : false, static: true)
+    netcdf = dependency('netcdf', language : 'fortran', required : false)
   else
     # For CI testing only; Windows not yet supported
     nc_dir = meson.project_source_root() / '..' / 'ncf' / 'netcdf-fortran-4.6.1' / 'fortran'

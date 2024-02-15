@@ -763,7 +763,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ ubuntu-22.04 ] #, macos-12 ] #, windows-2022 ]
+        os: [ ubuntu-22.04, macos-12 ] #, windows-2022 ]
     defaults:
       run:
         shell: bash -l {0}
@@ -887,6 +887,13 @@ jobs:
             powershell
           cache-environment: false
           cache-downloads: false
+
+      - name: Test netcdf
+        working-directory: modflow6/autotest/nctest
+        run: |
+          python nc_test.py
+          ls -l
+          ncinfo test.nc
 
       - name: Build modflow6
         working-directory: modflow6

@@ -891,15 +891,15 @@ jobs:
       - name: Test python netCDF4
         working-directory: modflow6/nctest
         run: |
-          LD_DEBUG=libs python nc_test.py
+          python nc_test.py
           ls -l
           file test.nc
           ncinfo test.nc
-          LD_DEBUG=libs python sim.py
-          echo $?
+          python sim.py
           file mymodel/mymodel.nc
           ls -l mymodel
           ncinfo mymodel/mymodel.nc
+          ncdump mymodel/mymodel.nc
 
       - name: Build modflow6
         working-directory: modflow6

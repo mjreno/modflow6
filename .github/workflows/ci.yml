@@ -889,7 +889,7 @@ jobs:
           cache-downloads: false
 
       - name: Test netcdf
-        working-directory: modflow6/autotest/nctest
+        working-directory: modflow6/nctest
         run: |
           python nc_test.py
           ls -l

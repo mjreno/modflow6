@@ -896,6 +896,10 @@ jobs:
           file test.nc
           ncinfo test.nc
           LD_DEBUG=libs python sim.py
+          echo $?
+          file mymodel/mymodel.nc
+          ls -l mymodel
+          ncinfo mymodel/mymodel.nc
 
       - name: Build modflow6
         working-directory: modflow6

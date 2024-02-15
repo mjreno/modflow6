@@ -905,11 +905,13 @@ jobs:
 
       - name: link check
         if: runner.os == 'Linux'
+        working-directory: modflow6
         run: |
           ldd bin/mf6
 
       - name: link check
         if: runner.os == 'macOS'
+        working-directory: modflow6
         run: |
           otool -L bin/mf6
 

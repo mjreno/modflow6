@@ -874,7 +874,9 @@ jobs:
         if: runner.os == 'macOS'
         run: |
           brew update
-          brew install hdf5 netcdf netcdf-fortran
+          brew install netcdf
+          brew install netcdf-fortran
+          ls /usr/local/bin
           nc-config --all
           nf-config --all
 
@@ -925,6 +927,7 @@ jobs:
         working-directory: modflow6/nctest/mymodel
         run: |
           ../../bin/mf6
+          cat mfsim.lst
 
       - name: Show Meson logs
         if: failure()

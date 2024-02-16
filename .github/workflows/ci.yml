@@ -809,7 +809,7 @@ jobs:
           path: modflow6/autotest/.failed
 
   netcdf_solo_test:
-    name: Netcdf testing
+    name: Netcdf solo testing
     needs:
       - build
       - smoke_test
@@ -843,12 +843,6 @@ jobs:
             mingw-w64-x86_64-python
             mingw-w64-x86_64-python-pip
             mingw-w64-x86_64-python-pytest
-
-      - name: Setup MPI
-        if: runner.os == 'Windows'
-        uses: mpi4py/setup-mpi@v1
-        with:
-          mpi: msmpi
 
       - name: Setup ${{ env.FC }} ${{ env.FC_V }}
         uses: fortran-lang/setup-fortran@v1
@@ -913,7 +907,6 @@ jobs:
         if: runner.os == 'macOS'
         working-directory: modflow6
         run: |
-          export LDFLAGS="$LDFLAGS -Wl,-ld_classic"
           meson setup builddir -Ddebug=false -Dnetcdf=true --prefix=$(pwd) --libdir=bin
           meson install -C builddir
           meson test --verbose --no-rebuild -C builddir
@@ -966,7 +959,6 @@ jobs:
           pytest -v test_gwf_uzf_wc_output.py --netcdf --durations 0 --keep-failed .failed
           pytest -v test_gwf_wel01.py --netcdf --durations 0 --keep-failed .failed
           pytest -v test_gwt_mst03.py --netcdf --durations 0 --keep-failed .failed
-          pytest -v test_par_gwf01.py --parallel --netcdf --durations 0 --keep-failed .failed
 
       - name: Upload failed test output
         if: failure()

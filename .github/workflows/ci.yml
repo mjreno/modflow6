@@ -807,3 +807,170 @@ jobs:
         with:
           name: failed-${{ matrix.os }}-${{ env.FC }}-${{ env.FC_V }}
           path: modflow6/autotest/.failed
+
+  netcdf_solo_test:
+    name: Netcdf testing
+    needs:
+      - build
+      - smoke_test
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu-22.04, macos-14 ] #, windows-2022 ]
+    defaults:
+      run:
+        shell: bash -l {0}
+    env:
+      FC: gfortran
+      FC_V: 12
+    steps:
+
+      - name: Checkout modflow6
+        uses: actions/checkout@v4
+        with:
+          path: modflow6
+
+      - name: Setup MSYS2
+        if: runner.os == 'Windows'
+        uses: msys2/setup-msys2@v2
+        with:
+          update: true
+          install: |
+            git
+            make
+            mingw-w64-x86_64-gcc
+            mingw-w64-x86_64-python
+            mingw-w64-x86_64-python-pip
+            mingw-w64-x86_64-python-pytest
+
+      - name: Setup MPI
+        if: runner.os == 'Windows'
+        uses: mpi4py/setup-mpi@v1
+        with:
+          mpi: msmpi
+
+      - name: Setup ${{ env.FC }} ${{ env.FC_V }}
+        uses: fortran-lang/setup-fortran@v1
+        with:
+          compiler: gcc
+          version: ${{ env.FC_V }}
+
+      - name: Install netcdf
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install build-essential \
+            libnetcdf-dev \
+            libnetcdff-dev \
+            netcdf-bin
+          nc-config --all
+          nf-config --all
+
+      - name: Install netcdf
+        if: runner.os == 'macOS'
+        run: |
+          brew update
+          brew install netcdf
+          brew install netcdf-fortran
+          ls -l /usr/local/Cellar/netcdf/4.9.2_1
+          ls -l /usr/local/Cellar/netcdf-fortran/4.6.1
+          nc-config --all
+          nf-config
+
+      - name: Setup Micromamba
+        uses: mamba-org/setup-micromamba@v1
+        with:
+          environment-file: modflow6/environment-nctest.yml
+          init-shell: >-
+            bash
+            powershell
+          cache-environment: false
+          cache-downloads: false
+
+      - name: Test python netCDF4
+        working-directory: modflow6/nctest
+        run: |
+          python nc_test.py
+          ls -l
+          file test.nc
+          ncinfo test.nc
+          python sim.py
+          file mymodel/mymodel.nc
+          ls -l mymodel
+          ncinfo mymodel/mymodel.nc
+          ncdump mymodel/mymodel.nc
+
+      - name: Build modflow6
+        if: runner.os == 'Linux'
+        working-directory: modflow6
+        run: |
+          meson setup builddir -Ddebug=false -Dnetcdf=true --prefix=$(pwd) --libdir=bin
+          meson install -C builddir
+          meson test --verbose --no-rebuild -C builddir
+
+      - name: Build modflow6
+        if: runner.os == 'macOS'
+        working-directory: modflow6
+        run: |
+          export LDFLAGS="$LDFLAGS -Wl,-ld_classic"
+          meson setup builddir -Ddebug=false -Dnetcdf=true --prefix=$(pwd) --libdir=bin
+          meson install -C builddir
+          meson test --verbose --no-rebuild -C builddir
+
+      - name: link check
+        if: runner.os == 'Linux'
+        working-directory: modflow6
+        run: |
+          ldd bin/mf6
+
+      - name: link check
+        if: runner.os == 'macOS'
+        working-directory: modflow6
+        run: |
+          otool -L bin/mf6
+
+      - name: Test mf6 netcdf
+        if: runner.os == 'Linux'
+        working-directory: modflow6/nctest/mymodel
+        run: |
+          ../../bin/mf6
+          cat mfsim.lst
+
+      - name: Show Meson logs
+        if: failure()
+        working-directory: modflow6
+        run: cat builddir/meson-logs/meson-log.txt
+
+      - name: Get executables
+        working-directory: modflow6/autotest
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: pytest -v --durations 0 get_exes.py
+
+      - name: Test programs (netcdf)
+        working-directory: modflow6/autotest
+        env:
+          REPOS_PATH: ${{ github.workspace }}
+        run: |
+          micromamba info
+          micromamba list
+          pytest -v test_gwf_boundname01.py --netcdf --durations 0 --keep-failed .failed
+          pytest -v test_gwf_chd01.py --netcdf --durations 0 --keep-failed .failed
+          pytest -v test_gwf_csub_sub03.py --netcdf --durations 0 --keep-failed .failed
+          pytest -v test_gwf_csub_zdisp01.py --netcdf --durations 0 -keep-failed .failed
+          pytest -v test_gwf_disv_uzf.py --netcdf --durations 0 --keep-failed .failed
+          pytest -v test_gwf_evt02.py --netcdf --durations 0 --keep-failed .failed
+          pytest -v test_gwf_npf02_rewet.py --netcdf --durations 0 --keep-failed .failed
+          pytest -v test_gwf_rch03.py --netcdf --durations 0 --keep-failed .failed
+          pytest -v test_gwf_uzf_wc_output.py --netcdf --durations 0 --keep-failed .failed
+          pytest -v test_gwf_wel01.py --netcdf --durations 0 --keep-failed .failed
+          pytest -v test_gwt_mst03.py --netcdf --durations 0 --keep-failed .failed
+          pytest -v test_par_gwf01.py --parallel --netcdf --durations 0 --keep-failed .failed
+
+      - name: Upload failed test output
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: failed-${{ matrix.os }}-${{ env.FC }}-${{ env.FC_V }}
+          path: modflow6/autotest/.failed

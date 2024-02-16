@@ -593,7 +593,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ ubuntu-22.04, macos-12 ] #, windows-2022 ]
+        os: [ ubuntu-22.04, macos-13 ] #, windows-2022 ]
     defaults:
       run:
         shell: bash -l {0}
@@ -735,8 +735,18 @@ jobs:
           ncdump mymodel/mymodel.nc
 
       - name: Build modflow6
+        if: runner.os == 'Linux'
         working-directory: modflow6
         run: |
+          meson setup builddir -Ddebug=false -Dextended=true --prefix=$(pwd) --libdir=bin
+          meson install -C builddir
+          meson test --verbose --no-rebuild -C builddir
+
+      - name: Build modflow6
+        if: runner.os == 'macOS'
+        working-directory: modflow6
+        run: |
+          export LDFLAGS="$LDFLAGS -Wl,-ld_classic"
           meson setup builddir -Ddebug=false -Dextended=true --prefix=$(pwd) --libdir=bin
           meson install -C builddir
           meson test --verbose --no-rebuild -C builddir

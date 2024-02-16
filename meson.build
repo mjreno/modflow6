@@ -195,7 +195,8 @@ if is_netcdf_build and not is_extended_build
     #netcdf = dependency('netcdf', language : 'c', required : true)
     netcdff = dependency('netcdf', language : 'fortran', required : true)
     if build_machine.system() == 'darwin'
-      nc_dir = / 'usr' / 'local' / 'Cellar' / 'netcdf' / '4.9.2_1'
+      #nc_dir = '/usr' / 'local' / 'Cellar' / 'netcdf' / '4.9.2_1'
+      nc_dir = '/usr/local/Cellar/netcdf/4.9.2_1'
       incdir = include_directories([ nc_dir ])
       ncdep = declare_dependency(link_with : netcdff, include_directories : incdir)
       dependencies += [ ncdep ]

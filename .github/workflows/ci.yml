@@ -876,9 +876,8 @@ jobs:
           brew update
           brew install netcdf
           brew install netcdf-fortran
-          ls /usr/local/bin
-          nc-config --all
-          nf-config --all
+          ls -l /usr/local/Cellar/netcdf/4.9.2_1
+          ls -l /usr/local/Cellar/netcdf-fortran/4.6.1
 
       - name: Setup Micromamba
         uses: mamba-org/setup-micromamba@v1
@@ -893,6 +892,8 @@ jobs:
       - name: Test python netCDF4
         working-directory: modflow6/nctest
         run: |
+          nc-config --all
+          nf-config --all
           python nc_test.py
           ls -l
           file test.nc

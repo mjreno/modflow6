@@ -817,7 +817,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ ubuntu-22.04, macos-14 ] #, windows-2022 ]
+        os: [ ubuntu-22.04, macos-13 ] #, windows-2022 ]
     defaults:
       run:
         shell: bash -l {0}
@@ -907,6 +907,7 @@ jobs:
         if: runner.os == 'macOS'
         working-directory: modflow6
         run: |
+          export LDFLAGS="$LDFLAGS -Wl,-ld_classic"
           meson setup builddir -Ddebug=false -Dnetcdf=true --prefix=$(pwd) --libdir=bin
           meson install -C builddir
           meson test --verbose --no-rebuild -C builddir
@@ -946,8 +947,6 @@ jobs:
         env:
           REPOS_PATH: ${{ github.workspace }}
         run: |
-          micromamba info
-          micromamba list
           pytest -v test_gwf_boundname01.py --netcdf --durations 0 --keep-failed .failed
           pytest -v test_gwf_chd01.py --netcdf --durations 0 --keep-failed .failed
           pytest -v test_gwf_csub_sub03.py --netcdf --durations 0 --keep-failed .failed

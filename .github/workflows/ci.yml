@@ -704,7 +704,6 @@ jobs:
         if: runner.os == 'macOS'
         run: |
           brew update
-          brew install netcdf
           brew install netcdf-fortran
           ls -l /usr/local/Cellar/netcdf/4.9.2_1
           ls -l /usr/local/Cellar/netcdf-fortran/4.6.1

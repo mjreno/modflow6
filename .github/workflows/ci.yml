@@ -871,6 +871,15 @@ jobs:
           nc-config --all
           nf-config
 
+      - name: netcdf compile test
+        if: runner.os == 'macOS'
+        working-directory: modflow6/nctest
+        run: |
+          chmod +x compile-test
+          compile-test
+          ls -l
+          test
+
       - name: Setup Micromamba
         uses: mamba-org/setup-micromamba@v1
         with:

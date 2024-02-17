@@ -47,7 +47,7 @@ if fc_id == 'gcc'
   if profile == 'release'
     compile_args += ['-ffpe-summary=overflow', '-ffpe-trap=overflow,zero,invalid']
   elif profile == 'develop'
-    compile_args += ['-fcheck=all', '-ffpe-trap=overflow,zero,invalid']
+    compile_args += ['-Og', '-fcheck=all', '-ffpe-trap=overflow,zero,invalid']
   endif
 
   # Define OS with gfortran for OS specific code

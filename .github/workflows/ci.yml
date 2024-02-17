@@ -924,6 +924,8 @@ jobs:
           meson setup builddir -Ddebug=false -Dnetcdf=true --prefix=$(pwd) --libdir=bin
           meson install -C builddir
           meson test --verbose --no-rebuild -C builddir
+          ninja -C builddir -t clean
+          meson compile -vC builddir/
 
       - name: Build modflow6
         if: runner.os == 'macOS'

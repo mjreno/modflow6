@@ -881,7 +881,7 @@ jobs:
           ls -l /usr/local/Cellar/netcdf-fortran/4.6.1/lib
           ./compile-test
           ls -l
-          test
+          LD_DEBUG=libs test
 
       - name: Setup Micromamba
         uses: mamba-org/setup-micromamba@v1

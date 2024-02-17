@@ -885,6 +885,21 @@ jobs:
           ls -l
           ncdump simple_xy.nc
 
+      - name: netcdf compile test2
+        if: runner.os == 'macOS'
+        working-directory: modflow6/nctest
+        run: |
+          ls -l /usr/local/Cellar/netcdf/4.9.2_1/include
+          ls -l /usr/local/Cellar/netcdf-fortran/4.6.1/include
+          ls -l /usr/local/Cellar/netcdf/4.9.2_1/lib
+          ls -l /usr/local/Cellar/netcdf-fortran/4.6.1/lib
+          ./compile-test2
+          ls -l
+          otool -L ./test
+          LD_DEBUG=libs ./test
+          ls -l
+          ncdump simple_xy.nc
+
       - name: pkg-config info
         working-directory: modflow6
         run: |

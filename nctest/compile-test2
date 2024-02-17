@@ -1,0 +1,3 @@
+#!/bin/bash
+
+gfortran -o test -Og -fimplicit-none  -Wall  -Wline-truncation  -Wcharacter-truncation  -Wsurprising  -Waliasing  -Wimplicit-interface  -Wunused-parameter  -fwhole-file  -fcheck=all  -std=f2008  -pedantic  -fbacktrace -I/usr/local/Cellar/netcdf-fortran/4.6.1/include -L/usr/local/Cellar/netcdf-fortran/4.6.1/lib ./test.f90 -lnetcdff

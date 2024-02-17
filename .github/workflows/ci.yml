@@ -864,7 +864,6 @@ jobs:
         if: runner.os == 'macOS'
         run: |
           brew update
-          brew install netcdf
           brew install netcdf-fortran
           ls -l /usr/local/Cellar/netcdf/4.9.2_1
           ls -l /usr/local/Cellar/netcdf-fortran/4.6.1
@@ -887,18 +886,14 @@ jobs:
           ncdump simple_xy.nc
 
       - name: pkg-config info
-        working-directory: modflow6/nctest
+        working-directory: modflow6
         run: |
-          echo "PC LIST ALL"
           pkg-config --list-all
-          echo "PC HDF5-SERIAL"
-          pkg-config --debug hdf5-serial
-          echo "PC HDF5"
+          pkg-config --debug hdf5_hl
           pkg-config --debug hdf5
-          echo "PC NETCDF"
           pkg-config --debug netcdf
-          echo "PC NETCDF-FORTRAN"
           pkg-config --debug netcdf-fortran
+          cat builddir/meson-info/intro-dependencies.json
 
       - name: Setup Micromamba
         uses: mamba-org/setup-micromamba@v1

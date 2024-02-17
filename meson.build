@@ -193,8 +193,9 @@ if is_netcdf_build and not is_extended_build
   # find netcdf
   if build_machine.system() != 'windows'
     if build_machine.system() == 'darwin'
+      hd5_dir = '/usr' / 'local' / 'Cellar' / 'hdf5' / '1.14.3' / 'include'
       nc_dir = '/usr' / 'local' / 'Cellar' / 'netcdf' / '4.9.2_1' / 'include'
-      nc_incdir = include_directories([nc_dir])
+      nc_incdir = include_directories([hd5_dif, nc_dir])
       #hdf5 = dependency('hdf5', language: 'fortran', required : true)
       #netcdf = dependency('netcdf', language : 'c', required : true)
       #dependencies += [ hdf5 ]

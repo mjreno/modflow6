@@ -875,6 +875,10 @@ jobs:
         if: runner.os == 'macOS'
         working-directory: modflow6/nctest
         run: |
+          ls -l /usr/local/Cellar/netcdf/4.9.2_1/include
+          ls -l /usr/local/Cellar/netcdf-fortran/4.6.1/include
+          ls -l /usr/local/Cellar/netcdf/4.9.2_1/lib
+          ls -l /usr/local/Cellar/netcdf-fortran/4.6.1/lib
           ./compile-test
           ls -l
           test

@@ -934,7 +934,7 @@ jobs:
           meson setup builddir -Ddebug=false -Dnetcdf=true --prefix=$(pwd) --libdir=bin
           meson install -C builddir
           meson test --verbose --no-rebuild -C builddir
-          ninja -C buildir -t clean
+          ninja -C builddir -t clean
           meson compile -vC builddir/
 
       - name: Show Meson logs

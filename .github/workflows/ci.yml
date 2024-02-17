@@ -884,7 +884,6 @@ jobs:
           otool -L ./test
           LD_DEBUG=libs ./test
           ls -l
-          ncinfo simple_xy.nc
           ncdump simple_xy.nc
 
       - name: Setup Micromamba

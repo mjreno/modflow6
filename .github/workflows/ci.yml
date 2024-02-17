@@ -886,6 +886,20 @@ jobs:
           ls -l
           ncdump simple_xy.nc
 
+      - name: pkg-config info
+        working-directory: modflow6/nctest
+        run: |
+          echo "PC LIST ALL"
+          pkg-config --list-all
+          echo "PC HDF5-SERIAL"
+          pkg-config --debug hdf5-serial
+          echo "PC HDF5"
+          pkg-config --debug hdf5
+          echo "PC NETCDF"
+          pkg-config --debug netcdf
+          echo "PC NETCDF-FORTRAN"
+          pkg-config --debug netcdf-fortran
+
       - name: Setup Micromamba
         uses: mamba-org/setup-micromamba@v1
         with:

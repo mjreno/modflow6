@@ -352,6 +352,7 @@ if build_machine.system() == 'windows' and with_petsc
                       install: true)
 
 elif build_machine.system() == 'darwin' and with_netcdf
+  message('netcdf macos build incdir: ' + nc_dir)
   mf6core = static_library('mf6core',
                            modflow_sources,
                            dependencies:  dependencies,

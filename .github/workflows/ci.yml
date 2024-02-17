@@ -875,8 +875,7 @@ jobs:
         if: runner.os == 'macOS'
         working-directory: modflow6/nctest
         run: |
-          chmod +x compile-test
-          compile-test
+          ./compile-test
           ls -l
           test
 

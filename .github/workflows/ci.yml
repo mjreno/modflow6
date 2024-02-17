@@ -893,7 +893,6 @@ jobs:
           pkg-config --debug hdf5
           pkg-config --debug netcdf
           pkg-config --debug netcdf-fortran
-          cat builddir/meson-info/intro-dependencies.json
 
       - name: Setup Micromamba
         uses: mamba-org/setup-micromamba@v1
@@ -930,6 +929,7 @@ jobs:
         if: runner.os == 'macOS'
         working-directory: modflow6
         run: |
+          ls -l /usr/local/Cellar/netcdf/4.9.2_1/include
           export LDFLAGS="$LDFLAGS -Wl,-ld_classic"
           meson setup builddir -Ddebug=false -Dnetcdf=true --prefix=$(pwd) --libdir=bin
           meson install -C builddir
@@ -943,7 +943,9 @@ jobs:
       - name: Show Meson logs
         if: runner.os == 'macOS'
         working-directory: modflow6
-        run: cat builddir/meson-logs/meson-log.txt
+        run: |
+          cat builddir/meson-logs/meson-log.txt
+          cat builddir/meson-info/intro-dependencies.json
 
       - name: link check
         if: runner.os == 'Linux'

@@ -29,4 +29,3 @@ dependencies:
   - pytest-order
   - pytest-xdist
   - flaky
-  - netcdf4

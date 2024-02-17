@@ -919,19 +919,6 @@ jobs:
           cache-environment: false
           cache-downloads: false
 
-      - name: Test python netCDF4
-        working-directory: modflow6/nctest
-        run: |
-          python nc_test.py
-          ls -l
-          file test.nc
-          ncinfo test.nc
-          python sim.py
-          file mymodel/mymodel.nc
-          ls -l mymodel
-          ncinfo mymodel/mymodel.nc
-          ncdump mymodel/mymodel.nc
-
       - name: Build modflow6
         if: runner.os == 'Linux'
         working-directory: modflow6
@@ -977,6 +964,20 @@ jobs:
         working-directory: modflow6
         run: |
           otool -L bin/mf6
+
+      - name: Test python netCDF4
+        working-directory: modflow6/nctest
+        run: |
+          micromamba install -c conda-forge netcdf4
+          python nc_test.py
+          ls -l
+          file test.nc
+          ncinfo test.nc
+          python sim.py
+          file mymodel/mymodel.nc
+          ls -l mymodel
+          ncinfo mymodel/mymodel.nc
+          ncdump mymodel/mymodel.nc
 
       - name: Test mf6 netcdf
         if: runner.os == 'Linux'

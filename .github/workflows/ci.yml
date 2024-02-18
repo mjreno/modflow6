@@ -982,8 +982,11 @@ jobs:
           ncdump mymodel/mymodel.nc
 
       - name: Test mf6 netcdf
+        if: runner.os == 'macOS'
         working-directory: modflow6/nctest/mymodel
         run: |
+          echo "DYLD_FALLBACK_LIBRARY_PATH=/usr/local/Cellar/hdf5/1.14.3/lib:/usr/local/Cellar/netcdf/4.9.2_1/lib:$DYLD_FALLBACK_LIBRARY_PATH" >> $GITHUB_ENV
+          echo "$DYLD_FALLBACK_LIBRARY_PATH"
           ../../bin/mf6
           cat mfsim.lst
 

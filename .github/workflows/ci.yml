@@ -980,7 +980,6 @@ jobs:
           ncdump mymodel/mymodel.nc
 
       - name: Test mf6 netcdf
-        if: runner.os == 'Linux'
         working-directory: modflow6/nctest/mymodel
         run: |
           ../../bin/mf6

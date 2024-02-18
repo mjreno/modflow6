@@ -964,6 +964,8 @@ jobs:
         working-directory: modflow6
         run: |
           otool -L bin/mf6
+          echo "$DYLD_LIBRARY_PATH"
+          echo "$DYLD_FALLBACK_LIBRARY_PATH"
 
       - name: Test python netCDF4
         working-directory: modflow6/nctest

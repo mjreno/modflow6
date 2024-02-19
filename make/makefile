@@ -343,9 +343,9 @@ $(OBJDIR)/ImsReordering.o \
 $(OBJDIR)/swf-disl.o \
 $(OBJDIR)/swf-cxs.o \
 $(OBJDIR)/swf-ic.o \
+$(OBJDIR)/StructVector.o \
 $(OBJDIR)/ModflowInput.o \
 $(OBJDIR)/IdmLogger.o \
-$(OBJDIR)/StructVector.o \
 $(OBJDIR)/Integer1dReader.o \
 $(OBJDIR)/Double2dReader.o \
 $(OBJDIR)/Double1dReader.o \
@@ -392,10 +392,10 @@ $(OBJDIR)/swf-oc.o \
 $(OBJDIR)/swf-obs.o \
 $(OBJDIR)/swf-flw.o \
 $(OBJDIR)/swf-dfw.o \
-$(OBJDIR)/InputLoadType.o \
-$(OBJDIR)/DefinitionSelect.o \
 $(OBJDIR)/StructArray.o \
 $(OBJDIR)/LayeredArrayReader.o \
+$(OBJDIR)/DefinitionSelect.o \
+$(OBJDIR)/InputLoadType.o \
 $(OBJDIR)/GridConnection.o \
 $(OBJDIR)/DistributedVariable.o \
 $(OBJDIR)/gwt.o \
@@ -408,11 +408,9 @@ $(OBJDIR)/LinearSolverFactory.o \
 $(OBJDIR)/ImsLinear.o \
 $(OBJDIR)/BaseSolution.o \
 $(OBJDIR)/swf.o \
-$(OBJDIR)/NCInputLoadType.o \
-$(OBJDIR)/LoadNCFile.o \
+$(OBJDIR)/LoadMf6File.o \
 $(OBJDIR)/DynamicParamFilter.o \
 $(OBJDIR)/BoundInputContext.o \
-$(OBJDIR)/LoadMf6File.o \
 $(OBJDIR)/AsciiInputLoadType.o \
 $(OBJDIR)/ExplicitModel.o \
 $(OBJDIR)/SpatialModelConnection.o \
@@ -426,8 +424,6 @@ $(OBJDIR)/RouterFactory.o \
 $(OBJDIR)/NumericalSolution.o \
 $(OBJDIR)/MappedMemory.o \
 $(OBJDIR)/ModelPackageInput.o \
-$(OBJDIR)/NCFileListInput.o \
-$(OBJDIR)/NCFileGridInput.o \
 $(OBJDIR)/Mf6FileListInput.o \
 $(OBJDIR)/Mf6FileGridInput.o \
 $(OBJDIR)/ExplicitSolution.o \
@@ -436,9 +432,7 @@ $(OBJDIR)/GwfGwfConnection.o \
 $(OBJDIR)/GweGweConnection.o \
 $(OBJDIR)/VirtualDataManager.o \
 $(OBJDIR)/Mapper.o \
-$(OBJDIR)/NCContextBuild.o \
 $(OBJDIR)/ModelPackageInputs.o \
-$(OBJDIR)/IdmNCFile.o \
 $(OBJDIR)/IdmMf6File.o \
 $(OBJDIR)/VirtualGwtModel.o \
 $(OBJDIR)/VirtualGwtExchange.o \

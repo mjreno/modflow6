@@ -581,6 +581,18 @@ jobs:
       FC_V: 12
     steps:
 
+      - name: setup macports
+        if: runner.os == 'macOS'
+        uses: actions/checkout@v3
+
+      - name: setup macports
+        if: runner.os == 'macOS'
+        uses: melusina-org/setup-macports@v1
+
+      - name: macports version
+        if: runner.os == 'macOS'
+        run: port version
+
       - name: Checkout modflow6
         uses: actions/checkout@v4
         with:
@@ -591,14 +603,6 @@ jobs:
         with:
           compiler: gcc
           version: ${{ env.FC_V }}
-
-      - name: setup macports
-        if: runner.os == 'macOS'
-        uses: melusina-org/setup-macports@v1
-
-      - name: macports version
-        if: runner.os == 'macOS'
-        run: port version
 
       - name: Cache PETSc
         id: cache-petsc

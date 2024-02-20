@@ -594,12 +594,16 @@ jobs:
 
       - name: macports step 1
         uses: actions/checkout@v3
-        run: development/testsuite
 
       - name: macports step 2
+        run: development/testsuite
+
+      - name: macports step 3
         uses: melusina-org/setup-macports@v1
         with:
           parameters: 'testsuite/run-testsuite-on-macos-12.yaml'
+
+      - name: macports version
         run: port version
 
       - name: Cache PETSc

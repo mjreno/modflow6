@@ -584,6 +584,8 @@ jobs:
       - name: setup macports
         if: runner.os == 'macOS'
         uses: melusina-org/setup-macports@v1
+        cache-environment: true
+        cache-downloads: true
 
       - name: macports version
         if: runner.os == 'macOS'
@@ -694,6 +696,8 @@ jobs:
         shell: micromamba-shell {0}
         working-directory: modflow6
         run: |
+          ls -l /opt/local/include
+          ls -l /opt/local/lib
           meson setup builddir -Ddebug=false -Dextended=true --prefix=$(pwd) --libdir=bin
           meson install -C builddir
           meson test --verbose --no-rebuild -C builddir

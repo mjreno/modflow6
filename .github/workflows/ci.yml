@@ -674,8 +674,6 @@ jobs:
         uses: mamba-org/setup-micromamba@v1
         with:
           environment-file: modflow6/environment-nctest.yml
-          create-args: >-
-            netcdf4
           init-shell: >-
             powershell
           cache-environment: true

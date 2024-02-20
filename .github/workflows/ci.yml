@@ -600,15 +600,6 @@ jobs:
         if: runner.os == 'macOS'
         run: port version
 
-      - name: micromamba shell
-        if: runner.os == 'macOS'
-        uses: mamba-org/setup-micromamba@v1
-        with:
-          generate-run-shell: true
-          environment-file: modflow6/environment-nctest.yml
-          create-args: >-
-            netcdf4
-
       - name: Cache PETSc
         id: cache-petsc
         uses: actions/cache@v4
@@ -666,7 +657,6 @@ jobs:
           nf-config --all
 
       - name: Setup Micromamba
-        if: runner.os == 'Linux'
         uses: mamba-org/setup-micromamba@v1
         with:
           environment-file: modflow6/environment-nctest.yml
@@ -675,21 +665,11 @@ jobs:
           init-shell: >-
             bash
             powershell
-          cache-environment: true
-          cache-downloads: true
+          cache-environment: false
+          cache-downloads: false
 
       - name: Build modflow6
-        if: runner.os == 'Linux'
         working-directory: modflow6
-        run: |
-          meson setup builddir -Ddebug=false -Dextended=true --prefix=$(pwd) --libdir=bin
-          meson install -C builddir
-          meson test --verbose --no-rebuild -C builddir
-
-      - name: Build modflow6
-        if: runner.os == 'macOS'
-        working-directory: modflow6
-        shell: micromamba-shell {0}
         run: |
           meson setup builddir -Ddebug=false -Dextended=true --prefix=$(pwd) --libdir=bin
           meson install -C builddir

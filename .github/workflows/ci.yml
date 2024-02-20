@@ -722,8 +722,7 @@ jobs:
           ncinfo mymodel/mymodel.nc
           ncdump mymodel/mymodel.nc
           cd mymodel
-          ../../bin/mf6
-          cat mfsim.lst
+          ls ../../bin
 
       - name: Get executables
         working-directory: modflow6/autotest
@@ -732,6 +731,16 @@ jobs:
         run: pytest -v --durations 0 get_exes.py
 
       - name: Test programs (netcdf)
+        if: runner.os == 'Linux'
+        working-directory: modflow6/autotest
+        env:
+          REPOS_PATH: ${{ github.workspace }}
+        run: |
+          pytest -v -n auto -m netcdf --netcdf --parallel --durations 0 --keep-failed .failed
+
+      - name: Test programs (netcdf)
+        if: runner.os == 'macOS'
+        shell: micromamba-shell {0}
         working-directory: modflow6/autotest
         env:
           REPOS_PATH: ${{ github.workspace }}

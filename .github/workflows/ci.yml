@@ -20,6 +20,7 @@ on:
     branches:
       - master
       - develop
+      - idm_netcdf1_test-b
     paths-ignore:
       - '**.md'
       - '**.pdf'
@@ -571,7 +572,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ ubuntu-22.04 ] #, macos-12 ] #, windows-2022 ]
+        os: [ ubuntu-22.04, macos-12 ] #, windows-2022 ]
     defaults:
       run:
         shell: bash -l {0}
@@ -590,6 +591,16 @@ jobs:
         with:
           compiler: gcc
           version: ${{ env.FC_V }}
+
+      - name: macports step 1
+        uses: actions/checkout@v3
+        run: development/testsuite
+
+      - name: macports step 2
+        uses: melusina-org/setup-macports@v1
+        with:
+          parameters: 'testsuite/run-testsuite-on-macos-12.yaml'
+        run: port version
 
       - name: Cache PETSc
         id: cache-petsc
@@ -639,6 +650,14 @@ jobs:
           nc-config --all
           nf-config --all
 
+      - name: Install netcdf
+        if: runner.os == 'macOS'
+        run: |
+          sudo port install netcdf
+          sudo port install netcdf-fortran
+          nc-config --all
+          nf-config --all
+
       - name: Setup Micromamba
         uses: mamba-org/setup-micromamba@v1
         with:
@@ -657,6 +676,22 @@ jobs:
           meson setup builddir -Ddebug=false -Dextended=true --prefix=$(pwd) --libdir=bin
           meson install -C builddir
           meson test --verbose --no-rebuild -C builddir
+
+      - name: Test netcdf-mf6
+        working-directory: modflow6/nctest
+        run: |
+          python nc_test.py
+          ls -l
+          file test.nc
+          ncinfo test.nc
+          python sim.py
+          file mymodel/mymodel.nc
+          ls -l mymodel
+          ncinfo mymodel/mymodel.nc
+          ncdump mymodel/mymodel.nc
+          cd mymodel
+          ../../bin/mf6
+          cat mfsim.lst
 
       - name: Show Meson logs
         if: failure()

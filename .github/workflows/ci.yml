@@ -700,6 +700,8 @@ jobs:
           meson test --verbose --no-rebuild -C builddir
 
       - name: Test netcdf-mf6
+        if: runner.os == 'macOS'
+        shell: micromamba-shell {0}
         working-directory: modflow6/nctest
         run: |
           python nc_test.py

@@ -373,20 +373,20 @@ if build_machine.system() == 'windows' and with_petsc
                       link_with: [mf6core],
                       dependencies: dependencies, 
                       install: true)
-elif build_machine.system() == 'darwin' and with_netcdf
-  nc_dir = '/opt' / 'local' / 'include'
-  nc_incdir = include_directories([nc_dir])
-  message('netcdf macos build incdir: ' + nc_dir)
-  mf6core = static_library('mf6core',
-                           modflow_sources,
-                           dependencies:  dependencies,
-                           link_with: [mf6_external],
-                           include_directories: nc_incdir)
-  mf6exe = executable(buildname,
-                      'mf6.f90',
-                      link_with: [mf6core],
-                      dependencies: dependencies,
-                      install: true)
+#elif build_machine.system() == 'darwin' and with_netcdf
+#  nc_dir = '/opt' / 'local' / 'include'
+#  nc_incdir = include_directories([nc_dir])
+#  message('netcdf macos build incdir: ' + nc_dir)
+#  mf6core = static_library('mf6core',
+#                           modflow_sources,
+#                           dependencies:  dependencies,
+#                           link_with: [mf6_external],
+#                           include_directories: nc_incdir)
+#  mf6exe = executable(buildname,
+#                      'mf6.f90',
+#                      link_with: [mf6core],
+#                      dependencies: dependencies,
+#                      install: true)
 else
   mf6core = static_library('mf6core', 
                            modflow_sources,  

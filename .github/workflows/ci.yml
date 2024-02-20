@@ -605,7 +605,7 @@ jobs:
         uses: mamba-org/setup-micromamba@v1
         with:
           generate-run-shell: true
-          environment-file: environment-nctest.yml
+          environment-file: modflow6/environment-nctest.yml
           create-args: >-
             netcdf4
 

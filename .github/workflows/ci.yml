@@ -592,18 +592,12 @@ jobs:
           compiler: gcc
           version: ${{ env.FC_V }}
 
-      - name: macports step 1
-        uses: actions/checkout@v3
-
-      - name: macports step 2
-        run: development/testsuite
-
-      - name: macports step 3
+      - name: setup macports
+        if: runner.os == 'macOS'
         uses: melusina-org/setup-macports@v1
-        with:
-          parameters: 'testsuite/run-testsuite-on-macos-12.yaml'
 
       - name: macports version
+        if: runner.os == 'macOS'
         run: port version
 
       - name: Cache PETSc

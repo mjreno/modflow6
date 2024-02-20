@@ -696,6 +696,7 @@ jobs:
         run: |
           ls -l /opt/local/include
           ls -l /opt/local/lib
+          echo "DYLD_LIBRARY_PATH=/opt/local/lib:$DYLD_LIBRARY_PATH"  >> $GITHUB_ENV
           meson setup builddir -Ddebug=false -Dextended=true --prefix=$(pwd) --libdir=bin
           meson install -C builddir
           meson test --verbose --no-rebuild -C builddir

@@ -584,8 +584,6 @@ jobs:
       - name: setup macports
         if: runner.os == 'macOS'
         uses: melusina-org/setup-macports@v1
-        cache-environment: true
-        cache-downloads: true
 
       - name: macports version
         if: runner.os == 'macOS'

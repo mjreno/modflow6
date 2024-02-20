@@ -669,18 +669,6 @@ jobs:
           cache-environment: true
           cache-downloads: true
 
-      - name: Setup Micromamba
-        if: runner.os == 'macOS'
-        uses: mamba-org/setup-micromamba@v1
-        with:
-          environment-file: modflow6/environment-nctest.yml
-          create-args: >-
-            netcdf4
-          init-shell: >-
-            powershell
-          cache-environment: true
-          cache-downloads: true
-
       - name: Build modflow6
         if: runner.os == 'Linux'
         working-directory: modflow6
@@ -691,10 +679,15 @@ jobs:
 
       - name: Build modflow6
         if: runner.os == 'macOS'
+        uses: mamba-org/setup-micromamba@v1
         working-directory: modflow6
+        shell: micromamba-shell {0}
+        with:
+          generate-run-shell: true
+          environment-file: environment-nctest.yml
+          create-args: >-
+            netcdf4
         run: |
-          sudo micromamba shell init -s bash
-          micromamba activate modflow6
           meson setup builddir -Ddebug=false -Dextended=true --prefix=$(pwd) --libdir=bin
           meson install -C builddir
           meson test --verbose --no-rebuild -C builddir

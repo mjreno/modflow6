@@ -694,6 +694,7 @@ jobs:
         working-directory: modflow6
         run: |
           sudo micromamba shell init -s bash
+          micromamba activate modflow6
           meson setup builddir -Ddebug=false -Dextended=true --prefix=$(pwd) --libdir=bin
           meson install -C builddir
           meson test --verbose --no-rebuild -C builddir

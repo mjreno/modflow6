@@ -1013,7 +1013,6 @@ jobs:
           make install
 
       - name: Look at config.log if error
-        working-directory: ncf
         run: |
           ls -l ${HOME}/environments/netcdf-fortran-4.6.1
           cat ${HOME}/environments/netcdf-fortran-4.6.1/config.log

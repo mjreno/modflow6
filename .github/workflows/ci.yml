@@ -968,9 +968,7 @@ jobs:
       - run: echo "PATH=${HOME}/environments/${{ matrix.hdf5 }}-${{ matrix.netcdf }}/bin:${PATH}" >> $GITHUB_ENV
 
       - run: brew install automake libaec
-        ###
-        # Installing libhdf4 and libhdf5
-        ###
+
       - name: Cache libhdf5-${{ matrix.hdf5 }}-${{ matrix.netcdf }}
         id: cache-hdf5
         uses: actions/cache@v2
@@ -999,6 +997,86 @@ jobs:
           popd
           popd
 
+      - run: brew install automake
+
+      - name: Check Cache
+        shell: bash -l {0}
+        run: ls ${HOME}/environments && ls ${HOME}/environments/${{ matrix.hdf5 }}-${{ matrix.netcdf }} && ls ${HOME}/environments/${{ matrix.hdf5 }}-${{ matrix.netcdf}}/lib
+
+      - name: Run autoconf
+        shell: bash -l {0}
+        run: autoreconf -if
+
+      - name: Configure
+        shell: bash -l {0}
+
+        run: CFLAGS=${CFLAGS} LDFLAGS=$(nc-config --libs) LD_LIBRARY_PATH=${LD_LIBRARY_PATH} ./configure
+
+      - name: Look at config.log if error
+        shell: bash -l {0}
+        run: cat config.log
+        if: ${{ failure() }}
+
+      - name: Print Summary
+        shell: bash -l {0}
+        run: cat libnetcdff.settings
+
+      - name: Build Library and Utilities
+        shell: bash -l {0}
+        run: CFLAGS=${CFLAGS} LDFLAGS=${LDFLAGS} LD_LIBRARY_PATH=${LD_LIBRARY_PATH} make -j
+        if: ${{ success() }}
+
+      - name: Build Tests
+        shell: bash -l {0}
+        run: CFLAGS=${CFLAGS} LDFLAGS=${LDFLAGS} LD_LIBRARY_PATH=${LD_LIBRARY_PATH} make check TESTS="" -j
+        if: ${{ success() }}
+
+      - name: Run Tests
+        shell: bash -l {0}
+        run: CFLAGS=${CFLAGS} LDFLAGS=${LDFLAGS} LD_LIBRARY_PATH=${LD_LIBRARY_PATH} make check -j
+        if: ${{ success() }}
+
+      - run: brew install automake
+
+      - name: Check Cache
+        shell: bash -l {0}
+        run: ls ${HOME}/environments && ls ${HOME}/environments/${{ matrix.hdf5 }}-${{ matrix.netcdf }} && ls ${HOME}/environments/${{ matrix.hdf5 }}-${{matrix.netcdf}}/lib
+
+      - name: Perform out-of-directory build
+        shell: bash -l {0}
+        run: |
+              mkdir build
+              cd build
+              LD_LIBRARY_PATH=${LD_LIBRARY_PATH} cmake .. -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}
+
+      - name: Print Summary
+        shell: bash -l {0}
+        run: |
+              cd build
+              cat libnetcdff.settings
+
+      - name: Build All
+        shell: bash -l {0}
+        run: |
+              cd build
+              LD_LIBRARY_PATH=${LD_LIBRARY_PATH} make -j 12
+        if: ${{ success() }}
+
+      - name: Run Tests
+        shell: bash -l {0}
+        run: |
+              cd build
+              LD_LIBRARY_PATH=${LD_LIBRARY_PATH} ctest -j 1 .
+        if: ${{ success() }}
+
+      - name: Look at LastTest.log if error
+        shell: bash -l {0}
+        run: |
+          cat /home/runner/work/netcdf-fortran/netcdf-fortran/build/Testing/Temporary/LastTest.log
+          cd build
+          LD_LIBRARY_PATH=${LD_LIBRARY_PATH} ctest --rerun-failed --output-on-failure
+
+        if: ${{ failure() }}
 
       - name: Setup Micromamba
         if: runner.os == 'Linux'

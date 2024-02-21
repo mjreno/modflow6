@@ -924,7 +924,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ macos-12 ] #[ ubuntu-22.04, macos-12 ] #, windows-2022 ]
+        os: [ macos-13 ] #[ ubuntu-22.04, macos-12 ] #, windows-2022 ]
         hdf5: [ 1.12.2 ]
         netcdf: [ v4.9.0 ] #, main ]
     defaults:
@@ -932,7 +932,7 @@ jobs:
         shell: bash -l {0}
     env:
       FC: gfortran
-      FC_V: 12
+      FC_V: 13
     steps:
 
       - name: Checkout modflow6
@@ -940,11 +940,9 @@ jobs:
         with:
           path: modflow6
 
-      - name: Setup ${{ env.FC }} ${{ env.FC_V }}
-        uses: fortran-lang/setup-fortran@v1
-        with:
-          compiler: gcc
-          version: ${{ env.FC_V }}
+      - name: Install gcc
+        run: |
+          brew install gcc
 
       - name: Install netcdf
         if: runner.os == 'Linux'

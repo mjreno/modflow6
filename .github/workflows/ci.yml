@@ -698,8 +698,6 @@ jobs:
           meson setup builddir -Ddebug=false -Dextended=true --prefix=$(pwd) --libdir=bin
           meson install -C builddir
           meson test --verbose --no-rebuild -C builddir
-          micromamba install -c conda-forge netcdf4
-          meson install -C builddir
           otool -L bin/mf6
 
       - name: Show Meson logs
@@ -718,11 +716,9 @@ jobs:
           ls -l
           file test.nc
           ncinfo test.nc
-          python sim.py
-          file mymodel/mymodel.nc
-          ls -l mymodel
-          ncinfo mymodel/mymodel.nc
-          ncdump mymodel/mymodel.nc
+          cd mymodel
+          ncgen -o mymodel.nc mymodel.cdl
+          ../../bin/mf6
 
       - name: Get executables
         if: runner.os == 'Linux'

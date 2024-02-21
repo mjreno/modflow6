@@ -925,8 +925,8 @@ jobs:
       fail-fast: false
       matrix:
         os: [ macos-13 ] #[ ubuntu-22.04, macos-12 ] #, windows-2022 ]
-        hdf5: [ 1.12.2 ]
-        netcdf: [ v4.9.0 ] #, main ]
+        hdf5: [ 1.14.3 ] #1.12.2 ]
+        netcdf: [ 4.9.2 ] #v4.9.0 ] #, main ]
     defaults:
       run:
         shell: bash -l {0}
@@ -1011,6 +1011,11 @@ jobs:
           cd netcdf-fortran-4.6.1
           LDFLAGS="-Wl,-no-undefined" LIBS="$(nc-config --libs)" ./configure --enable-shared
           make install
+
+      - name: Look at config.log if error
+        working-directory: ncf
+        run: cat config.log
+        if: ${{ failure() }}
 
       - name: Setup Micromamba
         if: runner.os == 'Linux'

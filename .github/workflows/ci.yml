@@ -713,6 +713,7 @@ jobs:
         shell: micromamba-shell {0}
         working-directory: modflow6/nctest/mymodel
         run: |
+          ls -l
           ncgen -o mymodel.nc mymodel.cdl
           gdb -batch -ex "run" -ex "bt" ../../bin/mf6
 

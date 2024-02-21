@@ -699,7 +699,8 @@ jobs:
           meson install -C builddir
           meson test --verbose --no-rebuild -C builddir
           micromamba install -c conda-forge netcdf4
-          meson install -C builddir/
+          meson compile -vC builddir
+          meson install -C buildir
           cd autotest
           pytest -v -n auto -m netcdf --netcdf --parallel --durations 0 --keep-failed .failed
 

@@ -221,7 +221,7 @@ endif
 # build mf6 and libmf6
 buildname = get_option('buildname')
 subdir('src')
-#subdir('srcbmi')
+subdir('srcbmi')
 
 # build zbud6 and mf5to6 utility programs
 subdir('utils')

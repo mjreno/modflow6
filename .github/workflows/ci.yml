@@ -716,7 +716,7 @@ jobs:
         run: |
           ls -l
           ncgen -o mymodel.nc mymodel.cdl
-          ggdb -batch -ex "run" -ex "bt" ../../bin/mf6
+          sudo ggdb -batch -ex "run" -ex "bt" ../../bin/mf6
 
       - name: Get executables
         if: runner.os == 'Linux'

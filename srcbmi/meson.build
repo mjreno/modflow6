@@ -9,4 +9,8 @@ bmi_sources = files(
 
 message('MODFLOW 6 shared library name:', 'lib' + buildname)
 
-library(buildname, bmi_sources, link_with: mf6core, name_prefix: 'lib', install: true)
+if build_machine.system() == 'darwin' and with_netcdf
+  library(buildname, bmi_sources, link_with: mf6core, link_args : '/opt/local/lib/libnetcdff.dylib', name_prefix: 'lib', install: true)
+else
+  library(buildname, bmi_sources, link_with: mf6core, name_prefix: 'lib', install: true)
+endif

@@ -20,6 +20,7 @@ on:
     branches:
       - master
       - develop
+      - simple_nc
     paths-ignore:
       - '**.md'
       - '**.pdf'
@@ -560,4 +561,162 @@ jobs:
         with:
           name: failed-${{ matrix.os }}-${{ env.FC }}-${{ env.FC_V }}
           path: modflow6/autotest/.failed
-          
+
+  netcdf_test:
+    name: NetCDF testing
+    needs:
+      - lint
+      - build
+      - smoke_test
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu-22.04, macos-12 ] #, windows-2022 ]
+    defaults:
+      run:
+        shell: bash -l {0}
+    env:
+      FC: gfortran
+      FC_V: 12
+    steps:
+
+      - name: setup macports
+        if: runner.os == 'macOS'
+        uses: melusina-org/setup-macports@v1
+
+      - name: macports version
+        if: runner.os == 'macOS'
+        run: port version
+
+      - name: Checkout modflow6
+        uses: actions/checkout@v4
+        with:
+          path: modflow6
+
+      - name: Setup ${{ env.FC }} ${{ env.FC_V }}
+        uses: fortran-lang/setup-fortran@v1
+        with:
+          compiler: gcc
+          version: ${{ env.FC_V }}
+
+      - name: Cache PETSc
+        id: cache-petsc
+        uses: actions/cache@v4
+        with:
+          path: petsc
+          key: ${{ runner.os }}-petsc
+
+      - name: Clone PETSc
+        if: runner.os != 'Windows' && steps.cache-petsc.outputs.cache-hit != 'true'
+        run: git clone -b release https://gitlab.com/petsc/petsc.git petsc
+
+      - name: Configure environment
+        if: runner.os == 'Linux'
+        run: |
+          echo "PKG_CONFIG_PATH=$GITHUB_WORKSPACE/petsc/linux-gnu/lib/pkgconfig" >> $GITHUB_ENV
+          echo "$GITHUB_WORKSPACE/petsc/linux-gnu/bin" >> $GITHUB_PATH
+
+      - name: Configure environment
+        if: runner.os == 'macOS'
+        run: |
+          echo "PKG_CONFIG_PATH=$GITHUB_WORKSPACE/petsc/arch-darwin-gcc-debug/lib/pkgconfig" >> $GITHUB_ENV
+          echo "$GITHUB_WORKSPACE/petsc/arch-darwin-gcc-debug/bin" >> $GITHUB_PATH
+
+      - name: Configure PETSc
+        if: runner.os == 'Linux'
+        working-directory: petsc
+        run: |
+          sudo ./configure PETSC_ARCH=linux-gnu --download-fblaslapack --download-openmpi
+          sudo make all
+
+      - name: Configure PETSc
+        if: runner.os == 'macOS'
+        working-directory: petsc
+        run: |
+          sudo ./configure PETSC_DIR="$GITHUB_WORKSPACE/petsc" PETSC_ARCH=arch-darwin-gcc-debug --download-fblaslapack --download-openmpi
+          sudo make all
+
+      - name: Install netcdf
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install build-essential \
+            libnetcdf-dev \
+            libnetcdff-dev \
+            netcdf-bin
+          nc-config --all
+          nf-config --all
+
+      - name: Install netcdf
+        if: runner.os == 'macOS'
+        run: |
+          sudo port install netcdf
+          sudo port install netcdf-fortran
+          nc-config --all
+          nf-config --all
+
+      - name: Setup Micromamba
+        if: runner.os == 'Linux'
+        uses: mamba-org/setup-micromamba@v1
+        with:
+          environment-file: modflow6/environment.yml
+          create-args: >-
+            netcdf4
+          init-shell: >-
+            bash
+            powershell
+          cache-environment: true
+          cache-downloads: true
+
+      - name: Setup Micromamba
+        if: runner.os == 'macOS'
+        uses: mamba-org/setup-micromamba@v1
+        with:
+          environment-file: modflow6/environment.yml
+          init-shell: >-
+            powershell
+          cache-environment: true
+          cache-downloads: true
+
+      - name: Build modflow6
+        if: runner.os == 'Linux'
+        working-directory: modflow6
+        run: |
+          meson setup builddir -Ddebug=false -Dextended=true --prefix=$(pwd) --libdir=bin
+          meson install -C builddir
+          meson test --verbose --no-rebuild -C builddir
+
+      - name: Build modflow6
+        if: runner.os == 'macOS'
+        shell: micromamba-shell {0}
+        working-directory: modflow6
+        run: |
+          ls -l /opt/local/include
+          ls -l /opt/local/lib
+          echo "DYLD_LIBRARY_PATH=/opt/local/lib:$DYLD_LIBRARY_PATH"  >> $GITHUB_ENV
+          meson setup builddir -Ddebug=false -Dextended=true --prefix=$(pwd) --libdir=bin
+          meson install -C builddir
+          meson test --verbose --no-rebuild -C builddir
+          otool -L bin/mf6
+
+      - name: Show Meson logs
+        if: failure()
+        working-directory: modflow6
+        run: |
+          cat builddir/meson-info/intro-dependencies.json
+          cat builddir/meson-logs/meson-log.txt
+
+      - name: Test netcdf-mf6
+        shell: micromamba-shell {0}
+        working-directory: modflow6/nctest/mymodel
+        run: |
+          ../../bin/mf6
+          cat mfsim.lst
+
+      - name: Upload failed test output
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: failed-${{ matrix.os }}-${{ env.FC }}-${{ env.FC_V }}
+          path: modflow6/autotest/.failed

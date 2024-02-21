@@ -42,14 +42,14 @@ if fc_id == 'gcc'
                    '-Wno-maybe-uninitialized',   # "Uninitialized" flags produce false positives with allocatables
                    '-Wno-uninitialized',
                    '-g', '-fbacktrace', '-fcheck=all',
-                   '-ffpe-trap=overflow,zero,invalid'
+                   '-ffpe-trap=underflow,overflow,zero,invalid,precision,denormal'
                    ]
   
   # Options specific to profile
   if profile == 'release'
     compile_args += ['-ffpe-summary=overflow', '-ffpe-trap=overflow,zero,invalid']
   elif profile == 'develop'
-    compile_args += ['-fcheck=all', '-ffpe-trap=overflow,zero,invalid']
+    #compile_args += ['-fcheck=all', '-ffpe-trap=overflow,zero,invalid']
   endif
 
   # Define OS with gfortran for OS specific code

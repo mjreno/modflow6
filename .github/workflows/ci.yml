@@ -716,6 +716,11 @@ jobs:
           ls -l
           file test.nc
           ncinfo test.nc
+          ./compile-test-macports
+          ls -l
+          ./test
+          ls -l
+          ncdump simple_xy.nc
           cd mymodel
           ncgen -o mymodel.nc mymodel.cdl
           ../../bin/mf6

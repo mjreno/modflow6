@@ -842,7 +842,7 @@ jobs:
         if: runner.os == 'Linux'
         working-directory: modflow6
         run: |
-          meson setup builddir -Ddebug=false -Dnetcdf=true --prefix=$(pwd) --libdir=bin
+          meson setup builddir -Ddebug=true -Dnetcdf=true --prefix=$(pwd) --libdir=bin
           meson install -C builddir
           meson test --verbose --no-rebuild -C builddir
 
@@ -854,7 +854,7 @@ jobs:
           ls -l /opt/local/include
           ls -l /opt/local/lib
           echo "DYLD_LIBRARY_PATH=/opt/local/lib:$DYLD_LIBRARY_PATH"  >> $GITHUB_ENV
-          meson setup builddir -Ddebug=false -Dextended=true --prefix=$(pwd) --libdir=bin
+          meson setup builddir -Ddebug=true -Dnetcdf=true --prefix=$(pwd) --libdir=bin
           meson install -C builddir
           meson test --verbose --no-rebuild -C builddir
           otool -L bin/mf6
@@ -896,7 +896,7 @@ jobs:
         env:
           REPOS_PATH: ${{ github.workspace }}
         run: |
-          pytest -v -n auto -m netcdf --netcdf --parallel --durations 0 --keep-failed .failed
+          pytest -v -n auto -m netcdf --netcdf --durations 0 --keep-failed .failed
 
       - name: Test programs (netcdf)
         if: runner.os == 'macOS'
@@ -905,7 +905,7 @@ jobs:
         env:
           REPOS_PATH: ${{ github.workspace }}
         run: |
-          pytest -v -n auto -m netcdf --netcdf --parallel --durations 0 --keep-failed .failed
+          pytest -v -n auto -m netcdf --netcdf --durations 0 --keep-failed .failed
 
       - name: Upload failed test output
         if: failure()

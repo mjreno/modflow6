@@ -700,6 +700,7 @@ jobs:
           meson test --verbose --no-rebuild -C builddir
           micromamba install -c conda-forge netcdf4
           meson install -C builddir
+          otool -L bin/mf6
 
       - name: Show Meson logs
         if: failure()

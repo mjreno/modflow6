@@ -721,6 +721,7 @@ jobs:
           ./test
           ls -l
           ncdump simple_xy.nc
+          ../bin/mf6
           cd mymodel
           ncgen -o mymodel.nc mymodel.cdl
           ../../bin/mf6

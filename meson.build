@@ -42,7 +42,7 @@ if fc_id == 'gcc'
                    '-Wno-maybe-uninitialized',   # "Uninitialized" flags produce false positives with allocatables
                    '-Wno-uninitialized',
                    '-g', '-fbacktrace', '-fcheck=all',
-                   '-ffpe-trap=underflow,overflow,zero,invalid'
+                   '-ffpe-trap=overflow,zero,invalid'
                    ]
   
   # Options specific to profile

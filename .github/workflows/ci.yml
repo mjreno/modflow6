@@ -926,7 +926,7 @@ jobs:
       matrix:
         os: [ macos-13 ] #[ ubuntu-22.04, macos-12 ] #, windows-2022 ]
         hdf5: [ 1.14.3 ] #1.12.2 ]
-        netcdf: [ 4.9.2 ] #v4.9.0 ] #, main ]
+        netcdf: [ 4.9.1 ] #v4.9.0 ] #, main ]
     defaults:
       run:
         shell: bash -l {0}

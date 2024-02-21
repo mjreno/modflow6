@@ -722,8 +722,6 @@ jobs:
           ls -l mymodel
           ncinfo mymodel/mymodel.nc
           ncdump mymodel/mymodel.nc
-          cd mymodel
-          ls ../../bin
 
       - name: Get executables
         working-directory: modflow6/autotest

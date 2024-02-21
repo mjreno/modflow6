@@ -656,6 +656,7 @@ jobs:
           sudo port install netcdf-fortran
           nc-config --all
           nf-config --all
+          port contents gdb
 
       - name: Setup Micromamba
         if: runner.os == 'Linux'
@@ -715,7 +716,7 @@ jobs:
         run: |
           ls -l
           ncgen -o mymodel.nc mymodel.cdl
-          gdb -batch -ex "run" -ex "bt" ../../bin/mf6
+          ggdb -batch -ex "run" -ex "bt" ../../bin/mf6
 
       - name: Get executables
         if: runner.os == 'Linux'

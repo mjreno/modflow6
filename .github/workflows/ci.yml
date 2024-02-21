@@ -973,8 +973,7 @@ jobs:
 
 
       - name: Build libhdf5-${{ matrix.hdf5 }}-${{ matrix.netcdf }}
-        if: runner.os == 'macOS'
-        if: steps.cache-hdf5.outputs.cache-hit != 'true'
+        if: runner.os == 'macOS' && steps.cache-hdf5.outputs.cache-hit != 'true'
         run: |
           pushd $HOME
           wget https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-$(echo ${{ matrix.hdf5 }} | cut -d. -f 1,2)/hdf5-${{ matrix.hdf5 }}/src/hdf5-${{ matrix.hdf5 }}.tar.bz2
@@ -1012,10 +1011,9 @@ jobs:
           make install
 
       - name: Look at config.log if error
-        if: runner.os == 'macOS'
         working-directory: ncf
         run: cat config.log
-        if: ${{ failure() }}
+        if: runner.os == 'macOS' && ${{ failure() }}
 
       - name: Setup Micromamba
         if: runner.os == 'Linux'

@@ -651,6 +651,7 @@ jobs:
       - name: Install netcdf
         if: runner.os == 'macOS'
         run: |
+          sudo port install gdb
           sudo port install netcdf
           sudo port install netcdf-fortran
           nc-config --all
@@ -710,21 +711,10 @@ jobs:
       - name: Test netcdf-mf6
         if: runner.os == 'macOS'
         shell: micromamba-shell {0}
-        working-directory: modflow6/nctest
+        working-directory: modflow6/nctest/mymodel
         run: |
-          python nc_test.py
-          ls -l
-          file test.nc
-          ncinfo test.nc
-          ./compile-test-macports
-          ls -l
-          ./test
-          ls -l
-          ncdump simple_xy.nc
-          ../bin/mf6
-          cd mymodel
           ncgen -o mymodel.nc mymodel.cdl
-          ../../bin/mf6
+          gdb -batch -ex "run" -ex "bt" ../../bin/mf6
 
       - name: Get executables
         if: runner.os == 'Linux'

@@ -698,9 +698,9 @@ jobs:
           meson setup builddir -Ddebug=false -Dextended=true --prefix=$(pwd) --libdir=bin
           meson install -C builddir
           meson test --verbose --no-rebuild -C builddir
+          mv bin/mf6 .
           micromamba install -c conda-forge netcdf4
-          meson compile -vC builddir
-          meson install -C buildir
+          mv mf6 bin
           cd autotest
           pytest -v -n auto -m netcdf --netcdf --parallel --durations 0 --keep-failed .failed
 

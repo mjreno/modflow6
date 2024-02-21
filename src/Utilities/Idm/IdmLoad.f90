@@ -430,14 +430,20 @@ contains
   !<
   subroutine simnam_load(paramlog)
     use SourceLoadModule, only: load_simnam
+#if defined(__WITH_NETCDF__)
     use SimVariablesModule, only: iout
     use netcdf
+#endif
     integer(I4B), intent(inout) :: paramlog
+#if defined(__WITH_NETCDF__)
     character(len=LINELENGTH) :: nc_libv
+#endif
     !
     ! -- nc lib version
+#if defined(__WITH_NETCDF__)
     nc_libv = nf90_inq_libvers()
     write (iout, '(a)') 'IDM nf90 library version='//trim(nc_libv)
+#endif
     !
     ! -- load sim nam file
     call load_simnam()

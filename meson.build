@@ -191,6 +191,17 @@ else
   with_mpi = false
 endif
 
+is_netcdf_build = get_option('netcdf')
+if is_netcdf_build and not is_extended_build
+  # find netcdf
+  if build_machine.system() != 'windows'
+    netcdff = dependency('netcdf', language : 'fortran', required : true)
+  endif
+  with_netcdf = true
+  extra_cmp_args += [ '-D__WITH_NETCDF__' ]
+  dependencies += [ netcdff ]
+endif
+
 compile_args += extra_cmp_args
 
 add_project_arguments(fc.get_supported_arguments(compile_args), language: 'fortran')

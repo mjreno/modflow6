@@ -566,7 +566,7 @@ contains
     !
     ! -- set memory paths
     sim_mempath = create_mem_path(component='SIM', context=idm_context)
-    simnam_mempath = create_mem_path('SIM', 'NAM', idm_context)
+    simnam_mempath =   create_mem_path('SIM', 'NAM', idm_context)
     !
     ! -- set pointers to loaded simnam arrays
     call mem_setptr(mtypes, 'MTYPE', simnam_mempath)

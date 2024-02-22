@@ -1017,6 +1017,9 @@ jobs:
           cd netcdf-fortran-4.6.1
           CC=/usr/bin/clang LIBS="$(nc-config --libs)" ./configure --enable-shared
           make install
+          echo "PKG_CONFIG_PATH=${HOME}/environments/netcdf-fortran-4.6.1/" >> $GITHUB_ENV
+          nf-config
+          pkg-config --list-all
 
       - name: Look at config.log if error
         run: |

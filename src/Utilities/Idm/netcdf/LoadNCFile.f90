@@ -40,8 +40,8 @@ contains
     ncid = -1
     !
     ! -- open netcdf file
-    !call nf_verify(nf90_open(nc_fname, NF90_NOWRITE, ncid), ncid, iout)
-    call nf_verify(nf90_open("gwf_chd01.nc", NF90_NOWRITE, ncid), ncid, iout)
+    call nf_verify(nf90_open(nc_fname, NF90_NOWRITE, ncid), ncid, iout)
+    !call nf_verify(nf90_open("gwf_chd01.nc", NF90_NOWRITE, ncid), ncid, iout)
     !
     ! -- return
     return

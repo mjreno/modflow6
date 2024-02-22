@@ -278,11 +278,12 @@ contains
 
   function verify_global_attr(nc_context) result(modelname)
     use InputOutputModule, only: lowcase, upcase
+    use LoadNCFileModule, only: IDM_NETCDF4_MAX_STRLEN
     type(NCModelInputsType), intent(inout) :: nc_context
     ! -- return
-    character(len=LENCOMPONENTNAME) :: modelname
+    character(len=IDM_NETCDF4_MAX_STRLEN) :: modelname
     ! -- local
-    character(len=LENPACKAGETYPE) :: modeltype
+    character(len=IDM_NETCDF4_MAX_STRLEN) :: modeltype
     !
     ! -- initialize modelname
     modelname = ''

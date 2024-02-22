@@ -19,9 +19,11 @@ module LoadNCFileModule
   public :: nc_fopen, nc_fclose
   public :: input_load
   public :: IDM_NETCDF4_MAX_DIM
+  public :: IDM_NETCDF4_MAX_STRLEN
   public :: nf_verify
 
   integer(I4B), parameter :: IDM_NETCDF4_MAX_DIM = 6
+  integer(I4B), parameter :: IDM_NETCDF4_MAX_STRLEN = 80
 
 contains
 

@@ -1065,7 +1065,6 @@ jobs:
         run: |
           ls -l
           ncgen -o mymodel.nc mymodel.cdl
-          h5debug mymodel.nc
           ../../bin/mf6
           ls -l
           cat mfsim.lst

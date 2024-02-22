@@ -1017,10 +1017,11 @@ jobs:
           wget https://github.com/Unidata/netcdf-fortran/archive/refs/tags/v4.6.1.zip
           unzip v4.6.1.zip
           cd netcdf-fortran-4.6.1
-          ls -l
           CC=/usr/bin/clang LIBS="$(nc-config --libs)" CPPFLAGS=-I/${HOME}/environments/1.14.3-v4.9.0/include LDFLAGS=-L${HOME}/environments/1.14.3-v4.9.0/lib ./configure --enable-shared --prefix=${HOME}/environments/netcdf-fortran-4.6.1
           make install
           echo "PKG_CONFIG_PATH=${HOME}/environments/netcdf-fortran-4.6.1/" >> $GITHUB_ENV
+          ls -l
+          nc-config --all
           nf-config --all
           pkg-config --list-all
 

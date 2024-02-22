@@ -931,7 +931,7 @@ jobs:
         shell: bash -l {0}
     env:
       FC: gfortran
-      FC_V: 13
+      FC_V: 12
     steps:
 
       - name: Checkout modflow6
@@ -1040,7 +1040,7 @@ jobs:
       - name: Build modflow6
         working-directory: modflow6
         run: |
-          meson setup builddir -Ddebug=true -Dnetcdf=true --prefix=$(pwd) --libdir=bin
+          meson setup builddir -Ddebug=false -Dnetcdf=true --prefix=$(pwd) --libdir=bin
           meson install -C builddir
           meson test --verbose --no-rebuild -C builddir
 

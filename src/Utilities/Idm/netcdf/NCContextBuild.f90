@@ -333,7 +333,7 @@ contains
     use InputOutputModule, only: lowcase, upcase
     type(NCModelInputsType), intent(inout) :: nc_context
     integer(I4B), intent(in) :: iout
-    integer(I4B) :: ndim, nvar, nattr, unlimDimID, format
+    integer(I4B) :: ndim, nvar, nattr, unlimDimID
     integer(I4B), dimension(:), allocatable :: varids
     ! -- local
     character(len=LENCOMPONENTNAME) :: modelname
@@ -345,12 +345,14 @@ contains
     modelname = verify_global_attr(nc_context)
     !
     ! -- inquire for root dataset info
-    call nf_verify(nf90_inquire(ncid, ndim, nvar, nattr, unlimdimid, format), &
+    call nf_verify(nf90_inquire(ncid, ndim, nvar, nattr, unlimdimid), &
                    ncid, iout)
     !
     ! -- allocate and set varids
     allocate (varids(nvar))
+    write(iout, '(a)') 'IDM nf90_inq_varids'
     call nf_verify(nf90_inq_varids(ncid, nvar, varids), ncid, iout)
+    write(iout, '(a)') 'IDM add_package_var'
     !
     ! -- identify package variables; build block variable lists
     do iparam = 1, nvar
@@ -358,6 +360,7 @@ contains
       call add_package_var(nc_context, modelname, varids(iparam), iout)
       !
     end do
+    write(iout, '(a)') 'IDM done'
     !
     ! -- cleanup
     deallocate (varids)

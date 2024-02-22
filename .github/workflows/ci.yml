@@ -966,7 +966,10 @@ jobs:
           echo "LDFLAGS=-L${HOME}/environments/${{ matrix.hdf5 }}-${{ matrix.netcdf }}/lib" >> $GITHUB_ENV
           echo "LD_LIBRARY_PATH=${HOME}/environments/${{ matrix.hdf5 }}-${{ matrix.netcdf }}/lib" >> $GITHUB_ENV
           echo "DYLD_LIBRARY_PATH=${HOME}/environments/${{ matrix.hdf5 }}-${{ matrix.netcdf }}/lib" >> $GITHUB_ENV
+          echo "LD_LIBRARY_PATH=${HOME}/environments/netcdf-fortran-4.6.1/lib" >> $GITHUB_ENV
+          echo "DYLD_LIBRARY_PATH=${HOME}/environments/netcdf-fortran-4.6.1/lib" >> $GITHUB_ENV
           echo "PATH=${HOME}/environments/${{ matrix.hdf5 }}-${{ matrix.netcdf }}/bin:${PATH}" >> $GITHUB_ENV
+          echo "PATH=${HOME}/environments/netcdf-fortran-4.6.1/bin:${PATH}" >> $GITHUB_ENV
           brew install automake libaec
 
       - name: Cache libhdf5-${{ matrix.hdf5 }}-${{ matrix.netcdf }}

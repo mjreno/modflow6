@@ -1009,6 +1009,7 @@ jobs:
           ls -l ${HOME}/environments
           ls -l ${HOME}/environments/1.14.3-v4.9.0
           ls -l ${HOME}/environments/1.14.3-v4.9.0/lib
+          ls -l ${HOME}/environments/1.14.3-v4.9.0/pkgconfig
           nc-config --all
           pkg-config --list-all
 

@@ -985,7 +985,7 @@ jobs:
           wget https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-$(echo ${{ matrix.hdf5 }} | cut -d. -f 1,2)/hdf5-${{ matrix.hdf5 }}/src/hdf5-${{ matrix.hdf5 }}.tar.bz2
           tar -jxf hdf5-${{ matrix.hdf5 }}.tar.bz2
           pushd hdf5-${{ matrix.hdf5 }}
-          ./configure --enable-debug --disable-static --enable-shared --prefix=${HOME}/environments/${{ matrix.hdf5 }}-${{ matrix.netcdf }} --enable-hl --with-szlib
+          ./configure --enable-build-mode=debug --disable-static --enable-shared --prefix=${HOME}/environments/${{ matrix.hdf5 }}-${{ matrix.netcdf }} --enable-hl --with-szlib
           make -j
           make install -j
           popd
@@ -1017,6 +1017,7 @@ jobs:
           wget https://github.com/Unidata/netcdf-fortran/archive/refs/tags/v4.6.1.zip
           unzip v4.6.1.zip
           cd netcdf-fortran-4.6.1
+          ls -l
           CC=/usr/bin/clang LIBS="$(nc-config --libs)" CPPFLAGS=-I/${HOME}/environments/1.14.3-v4.9.0/include LDFLAGS=-L${HOME}/environments/1.14.3-v4.9.0/lib ./configure --enable-shared --prefix=${HOME}/environments/netcdf-fortran-4.6.1
           make install
           echo "PKG_CONFIG_PATH=${HOME}/environments/netcdf-fortran-4.6.1/" >> $GITHUB_ENV

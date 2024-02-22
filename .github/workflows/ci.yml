@@ -939,6 +939,12 @@ jobs:
         with:
           path: modflow6
 
+      - name: Setup ${{ env.FC }} ${{ env.FC_V }}
+        uses: fortran-lang/setup-fortran@v1
+        with:
+          compiler: gcc
+          version: ${{ env.FC_V }}
+
       - name: Install netcdf
         if: runner.os == 'Linux'
         run: |
@@ -1014,6 +1020,9 @@ jobs:
 
       - name: Look at config.log if error
         run: |
+          ls -l /usr/bin
+          ls -l /usr/local
+          which gfortran
           ls -l ${HOME}/environments/netcdf-fortran-4.6.1
           cat ${HOME}/environments/netcdf-fortran-4.6.1/config.log
         if: runner.os == 'macOS' && ${{ failure() }}

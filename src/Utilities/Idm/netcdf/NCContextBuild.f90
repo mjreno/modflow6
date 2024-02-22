@@ -218,6 +218,7 @@ contains
     use MemoryHelperModule, only: split_mem_path
     use SourceCommonModule, only: idm_subcomponent_type
     use SourceCommonModule, only: idm_subcomponent_name
+    use LoadNCFileModule, only: IDM_NETCDF4_MAX_STRLEN
     ! -- dummy
     type(NCModelInputsType), intent(inout) :: nc_context
     character(len=*), intent(in) :: modelname
@@ -225,7 +226,7 @@ contains
     integer(I4B), intent(in) :: iout
     ! -- local
     type(NCModelPackageInputType), pointer :: ncpkg
-    character(len=LINELENGTH) :: input_str
+    character(len=IDM_NETCDF4_MAX_STRLEN) :: input_str
     character(len=LENCOMPONENTNAME) :: c_name, sc_name, sc_type
     character(len=LENPACKAGETYPE) :: pkgtype
     character(len=LINELENGTH) :: varname
@@ -343,6 +344,7 @@ contains
     ncid = nc_context%ncid
     !
     ! -- verify expected global attributes
+    write(iout, '(a)') 'IDM verify_global_attr'
     modelname = verify_global_attr(nc_context)
     !
     ! -- inquire for root dataset info

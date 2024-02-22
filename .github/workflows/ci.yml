@@ -1065,7 +1065,7 @@ jobs:
         working-directory: modflow6/nctest/mymodel
         run: |
           ls -l
-          HDF5_DEBUG=trace ../../bin/mf6
+          ../../bin/mf6
           ls -l
           cat mfsim.lst
 

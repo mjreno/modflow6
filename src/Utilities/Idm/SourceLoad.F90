@@ -419,8 +419,8 @@ contains
       write(iout, '(a)') 'IDM create_nc_context'
       !
       ! -- open nc input file
-      ncid = open_ncfile(nc_fname, iout)
-      !ncid = 0
+      !ncid = open_ncfile(nc_fname, iout)
+      ncid = 0
       !
       ! -- init model context object
       call nc_context%init(modeltype, component_type, modelname, nc_fname, ncid)

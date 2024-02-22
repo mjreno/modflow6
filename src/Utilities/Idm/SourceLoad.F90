@@ -416,6 +416,7 @@ contains
 #if defined(__WITH_NETCDF__)
       !
       call nf_set_log_level(3)
+      write(iout, '(a)') 'IDM create_nc_context'
       !
       ! -- open nc input file
       ncid = open_ncfile(nc_fname, iout)

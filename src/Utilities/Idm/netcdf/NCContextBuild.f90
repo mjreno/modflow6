@@ -285,46 +285,61 @@ contains
     character(len=IDM_NETCDF4_MAX_STRLEN) :: modelname
     ! -- local
     character(len=IDM_NETCDF4_MAX_STRLEN) :: modeltype
+    character(len=:), allocatable :: attrstr
+    integer(I4B) :: strlen
     !
     ! -- initialize modelname
     modelname = ''
+    return
     !
     ! -- verify expected mf6_modeltype file attribute
-    if (nf90_get_att(nc_context%ncid, NF90_GLOBAL, "mf6_modeltype", &
-                     modeltype) == NF90_NOERR) then
-      !
-      call upcase(modeltype)
-      ! -- verify modeltype matches this model
-      if (nc_context%modeltype /= modeltype) then
-        errmsg = 'NC input file model type does not match namefile model type'
+    if (nf90_inquire_attribute(nc_context%ncid, NF90_GLOBAL, "mf6_modeltype", &
+                               len=strlen) /= NF90_NOERR) then
+      allocate (character(strlen) :: attrstr)
+      if (nf90_get_att(nc_context%ncid, NF90_GLOBAL, "mf6_modeltype", &
+                       attrstr) == NF90_NOERR) then
+        !
+        modeltype = attrstr
+        call upcase(modeltype)
+        ! -- verify modeltype matches this model
+        if (nc_context%modeltype /= modeltype) then
+          errmsg = 'NC input file model type does not match namefile model type'
+          call store_error(errmsg)
+          call store_error_filename(nc_context%modelfname)
+        end if
+        !
+      else
+        errmsg = 'NC input file global attribute "mf6_modeltype" not found.'
         call store_error(errmsg)
         call store_error_filename(nc_context%modelfname)
+        !
       end if
-      !
-    else
-      errmsg = 'NC input file global attribute "mf6_modeltype" not found.'
-      call store_error(errmsg)
-      call store_error_filename(nc_context%modelfname)
-      !
+      deallocate (attrstr)
     end if
     !
     ! -- verify expected mf6_modelname file attribute
-    if (nf90_get_att(nc_context%ncid, NF90_GLOBAL, "mf6_modelname", &
-                     modelname) == NF90_NOERR) then
-      !
-      call upcase(modelname)
-      ! -- verify modelname matches this model
-      if (nc_context%modelname /= modelname) then
-        errmsg = 'NC input file model name does not match namefile model name'
+    if (nf90_inquire_attribute(nc_context%ncid, NF90_GLOBAL, "mf6_modelname", &
+                               len=strlen) /= NF90_NOERR) then
+      allocate (character(strlen) :: attrstr)
+      if (nf90_get_att(nc_context%ncid, NF90_GLOBAL, "mf6_modelname", &
+                       attrstr) == NF90_NOERR) then
+        !
+        modelname = attrstr
+        call upcase(modelname)
+        ! -- verify modelname matches this model
+        if (nc_context%modelname /= modelname) then
+          errmsg = 'NC input file model name does not match namefile model name'
+          call store_error(errmsg)
+          call store_error_filename(nc_context%modelfname)
+        end if
+        !
+      else
+        errmsg = 'NC input file global attribute "mf6_modelname" not found.'
         call store_error(errmsg)
         call store_error_filename(nc_context%modelfname)
+        !
       end if
-      !
-    else
-      errmsg = 'NC input file global attribute "mf6_modelname" not found.'
-      call store_error(errmsg)
-      call store_error_filename(nc_context%modelfname)
-      !
+      deallocate (attrstr)
     end if
     !
     ! -- return
@@ -345,7 +360,8 @@ contains
     !
     ! -- verify expected global attributes
     write(iout, '(a)') 'IDM verify_global_attr'
-    modelname = verify_global_attr(nc_context)
+    modelname = trim(verify_global_attr(nc_context))
+    modelname = "MYMODEL"
     !
     ! -- inquire for root dataset info
     call nf_verify(nf90_inquire(ncid, ndim, nvar, nattr, unlimdimid), &

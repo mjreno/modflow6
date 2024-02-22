@@ -1065,6 +1065,7 @@ jobs:
         run: |
           ls -l
           file gwf_chd01.nc
+          h5stat gwf_chd01.nc
           ../../bin/mf6
           ls -l
           cat mfsim.lst

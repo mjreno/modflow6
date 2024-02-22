@@ -966,7 +966,9 @@ jobs:
           echo "LDFLAGS=-L${HOME}/environments/${{ matrix.hdf5 }}-${{ matrix.netcdf }}/lib" >> $GITHUB_ENV
           echo "LD_LIBRARY_PATH=${HOME}/environments/${{ matrix.hdf5 }}-${{ matrix.netcdf }}/lib:${HOME}/environments/netcdf-fortran-4.6.1/lib" >> $GITHUB_ENV
           echo "DYLD_LIBRARY_PATH=${HOME}/environments/${{ matrix.hdf5 }}-${{ matrix.netcdf }}/lib:${HOME}/environments/netcdf-fortran-4.6.1/lib" >> $GITHUB_ENV
-          echo "PATH=${HOME}/environments/${{ matrix.hdf5 }}-${{ matrix.netcdf }}/bin:${HOME}/environments/netcdf-fortran-4.6.1/bin" >> $GITHUB_ENV
+          echo "PKG_CONFIG_PATH=${HOME}/environments/1.14.3-v4.9.0/lib/pkgconfig:${HOME}/environments/netcdf-fortran-4.6.1/" >> $GITHUB_ENV
+          echo "${HOME}/environments/${{ matrix.hdf5 }}-${{ matrix.netcdf }}/bin" >> $GITHUB_PATH
+          echo "${HOME}/environments/netcdf-fortran-4.6.1/bin" >> $GITHUB_PATH
           brew install automake libaec
 
       - name: Cache libhdf5-${{ matrix.hdf5 }}-${{ matrix.netcdf }}
@@ -1006,7 +1008,6 @@ jobs:
           ls -l ${HOME}/environments
           ls -l ${HOME}/environments/1.14.3-v4.9.0
           ls -l ${HOME}/environments/1.14.3-v4.9.0/lib
-          echo "PKG_CONFIG_PATH=${HOME}/environments/1.14.3-v4.9.0/lib/pkgconfig:${HOME}/environments/netcdf-fortran-4.6.1/" >> $GITHUB_ENV
           nc-config --all
           pkg-config --list-all
 

@@ -389,6 +389,7 @@ contains
 #if defined(__WITH_NETCDF__)
     use NCContextBuildModule, only: create_ncpkg_context
     use IdmNCFileModule, only: open_ncfile
+    use netcdf
 #endif
     ! -- drummy
     character(len=*), intent(in) :: modeltype
@@ -413,6 +414,8 @@ contains
     !
     if (nc_fname /= '') then
 #if defined(__WITH_NETCDF__)
+      !
+      call nf_set_log_level(3)
       !
       ! -- open nc input file
       ncid = open_ncfile(nc_fname, iout)

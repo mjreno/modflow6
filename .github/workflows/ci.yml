@@ -1009,7 +1009,7 @@ jobs:
           wget https://github.com/Unidata/netcdf-fortran/archive/refs/tags/v4.6.1.zip
           unzip v4.6.1.zip
           cd netcdf-fortran-4.6.1
-          CC=/usr/bin/clang LDFLAGS="-Wl,-no-undefined" LIBS="$(nc-config --libs)" ./configure --enable-shared
+          CC=/usr/bin/clang LIBS="$(nc-config --libs)" ./configure --enable-shared
           make install
 
       - name: Look at config.log if error

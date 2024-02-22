@@ -1065,13 +1065,16 @@ jobs:
         run: |
           ls -l
           ncgen -o mymodel.nc mymodel.cdl
+          h5debug mymodel.nc
           ../../bin/mf6
+          ls -l
           cat mfsim.lst
 
       - name: Show mfsim.lst
         if: failure()
         working-directory: modflow6/nctest/mymodel
         run: |
+          ls -l
           cat mfsim.lst
 
       - name: Get executables

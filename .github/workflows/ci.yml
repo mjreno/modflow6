@@ -1028,48 +1028,21 @@ jobs:
         if: runner.os == 'macOS' && ${{ failure() }}
 
       - name: Setup Micromamba
-        if: runner.os == 'Linux'
         uses: mamba-org/setup-micromamba@v1
         with:
           environment-file: modflow6/environment-nctest.yml
-          create-args: >-
-            netcdf4
           init-shell: >-
             bash
             powershell
           cache-environment: true
           cache-downloads: true
 
-      - name: Setup Micromamba
-        if: runner.os == 'macOS'
-        uses: mamba-org/setup-micromamba@v1
-        with:
-          environment-file: modflow6/environment-nctest.yml
-          init-shell: >-
-            powershell
-          cache-environment: true
-          cache-downloads: true
-
       - name: Build modflow6
-        if: runner.os == 'Linux'
         working-directory: modflow6
         run: |
           meson setup builddir -Ddebug=true -Dnetcdf=true --prefix=$(pwd) --libdir=bin
           meson install -C builddir
           meson test --verbose --no-rebuild -C builddir
-
-      - name: Build modflow6
-        if: runner.os == 'macOS'
-        shell: micromamba-shell {0}
-        working-directory: modflow6
-        run: |
-          ls -l /opt/local/include
-          ls -l /opt/local/lib
-          echo "DYLD_LIBRARY_PATH=/opt/local/lib:$DYLD_LIBRARY_PATH"  >> $GITHUB_ENV
-          meson setup builddir -Ddebug=true -Dnetcdf=true --prefix=$(pwd) --libdir=bin
-          meson install -C builddir
-          meson test --verbose --no-rebuild -C builddir
-          otool -L bin/mf6
 
       - name: Show Meson logs
         if: failure()
@@ -1080,38 +1053,19 @@ jobs:
 
       - name: Test netcdf-mf6
         if: runner.os == 'macOS'
-        shell: micromamba-shell {0}
         working-directory: modflow6/nctest/mymodel
         run: |
           ls -l
           ncgen -o mymodel.nc mymodel.cdl
+          ../../bin/mf6
 
       - name: Get executables
-        if: runner.os == 'Linux'
-        working-directory: modflow6/autotest
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-        run: pytest -v --durations 0 get_exes.py
-
-      - name: Get executables
-        if: runner.os == 'macOS'
-        shell: micromamba-shell {0}
         working-directory: modflow6/autotest
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: pytest -v --durations 0 get_exes.py
 
       - name: Test programs (netcdf)
-        if: runner.os == 'Linux'
-        working-directory: modflow6/autotest
-        env:
-          REPOS_PATH: ${{ github.workspace }}
-        run: |
-          pytest -v -n auto -m netcdf --netcdf --durations 0 --keep-failed .failed
-
-      - name: Test programs (netcdf)
-        if: runner.os == 'macOS'
-        shell: micromamba-shell {0}
         working-directory: modflow6/autotest
         env:
           REPOS_PATH: ${{ github.workspace }}

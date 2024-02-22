@@ -56,6 +56,7 @@ contains
   subroutine static_init(this, mf6_input, component_name, component_input_name, &
                          input_name)
     use InputModelContextModule, only: GetModelNCContext
+    use netcdf
     class(NCStaticPkgLoadType), intent(inout) :: this
     type(ModflowInputType), intent(in) :: mf6_input
     character(len=*), intent(in) :: component_name
@@ -63,6 +64,7 @@ contains
     character(len=*), intent(in) :: input_name
     type(NCModelInputsType), pointer :: nc_context
     !
+    call nf_set_log_level(3)
     call this%StaticPkgLoadType%init(mf6_input, component_name, &
                                      component_input_name, &
                                      input_name)

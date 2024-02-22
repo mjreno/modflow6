@@ -994,7 +994,7 @@ jobs:
           git clone -b ${{ matrix.netcdf}} https://github.com/Unidata/netcdf-c
           pushd netcdf-c
           autoreconf -if
-          CFLAGS=${CFLAGS} LDFLAGS=${LDFLAGS} LD_LIBRARY_PATH=${LD_LIBRARY_PATH} ./configure --disable-static --enable-shared --prefix=${HOME}/environments/${{ matrix.hdf5 }}-${{ matrix.netcdf }}
+          CFLAGS=${CFLAGS} LDFLAGS=${LDFLAGS} LD_LIBRARY_PATH=${LD_LIBRARY_PATH} ./configure --enable-logging --disable-static --enable-shared --prefix=${HOME}/environments/${{ matrix.hdf5 }}-${{ matrix.netcdf }}
           make -j
           make install -j
           popd
@@ -1019,7 +1019,7 @@ jobs:
           wget https://github.com/Unidata/netcdf-fortran/archive/refs/tags/v4.6.1.zip
           unzip v4.6.1.zip
           cd netcdf-fortran-4.6.1
-          CC=/usr/bin/clang FCFLAGS=-I/${HOME}/environments/1.14.3-v4.9.0/include LDFLAGS=-L${HOME}/environments/1.14.3-v4.9.0/lib ./configure --enable-shared --prefix=${HOME}/environments/netcdf-fortran-4.6.1
+          CC=/usr/bin/clang FCFLAGS=-I/${HOME}/environments/1.14.3-v4.9.0/include LDFLAGS=-L${HOME}/environments/1.14.3-v4.9.0/lib ./configure --enable-logging --enable-shared --prefix=${HOME}/environments/netcdf-fortran-4.6.1
           make install
           ls -l
           nc-config --all
@@ -1048,7 +1048,7 @@ jobs:
       - name: Build modflow6
         working-directory: modflow6
         run: |
-          meson setup builddir -Ddebug=false -Dnetcdf=true --prefix=$(pwd) --libdir=bin
+          meson setup builddir -Ddebug=true -Dnetcdf=true --prefix=$(pwd) --libdir=bin
           meson install -C builddir
           meson test --verbose --no-rebuild -C builddir
 

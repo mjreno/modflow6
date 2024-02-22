@@ -40,7 +40,8 @@ contains
     ncid = -1
     !
     ! -- open netcdf file
-    call nf_verify(nf90_open(nc_fname, NF90_NOWRITE, ncid), ncid, iout)
+    !call nf_verify(nf90_open(nc_fname, NF90_NOWRITE, ncid), ncid, iout)
+    call nf_verify(nf90_open("gwf_chd01.nc", NF90_NOWRITE, ncid), ncid, iout)
     !
     ! -- return
     return
@@ -1003,9 +1004,12 @@ contains
     !
     ! -- strings are set for a subset of errors
     !    but the exit status will always be reported
+    ! TODO: update to use nf90_strerror
     if (res /= NF90_NOERR) then
       !
       select case (res)
+      !case (NC_EBADID) ! (-33)
+      !  errstr = 'Not a netcdf id'
       case (NF90_EINVAL) ! (-36)
         errstr = 'Invalid Argument'
       case (NF90_EPERM) ! (-37)

@@ -1059,6 +1059,17 @@ jobs:
           cat builddir/meson-info/intro-dependencies.json
           cat builddir/meson-logs/meson-log.txt
 
+      - name: Test netcdf
+        if: runner.os == 'macOS'
+        working-directory: modflow6/nctest
+        run: |
+          ls -l
+          ./compile-test
+          ls -l
+          ./test
+          ls -l
+          h5stat simple_xy.nc
+
       - name: Test netcdf-mf6
         if: runner.os == 'macOS'
         working-directory: modflow6/nctest/mymodel

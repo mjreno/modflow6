@@ -1109,3 +1109,185 @@ jobs:
         with:
           name: failed-${{ matrix.os }}-${{ env.FC }}-${{ env.FC_V }}
           path: modflow6/autotest/.failed
+
+  netcdf4_test:
+    name: NetCDF4 testing
+    needs:
+      - build
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ macos-11 ] #[ ubuntu-22.04, macos-12 ] #, windows-2022 ]
+        hdf5: [ 1.14.3 ] #1.12.2 ]
+        netcdf: [ v4.9.0 ] #, main ]
+    defaults:
+      run:
+        shell: bash -l {0}
+    env:
+      FC: gfortran
+      FC_V: 12
+    steps:
+
+      - name: Checkout modflow6
+        uses: actions/checkout@v4
+        with:
+          path: modflow6
+
+      - name: Setup ${{ env.FC }} ${{ env.FC_V }}
+        uses: fortran-lang/setup-fortran@v1
+        with:
+          compiler: gcc
+          version: ${{ env.FC_V }}
+
+      - name: Install netcdf
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install build-essential \
+            libnetcdf-dev \
+            libnetcdff-dev \
+            netcdf-bin
+          nc-config --all
+          nf-config --all
+
+      - name: Setup netcdf-c install
+        if: runner.os == 'macOS'
+        run: |
+          echo "FCFLAGS=-I${HOME}/environments/${{ matrix.hdf5 }}-${{ matrix.netcdf }}/include" >> $GITHUB_ENV
+          echo "FFLAGS=-I${HOME}/environments/${{ matrix.hdf5 }}-${{ matrix.netcdf }}/include" >> $GITHUB_ENV
+          echo "CFLAGS=-I${HOME}/environments/${{ matrix.hdf5 }}-${{ matrix.netcdf }}/include" >> $GITHUB_ENV
+          echo "CPPFLAGS=-I${HOME}/environments/${{ matrix.hdf5 }}-${{ matrix.netcdf }}/include" >> $GITHUB_ENV
+          echo "LDFLAGS=-L${HOME}/environments/${{ matrix.hdf5 }}-${{ matrix.netcdf }}/lib" >> $GITHUB_ENV
+          echo "LD_LIBRARY_PATH=${HOME}/environments/${{ matrix.hdf5 }}-${{ matrix.netcdf }}/lib:${HOME}/environments/netcdf-fortran-4.6.1/lib" >> $GITHUB_ENV
+          echo "DYLD_LIBRARY_PATH=${HOME}/environments/${{ matrix.hdf5 }}-${{ matrix.netcdf }}/lib:${HOME}/environments/netcdf-fortran-4.6.1/lib" >> $GITHUB_ENV
+          echo "PKG_CONFIG_PATH=${HOME}/environments/1.14.3-v4.9.0/lib/pkgconfig:${HOME}/environments/netcdf-fortran-4.6.1/" >> $GITHUB_ENV
+          echo "${HOME}/environments/${{ matrix.hdf5 }}-${{ matrix.netcdf }}/bin" >> $GITHUB_PATH
+          echo "${HOME}/environments/netcdf-fortran-4.6.1/bin" >> $GITHUB_PATH
+          brew install automake libaec
+          echo "HDF5_DEBUG=trace" >> $GITHUB_ENV
+
+      - name: Install hdf5
+        if: runner.os == 'macOS'
+        run: |
+          brew install hdf5
+
+      - name: Build netcdf-c libhdf5-${{ matrix.hdf5 }}-${{ matrix.netcdf }}
+        if: runner.os == 'macOS' && steps.cache-hdf5.outputs.cache-hit != 'true'
+        run: |
+          git clone -b ${{ matrix.netcdf}} https://github.com/Unidata/netcdf-c
+          pushd netcdf-c
+          autoreconf -if
+          CFLAGS=${CFLAGS} LDFLAGS=${LDFLAGS} LD_LIBRARY_PATH=${LD_LIBRARY_PATH} ./configure --enable-logging --disable-static --enable-shared --prefix=${HOME}/environments/${{ matrix.hdf5 }}-${{ matrix.netcdf }}
+          make -j
+          make install -j
+          popd
+
+      - name: Verify netcdf-c
+        if: runner.os == 'macOS'
+        working-directory: modflow6
+        run: |
+          echo "$HOME"
+          ls -l ${HOME}/environments
+          ls -l ${HOME}/environments/1.14.3-v4.9.0
+          ls -l ${HOME}/environments/1.14.3-v4.9.0/lib
+          ls -l ${HOME}/environments/1.14.3-v4.9.0/lib/pkgconfig
+          nc-config --all
+          pkg-config --list-all
+
+      - name: Make netcdf-f
+        if: runner.os == 'macOS'
+        run: |
+          echo "$PKG_CONFIG_PATH"
+          cd ${HOME}/environments
+          wget https://github.com/Unidata/netcdf-fortran/archive/refs/tags/v4.6.1.zip
+          unzip v4.6.1.zip
+          cd netcdf-fortran-4.6.1
+          CC=/usr/bin/clang FCFLAGS=-I/${HOME}/environments/1.14.3-v4.9.0/include LDFLAGS=-L${HOME}/environments/1.14.3-v4.9.0/lib ./configure --enable-logging --enable-shared --prefix=${HOME}/environments/netcdf-fortran-4.6.1
+          make install
+          ls -l
+          nc-config --all
+          nf-config --all
+          pkg-config --list-all
+
+      - name: Look at config.log if error
+        run: |
+          ls -l /usr/bin
+          ls -l /usr/local
+          which gfortran
+          ls -l ${HOME}/environments/netcdf-fortran-4.6.1
+          cat ${HOME}/environments/netcdf-fortran-4.6.1/config.log
+        if: runner.os == 'macOS' && ${{ failure() }}
+
+      - name: Setup Micromamba
+        uses: mamba-org/setup-micromamba@v1
+        with:
+          environment-file: modflow6/environment-nctest.yml
+          init-shell: >-
+            bash
+            powershell
+          cache-environment: true
+          cache-downloads: true
+
+      - name: Build modflow6
+        working-directory: modflow6
+        run: |
+          meson setup builddir -Ddebug=true -Dnetcdf=true --prefix=$(pwd) --libdir=bin
+          meson install -C builddir
+          meson test --verbose --no-rebuild -C builddir
+
+      - name: Show Meson logs
+        if: failure()
+        working-directory: modflow6
+        run: |
+          cat builddir/meson-info/intro-dependencies.json
+          cat builddir/meson-logs/meson-log.txt
+
+      - name: Test netcdf-mf6
+        if: runner.os == 'macOS'
+        working-directory: modflow6/nctest/mymodel
+        run: |
+          ls -l
+          ../../bin/mf6
+          ls -l
+          cat mfsim.lst
+
+      - name: Test netcdf
+        if: runner.os == 'macOS'
+        working-directory: modflow6/nctest
+        run: |
+          ls -l
+          ./compile-test
+          ls -l
+          ./test
+          ls -l
+          file simple_xy.nc
+          ncdump simple_xy.nc
+          h5stat simple_xy.nc
+
+      - name: Show mfsim.lst
+        if: failure()
+        working-directory: modflow6/nctest/mymodel
+        run: |
+          ls -l
+          cat mfsim.lst
+
+      - name: Get executables
+        working-directory: modflow6/autotest
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: pytest -v --durations 0 get_exes.py
+
+      - name: Test programs (netcdf)
+        working-directory: modflow6/autotest
+        env:
+          REPOS_PATH: ${{ github.workspace }}
+        run: |
+          pytest -v -n auto -m netcdf --netcdf --durations 0 --keep-failed .failed
+
+      - name: Upload failed test output
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: failed-${{ matrix.os }}-${{ env.FC }}-${{ env.FC_V }}
+          path: modflow6/autotest/.failed

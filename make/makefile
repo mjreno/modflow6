@@ -5,109 +5,40 @@ include ./makedefaults
 
 # Define the source file directories
 SOURCEDIR1=../src
-<<<<<<< HEAD
-SOURCEDIR2=../src/Idm
-SOURCEDIR3=../src/Idm/selector
-SOURCEDIR4=../src/Exchange
-SOURCEDIR5=../src/Distributed
-SOURCEDIR6=../src/Solution
-SOURCEDIR7=../src/Solution/LinearMethods
-SOURCEDIR8=../src/Solution/PETSc
-SOURCEDIR9=../src/Timing
-SOURCEDIR10=../src/Utilities
-SOURCEDIR11=../src/Utilities/Idm
-SOURCEDIR12=../src/Utilities/Idm/mf6blockfile
-SOURCEDIR13=../src/Utilities/TimeSeries
-SOURCEDIR14=../src/Utilities/Memory
-SOURCEDIR15=../src/Utilities/OutputControl
-SOURCEDIR16=../src/Utilities/ArrayRead
-SOURCEDIR17=../src/Utilities/Libraries
-SOURCEDIR18=../src/Utilities/Libraries/rcm
-SOURCEDIR19=../src/Utilities/Libraries/blas
-SOURCEDIR20=../src/Utilities/Libraries/sparskit2
-SOURCEDIR21=../src/Utilities/Libraries/daglib
-SOURCEDIR22=../src/Utilities/Libraries/sparsekit
-SOURCEDIR23=../src/Utilities/Vector
-SOURCEDIR24=../src/Utilities/Matrix
-SOURCEDIR25=../src/Utilities/Observation
-SOURCEDIR26=../src/Model
-SOURCEDIR27=../src/Model/Connection
-SOURCEDIR28=../src/Model/SurfaceWaterFlow
-SOURCEDIR29=../src/Model/GroundWaterTransport
-SOURCEDIR30=../src/Model/ModelUtilities
-SOURCEDIR31=../src/Model/GroundWaterFlow
-SOURCEDIR32=../src/Model/TransportModel
-SOURCEDIR33=../src/Model/Geometry
-SOURCEDIR34=../src/Model/GroundWaterEnergy
-=======
 SOURCEDIR2=../src/Exchange
-SOURCEDIR3=../src/Timing
-SOURCEDIR4=../src/Model
-SOURCEDIR5=../src/Model/Connection
-SOURCEDIR6=../src/Model/ModelUtilities
-SOURCEDIR7=../src/Model/GroundWaterFlow
-SOURCEDIR8=../src/Model/Geometry
-SOURCEDIR9=../src/Model/TransportModel
-SOURCEDIR10=../src/Model/GroundWaterTransport
-<<<<<<< HEAD
-SOURCEDIR11=../src/Model/GroundWaterEnergy
-SOURCEDIR12=../src/Solution
-SOURCEDIR13=../src/Solution/LinearMethods
-SOURCEDIR14=../src/Solution/PETSc
-SOURCEDIR15=../src/Distributed
-SOURCEDIR16=../src/Utilities
-SOURCEDIR17=../src/Utilities/TimeSeries
-SOURCEDIR18=../src/Utilities/Idm
-SOURCEDIR19=../src/Utilities/Idm/selector
-SOURCEDIR20=../src/Utilities/Idm/netcdf
-SOURCEDIR21=../src/Utilities/Idm/mf6blockfile
-SOURCEDIR22=../src/Utilities/ArrayRead
-SOURCEDIR23=../src/Utilities/Memory
-SOURCEDIR24=../src/Utilities/Matrix
-SOURCEDIR25=../src/Utilities/Vector
-SOURCEDIR26=../src/Utilities/Observation
-SOURCEDIR27=../src/Utilities/OutputControl
-SOURCEDIR28=../src/Utilities/Libraries
-SOURCEDIR29=../src/Utilities/Libraries/rcm
-SOURCEDIR30=../src/Utilities/Libraries/sparskit2
-SOURCEDIR31=../src/Utilities/Libraries/sparsekit
-SOURCEDIR32=../src/Utilities/Libraries/blas
-SOURCEDIR33=../src/Utilities/Libraries/daglib
-<<<<<<< HEAD
->>>>>>> 301055a8b1 (rebuild makefiles)
->>>>>>> 617f37a82b (rebuild makefiles)
-<<<<<<< HEAD
->>>>>>> 19fe9838f1 (rebuild makefiles)
-=======
-=======
->>>>>>> 10b5ed7cb3 (rebuild makefiles)
->>>>>>> 54cafe7b6e (rebuild makefiles)
-=======
-SOURCEDIR11=../src/Model/SurfaceWaterFlow
-SOURCEDIR12=../src/Model/GroundWaterEnergy
-SOURCEDIR13=../src/Solution
-SOURCEDIR14=../src/Solution/LinearMethods
-SOURCEDIR15=../src/Solution/PETSc
-SOURCEDIR16=../src/Distributed
-SOURCEDIR17=../src/Utilities
-SOURCEDIR18=../src/Utilities/TimeSeries
-SOURCEDIR19=../src/Utilities/Idm
-SOURCEDIR20=../src/Utilities/Idm/selector
-SOURCEDIR21=../src/Utilities/Idm/netcdf
-SOURCEDIR22=../src/Utilities/Idm/mf6blockfile
-SOURCEDIR23=../src/Utilities/ArrayRead
-SOURCEDIR24=../src/Utilities/Memory
-SOURCEDIR25=../src/Utilities/Matrix
-SOURCEDIR26=../src/Utilities/Vector
-SOURCEDIR27=../src/Utilities/Observation
-SOURCEDIR28=../src/Utilities/OutputControl
-SOURCEDIR29=../src/Utilities/Libraries
-SOURCEDIR30=../src/Utilities/Libraries/rcm
-SOURCEDIR31=../src/Utilities/Libraries/sparskit2
-SOURCEDIR32=../src/Utilities/Libraries/sparsekit
-SOURCEDIR33=../src/Utilities/Libraries/blas
-SOURCEDIR34=../src/Utilities/Libraries/daglib
->>>>>>> d73a4230c8 (rebuild makefiles)
+SOURCEDIR3=../src/Idm
+SOURCEDIR4=../src/Idm/selector
+SOURCEDIR5=../src/Timing
+SOURCEDIR6=../src/Model
+SOURCEDIR7=../src/Model/Connection
+SOURCEDIR8=../src/Model/ModelUtilities
+SOURCEDIR9=../src/Model/GroundWaterFlow
+SOURCEDIR10=../src/Model/Geometry
+SOURCEDIR11=../src/Model/TransportModel
+SOURCEDIR12=../src/Model/GroundWaterTransport
+SOURCEDIR13=../src/Model/SurfaceWaterFlow
+SOURCEDIR14=../src/Model/GroundWaterEnergy
+SOURCEDIR15=../src/Solution
+SOURCEDIR16=../src/Solution/LinearMethods
+SOURCEDIR17=../src/Solution/PETSc
+SOURCEDIR18=../src/Distributed
+SOURCEDIR19=../src/Utilities
+SOURCEDIR20=../src/Utilities/TimeSeries
+SOURCEDIR21=../src/Utilities/Idm
+SOURCEDIR22=../src/Utilities/Idm/netcdf
+SOURCEDIR23=../src/Utilities/Idm/mf6blockfile
+SOURCEDIR24=../src/Utilities/ArrayRead
+SOURCEDIR25=../src/Utilities/Memory
+SOURCEDIR26=../src/Utilities/Matrix
+SOURCEDIR27=../src/Utilities/Vector
+SOURCEDIR28=../src/Utilities/Observation
+SOURCEDIR29=../src/Utilities/OutputControl
+SOURCEDIR30=../src/Utilities/Libraries
+SOURCEDIR31=../src/Utilities/Libraries/rcm
+SOURCEDIR32=../src/Utilities/Libraries/sparskit2
+SOURCEDIR33=../src/Utilities/Libraries/sparsekit
+SOURCEDIR34=../src/Utilities/Libraries/blas
+SOURCEDIR35=../src/Utilities/Libraries/daglib
 
 VPATH = \
 ${SOURCEDIR1} \
@@ -143,7 +74,8 @@ ${SOURCEDIR30} \
 ${SOURCEDIR31} \
 ${SOURCEDIR32} \
 ${SOURCEDIR33} \
-${SOURCEDIR34} 
+${SOURCEDIR34} \
+${SOURCEDIR35} 
 
 .SUFFIXES: .f90 .F90 .o
 

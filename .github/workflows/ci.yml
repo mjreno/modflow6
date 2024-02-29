@@ -715,7 +715,7 @@ jobs:
         working-directory: modflow6/nctest/mymodel
         run: |
           ls -l
-          ncgen -o mymodel.nc mymodel.cdl
+          ncgen -4 -b -o mymodel.nc mymodel.cdl
           sudo ggdb -batch -ex "run" -ex "bt" ../../bin/mf6
 
       - name: Get executables

@@ -1,0 +1,147 @@
+netcdf mymodel {
+dimensions:
+	LINELENGTH = 300 ;
+	LENAUXNAME = 16 ;
+	LENBOUNDNAME = 40 ;
+	NPER = 1 ;
+	NLAY = 1 ;
+	NROW = 10 ;
+	NCOL = 10 ;
+	NCPL = 100 ;
+	NCELLDIM = 3 ;
+	dim_chd_0_maxbound = 2 ;
+	dim_chd_0_niper = 1 ;
+variables:
+	int dis_nlay ;
+		dis_nlay:mf6_input = "DIS6:MYMODEL/DIS/NLAY" ;
+	int dis_nrow ;
+		dis_nrow:mf6_input = "DIS6:MYMODEL/DIS/NROW" ;
+	int dis_ncol ;
+		dis_ncol:mf6_input = "DIS6:MYMODEL/DIS/NCOL" ;
+	double dis_delr(NCOL) ;
+		dis_delr:_FillValue = 3.e+30 ;
+		dis_delr:mf6_input = "DIS6:MYMODEL/DIS/DELR" ;
+	double dis_delc(NROW) ;
+		dis_delc:_FillValue = 3.e+30 ;
+		dis_delc:mf6_input = "DIS6:MYMODEL/DIS/DELC" ;
+	double dis_top(NLAY, NROW, NCOL) ;
+		dis_top:_FillValue = 3.e+30 ;
+		dis_top:mf6_input = "DIS6:MYMODEL/DIS/TOP" ;
+	double dis_botm(NLAY, NROW, NCOL) ;
+		dis_botm:_FillValue = 3.e+30 ;
+		dis_botm:mf6_input = "DIS6:MYMODEL/DIS/BOTM" ;
+	double ic_strt(NLAY, NROW, NCOL) ;
+		ic_strt:_FillValue = 3.e+30 ;
+		ic_strt:mf6_input = "IC6:MYMODEL/IC/STRT" ;
+	int npf_save_specific_discharge ;
+		npf_save_specific_discharge:mf6_input = "NPF6:MYMODEL/NPF/SAVE_SPECIFIC_DISCHARGE" ;
+	int npf_icelltype(NLAY, NROW, NCOL) ;
+		npf_icelltype:_FillValue = -2147483647 ;
+		npf_icelltype:mf6_input = "NPF6:MYMODEL/NPF/ICELLTYPE" ;
+	double npf_k(NLAY, NROW, NCOL) ;
+		npf_k:_FillValue = 3.e+30 ;
+		npf_k:mf6_input = "NPF6:MYMODEL/NPF/K" ;
+	int chd_0_maxbound ;
+		chd_0_maxbound:mf6_input = "CHD6:MYMODEL/CHD_0/MAXBOUND" ;
+	int chd_0_cellid(dim_chd_0_niper, dim_chd_0_maxbound, NCELLDIM) ;
+		chd_0_cellid:_FillValue = -2147483647 ;
+		chd_0_cellid:mf6_input = "CHD6:MYMODEL/CHD_0/CELLID" ;
+	double chd_0_head(dim_chd_0_niper, dim_chd_0_maxbound) ;
+		chd_0_head:_FillValue = 3.e+30 ;
+		chd_0_head:mf6_input = "CHD6:MYMODEL/CHD_0/HEAD" ;
+	int chd_0_iper(dim_chd_0_niper) ;
+		chd_0_iper:_FillValue = -2147483647 ;
+		chd_0_iper:mf6_input = "CHD6:MYMODEL/CHD_0/IPER" ;
+
+// global attributes:
+		:description = "MODFLOW 6 NetCDF4 file prototype" ;
+		:history = "Created Thu Feb 29 16:48:47 2024" ;
+		:source = "flopy v3.5.0.dev0" ;
+		:mf6_modeltype = "GWF6" ;
+		:mf6_modelname = "MYMODEL" ;
+		:Conventions = "" ;
+data:
+
+ dis_nlay = 1 ;
+
+ dis_nrow = 10 ;
+
+ dis_ncol = 10 ;
+
+ dis_delr = 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ;
+
+ dis_delc = 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ;
+
+ dis_top =
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ;
+
+ dis_botm =
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ;
+
+ ic_strt =
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ;
+
+ npf_save_specific_discharge = 1 ;
+
+ npf_icelltype =
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ;
+
+ npf_k =
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ;
+
+ chd_0_maxbound = 2 ;
+
+ chd_0_cellid =
+  1, 1, 1,
+  1, 10, 10 ;
+
+ chd_0_head =
+  1, 0 ;
+
+ chd_0_iper = 1 ;
+}

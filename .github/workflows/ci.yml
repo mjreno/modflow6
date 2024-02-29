@@ -1245,9 +1245,10 @@ jobs:
 
       - name: Test netcdf-mf6
         if: runner.os == 'macOS'
-        working-directory: modflow6/nctest/mymodel
+        working-directory: modflow6/nctest/chd
         run: |
           ls -l
+          ncgen -4 -b -o gwf_chd01.nc gwf_chd01.cdl
           ../../bin/mf6
           ls -l
           cat mfsim.lst

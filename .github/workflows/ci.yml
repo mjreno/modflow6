@@ -564,6 +564,8 @@ jobs:
   netcdf_test:
     name: NetCDF testing
     needs:
+      - lint
+      - build
       - smoke_test
     runs-on: ${{ matrix.os }}
     strategy:

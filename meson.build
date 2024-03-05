@@ -43,13 +43,6 @@ if fc_id == 'gcc'
                    '-Wno-uninitialized',
                    ]
   
-  # Options specific to profile
-  if profile == 'release'
-    compile_args += ['-ffpe-summary=overflow', '-ffpe-trap=overflow,zero']
-  elif profile == 'develop'
-    compile_args += ['-fcheck=all', '-ffpe-trap=overflow,zero']
-  endif
-
   # Define OS with gfortran for OS specific code
   # These are identical to pre-defined macros available with ifort
   system = build_machine.system()
@@ -190,6 +183,25 @@ else
 endif
 
 compile_args += extra_cmp_args
+
+# Command line options for gfortran
+if fc_id == 'gcc'
+  # Options specific to profile
+  if with_netcdf and build_machine.system() == 'darwin'
+    # HDF5 1.14.3 invalid fpe trap issue: https://github.com/HDFGroup/hdf5/issues/3831
+    if profile == 'release'
+      compile_args += ['-ffpe-summary=overflow', '-ffpe-trap=overflow,zero']
+    elif profile == 'develop'
+      compile_args += ['-fcheck=all', '-ffpe-trap=overflow,zero']
+    endif
+  else
+    if profile == 'release'
+      compile_args += ['-ffpe-summary=overflow', '-ffpe-trap=overflow,zero,invalid']
+    elif profile == 'develop'
+      compile_args += ['-fcheck=all', '-ffpe-trap=overflow,zero,invalid']
+    endif
+  endif
+endif
 
 add_project_arguments(fc.get_supported_arguments(compile_args), language: 'fortran')
 add_project_link_arguments(fc.get_supported_arguments(link_args), language: 'fortran')

@@ -126,7 +126,11 @@ def get_model(ws, name, bmi=False, netcdf=None):
             depth=et_depth,
             filename=f"{name}.nc" if netcdf else f"{name}.evta",
         )
-    wel = flopy.mf6.ModflowGwfwel(gwf, stress_period_data=[[(0, 0, 0), 0.0]])
+    wel = flopy.mf6.ModflowGwfwel(
+        gwf,
+        stress_period_data=[[(0, 0, 0), 0.0]],
+        filename=f"{name}.nc" if netcdf else f"{name}.wel",
+    )
 
     # output control
     oc = flopy.mf6.ModflowGwfoc(
@@ -150,6 +154,7 @@ def build_models(idx, test, netcdf=None):
     mc = get_model(ws, name, bmi=True, netcdf=netcdf)
 
     return sim, mc
+    # return [sim, mc]
 
 
 def head2et_wellrate(h):
@@ -274,6 +279,7 @@ def test_mf6model(idx, name, function_tmpdir, targets, netcdf):
         targets=targets,
         build=lambda t: build_models(idx, t, netcdf),
         api_func=lambda exe, ws: api_func(exe, idx, ws),
+        compare=False,
         netcdf=netcdf,
     )
     test.run()

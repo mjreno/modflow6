@@ -184,9 +184,8 @@ endif
 
 compile_args += extra_cmp_args
 
-# Command line options for gfortran
+# GCC profile options need to be netcdf aware
 if fc_id == 'gcc'
-  # Options specific to profile
   if with_netcdf and build_machine.system() == 'darwin'
     # HDF5 1.14.3 invalid fpe trap issue: https://github.com/HDFGroup/hdf5/issues/3831
     if profile == 'release'

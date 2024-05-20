@@ -1,49 +1,53 @@
 ! ** Do Not Modify! MODFLOW 6 system generated file. **
-module ExgGwfgwtInputModule
+module GwfNcfInputModule
   use ConstantsModule, only: LENVARNAME
   use InputDefinitionModule, only: InputParamDefinitionType, &
                                    InputBlockDefinitionType
   private
-  public exg_gwfgwt_param_definitions
-  public exg_gwfgwt_aggregate_definitions
-  public exg_gwfgwt_block_definitions
-  public ExgGwfgwtParamFoundType
-  public exg_gwfgwt_multi_package
-  public exg_gwfgwt_subpackages
+  public gwf_ncf_param_definitions
+  public gwf_ncf_aggregate_definitions
+  public gwf_ncf_block_definitions
+  public GwfNcfParamFoundType
+  public gwf_ncf_multi_package
+  public gwf_ncf_subpackages
 
-  type ExgGwfgwtParamFoundType
-  end type ExgGwfgwtParamFoundType
+  type GwfNcfParamFoundType
+    logical :: ogc_wkt = .false.
+  end type GwfNcfParamFoundType
 
-  logical :: exg_gwfgwt_multi_package = .false.
+  logical :: gwf_ncf_multi_package = .false.
 
   character(len=16), parameter :: &
-    exg_gwfgwt_subpackages(*) = &
+    gwf_ncf_subpackages(*) = &
     [ &
     '                ' &
     ]
 
   type(InputParamDefinitionType), parameter :: &
-    exg_gwfgwt_param_definitions(*) = &
-    [ &
-    InputParamDefinitionType &
+    gwfncf_ogc_wkt = InputParamDefinitionType &
     ( &
-    '', & ! component
-    '', & ! subcomponent
-    '', & ! block
-    '', & ! tag name
-    '', & ! fortran variable
-    '', & ! type
+    'GWF', & ! component
+    'NCF', & ! subcomponent
+    'OPTIONS', & ! block
+    'OGC_WKT', & ! tag name
+    'OGC_WKT', & ! fortran variable
+    'LONGSTRING', & ! type
     '', & ! shape
-    .false., & ! required
+    .true., & ! required
     .false., & ! multi-record
     .false., & ! preserve case
     .false., & ! layered
     .false. & ! timeseries
-    ) &
+    )
+
+  type(InputParamDefinitionType), parameter :: &
+    gwf_ncf_param_definitions(*) = &
+    [ &
+    gwfncf_ogc_wkt &
     ]
 
   type(InputParamDefinitionType), parameter :: &
-    exg_gwfgwt_aggregate_definitions(*) = &
+    gwf_ncf_aggregate_definitions(*) = &
     [ &
     InputParamDefinitionType &
     ( &
@@ -63,15 +67,14 @@ module ExgGwfgwtInputModule
     ]
 
   type(InputBlockDefinitionType), parameter :: &
-    exg_gwfgwt_block_definitions(*) = &
+    gwf_ncf_block_definitions(*) = &
     [ &
-    InputBlockDefinitionType &
-    ( &
-    '', & ! blockname
-    .false., & ! required
+    InputBlockDefinitionType( &
+    'OPTIONS', & ! blockname
+    .true., & ! required
     .false., & ! aggregate
-    .false. & ! block_varaible
+    .false. & ! block_variable
     ) &
     ]
 
-end module ExgGwfgwtInputModule
+end module GwfNcfInputModule

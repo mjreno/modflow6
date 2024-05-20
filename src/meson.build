@@ -64,6 +64,7 @@ modflow_sources = files(
     'Idm' / 'gwf-ghbidm.f90',
     'Idm' / 'gwf-icidm.f90',
     'Idm' / 'gwf-namidm.f90',
+    'Idm' / 'gwf-ncfidm.f90',
     'Idm' / 'gwf-npfidm.f90',
     'Idm' / 'gwf-rchidm.f90',
     'Idm' / 'gwf-rchaidm.f90',
@@ -305,6 +306,8 @@ modflow_sources = files(
     'Utilities' / 'Observation' / 'ObsOutput.f90',
     'Utilities' / 'Observation' / 'ObsOutputList.f90',
     'Utilities' / 'Observation' / 'ObsUtility.f90',
+    'Utilities' / 'Odm' / 'NCExportModel.f90',
+    'Utilities' / 'Odm' / 'OdmExportModel.f90',
     'Utilities' / 'OutputControl' / 'OutputControl.f90',
     'Utilities' / 'OutputControl' / 'OutputControlData.f90',
     'Utilities' / 'OutputControl' / 'PrintSaveManager.f90',
@@ -385,12 +388,23 @@ modflow_mpi_sources = files(
   'Solution' / 'ParallelSolution.f90'
 )
 
+modflow_netcdf_sources = files(
+  'Utilities' / 'Odm' / 'NCExport.f90',
+  'Utilities' / 'Odm' / 'UgridDisvModel.f90',
+  'Utilities' / 'Odm' / 'UgridDisModel.f90',
+  'Utilities' / 'Odm' / 'UgridModel.f90'
+)
+
 if with_petsc
   modflow_sources += modflow_petsc_sources  
 endif
 
 if with_mpi
   modflow_sources += modflow_mpi_sources
+endif
+
+if with_netcdf
+  modflow_sources += modflow_netcdf_sources
 endif
 
 mf6_external = static_library('mf6_external', external_libraries)

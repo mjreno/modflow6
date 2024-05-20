@@ -41,6 +41,9 @@ if fc_id == 'gcc'
                    '-Wno-intrinsic-shadow',      # We shadow intrinsics with methods, which should be fine
                    '-Wno-maybe-uninitialized',   # "Uninitialized" flags produce false positives with allocatables
                    '-Wno-uninitialized',
+                   '-g',
+                   '-fbacktrace', '-fcheck=all',
+                   '-ffpe-trap=overflow,zero,invalid'
                    ]
   
   # Options specific to profile

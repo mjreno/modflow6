@@ -9,13 +9,21 @@ module GwfIcInputModule
   public gwf_ic_block_definitions
   public GwfIcParamFoundType
   public gwf_ic_multi_package
+  public gwf_ic_subpackages
 
   type GwfIcParamFoundType
     logical :: export_ascii = .false.
+    logical :: export_nc = .false.
     logical :: strt = .false.
   end type GwfIcParamFoundType
 
   logical :: gwf_ic_multi_package = .false.
+
+  character(len=16), parameter :: &
+    gwf_ic_subpackages(*) = &
+    [ &
+    '                ' &
+    ]
 
   type(InputParamDefinitionType), parameter :: &
     gwfic_export_ascii = InputParamDefinitionType &
@@ -25,6 +33,23 @@ module GwfIcInputModule
     'OPTIONS', & ! block
     'EXPORT_ARRAY_ASCII', & ! tag name
     'EXPORT_ASCII', & ! fortran variable
+    'KEYWORD', & ! type
+    '', & ! shape
+    .false., & ! required
+    .false., & ! multi-record
+    .false., & ! preserve case
+    .false., & ! layered
+    .false. & ! timeseries
+    )
+
+  type(InputParamDefinitionType), parameter :: &
+    gwfic_export_nc = InputParamDefinitionType &
+    ( &
+    'GWF', & ! component
+    'IC', & ! subcomponent
+    'OPTIONS', & ! block
+    'EXPORT_ARRAY_NETCDF', & ! tag name
+    'EXPORT_NC', & ! fortran variable
     'KEYWORD', & ! type
     '', & ! shape
     .false., & ! required
@@ -55,6 +80,7 @@ module GwfIcInputModule
     gwf_ic_param_definitions(*) = &
     [ &
     gwfic_export_ascii, &
+    gwfic_export_nc, &
     gwfic_strt &
     ]
 

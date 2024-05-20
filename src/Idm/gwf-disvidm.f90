@@ -9,6 +9,7 @@ module GwfDisvInputModule
   public gwf_disv_block_definitions
   public GwfDisvParamFoundType
   public gwf_disv_multi_package
+  public gwf_disv_subpackages
 
   type GwfDisvParamFoundType
     logical :: length_units = .false.
@@ -17,6 +18,11 @@ module GwfDisvInputModule
     logical :: yorigin = .false.
     logical :: angrot = .false.
     logical :: export_ascii = .false.
+    logical :: export_nc = .false.
+    logical :: ncf_filerecord = .false.
+    logical :: ncf6 = .false.
+    logical :: filein = .false.
+    logical :: ncf6_filename = .false.
     logical :: nlay = .false.
     logical :: ncpl = .false.
     logical :: nvert = .false.
@@ -34,6 +40,12 @@ module GwfDisvInputModule
   end type GwfDisvParamFoundType
 
   logical :: gwf_disv_multi_package = .false.
+
+  character(len=16), parameter :: &
+    gwf_disv_subpackages(*) = &
+    [ &
+    'GWF-NCF         ' &
+    ]
 
   type(InputParamDefinitionType), parameter :: &
     gwfdisv_length_units = InputParamDefinitionType &
@@ -133,6 +145,91 @@ module GwfDisvInputModule
     .false., & ! required
     .false., & ! multi-record
     .false., & ! preserve case
+    .false., & ! layered
+    .false. & ! timeseries
+    )
+
+  type(InputParamDefinitionType), parameter :: &
+    gwfdisv_export_nc = InputParamDefinitionType &
+    ( &
+    'GWF', & ! component
+    'DISV', & ! subcomponent
+    'OPTIONS', & ! block
+    'EXPORT_ARRAY_NETCDF', & ! tag name
+    'EXPORT_NC', & ! fortran variable
+    'KEYWORD', & ! type
+    '', & ! shape
+    .false., & ! required
+    .false., & ! multi-record
+    .false., & ! preserve case
+    .false., & ! layered
+    .false. & ! timeseries
+    )
+
+  type(InputParamDefinitionType), parameter :: &
+    gwfdisv_ncf_filerecord = InputParamDefinitionType &
+    ( &
+    'GWF', & ! component
+    'DISV', & ! subcomponent
+    'OPTIONS', & ! block
+    'NCF_FILERECORD', & ! tag name
+    'NCF_FILERECORD', & ! fortran variable
+    'RECORD NCF6 FILEIN NCF6_FILENAME', & ! type
+    '', & ! shape
+    .false., & ! required
+    .false., & ! multi-record
+    .false., & ! preserve case
+    .false., & ! layered
+    .false. & ! timeseries
+    )
+
+  type(InputParamDefinitionType), parameter :: &
+    gwfdisv_ncf6 = InputParamDefinitionType &
+    ( &
+    'GWF', & ! component
+    'DISV', & ! subcomponent
+    'OPTIONS', & ! block
+    'NCF6', & ! tag name
+    'NCF6', & ! fortran variable
+    'KEYWORD', & ! type
+    '', & ! shape
+    .true., & ! required
+    .true., & ! multi-record
+    .false., & ! preserve case
+    .false., & ! layered
+    .false. & ! timeseries
+    )
+
+  type(InputParamDefinitionType), parameter :: &
+    gwfdisv_filein = InputParamDefinitionType &
+    ( &
+    'GWF', & ! component
+    'DISV', & ! subcomponent
+    'OPTIONS', & ! block
+    'FILEIN', & ! tag name
+    'FILEIN', & ! fortran variable
+    'KEYWORD', & ! type
+    '', & ! shape
+    .true., & ! required
+    .true., & ! multi-record
+    .false., & ! preserve case
+    .false., & ! layered
+    .false. & ! timeseries
+    )
+
+  type(InputParamDefinitionType), parameter :: &
+    gwfdisv_ncf6_filename = InputParamDefinitionType &
+    ( &
+    'GWF', & ! component
+    'DISV', & ! subcomponent
+    'OPTIONS', & ! block
+    'NCF6_FILENAME', & ! tag name
+    'NCF6_FILENAME', & ! fortran variable
+    'STRING', & ! type
+    '', & ! shape
+    .true., & ! required
+    .true., & ! multi-record
+    .true., & ! preserve case
     .false., & ! layered
     .false. & ! timeseries
     )
@@ -384,6 +481,11 @@ module GwfDisvInputModule
     gwfdisv_yorigin, &
     gwfdisv_angrot, &
     gwfdisv_export_ascii, &
+    gwfdisv_export_nc, &
+    gwfdisv_ncf_filerecord, &
+    gwfdisv_ncf6, &
+    gwfdisv_filein, &
+    gwfdisv_ncf6_filename, &
     gwfdisv_nlay, &
     gwfdisv_ncpl, &
     gwfdisv_nvert, &

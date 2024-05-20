@@ -9,6 +9,7 @@ module GwfDisInputModule
   public gwf_dis_block_definitions
   public GwfDisParamFoundType
   public gwf_dis_multi_package
+  public gwf_dis_subpackages
 
   type GwfDisParamFoundType
     logical :: length_units = .false.
@@ -17,6 +18,11 @@ module GwfDisInputModule
     logical :: yorigin = .false.
     logical :: angrot = .false.
     logical :: export_ascii = .false.
+    logical :: export_nc = .false.
+    logical :: ncf_filerecord = .false.
+    logical :: ncf6 = .false.
+    logical :: filein = .false.
+    logical :: ncf6_filename = .false.
     logical :: nlay = .false.
     logical :: nrow = .false.
     logical :: ncol = .false.
@@ -28,6 +34,12 @@ module GwfDisInputModule
   end type GwfDisParamFoundType
 
   logical :: gwf_dis_multi_package = .false.
+
+  character(len=16), parameter :: &
+    gwf_dis_subpackages(*) = &
+    [ &
+    'GWF-NCF         ' &
+    ]
 
   type(InputParamDefinitionType), parameter :: &
     gwfdis_length_units = InputParamDefinitionType &
@@ -127,6 +139,91 @@ module GwfDisInputModule
     .false., & ! required
     .false., & ! multi-record
     .false., & ! preserve case
+    .false., & ! layered
+    .false. & ! timeseries
+    )
+
+  type(InputParamDefinitionType), parameter :: &
+    gwfdis_export_nc = InputParamDefinitionType &
+    ( &
+    'GWF', & ! component
+    'DIS', & ! subcomponent
+    'OPTIONS', & ! block
+    'EXPORT_ARRAY_NETCDF', & ! tag name
+    'EXPORT_NC', & ! fortran variable
+    'KEYWORD', & ! type
+    '', & ! shape
+    .false., & ! required
+    .false., & ! multi-record
+    .false., & ! preserve case
+    .false., & ! layered
+    .false. & ! timeseries
+    )
+
+  type(InputParamDefinitionType), parameter :: &
+    gwfdis_ncf_filerecord = InputParamDefinitionType &
+    ( &
+    'GWF', & ! component
+    'DIS', & ! subcomponent
+    'OPTIONS', & ! block
+    'NCF_FILERECORD', & ! tag name
+    'NCF_FILERECORD', & ! fortran variable
+    'RECORD NCF6 FILEIN NCF6_FILENAME', & ! type
+    '', & ! shape
+    .false., & ! required
+    .false., & ! multi-record
+    .false., & ! preserve case
+    .false., & ! layered
+    .false. & ! timeseries
+    )
+
+  type(InputParamDefinitionType), parameter :: &
+    gwfdis_ncf6 = InputParamDefinitionType &
+    ( &
+    'GWF', & ! component
+    'DIS', & ! subcomponent
+    'OPTIONS', & ! block
+    'NCF6', & ! tag name
+    'NCF6', & ! fortran variable
+    'KEYWORD', & ! type
+    '', & ! shape
+    .true., & ! required
+    .true., & ! multi-record
+    .false., & ! preserve case
+    .false., & ! layered
+    .false. & ! timeseries
+    )
+
+  type(InputParamDefinitionType), parameter :: &
+    gwfdis_filein = InputParamDefinitionType &
+    ( &
+    'GWF', & ! component
+    'DIS', & ! subcomponent
+    'OPTIONS', & ! block
+    'FILEIN', & ! tag name
+    'FILEIN', & ! fortran variable
+    'KEYWORD', & ! type
+    '', & ! shape
+    .true., & ! required
+    .true., & ! multi-record
+    .false., & ! preserve case
+    .false., & ! layered
+    .false. & ! timeseries
+    )
+
+  type(InputParamDefinitionType), parameter :: &
+    gwfdis_ncf6_filename = InputParamDefinitionType &
+    ( &
+    'GWF', & ! component
+    'DIS', & ! subcomponent
+    'OPTIONS', & ! block
+    'NCF6_FILENAME', & ! tag name
+    'NCF6_FILENAME', & ! fortran variable
+    'STRING', & ! type
+    '', & ! shape
+    .true., & ! required
+    .true., & ! multi-record
+    .true., & ! preserve case
     .false., & ! layered
     .false. & ! timeseries
     )
@@ -276,6 +373,11 @@ module GwfDisInputModule
     gwfdis_yorigin, &
     gwfdis_angrot, &
     gwfdis_export_ascii, &
+    gwfdis_export_nc, &
+    gwfdis_ncf_filerecord, &
+    gwfdis_ncf6, &
+    gwfdis_filein, &
+    gwfdis_ncf6_filename, &
     gwfdis_nlay, &
     gwfdis_nrow, &
     gwfdis_ncol, &

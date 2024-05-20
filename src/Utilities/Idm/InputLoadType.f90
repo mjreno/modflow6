@@ -7,7 +7,8 @@
 module InputLoadTypeModule
 
   use KindModule, only: DP, I4B, LGP
-  use ConstantsModule, only: LINELENGTH, LENCOMPONENTNAME, LENMODELNAME
+  use ConstantsModule, only: LINELENGTH, LENCOMPONENTNAME, LENMODELNAME, &
+                             LENMEMPATH, LENVARNAME, LENFTYPE
   use SimVariablesModule, only: errmsg
   use SimModule, only: store_error, store_error_filename
   use ModflowInputModule, only: ModflowInputType
@@ -21,6 +22,23 @@ module InputLoadTypeModule
   public :: ModelDynamicPkgsType
   public :: AddDynamicModelToList, GetDynamicModelFromList
   public :: StaticPkgLoadType, DynamicPkgLoadType
+  public :: SubPackageListType
+  public :: model_dynamic_pkgs
+
+  !> @brief type representing package subpackage list
+  type :: SubPackageListType
+    character(len=LENCOMPONENTNAME), dimension(:), allocatable :: pkgtypes
+    character(len=LENCOMPONENTNAME), dimension(:), allocatable :: component_types
+    character(len=LENCOMPONENTNAME), dimension(:), &
+      allocatable :: subcomponent_types
+    character(len=LINELENGTH), dimension(:), allocatable :: filenames
+    character(len=LENVARNAME), dimension(:), allocatable :: varnames
+    integer(I4B) :: pnum
+  contains
+    procedure :: create => subpkg_create
+    procedure :: add => subpkg_add
+    procedure :: destroy => subpkg_destroy
+  end type SubPackageListType
 
   !> @brief Static loader type
   !!
@@ -33,6 +51,7 @@ module InputLoadTypeModule
     character(len=LINELENGTH) :: component_input_name !< component input name, e.g. model name file
     character(len=LINELENGTH) :: input_name !< input name, e.g. package *.chd file
     integer(I4B) :: iperblock !< index of period block on block definition list
+    type(SubPackageListType) :: subpkg_list
   contains
     procedure :: init => static_init
     procedure :: destroy => static_destroy
@@ -102,6 +121,7 @@ module InputLoadTypeModule
   !!
   !<
   type :: ModelDynamicPkgsType
+    character(len=LENCOMPONENTNAME) :: modeltype !< type of model
     character(len=LENMODELNAME) :: modelname !< name of model
     character(len=LINELENGTH) :: modelfname !< name of model input file
     type(ListType) :: pkglist !< list of pointers to model dynamic package loaders
@@ -117,7 +137,101 @@ module InputLoadTypeModule
     procedure :: destroy => dynamicpkgs_destroy
   end type ModelDynamicPkgsType
 
+  type(ListType) :: model_dynamic_pkgs
+
 contains
+
+  !> @brief create a new package type
+  !<
+  subroutine subpkg_create(this)
+    ! -- modules
+    ! -- dummy
+    class(SubPackageListType) :: this
+    ! -- local
+    !
+    ! -- initialize
+    this%pnum = 0
+    !
+    ! -- allocate arrays
+    allocate (this%pkgtypes(0))
+    allocate (this%component_types(0))
+    allocate (this%subcomponent_types(0))
+    allocate (this%varnames(0))
+    allocate (this%filenames(0))
+    !
+    ! -- return
+    return
+  end subroutine subpkg_create
+
+  !> @brief create a new package type
+  !<
+  subroutine subpkg_add(this, pkgtype, component_type, subcomponent_type, &
+                        tagname, filename)
+    ! -- modules
+    use ArrayHandlersModule, only: expandarray
+    ! -- dummy
+    class(SubPackageListType) :: this
+    ! -- local
+    character(len=*), intent(in) :: pkgtype
+    character(len=*), intent(in) :: component_type
+    character(len=*), intent(in) :: subcomponent_type
+    character(len=*), intent(in) :: tagname
+    character(len=*), intent(in) :: filename
+    !
+    ! -- local
+    character(len=LENVARNAME) :: mempath_tag
+    integer(I4B) :: idx, trimlen
+    !
+    ! -- reallocate
+    call expandarray(this%pkgtypes)
+    call expandarray(this%component_types)
+    call expandarray(this%subcomponent_types)
+    call expandarray(this%varnames)
+    call expandarray(this%filenames)
+    !
+    ! -- initialize
+    mempath_tag = tagname
+    trimlen = len_trim(tagname)
+    idx = 0
+    !
+    ! -- identify version index
+    idx = index(tagname, '_')
+    if (idx > 0) then
+      if (tagname(idx + 1:trimlen) == 'FILENAME') then
+        write (mempath_tag, '(a)') tagname(1:idx)//'MEMPATH'
+      end if
+    end if
+    !
+    ! -- add new package instance
+    this%pnum = this%pnum + 1
+    this%pkgtypes(this%pnum) = pkgtype
+    this%component_types(this%pnum) = component_type
+    this%subcomponent_types(this%pnum) = subcomponent_type
+    this%filenames(this%pnum) = filename
+    this%varnames(this%pnum) = mempath_tag
+    !
+    ! -- return
+    return
+  end subroutine subpkg_add
+
+  !> @brief create a new package type
+  !<
+  subroutine subpkg_destroy(this)
+    ! -- modules
+    ! -- dummy
+    class(SubPackageListType) :: this
+    ! -- local
+    !
+    ! -- allocate arrays
+    deallocate (this%pkgtypes)
+    deallocate (this%component_types)
+    deallocate (this%subcomponent_types)
+    deallocate (this%filenames)
+    deallocate (this%varnames)
+    !
+    ! -- return
+    return
+  end subroutine subpkg_destroy
 
   !> @brief initialize static package loader
   !!
@@ -137,6 +251,9 @@ contains
     this%input_name = input_name
     this%iperblock = 0
     !
+    ! -- create subpackage list
+    call this%subpkg_list%create()
+    !
     ! -- identify period block definition
     do iblock = 1, size(mf6_input%block_dfns)
       !
@@ -151,6 +268,9 @@ contains
 
   subroutine static_destroy(this)
     class(StaticPkgLoadType), intent(inout) :: this
+    !
+    ! -- create subpackage list
+    call this%subpkg_list%destroy()
     !
     return
   end subroutine static_destroy
@@ -243,12 +363,14 @@ contains
   !> @brief model dynamic packages init
   !!
   !<
-  subroutine dynamicpkgs_init(this, modelname, modelfname, iout)
+  subroutine dynamicpkgs_init(this, modeltype, modelname, modelfname, iout)
     class(ModelDynamicPkgsType), intent(inout) :: this
+    character(len=*), intent(in) :: modeltype
     character(len=*), intent(in) :: modelname
     character(len=*), intent(in) :: modelfname
     integer(I4B), intent(in) :: iout
     !
+    this%modeltype = modeltype
     this%modelname = modelname
     this%modelfname = modelfname
     this%iout = iout

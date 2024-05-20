@@ -9,6 +9,7 @@ module GwfNamInputModule
   public gwf_nam_block_definitions
   public GwfNamParamFoundType
   public gwf_nam_multi_package
+  public gwf_nam_subpackages
 
   type GwfNamParamFoundType
     logical :: list = .false.
@@ -18,12 +19,19 @@ module GwfNamInputModule
     logical :: newtonoptions = .false.
     logical :: newton = .false.
     logical :: under_relaxation = .false.
+    logical :: export_netcdf = .false.
     logical :: ftype = .false.
     logical :: fname = .false.
     logical :: pname = .false.
   end type GwfNamParamFoundType
 
   logical :: gwf_nam_multi_package = .false.
+
+  character(len=16), parameter :: &
+    gwf_nam_subpackages(*) = &
+    [ &
+    '                ' &
+    ]
 
   type(InputParamDefinitionType), parameter :: &
     gwfnam_list = InputParamDefinitionType &
@@ -145,6 +153,23 @@ module GwfNamInputModule
     )
 
   type(InputParamDefinitionType), parameter :: &
+    gwfnam_export_netcdf = InputParamDefinitionType &
+    ( &
+    'GWF', & ! component
+    'NAM', & ! subcomponent
+    'OPTIONS', & ! block
+    'EXPORT_NETCDF', & ! tag name
+    'EXPORT_NETCDF', & ! fortran variable
+    'STRING', & ! type
+    '', & ! shape
+    .false., & ! required
+    .false., & ! multi-record
+    .false., & ! preserve case
+    .false., & ! layered
+    .false. & ! timeseries
+    )
+
+  type(InputParamDefinitionType), parameter :: &
     gwfnam_ftype = InputParamDefinitionType &
     ( &
     'GWF', & ! component
@@ -205,6 +230,7 @@ module GwfNamInputModule
     gwfnam_newtonoptions, &
     gwfnam_newton, &
     gwfnam_under_relaxation, &
+    gwfnam_export_netcdf, &
     gwfnam_ftype, &
     gwfnam_fname, &
     gwfnam_pname &

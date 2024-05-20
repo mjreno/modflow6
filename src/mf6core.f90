@@ -70,6 +70,7 @@ contains
     ! -- modules
     use RunControlFactoryModule, only: create_run_control
     use SimulationCreateModule, only: simulation_cr
+    use SourceLoadModule, only: odm_cr
 
     ! -- get the run controller for sequential or parallel builds
     run_ctrl => create_run_control()
@@ -92,6 +93,9 @@ contains
 
     ! -- allocate and read
     call simulation_ar()
+
+    ! -- odm
+    call odm_cr()
 
   end subroutine Mf6Initialize
 
@@ -131,6 +135,7 @@ contains
     use SimulationCreateModule, only: simulation_da
     use TdisModule, only: tdis_da
     use IdmLoadModule, only: idm_da
+    use SourceLoadModule, only: odm_da
     use SimVariablesModule, only: iout
     ! -- local variables
     integer(I4B) :: im
@@ -202,6 +207,7 @@ contains
       deallocate (sgp)
     end do
     !
+    call odm_da()
     call idm_da(iout)
     call simulation_da()
     call lists_da()
@@ -675,6 +681,7 @@ contains
     use BaseSolutionModule, only: BaseSolutionType, GetBaseSolutionFromList
     use SimModule, only: converge_check
     use SimVariablesModule, only: isim_mode
+    use SourceLoadModule, only: odm_post_step
     ! -- return variable
     logical(LGP) :: hasConverged
     ! -- local variables
@@ -732,6 +739,9 @@ contains
     !
     ! -- Check if we're done
     call converge_check(hasConverged)
+    !
+    ! -- odm export
+    call odm_post_step()
     !
     ! -- return
     return

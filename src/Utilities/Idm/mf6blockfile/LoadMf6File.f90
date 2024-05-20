@@ -492,6 +492,8 @@ contains
       else
         call load_string_type(this%parser, idt, this%mf6_input%mempath, this%iout)
       end if
+    case ('LONGSTRING')
+      call load_longstring_type(this%parser, idt, this%mf6_input%mempath, this%iout)
     case ('INTEGER')
       call load_integer_type(this%parser, idt, this%mf6_input%mempath, this%iout)
     case ('INTEGER1D')
@@ -724,7 +726,24 @@ contains
     return
   end subroutine load_string_type
 
-  !> @brief load type string
+  !> @brief load type longstring
+  !<
+  subroutine load_longstring_type(parser, idt, memoryPath, iout)
+    use ConstantsModule, only: LENBIGLINE
+    type(BlockParserType), intent(inout) :: parser !< block parser
+    type(InputParamDefinitionType), intent(in) :: idt !< input data type object describing this record
+    character(len=*), intent(in) :: memoryPath !< memorypath to put loaded information
+    integer(I4B), intent(in) :: iout !< unit number for output
+    character(len=LENBIGLINE), pointer :: cstr
+    integer(I4B) :: ilen
+    ilen = LENBIGLINE
+    call mem_allocate(cstr, ilen, idt%mf6varname, memoryPath)
+    call parser%GetString(cstr, (.not. idt%preserve_case))
+    call idm_log_var(cstr, idt%tagname, memoryPath, iout)
+    return
+  end subroutine load_longstring_type
+
+  !> @brief load io tag
   !<
   subroutine load_io_tag(parser, idt, memoryPath, which, iout)
     use MemoryManagerModule, only: mem_allocate, mem_reallocate, &

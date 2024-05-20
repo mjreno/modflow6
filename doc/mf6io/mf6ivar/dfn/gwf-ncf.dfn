@@ -1,0 +1,12 @@
+# flopy subpackage ncf_filerecord ncf
+# flopy parent_name_type parent_package MFPackage
+
+# --------------------- gwf ncf options ---------------------
+
+block options
+name ogc_wkt
+type longstring
+#type string
+reader urword
+longname CRS well-known text (WKT) string
+description CRS well-known text (WKT) string.

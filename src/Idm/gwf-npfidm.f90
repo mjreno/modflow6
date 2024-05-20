@@ -9,6 +9,7 @@ module GwfNpfInputModule
   public gwf_npf_block_definitions
   public GwfNpfParamFoundType
   public gwf_npf_multi_package
+  public gwf_npf_subpackages
 
   type GwfNpfParamFoundType
     logical :: ipakcb = .false.
@@ -36,6 +37,7 @@ module GwfNpfInputModule
     logical :: filein = .false.
     logical :: tvk6_filename = .false.
     logical :: export_ascii = .false.
+    logical :: export_nc = .false.
     logical :: inewton = .false.
     logical :: satomega = .false.
     logical :: icelltype = .false.
@@ -49,6 +51,12 @@ module GwfNpfInputModule
   end type GwfNpfParamFoundType
 
   logical :: gwf_npf_multi_package = .false.
+
+  character(len=16), parameter :: &
+    gwf_npf_subpackages(*) = &
+    [ &
+    '                ' &
+    ]
 
   type(InputParamDefinitionType), parameter :: &
     gwfnpf_ipakcb = InputParamDefinitionType &
@@ -476,6 +484,23 @@ module GwfNpfInputModule
     )
 
   type(InputParamDefinitionType), parameter :: &
+    gwfnpf_export_nc = InputParamDefinitionType &
+    ( &
+    'GWF', & ! component
+    'NPF', & ! subcomponent
+    'OPTIONS', & ! block
+    'EXPORT_ARRAY_NETCDF', & ! tag name
+    'EXPORT_NC', & ! fortran variable
+    'KEYWORD', & ! type
+    '', & ! shape
+    .false., & ! required
+    .false., & ! multi-record
+    .false., & ! preserve case
+    .false., & ! layered
+    .false. & ! timeseries
+    )
+
+  type(InputParamDefinitionType), parameter :: &
     gwfnpf_inewton = InputParamDefinitionType &
     ( &
     'GWF', & ! component
@@ -673,6 +698,7 @@ module GwfNpfInputModule
     gwfnpf_filein, &
     gwfnpf_tvk6_filename, &
     gwfnpf_export_ascii, &
+    gwfnpf_export_nc, &
     gwfnpf_inewton, &
     gwfnpf_satomega, &
     gwfnpf_icelltype, &

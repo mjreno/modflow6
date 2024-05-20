@@ -20,6 +20,7 @@ module SourceLoadModule
   public :: open_source_file
   public :: load_modelnam, load_simnam, load_simtdis
   public :: remote_model_ndim
+  public :: odm_cr, odm_post_step, odm_da
 
 contains
 
@@ -147,7 +148,7 @@ contains
 
   subroutine load_simnam()
     use SimVariablesModule, only: simfile, iout
-    use MemoryManagerModule, only: mem_setptr, mem_print_detailed
+    use MemoryManagerModule, only: mem_setptr
     use MessageModule, only: write_message
     use IdmMf6FileModule, only: input_load
     use SourceCommonModule, only: filein_fname
@@ -324,5 +325,62 @@ contains
     ! -- return
     return
   end function remote_model_ndim
+
+  subroutine odm_cr()
+    ! -- modules
+    use OdmExportModelModule, only: odm_create, nc_export
+#if defined(__WITH_NETCDF__)
+    use NCExportModule, only: nc_export_init, nc_version
+    call nc_version()
+#endif
+    call odm_create()
+    if (nc_export()) then
+#if defined(__WITH_NETCDF__)
+      !write(iout, '(a)') 'ODM nc_export'
+      call nc_export_init()
+#else
+      write (errmsg, '(a)') &
+        'Model namefile EXPORT_NETCDF option configured but NetCDF libraries are &
+        &not available.'
+      call store_error(errmsg, .true.)
+#endif
+    end if
+  end subroutine odm_cr
+
+  subroutine odm_post_step()
+    ! -- modules
+    use OdmExportModelModule, only: nc_export
+#if defined(__WITH_NETCDF__)
+    use NCExportModule, only: nc_export_post_step
+#endif
+    if (nc_export()) then
+#if defined(__WITH_NETCDF__)
+      call nc_export_post_step()
+#else
+      write (errmsg, '(a)') &
+        'Model namefile EXPORT_NETCDF option configured but NetCDF libraries are &
+        &not available.'
+      call store_error(errmsg, .true.)
+#endif
+    end if
+  end subroutine odm_post_step
+
+  subroutine odm_da()
+    ! -- modules
+    use OdmExportModelModule, only: nc_export
+#if defined(__WITH_NETCDF__)
+    use NCExportModule, only: nc_export_destroy
+#endif
+    if (nc_export()) then
+#if defined(__WITH_NETCDF__)
+      call nc_export_destroy()
+#else
+      write (errmsg, '(a)') &
+        'Model namefile EXPORT_NETCDF option configured but NetCDF libraries are &
+        &not available.'
+      call store_error(errmsg, .true.)
+#endif
+    end if
+  end subroutine odm_da
 
 end module SourceLoadModule

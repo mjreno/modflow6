@@ -9,18 +9,26 @@ module GwtNamInputModule
   public gwt_nam_block_definitions
   public GwtNamParamFoundType
   public gwt_nam_multi_package
+  public gwt_nam_subpackages
 
   type GwtNamParamFoundType
     logical :: list = .false.
     logical :: print_input = .false.
     logical :: print_flows = .false.
     logical :: save_flows = .false.
+    logical :: export_netcdf = .false.
     logical :: ftype = .false.
     logical :: fname = .false.
     logical :: pname = .false.
   end type GwtNamParamFoundType
 
   logical :: gwt_nam_multi_package = .false.
+
+  character(len=16), parameter :: &
+    gwt_nam_subpackages(*) = &
+    [ &
+    '                ' &
+    ]
 
   type(InputParamDefinitionType), parameter :: &
     gwtnam_list = InputParamDefinitionType &
@@ -91,6 +99,23 @@ module GwtNamInputModule
     )
 
   type(InputParamDefinitionType), parameter :: &
+    gwtnam_export_netcdf = InputParamDefinitionType &
+    ( &
+    'GWT', & ! component
+    'NAM', & ! subcomponent
+    'OPTIONS', & ! block
+    'EXPORT_NETCDF', & ! tag name
+    'EXPORT_NETCDF', & ! fortran variable
+    'STRING', & ! type
+    '', & ! shape
+    .false., & ! required
+    .false., & ! multi-record
+    .false., & ! preserve case
+    .false., & ! layered
+    .false. & ! timeseries
+    )
+
+  type(InputParamDefinitionType), parameter :: &
     gwtnam_ftype = InputParamDefinitionType &
     ( &
     'GWT', & ! component
@@ -148,6 +173,7 @@ module GwtNamInputModule
     gwtnam_print_input, &
     gwtnam_print_flows, &
     gwtnam_save_flows, &
+    gwtnam_export_netcdf, &
     gwtnam_ftype, &
     gwtnam_fname, &
     gwtnam_pname &

@@ -508,7 +508,7 @@ jobs:
         working-directory: modflow6
         run: pixi run install
 
-      - name: Test parallel MF6
+      - name: Test netcdf MF6
         uses: ./modflow6/.github/actions/test-netcdf
 
       - name: Upload failed test output

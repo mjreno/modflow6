@@ -1,5 +1,5 @@
-name: Test parallel MF6
-description: Build and test parallel MODFLOW 6
+name: Test netcdf MF6
+description: Build and test netcdf MODFLOW 6
 runs:
   using: "composite"
   steps:
@@ -98,7 +98,7 @@ runs:
 
     - name: Test programs
       shell: bash
-      working-directory: modflow6
+      working-directory: modflow6/autotest
       env:
         REPOS_PATH: ${{ github.workspace }}
       run: pixi run pytest test_gwf_chd01.py -s

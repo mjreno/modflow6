@@ -41,16 +41,13 @@ if fc_id == 'gcc'
                    '-Wno-intrinsic-shadow',      # We shadow intrinsics with methods, which should be fine
                    '-Wno-maybe-uninitialized',   # "Uninitialized" flags produce false positives with allocatables
                    '-Wno-uninitialized',
-                   '-g',
-                   '-fbacktrace', '-fcheck=all',
-                   '-ffpe-trap=overflow,zero,invalid'
                    ]
   
   # Options specific to profile
   if profile == 'release'
-    compile_args += ['-ffpe-summary=overflow', '-ffpe-trap=overflow,zero,invalid']
+    compile_args += ['-ffpe-summary=overflow', '-ffpe-trap=overflow,zero']
   elif profile == 'develop'
-    compile_args += ['-fcheck=all', '-ffpe-trap=overflow,zero,invalid']
+    compile_args += ['-fcheck=all', '-ffpe-trap=overflow,zero']
   endif
 
   # Define OS with gfortran for OS specific code

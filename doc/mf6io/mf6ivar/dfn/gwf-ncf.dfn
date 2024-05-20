@@ -5,8 +5,8 @@
 
 block options
 name ogc_wkt
-type longstring
-#type string
+#type longstring
+type string
 reader urword
 longname CRS well-known text (WKT) string
 description CRS well-known text (WKT) string.

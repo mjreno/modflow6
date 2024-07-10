@@ -1,6 +1,8 @@
 name: MODFLOW 6 continuous integration
 on:
   push:
+    branches:
+      - nc_readarray_test
     paths-ignore:
       - '**.md'
       - '**.pdf'

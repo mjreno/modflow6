@@ -8,7 +8,7 @@ runs:
       uses: fortran-lang/setup-fortran@v1
       with:
         compiler: gcc
-        version: 13
+        version: 12
 
     - name: Checkout PETSc
       uses: actions/checkout@v4

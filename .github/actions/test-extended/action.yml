@@ -8,7 +8,7 @@ runs:
       uses: fortran-lang/setup-fortran@v1
       with:
         compiler: gcc
-        version: 13
+        version: 12
 
     - name: Checkout PETSc
       uses: actions/checkout@v4
@@ -66,7 +66,7 @@ runs:
       run: |
         bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
         brew install netcdf-fortran
-        brew install gcc@13
+        brew install gcc@12
         nc-config --all
         nf-config
 

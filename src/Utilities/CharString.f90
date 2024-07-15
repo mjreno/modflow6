@@ -133,5 +133,4 @@ contains
     if (allocated(this%charstring)) deallocate (this%charstring)
   end subroutine destruct
 
-
 end module CharacterStringModule

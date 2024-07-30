@@ -20,11 +20,11 @@ except:
     msg += " pip install flopy"
     raise Exception(msg)
 
-try:
-    import xarray as xa
-    import xugrid as xu
-except ImportError:
-    pytest.skip("xarray and xugrid not found", allow_module_level=True)
+#try:
+import xarray as xa
+import xugrid as xu
+#except ImportError:
+#    pytest.skip("xarray and xugrid not found", allow_module_level=True)
 
 from framework import TestFramework
 from test_gwe_cnd import cases

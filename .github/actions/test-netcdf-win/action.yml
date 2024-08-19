@@ -7,10 +7,7 @@ runs:
     - name: Convert line endings
       shell: cmd
       run: |
-         unix2dos -n "%GITHUB_WORKSPACE%\modflow6\.github\common\compile_zlib.sh" "%TEMP%\compile_zlib.sh"
          unix2dos -n "%GITHUB_WORKSPACE%\modflow6\.github\common\compile_hdf5.sh" "%TEMP%\compile_hdf5.sh"
-         unix2dos -n "%GITHUB_WORKSPACE%\modflow6\.github\common\compile_netcdfc.sh" "%TEMP%\compile_netcdfc.sh"
-         unix2dos -n "%GITHUB_WORKSPACE%\modflow6\.github\common\compile_netcdff.sh" "%TEMP%\compile_netcdff.sh"
 
     - name: Hide Strawberry programs
       shell: bash

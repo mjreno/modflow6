@@ -1,0 +1,65 @@
+name: Build NetCDF (Windows)
+description: Build NetCDF on Windows with Cygwin
+runs:
+  using: "composite"
+  steps:
+
+    - name: Convert line endings
+      shell: cmd
+      run: |
+         unix2dos -n "%GITHUB_WORKSPACE%\modflow6\.github\common\compile_zlib.sh" "%TEMP%\compile_zlib.sh"
+         unix2dos -n "%GITHUB_WORKSPACE%\modflow6\.github\common\compile_hdf5.sh" "%TEMP%\compile_hdf5.sh"
+         unix2dos -n "%GITHUB_WORKSPACE%\modflow6\.github\common\compile_netcdfc.sh" "%TEMP%\compile_netcdfc.sh"
+         unix2dos -n "%GITHUB_WORKSPACE%\modflow6\.github\common\compile_netcdff.sh" "%TEMP%\compile_netcdff.sh"
+
+    - name: Hide Strawberry programs
+      shell: bash
+      run: |
+        mkdir "$RUNNER_TEMP/strawberry"
+        mv /c/Strawberry/c/bin/gmake "$RUNNER_TEMP/strawberry/gmake"
+        mv /c/Strawberry/perl/bin/pkg-config "$RUNNER_TEMP/strawberry/pkg-config"
+        mv /c/Strawberry/perl/bin/pkg-config.bat "$RUNNER_TEMP/strawberry/pkg-config.bat"
+
+    - name: Get date
+      id: get-date
+      shell: bash
+      run: echo "date=$(/bin/date -u "+%Y%m%d")" >> "$GITHUB_OUTPUT"
+
+    - name: Setup oneAPI
+      uses: ./modflow6/.github/actions/setup-par-oneapi
+
+    - name: Download HDF5
+      shell: bash
+      run: |
+        curl https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.14/hdf5-1.14.4/src/hdf5-1.14.4-3.tar.gz -O -J
+        mkdir hdf5
+        tar -xzf hdf5-1.14.4-3.tar.gz -C hdf5 --strip-components=1
+
+#    - name: Restore hdf5 cache
+#      id: hdf5-cache
+#      uses: actions/cache/restore@v3
+#      with:
+#        path: hdf5
+#        key: hdf5-${{ runner.os }}-${{ steps.get-date.outputs.date }}
+
+    - name: Setup Cygwin
+      uses: egor-tensin/setup-cygwin@v4
+      with:
+        packages: python3 make gcc-core gcc-g++ pkg-config m4 zlib-devel
+
+    - name: Hide Cygwin linker
+      shell: C:\tools\cygwin\bin\bash.exe --login --norc -eo pipefail -o igncr '{0}'
+      run: mv /usr/bin/link.exe /usr/bin/link-cygwin.exe
+
+    - name: Compile hdf5
+      if: steps.hdf5-cache.outputs.cache-hit != 'true'
+      shell: cmd
+      run: |
+        "%ONEAPI_ROOT%\setvars.bat" intel64 vs2022 && "C:\tools\cygwin\bin\bash.exe" --login --norc -eo pipefail -o igncr "%TEMP%\compile_hdf5.sh"
+
+    - name: Save hdf5 cache
+      if: steps.hdf5-cache.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v3
+      with:
+        path: hdf5
+        key: hdf5-${{ runner.os }}-${{ steps.get-date.outputs.date }}

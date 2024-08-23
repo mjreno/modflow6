@@ -51,7 +51,7 @@ runs:
 #      if: steps.petsc-cache.outputs.cache-hit != 'true'
       uses: egor-tensin/setup-cygwin@v4
       with:
-        packages: python3 make gcc-core gcc-g++ pkg-config zlib-devel netcdf-fortran
+        packages: python3 make gcc-core gcc-g++ pkg-config zlib-devel libnetcdf-fortran-devel
 
     - name: Hide Cygwin linker
 #      if: steps.petsc-cache.outputs.cache-hit != 'true'

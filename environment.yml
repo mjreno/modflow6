@@ -5,7 +5,7 @@ channels:
   - defaults
 
 dependencies:
-  - python>=3.10
+  - python>=3.9
   - appdirs
   - codespell
   - filelock
@@ -39,4 +39,4 @@ dependencies:
   - scipy
   - shapely
   - syrupy
-  
+  - netcdf-fortran

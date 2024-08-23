@@ -106,7 +106,7 @@ jobs:
 
       - name: Install additional netcdf testing packages
         working-directory: modflow6
-        run: pixi run pip install xugrid xarray netcdf4 netcdf-fortran
+        run: pixi run pip install xugrid xarray netcdf4
 
       - name: Test extended MF6
         if: runner.os != 'Windows'

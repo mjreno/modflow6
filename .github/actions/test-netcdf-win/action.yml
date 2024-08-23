@@ -48,13 +48,13 @@ runs:
         tar -xzf petsc-3.20.5.tar.gz -C petsc --strip-components=1
 
     - name: Setup Cygwin
-      if: steps.petsc-cache.outputs.cache-hit != 'true'
+#      if: steps.petsc-cache.outputs.cache-hit != 'true'
       uses: egor-tensin/setup-cygwin@v4
       with:
         packages: python3 make gcc-core gcc-g++ pkg-config zlib-devel netcdf-fortran
 
     - name: Hide Cygwin linker
-      if: steps.petsc-cache.outputs.cache-hit != 'true'
+#      if: steps.petsc-cache.outputs.cache-hit != 'true'
       shell: C:\tools\cygwin\bin\bash.exe --login --norc -eo pipefail -o igncr '{0}'
       run: mv /usr/bin/link.exe /usr/bin/link-cygwin.exe
 
@@ -113,8 +113,8 @@ runs:
     - name: Convert unix2dos
       shell: cmd
       run: |
-        unix2dos -n "%GITHUB_WORKSPACE%\modflow6\.github\common\test_modflow6_parallel.bat" "%TEMP%\test_modflow6_parallel.bat"
-        unix2dos -n "%GITHUB_WORKSPACE%\modflow6\.github\common\test_modflow6_serial.bat" "%TEMP%\test_modflow6_serial.bat"
+        unix2dos -n "%GITHUB_WORKSPACE%\modflow6\.github\common\test_ext_parallel.bat" "%TEMP%\test_ext_parallel.bat"
+        unix2dos -n "%GITHUB_WORKSPACE%\modflow6\.github\common\test_ext_serial.bat" "%TEMP%\test_ext_serial.bat"
 
     - name: Test programs
       if: github.ref_name != 'master'
@@ -122,7 +122,7 @@ runs:
       env:
         REPOS_PATH: ${{ github.workspace }}
       run: |
-        "%ONEAPI_ROOT%\setvars.bat" intel64 vs2022 && "%TEMP%\test_modflow6_parallel.bat"
+        "%ONEAPI_ROOT%\setvars.bat" intel64 vs2022 && "%TEMP%\test_ext_parallel.bat"
 
     - name: Test programs
       if: github.ref_name == 'master'
@@ -131,7 +131,7 @@ runs:
         REPOS_PATH: ${{ github.workspace }}
         MARKERS: not developmode
       run: |
-        "%ONEAPI_ROOT%\setvars.bat" intel64 vs2022 && "%TEMP%\test_modflow6_parallel.bat"
+        "%ONEAPI_ROOT%\setvars.bat" intel64 vs2022 && "%TEMP%\test_ext_parallel.bat"
 
     - name: Test programs (serial)
       if: github.ref_name != 'master'
@@ -139,7 +139,7 @@ runs:
       env:
         REPOS_PATH: ${{ github.workspace }}
       run: |
-        "%ONEAPI_ROOT%\setvars.bat" intel64 vs2022 && "%TEMP%\test_modflow6_serial.bat"
+        "%ONEAPI_ROOT%\setvars.bat" intel64 vs2022 && "%TEMP%\test_ext_serial.bat"
 
     - name: Test programs (serial)
       if: github.ref_name == 'master'
@@ -148,4 +148,4 @@ runs:
         REPOS_PATH: ${{ github.workspace }}
         MARKERS: not developmode
       run: |
-        "%ONEAPI_ROOT%\setvars.bat" intel64 vs2022 && "%TEMP%\test_modflow6_serial.bat"
+        "%ONEAPI_ROOT%\setvars.bat" intel64 vs2022 && "%TEMP%\test_ext_serial.bat"

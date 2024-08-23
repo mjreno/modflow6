@@ -58,6 +58,13 @@ runs:
       shell: C:\tools\cygwin\bin\bash.exe --login --norc -eo pipefail -o igncr '{0}'
       run: mv /usr/bin/link.exe /usr/bin/link-cygwin.exe
 
+    - name: Check env
+      shell: C:\tools\cygwin\bin\bash.exe --login --norc -eo pipefail -o igncr '{0}'
+      run: |
+        ls -a /usr/bin
+        which pkg-config
+        pkg-config --list-all
+
     - name: Configure PETSc
       if: steps.petsc-cache.outputs.cache-hit != 'true'
       shell: cmd

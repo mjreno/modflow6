@@ -1,3 +1,4 @@
+cd "%GITHUB_WORKSPACE%\modflow6"
 pixi shell
 which meson
 which pkg-config

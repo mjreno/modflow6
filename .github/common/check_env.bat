@@ -1,10 +1,8 @@
 cd "%GITHUB_WORKSPACE%\modflow6"
-pixi shell
-which meson
-which pkg-config
-pkg-config --list-all
-pkg-config --libs netcdf
-pkg-config --libs netcdf-fortran
-pkg-config --cflags netcdf
-pkg-config --cflags netcdf-fortran
-exit
+pixi run which meson
+pixi run which pkg-config
+pixi run pkg-config --list-all
+pixi run pkg-config --libs netcdf
+pixi run pkg-config --libs netcdf-fortran
+pixi run pkg-config --cflags netcdf
+pixi run pkg-config --cflags netcdf-fortran

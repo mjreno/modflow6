@@ -37,6 +37,8 @@ scipy = "*"
 shapely = "*"
 syrupy = "*"
 xmipy = "*"
+pkg-config = "*"
+netcdf-fortram = "*"
 
 [feature.rtd.dependencies]
 numpy = "*"

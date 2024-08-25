@@ -117,8 +117,8 @@ runs:
         echo "HERE2"
         type "%TEMP%\compile_zlib.bat"
         echo "HERE3"
-        #"%ONEAPI_ROOT%\setvars.bat" intel64 vs2022 && "C:\tools\cygwin\bin\bash.exe" --login --norc -eo pipefail -o igncr "%TEMP%\compile_zlib.sh"
-        "%ONEAPI_ROOT%\setvars.bat" intel64 vs2022 && "%TEMP%\compile_zlib.bat"
+        "%ONEAPI_ROOT%\setvars.bat" intel64 vs2022 && "C:\tools\cygwin\bin\bash.exe" --login --norc -eo pipefail -o igncr "%TEMP%\compile_zlib.bat"
+        #"%ONEAPI_ROOT%\setvars.bat" intel64 vs2022 && "%TEMP%\compile_zlib.bat"
         #echo "PKG_CONFIG_PATH=$GITHUB_WORKSPACE/zlib/lib/pkgconfig" >> $GITHUB_ENV
         #echo "$GITHUB_WORKSPACE/zlib/lib" >> $GITHUB_PATH
 

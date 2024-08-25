@@ -115,7 +115,7 @@ runs:
         echo "HERE1"
         unix2dos -n "%GITHUB_WORKSPACE%\modflow6\.github\common\compile_zlib.sh" "%TEMP%\compile_zlib.sh"
         echo "HERE2"
-        "%TEMP%\compile_zlib.sh"
+        type "%TEMP%\compile_zlib.sh"
         echo "HERE3"
         #"%ONEAPI_ROOT%\setvars.bat" intel64 vs2022 && "C:\tools\cygwin\bin\bash.exe" --login --norc -eo pipefail -o igncr "%TEMP%\compile_zlib.sh"
         "%ONEAPI_ROOT%\setvars.bat" intel64 vs2022 && "%TEMP%\compile_zlib.sh"

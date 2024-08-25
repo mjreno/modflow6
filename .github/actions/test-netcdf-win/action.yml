@@ -48,13 +48,13 @@ runs:
         tar -xzf petsc-3.20.5.tar.gz -C petsc --strip-components=1
 
     - name: Setup Cygwin
-#      if: steps.petsc-cache.outputs.cache-hit != 'true'
+      if: steps.petsc-cache.outputs.cache-hit != 'true'
       uses: egor-tensin/setup-cygwin@v4
       with:
         packages: python3 make gcc-core gcc-g++ pkg-config
 
     - name: Hide Cygwin linker
-#      if: steps.petsc-cache.outputs.cache-hit != 'true'
+      if: steps.petsc-cache.outputs.cache-hit != 'true'
       shell: C:\tools\cygwin\bin\bash.exe --login --norc -eo pipefail -o igncr '{0}'
       run: mv /usr/bin/link.exe /usr/bin/link-cygwin.exe
 
@@ -86,11 +86,42 @@ runs:
         echo PETSC_ARCH=%PETSC_ARCH%>>%GITHUB_ENV%
         echo %PETSC_DIR%\%PETSC_ARCH%\lib>>%GITHUB_PATH%
 
-    - name: Check env
+#    - name: Download for NetCDF build
+#      shell: bash
+#      run: |
+#        curl https://zlib.net/zlib-1.3.1.tar.gz -O -J
+#        curl https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.14/hdf5-1.14.4/src/hdf5-1.14.4-3.tar.gz -O -J
+#        curl https://downloads.unidata.ucar.edu/netcdf-c/4.9.2/netcdf-c-4.9.2.tar.gz -O -J
+#        curl https://downloads.unidata.ucar.edu/netcdf-fortran/4.6.1/netcdf-fortran-4.6.1.tar.gz -O -J
+#        mkdir zlib
+#        mkdir hdf5
+#        mkdir netcdf-c
+#        mkdir netcdf-f
+#        tar -xzf zlib-1.3.1.tar.gz -C zlib --strip-components=1
+#        tar -xzf hdf5-1.14.4-3.tar.gz -C hdf5 --strip-components=1
+#        tar -xzf netcdf-c-4.9.2.tar.gz -C netcdf-c --strip-components=1
+#        tar -xzf netcdf-fortran-4.6.1.tar.gz -C netcdf-f --strip-components=1
+
+    - name: Download zlib
+      shell: bash
+      run: |
+        curl https://zlib.net/zlib-1.3.1.tar.gz -O -J
+        mkdir zlib
+        tar -xzf zlib-1.3.1.tar.gz -C zlib --strip-components=1
+
+    - name: Compile zlib
       shell: cmd
       run: |
-        unix2dos -n "%GITHUB_WORKSPACE%\modflow6\.github\common\check_env.bat" "%TEMP%\check_env.bat"
-        "%TEMP%\check_env.bat"
+        unix2dos -n "%GITHUB_WORKSPACE%\modflow6\.github\common\compile_zlib.sh" "%TEMP%\compile_zlib.sh"
+        "%ONEAPI_ROOT%\setvars.bat" intel64 vs2022 && "C:\tools\cygwin\bin\bash.exe" --login --norc -eo pipefail -o igncr "%TEMP%\compile_zlib.sh"
+        #echo "PKG_CONFIG_PATH=$GITHUB_WORKSPACE/zlib/lib/pkgconfig" >> $GITHUB_ENV
+        #echo "$GITHUB_WORKSPACE/zlib/lib" >> $GITHUB_PATH
+
+    - name: Update pixi
+      shell: cmd
+      run: |
+        unix2dos -n "%GITHUB_WORKSPACE%\modflow6\.github\common\update_pixi.bat" "%TEMP%\update_pixi.bat"
+        "%TEMP%\update_pixi.bat"
 
     - name: Build modflow6
       shell: cmd

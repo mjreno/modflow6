@@ -39,5 +39,3 @@ dependencies:
   - scipy
   - shapely
   - syrupy
-  - pkg-config
-  - netcdf-fortran

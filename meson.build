@@ -173,14 +173,6 @@ endif
 
 if is_extended_build
   # find netcdf
-  #if build_machine.system() != 'windows'
-  #  netcdff = dependency('netcdf', language : 'fortran', required : false)
-  #else
-  #  # For CI testing only; Windows not yet supported
-  #  nc_dir = meson.project_source_root() / '..' / 'ncf' / 'netcdf-fortran-4.6.1' / 'fortran'
-  #  netcdff = fc.find_library('netcdff', dirs: [ nc_dir ], required : false, static : false)
-  #  #nc_incdir = include_directories([ nc_dir ])
-  #endif
   netcdff = dependency('netcdf', language : 'fortran', required : false)
   if netcdff.found()
     with_netcdf = true

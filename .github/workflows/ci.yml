@@ -1,6 +1,9 @@
 name: MODFLOW 6 continuous integration
 on:
   push:
+    branches:
+      - master
+      - develop
     paths-ignore:
       - '**.md'
       - '**.pdf'

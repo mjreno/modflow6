@@ -1,6 +1,9 @@
 name: MODFLOW 6 documentation
 on:
   push:
+    branches:
+      - master
+      - develop
     paths-ignore:
       - '.github/workflows/release.yml'
       - '.github/workflows/ci.yml'

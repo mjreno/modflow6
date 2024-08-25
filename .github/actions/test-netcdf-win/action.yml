@@ -48,7 +48,7 @@ runs:
         tar -xzf petsc-3.20.5.tar.gz -C petsc --strip-components=1
 
     - name: Setup Cygwin
-      if: steps.petsc-cache.outputs.cache-hit != 'true'
+#      if: steps.petsc-cache.outputs.cache-hit != 'true'
       uses: egor-tensin/setup-cygwin@v4
       with:
         packages: python3 make gcc-core gcc-g++ pkg-config
@@ -113,12 +113,12 @@ runs:
       shell: cmd
       run: |
         echo "HERE1"
-        unix2dos -n "%GITHUB_WORKSPACE%\modflow6\.github\common\compile_zlib.bat" "%TEMP%\compile_zlib.bat"
+        unix2dos -n "%GITHUB_WORKSPACE%\modflow6\.github\common\compile_zlib.sh" "%TEMP%\compile_zlib.sh"
         echo "HERE2"
-        type "%TEMP%\compile_zlib.bat"
+        type "%TEMP%\compile_zlib.sh"
         echo "HERE3"
-        "%ONEAPI_ROOT%\setvars.bat" intel64 vs2022 && "C:\tools\cygwin\bin\bash.exe" --login --norc -eo pipefail -o igncr "%TEMP%\compile_zlib.bat"
-        #"%ONEAPI_ROOT%\setvars.bat" intel64 vs2022 && "%TEMP%\compile_zlib.bat"
+        "%ONEAPI_ROOT%\setvars.bat" intel64 vs2022 && "C:\tools\cygwin\bin\bash.exe" --login --norc -eo pipefail -o igncr "%TEMP%\compile_zlib.sh"
+        #"%ONEAPI_ROOT%\setvars.bat" intel64 vs2022 && "%TEMP%\compile_zlib.sh"
         #echo "PKG_CONFIG_PATH=$GITHUB_WORKSPACE/zlib/lib/pkgconfig" >> $GITHUB_ENV
         #echo "$GITHUB_WORKSPACE/zlib/lib" >> $GITHUB_PATH
 

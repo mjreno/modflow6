@@ -1,6 +1,8 @@
 name: MODFLOW 6 continuous integration
 on:
   push:
+    branches:
+      - netcdf_ciwin_test
     paths-ignore:
       - '**.md'
       - '**.pdf'
@@ -546,6 +548,53 @@ jobs:
       - name: Test parallel MF6 (Windows)
         if: runner.os == 'Windows'
         uses: ./modflow6/.github/actions/test-par-win
+
+      - name: Upload failed test output
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: failed-${{ matrix.os }}
+          path: modflow6/autotest/.failed
+
+  netcdf_test:
+    name: NetCDF executable testing
+    needs:
+      - lint
+      - build
+      - smoke_test
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu-22.04, macos-12, windows-2022 ]
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+
+      - name: Checkout MF6
+        uses: actions/checkout@v4
+        with:
+          path: modflow6
+
+      - name: Setup pixi
+        uses: prefix-dev/setup-pixi@v0.8.1
+        with:
+          pixi-version: v0.24.2
+          manifest-path: "modflow6/pixi.toml"
+
+      - name: Custom pixi install
+        working-directory: modflow6
+        run: pixi run install
+
+      - name: Install additional netcdf testing packages
+        working-directory: modflow6
+        run: pixi run pip install xugrid xarray netcdf4
+
+      - name: Test extended MF6
+        if: runner.os != 'Windows'
+        uses: ./modflow6/.github/actions/test-extended
 
       - name: Upload failed test output
         if: failure()

@@ -7,7 +7,7 @@ runs:
     - name: Convert line endings
       shell: cmd
       run: |
-        unix2dos -n "%GITHUB_WORKSPACE%\modflow6\.github\common\compile_netcdf.sh" "%TEMP%\compile_netcdf.sh"
+        unix2dos -n "%GITHUB_WORKSPACE%\modflow6\.github\common\compile_netcdf.bat" "%TEMP%\compile_netcdf.bat"
 
     - name: Get date
       id: get-date
@@ -43,7 +43,7 @@ runs:
     - name: Build NetCDF
       shell: cmd
       run: |
-        "%ONEAPI_ROOT%\setvars.bat" intel64 vs2022 && "C:\tools\cygwin\bin\bash.exe" --login --norc -eo pipefail -o igncr "%TEMP%\compile_netcdf.sh"
+        "%ONEAPI_ROOT%\setvars.bat" intel64 vs2022 && "%TEMP%\compile_netcdf.bat"
 
 #    - name: Setup PETSC environment
 #      shell: cmd

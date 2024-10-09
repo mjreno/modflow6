@@ -1,5 +1,5 @@
-name: Test Extended MF6
-description: Build and test Extended MODFLOW 6
+name: Test NetCDF MF6
+description: Build and test NetCDF MODFLOW 6
 runs:
   using: "composite"
   steps:
@@ -36,7 +36,7 @@ runs:
       shell: bash
       working-directory: modflow6
       run: |
-        pixi run setup -Dextended=true builddir
+        pixi run setup -Dnetcdf=true builddir
         pixi run build builddir
         pixi run test builddir
 

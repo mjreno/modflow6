@@ -99,9 +99,9 @@ elif fc_id == 'intel-llvm-cl'
 endif
 
 # parallel build options
-is_netcdf_build = get_option('netcdf')
 is_extended_build = get_option('extended')
 is_parallel_build = get_option('parallel') or is_extended_build
+is_netcdf_build = get_option('netcdf') or is_extended_build
 is_cray = get_option('cray')
 is_mpich = get_option('mpich')
 if is_cray and build_machine.system() != 'linux'
@@ -146,7 +146,7 @@ netcdff_compiled_rel = netcdf_dir_rel / netcdff_build
 netcdff_compiled_abs = netcdf_dir_abs / netcdff_build
 
 # on windows only with intel
-if build_machine.system() == 'windows' and (is_extended_build or is_netcdf_build)
+if build_machine.system() == 'windows' and is_parallel_build
   if fc_id != 'intel-cl'
     error('Parallel build on Windows only with intel compiler. Terminating...')
   endif
@@ -186,7 +186,7 @@ endif
 
 # find netcdf
 with_netcdf = false
-if is_netcdf_build or is_extended_build
+if is_netcdf_build
   netcdff = dependency('netcdf', language : 'fortran', required : true)
   if netcdff.found()
     with_netcdf = true

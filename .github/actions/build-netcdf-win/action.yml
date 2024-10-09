@@ -24,10 +24,10 @@ runs:
       shell: bash
       run: |
         mkdir netcdf
-        cd netcdf
+        mkdir netcdf/netCDF4.9.2-NC4-64
+        cd netcdf/netCDF4.9.2-NC4-64
         curl https://downloads.unidata.ucar.edu/netcdf-c/4.9.2/netCDF4.9.2-NC4-64.exe -O -J
         7z x netCDF4.9.2-NC4-64.exe -aou
-        ls netCDF4.9.2-NC4-64
 
     - name: Download NetCDF-Fortran
       shell: bash

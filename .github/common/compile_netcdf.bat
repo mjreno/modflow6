@@ -5,9 +5,10 @@ dir netcdf-fortran-4.6.1_build
 cd netcdf-fortran-4.6.1_build\build
 
 where ifort
-echo %CMAKE_Fortran_COMPILER%
+cmake --version
 cmake --help
 
+set CMAKE_Fortran_COMPILER=C:\Program Files (x86)\Intel\oneAPI\compiler\latest\bin\ifort.exe
 set FC=ifort
 
 :: FIRST BUILD/INSTALL STATIC LIBS

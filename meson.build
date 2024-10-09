@@ -136,13 +136,13 @@ petsc_compiled_rel = petsc_dir_rel / petsc_arch
 petsc_compiled_abs = petsc_dir_abs / petsc_arch
 
 # windows options for netcdf
-#netcdf_dir_rel = '..' /'netcdf'
+netcdf_dir_rel = '..' /'netcdf'
 netcdf_dir_abs = meson.project_source_root() / '..' /'netcdf'
 netcdfc_build = 'netCDF4.9.2-NC4-64'
 netcdff_build = 'netcdf-fortran-4.6.1_build'
-#netcdfc_compiled_rel = netcdf_dir_rel / netcdfc_build
+netcdfc_compiled_rel = netcdf_dir_rel / netcdfc_build
 netcdfc_compiled_abs = netcdf_dir_abs / netcdfc_build
-#netcdff_compiled_rel = netcdf_dir_rel / netcdff_build
+netcdff_compiled_rel = netcdf_dir_rel / netcdff_build
 netcdff_compiled_abs = netcdf_dir_abs / netcdff_build
 
 # on windows only with intel
@@ -194,8 +194,8 @@ if is_netcdf_build or is_extended_build
     dependencies += [ netcdff ]
     if build_machine.system() == 'windows'
       netcdf_incdir = include_directories([
-        netcdfc_compiled_abs / 'include',
-        netcdff_compiled_abs / 'fortran' / 'Release'
+        netcdfc_compiled_rel / 'include',
+        netcdff_compiled_rel / 'fortran' / 'Release'
       ])
     endif
   endif

@@ -592,9 +592,13 @@ jobs:
         working-directory: modflow6
         run: pixi run pip install xugrid xarray netcdf4
 
-      - name: Test extended MF6
+      - name: Test NetCDF MF6
         if: runner.os != 'Windows'
-        uses: ./modflow6/.github/actions/test-extended
+        uses: ./modflow6/.github/actions/test-netcdf
+
+      - name: Test NetCDF MF6
+        if: runner.os == 'Windows'
+        uses: ./modflow6/.github/actions/test-netcdf-win
 
       - name: Upload failed test output
         if: failure()

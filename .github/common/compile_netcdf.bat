@@ -11,7 +11,8 @@ where micromamba
 cmake --version
 cmake --help
 
-ifort /c "program test; print *, 'Hello, World!'; end program test;"
+ifort temp.f90 -o hello.exe
+hello.exe
 
 :: set CMAKE_Fortran_COMPILER=C:\Program Files (x86)\Intel\oneAPI\compiler\latest\bin\ifort.exe
 :: set CMAKE_Fortran_COMPILER=ifort

@@ -9,17 +9,17 @@ cd netcdf-fortran-4.6.1_build\build
 
 where ifort
 where ifx
-where conda
-where mamba
-where micromamba
 cmake --version
 :: cmake --help
+:: where conda
+:: where mamba
+:: where micromamba
 
 :: %GITHUB_WORKSPACE%
 :: D:/a/modflow6/modflow6
 
 :: FIRST BUILD/INSTALL STATIC LIBS
-cmake --fresh -G "Visual Studio 17 2022" -A x64 -DCMAKE_Fortran_COMPILER="C:/Program Files (x86)/Intel/oneAPI/compiler/latest/bin/ifort.exe" -DNETCDF_C_LIBRARY="D:/a/modflow6/modflow6/netcdf/netCDF4.9.2-NC4-64/lib/netcdf.lib" -DNETCDF_C_INCLUDE_DIR="D:/a/modflow6/modflow6/netcdf/netCDF4.9.2-NC4-64/include" -DBUILD_SHARED_LIBS=0 -DCMAKE_INSTALL_PREFIX="D:/a/modflow6/modflow6/netcdf/netcdf-fortran-4.6.1_build/build" ../netcdf-fortran-4.6.1
+cmake --fresh -G "Visual Studio 17 2022" -A x64 -DCMAKE_Fortran_COMPILER="C:/Program Files (x86)/Intel/oneAPI/compiler/latest/bin/ifx.exe" -DNETCDF_C_LIBRARY="D:/a/modflow6/modflow6/netcdf/netCDF4.9.2-NC4-64/lib/netcdf.lib" -DNETCDF_C_INCLUDE_DIR="D:/a/modflow6/modflow6/netcdf/netCDF4.9.2-NC4-64/include" -DBUILD_SHARED_LIBS=0 -DCMAKE_INSTALL_PREFIX="D:/a/modflow6/modflow6/netcdf/netcdf-fortran-4.6.1_build/build" ../netcdf-fortran-4.6.1
 cmake --build . --config Release
 cmake –install .
 

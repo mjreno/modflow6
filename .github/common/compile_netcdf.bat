@@ -2,6 +2,9 @@ cd "%GITHUB_WORKSPACE%\netcdf"
 dir netCDF4.9.2-NC4-64
 dir netcdf-fortran-4.6.1_build
 
+ifort temp.f90 -o hello.exe
+hello.exe
+
 cd netcdf-fortran-4.6.1_build\build
 
 where ifort
@@ -10,9 +13,6 @@ where mamba
 where micromamba
 cmake --version
 cmake --help
-
-ifort temp.f90 -o hello.exe
-hello.exe
 
 :: set CMAKE_Fortran_COMPILER=C:\Program Files (x86)\Intel\oneAPI\compiler\latest\bin\ifort.exe
 :: set CMAKE_Fortran_COMPILER=ifort

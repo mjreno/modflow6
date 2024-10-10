@@ -58,8 +58,7 @@ runs:
     - name: Build NetCDF
       shell: cmd
       run: |
-        "%TEMP%\compile_netcdf.bat"
-#        "%ONEAPI_ROOT%\setvars.bat" intel64 vs2022 && "%TEMP%\compile_netcdf.bat"
+        "%ONEAPI_ROOT%\setvars.bat" intel64 vs2022 && "%TEMP%\compile_netcdf.bat"
 
 #    - name: Setup PETSC environment
 #      shell: cmd

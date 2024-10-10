@@ -2,7 +2,7 @@ cd "%GITHUB_WORKSPACE%\netcdf"
 dir netCDF4.9.2-NC4-64
 dir netcdf-fortran-4.6.1_build
 
-"C:\Program Files (x86)\Intel\oneAPI\setvars.bat"
+"C:\Program Files (x86)\Intel\oneAPI\setvars.bat" intel64 vs2022
 
 ifort temp.f90 -o hello.exe
 hello.exe

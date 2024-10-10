@@ -5,6 +5,10 @@ dir netcdf-fortran-4.6.1_build
 ifort temp.f90 -o hello.exe
 hello.exe
 
+echo %PATH%
+set PATH="C:\Program Files (x86)\Intel\oneAPI\compiler\latest\bin";%PATH%
+echo %PATH%
+
 cd netcdf-fortran-4.6.1_build\build
 
 where ifort

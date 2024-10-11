@@ -138,6 +138,7 @@ petsc_compiled_abs = petsc_dir_abs / petsc_arch
 # windows options for netcdf
 netcdf_dir_rel = '..' /'netcdf'
 netcdf_dir_abs = meson.project_source_root() / '..' / 'netcdf'
+message('NetCDF dir abs: ', netcdf_dir_abs)
 netcdfc_build = 'netCDF4.9.2-NC4-64'
 netcdff_build = 'netcdf-fortran-4.6.1_build' / 'build'
 netcdfc_compiled_rel = netcdf_dir_rel / netcdfc_build

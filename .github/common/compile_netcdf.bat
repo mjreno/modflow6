@@ -44,6 +44,9 @@ set PATH=%GITHUB_WORKSPACE%\netcdf\netcdf-fortran-4.6.1_build\build\bin;%PATH%
 
 set FC=ifort
 cd "%GITHUB_WORKSPACE%\modflow6"
+dir
+dir ..
+dir ../..
 pixi run setup -Dnetcdf=true builddir
 pixi run build builddir
 pixi run test builddir

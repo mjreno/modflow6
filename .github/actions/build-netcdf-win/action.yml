@@ -68,3 +68,14 @@ runs:
 #        echo PETSC_DIR=%PETSC_DIR%>>%GITHUB_ENV%
 #        echo PETSC_ARCH=%PETSC_ARCH%>>%GITHUB_ENV%
 #        echo %PETSC_DIR%\%PETSC_ARCH%\lib>>%GITHUB_PATH%
+    - name: Setup NetCDF environment
+      shell: cmd
+      run: |
+        set PKG_CONFIG_PATH=%GITHUB_WORKSPACE%\netcdf\netcdf-fortran-4.6.1_build\build\lib\pkgconfig\;%PKG_CONFIG_PATH%
+        set PKG_CONFIG_PATH=%GITHUB_WORKSPACE%\netcdf\netCDF4.9.2-NC4-64\lib\pkgconfig\;%PKG_CONFIG_PATH%
+        set PATH=%GITHUB_WORKSPACE%\netcdf\netCDF4.9.2-NC4-64\include;%PATH%
+        set PATH=%GITHUB_WORKSPACE%\netcdf\netcdf-fortran-4.6.1_build\build\fortran\Release;%PATH%
+        set PATH=%GITHUB_WORKSPACE%\netcdf\netCDF4.9.2-NC4-64\bin;%PATH%
+        set PATH=%GITHUB_WORKSPACE%\netcdf\netcdf-fortran-4.6.1_build\build\bin;%PATH%
+        echo PKG_CONFIG_PATH=%PKG_CONFIG_PATH%>>%GITHUB_ENV%
+        echo PATH=%PATH%>>%GITHUB_PATH%

@@ -35,6 +35,10 @@ cmake --fresh -G Ninja -DCMAKE_Fortran_COMPILER="C:/Program Files (x86)/Intel/on
 cmake --build . --config Release
 cmake –install .
 
+dir .
+dir bin
+dir D:\a\modflow6\modflow6\modflow6\..\netcdf
+
 set PKG_CONFIG_PATH=%GITHUB_WORKSPACE%\netcdf\netcdf-fortran-4.6.1_build\build\lib\pkgconfig\;%PKG_CONFIG_PATH%
 set PKG_CONFIG_PATH=%GITHUB_WORKSPACE%\netcdf\netCDF4.9.2-NC4-64\lib\pkgconfig\;%PKG_CONFIG_PATH%
 set PATH=%GITHUB_WORKSPACE%\netcdf\netCDF4.9.2-NC4-64\include;%PATH%
@@ -46,7 +50,7 @@ set FC=ifort
 cd "%GITHUB_WORKSPACE%\modflow6"
 dir
 dir ..
-dir ../..
+dir ..\..
 pixi run setup -Dnetcdf=true builddir
 pixi run build builddir
 pixi run test builddir

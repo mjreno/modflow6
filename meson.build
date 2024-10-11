@@ -196,7 +196,7 @@ if is_netcdf_build
     if build_machine.system() == 'windows'
       netcdf_incdir = include_directories([
         netcdfc_compiled_rel / 'include',
-        netcdff_compiled_rel / 'fortran' / 'Release'
+        netcdff_compiled_rel / 'fortran'
       ])
     endif
   endif

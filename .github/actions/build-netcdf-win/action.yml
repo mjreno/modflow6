@@ -25,7 +25,8 @@ runs:
     - name: Get specific version CMake, 3.28.0-msvc1
       uses: lukka/get-cmake@latest
       with:
-        cmakeVersion: "3.28.0"
+        cmakeVersion: latest
+        ninjaVersion: latest
 
     - name: Setup oneAPI
       uses: ./modflow6/.github/actions/setup-par-oneapi

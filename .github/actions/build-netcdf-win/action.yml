@@ -8,7 +8,6 @@ runs:
       shell: cmd
       run: |
         unix2dos -n "%GITHUB_WORKSPACE%\modflow6\.github\common\compile_netcdf.bat" "%TEMP%\compile_netcdf.bat"
-        unix2dos -n "%GITHUB_WORKSPACE%\modflow6\.github\common\temp.f90" "%TEMP%\temp.f90"
 
     - name: Hide Strawberry programs
       shell: bash
@@ -26,7 +25,7 @@ runs:
     - name: Get specific version CMake, 3.28.0-msvc1
       uses: lukka/get-cmake@latest
       with:
-        cmakeVersion: "~3.28.0"
+        cmakeVersion: "3.28.0"
 
     - name: Setup oneAPI
       uses: ./modflow6/.github/actions/setup-par-oneapi

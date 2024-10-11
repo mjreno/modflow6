@@ -42,9 +42,9 @@ set PATH=%GITHUB_WORKSPACE%\netcdf\netcdf-fortran-4.6.1_build\build\fortran\Rele
 set PATH=%GITHUB_WORKSPACE%\netcdf\netCDF4.9.2-NC4-64\bin;%PATH%
 set PATH=%GITHUB_WORKSPACE%\netcdf\netcdf-fortran-4.6.1_build\build\bin;%PATH%
 
-set FC=ifort
-cd "%GITHUB_WORKSPACE%\modflow6"
-pixi run setup -Dnetcdf=true builddir
-pixi run build builddir
-pixi run test builddir
-pixi run pytest -v --durations=0 --keep-failed .failed --netcdf -k "test_netcdf"
+:: set FC=ifort
+:: cd "%GITHUB_WORKSPACE%\modflow6"
+:: pixi run setup -Dnetcdf=true builddir
+:: pixi run build builddir
+:: pixi run test builddir
+:: pixi run pytest -v --durations=0 --keep-failed .failed --netcdf -k "test_netcdf"

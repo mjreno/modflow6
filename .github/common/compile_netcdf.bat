@@ -36,7 +36,7 @@ cmake --build . --config Release
 cmake –install .
 
 dir .
-dir bin
+dir fortran
 dir D:\a\modflow6\modflow6\modflow6\..\netcdf
 
 set PKG_CONFIG_PATH=%GITHUB_WORKSPACE%\netcdf\netcdf-fortran-4.6.1_build\build\lib\pkgconfig\;%PKG_CONFIG_PATH%

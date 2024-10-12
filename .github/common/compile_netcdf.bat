@@ -28,15 +28,16 @@ cmake --version
 :: cmake --fresh -G "Visual Studio 17 2022" -A x64 -DCMAKE_Fortran_COMPILER="C:/Program Files (x86)/Intel/oneAPI/compiler/latest/bin/ifort.exe" -DNETCDF_C_LIBRARY="D:/a/modflow6/modflow6/netcdf/netCDF4.9.2-NC4-64/lib/netcdf.lib" -DNETCDF_C_INCLUDE_DIR="D:/a/modflow6/modflow6/netcdf/netCDF4.9.2-NC4-64/include" -DBUILD_SHARED_LIBS=0 -DCMAKE_INSTALL_PREFIX="D:/a/modflow6/modflow6/netcdf/netcdf-fortran-4.6.1_build/build" ../netcdf-fortran-4.6.1
 cmake --fresh -G Ninja -DCMAKE_Fortran_COMPILER="C:/Program Files (x86)/Intel/oneAPI/compiler/latest/bin/ifort.exe" -DNETCDF_C_LIBRARY="D:/a/modflow6/modflow6/netcdf/netCDF4.9.2-NC4-64/lib/netcdf.lib" -DNETCDF_C_INCLUDE_DIR="D:/a/modflow6/modflow6/netcdf/netCDF4.9.2-NC4-64/include" -DBUILD_SHARED_LIBS=0 -DCMAKE_INSTALL_PREFIX="D:/a/modflow6/modflow6/netcdf/netcdf-fortran-4.6.1_build/build" ../netcdf-fortran-4.6.1
 cmake --build . --config Release
-cmake –install .
+cmake –install . --config Release
 
 :: BUILD/INSTALL SHARED LIBS
 cmake --fresh -G Ninja -DCMAKE_Fortran_COMPILER="C:/Program Files (x86)/Intel/oneAPI/compiler/latest/bin/ifort.exe" -DNETCDF_C_LIBRARY="%GITHUB_WORKSPACE%/netcdf/netCDF4.9.2-NC4-64/lib/netcdf.lib" -DNETCDF_C_INCLUDE_DIR="%GITHUB_WORKSPACE%/netcdf/netCDF4.9.2-NC4-64/include" -DBUILD_SHARED_LIBS=1 -DCMAKE_INSTALL_PREFIX="%GITHUB_WORKSPACE%/netcdf/netcdf-fortran-4.6.1_build/build" ../netcdf-fortran-4.6.1
 cmake --build . --config Release
-cmake –install .
+cmake –install . --config Release
 
 dir .
 dir fortran
+dir libsrc
 dir D:\a\modflow6\modflow6\modflow6\..\netcdf
 
 set PKG_CONFIG_PATH=%GITHUB_WORKSPACE%\netcdf\netcdf-fortran-4.6.1_build\build\lib\pkgconfig\;%PKG_CONFIG_PATH%

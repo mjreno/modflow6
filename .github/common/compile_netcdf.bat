@@ -55,6 +55,8 @@ set PATH=%GITHUB_WORKSPACE%\netcdf\netCDF4.9.2-NC4-64\bin;%PATH%
 :: set PATH=%GITHUB_WORKSPACE%\netcdf\netcdf-fortran-4.6.1_build\build\bin;%PATH%
 set PATH=%GITHUB_WORKSPACE%\netcdf\netcdf-fortran-4.6.1_build\build;%PATH%
 
+%GITHUB_WORKSPACE%\netcdf\netcdf-fortran-4.6.1_build\build\nf-config --all
+
 set FC=ifort
 cd "%GITHUB_WORKSPACE%\modflow6"
 dir

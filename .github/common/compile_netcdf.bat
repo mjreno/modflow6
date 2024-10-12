@@ -54,7 +54,10 @@ set PATH=%GITHUB_WORKSPACE%\netcdf\netcdf-fortran-4.6.1_build\build\fortran;%PAT
 set PATH=%GITHUB_WORKSPACE%\netcdf\netCDF4.9.2-NC4-64\bin;%PATH%
 :: set PATH=%GITHUB_WORKSPACE%\netcdf\netcdf-fortran-4.6.1_build\build\bin;%PATH%
 set PATH=%GITHUB_WORKSPACE%\netcdf\netcdf-fortran-4.6.1_build\build;%PATH%
+echo PKG_CONFIG_PATH=%PKG_CONFIG_PATH%>>%GITHUB_ENV%
+echo PATH=%PATH%>>%GITHUB_PATH%
 
+echo %PATH%
 %GITHUB_WORKSPACE%\netcdf\netcdf-fortran-4.6.1_build\build\nf-config --all
 
 set FC=ifort

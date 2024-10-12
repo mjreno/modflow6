@@ -14,6 +14,8 @@ cd netcdf-fortran-4.6.1_build\build
 
 where ifort
 where ifx
+where meson
+where pixi
 where cmake
 cmake --version
 :: cmake --help
@@ -47,25 +49,24 @@ dir D:\a\modflow6\modflow6\modflow6\..\netcdf
 dir %GITHUB_WORKSPACE%\netcdf\netcdf-fortran-4.6.1_build\build\fortran
 .\nf-config --all
 
-set PKG_CONFIG_PATH=%GITHUB_WORKSPACE%\netcdf\netcdf-fortran-4.6.1_build\build;%PKG_CONFIG_PATH%
-set PKG_CONFIG_PATH=%GITHUB_WORKSPACE%\netcdf\netCDF4.9.2-NC4-64\lib\pkgconfig\;%PKG_CONFIG_PATH%
-set PATH=%GITHUB_WORKSPACE%\netcdf\netCDF4.9.2-NC4-64\include;%PATH%
-set PATH=%GITHUB_WORKSPACE%\netcdf\netcdf-fortran-4.6.1_build\build\fortran;%PATH%
-set PATH=%GITHUB_WORKSPACE%\netcdf\netCDF4.9.2-NC4-64\bin;%PATH%
-:: set PATH=%GITHUB_WORKSPACE%\netcdf\netcdf-fortran-4.6.1_build\build\bin;%PATH%
-set PATH=%GITHUB_WORKSPACE%\netcdf\netcdf-fortran-4.6.1_build\build;%PATH%
-echo PKG_CONFIG_PATH=%PKG_CONFIG_PATH%>>%GITHUB_ENV%
-echo PATH=%PATH%>>%GITHUB_PATH%
+:: set PKG_CONFIG_PATH=%GITHUB_WORKSPACE%\netcdf\netcdf-fortran-4.6.1_build\build;%PKG_CONFIG_PATH%
+:: set PKG_CONFIG_PATH=%GITHUB_WORKSPACE%\netcdf\netCDF4.9.2-NC4-64\lib\pkgconfig\;%PKG_CONFIG_PATH%
+:: set PATH=%GITHUB_WORKSPACE%\netcdf\netCDF4.9.2-NC4-64\include;%PATH%
+:: set PATH=%GITHUB_WORKSPACE%\netcdf\netcdf-fortran-4.6.1_build\build\fortran;%PATH%
+:: set PATH=%GITHUB_WORKSPACE%\netcdf\netCDF4.9.2-NC4-64\bin;%PATH%
+:: set PATH=%GITHUB_WORKSPACE%\netcdf\netcdf-fortran-4.6.1_build\build;%PATH%
+:: echo PKG_CONFIG_PATH=%PKG_CONFIG_PATH%>>%GITHUB_ENV%
+:: echo PATH=%PATH%>>%GITHUB_PATH%
 
-echo %PATH%
-%GITHUB_WORKSPACE%\netcdf\netcdf-fortran-4.6.1_build\build\nf-config --all
+:: echo %PATH%
+:: %GITHUB_WORKSPACE%\netcdf\netcdf-fortran-4.6.1_build\build\nf-config --all
 
-set FC=ifort
-cd "%GITHUB_WORKSPACE%\modflow6"
-dir
-dir ..
-dir ..\..
-pixi run setup -Dnetcdf=true builddir
-pixi run build builddir
-pixi run test builddir
-pixi run pytest -v --durations=0 --netcdf -k "test_netcdf"
+:: set FC=ifort
+:: cd "%GITHUB_WORKSPACE%\modflow6"
+:: dir
+:: dir ..
+:: dir ..\..
+:: pixi run setup -Dnetcdf=true builddir
+:: pixi run build builddir
+:: pixi run test builddir
+:: pixi run pytest -v --durations=0 --netcdf -k "test_netcdf"

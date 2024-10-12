@@ -42,9 +42,10 @@ dir .
 dir fortran
 dir libsrc
 dir D:\a\modflow6\modflow6\modflow6\..\netcdf
-nf-config
+dir %GITHUB_WORKSPACE%\netcdf\netcdf-fortran-4.6.1_build\build\fortran
+.\nf-config --all
 
-set PKG_CONFIG_PATH=%GITHUB_WORKSPACE%\netcdf\netcdf-fortran-4.6.1_build\build\lib\pkgconfig\;%PKG_CONFIG_PATH%
+set PKG_CONFIG_PATH=%GITHUB_WORKSPACE%\netcdf\netcdf-fortran-4.6.1_build\build;%PKG_CONFIG_PATH%
 set PKG_CONFIG_PATH=%GITHUB_WORKSPACE%\netcdf\netCDF4.9.2-NC4-64\lib\pkgconfig\;%PKG_CONFIG_PATH%
 set PATH=%GITHUB_WORKSPACE%\netcdf\netCDF4.9.2-NC4-64\include;%PATH%
 set PATH=%GITHUB_WORKSPACE%\netcdf\netcdf-fortran-4.6.1_build\build\fortran;%PATH%

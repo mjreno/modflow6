@@ -8,7 +8,7 @@ runs:
       shell: cmd
       run: |
         unix2dos -n "%GITHUB_WORKSPACE%\modflow6\.github\common\compile_netcdf.bat" "%TEMP%\compile_netcdf.bat"
-        unix2dos -n "%GITHUB_WORKSPACE%\modflow6\.github\common\compile_modflow6.bat" "%TEMP%\compile_modflow6.bat"
+        unix2dos -n "%GITHUB_WORKSPACE%\modflow6\.github\common\cn_modflow6.bat" "%TEMP%\cn_modflow6.bat"
 
     - name: Hide Strawberry programs
       shell: bash
@@ -76,7 +76,12 @@ runs:
     - name: Build modflow6
       shell: cmd
       run: |
-        "%ONEAPI_ROOT%\setvars.bat" intel64 vs2022 && "%TEMP%\compile_modflow6.bat"
+        "%ONEAPI_ROOT%\setvars.bat" intel64 vs2022 && "%TEMP%\cn_modflow6.bat"
+
+    - uses: actions/checkout@v4
+    - name: Setup tmate session
+      if: ${{ failure() }}
+      uses: mxschmitt/action-tmate@v3
 
     - name: Show Meson logs
       if: failure()

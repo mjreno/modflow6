@@ -86,4 +86,4 @@ runs:
         #"%ONEAPI_ROOT%\setvars.bat" intel64 vs2022 && "%GITHUB_WORKSPACE%\modflow6\.github\common\cn_modflow6.bat"
         unix2dos -n "%GITHUB_WORKSPACE%\modflow6\.github\common\cn_modflow6.bat" "%TEMP%\cn_modflow6.bat"
         echo "%TEMP%"
-        %ONEAPI_ROOT%\setvars.bat intel64 vs2022 && %TEMP%\cn_modflow6.bat
+        "%ONEAPI_ROOT%\setvars.bat && %TEMP%\cn_modflow6.bat"

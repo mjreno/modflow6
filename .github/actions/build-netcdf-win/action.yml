@@ -84,6 +84,7 @@ runs:
       shell: cmd
       run: |
         #"%ONEAPI_ROOT%\setvars.bat" intel64 vs2022 && "%GITHUB_WORKSPACE%\modflow6\.github\common\cn_modflow6.bat"
-        unix2dos -n "%GITHUB_WORKSPACE%\modflow6\.github\common\cn_modflow6.bat" "%TEMP%\cn_modflow6.bat"
-        echo "converted to dir: %TEMP%"
-        "%ONEAPI_ROOT%\setvars.bat" && "%TEMP%\cn_modflow6.bat"
+        #unix2dos -n "%GITHUB_WORKSPACE%\modflow6\.github\common\cn_modflow6.bat" "%TEMP%\cn_modflow6.bat"
+        #echo "converted to dir: %TEMP%"
+        unix2dos -n "%GITHUB_WORKSPACE%\modflow6\.github\common\cn_modflow6.bat" "netcdf\cn_modflow6.bat"
+        "%ONEAPI_ROOT%\setvars.bat" && "netcdf\cn_modflow6.bat"

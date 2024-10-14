@@ -8,6 +8,7 @@ runs:
       shell: cmd
       run: |
         unix2dos -n "%GITHUB_WORKSPACE%\modflow6\.github\common\compile_netcdf.bat" "%TEMP%\compile_netcdf.bat"
+        unix2dos -n "%GITHUB_WORKSPACE%\modflow6\.github\common\cn_modflow6.bat" "%TEMP%\cn_modflow6.bat"
 
     - name: Hide Strawberry programs
       shell: bash
@@ -60,14 +61,6 @@ runs:
       run: |
         "%ONEAPI_ROOT%\setvars.bat" intel64 vs2022 && "%TEMP%\compile_netcdf.bat"
 
-#    - name: Setup PETSC environment
-#      shell: cmd
-#      run: |
-#        set PETSC_DIR=%GITHUB_WORKSPACE%\petsc
-#        set PETSC_ARCH=arch-mswin-c-opt
-#        echo PETSC_DIR=%PETSC_DIR%>>%GITHUB_ENV%
-#        echo PETSC_ARCH=%PETSC_ARCH%>>%GITHUB_ENV%
-#        echo %PETSC_DIR%\%PETSC_ARCH%\lib>>%GITHUB_PATH%
     - name: Setup NetCDF environment
       shell: cmd
       run: |
@@ -83,5 +76,10 @@ runs:
     - name: Build modflow6
       shell: cmd
       run: |
-        unix2dos -n "%GITHUB_WORKSPACE%\modflow6\.github\common\cn_modflow6.bat" "%TEMP%\cn_modflow6.bat"
         "%ONEAPI_ROOT%\setvars.bat" intel64 vs2022 && "%TEMP%\cn_modflow6.bat"
+
+    - name: Show Meson logs
+      if: failure()
+      shell: bash
+      working-directory: modflow6
+      run: cat builddir/meson-logs/meson-log.txt

@@ -199,21 +199,8 @@ if is_netcdf_build
         netcdff_compiled_rel / 'fortran'
       ])
       netcdff_libdir = netcdff_compiled_abs / 'fortran'
-      #lnetcdff = fc.find_library('netcdff', dirs: netcdff_compiled_abs / 'fortran', required : true)
       lnetcdff = fc.find_library('netcdff', dirs: netcdff_libdir, required : true)
       dependencies += [ lnetcdff ]
-      code = '''
-program meson_netcdf_link_test
-  use netcdf
-  print *, trim(nf90_inq_libvers())
-end program meson_netcdf_link_test
-'''
-      result = fc.links(code, include_directories: netcdf_incdir, dependencies : dependencies, name : 'NetCDF link check')
-      if result == false
-        message('Linking against NetCDF failed!')
-      else
-        message('Linking against NetCDF success')
-      endif
     endif
   endif
 endif

@@ -198,6 +198,18 @@ if is_netcdf_build
         netcdfc_compiled_rel / 'include',
         netcdff_compiled_rel / 'fortran'
       ])
+      code = '''
+program meson_netcdf_link_test
+  use netcdf
+  print *, trim(nf90_inq_libvers())
+end program meson_netcdf_link_test
+'''
+      result = fc.links(code, dependencies : dependencies, name : 'NetCDF link check')
+      if result == false
+        message('Linking against NetCDF failed!')
+      else
+        message('Linking against NetCDF success')
+      endif
     endif
   endif
 endif

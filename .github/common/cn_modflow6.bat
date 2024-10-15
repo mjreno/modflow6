@@ -13,6 +13,11 @@ dir %GITHUB_WORKSPACE%\netcdf\netcdf-fortran-4.6.1_build\build\fortran
 echo "%PKG_CONFIG_PATH%"
 echo "%PATH%"
 
+where nc-config
+where nf-config
+nc-config
+nf-config --all
+
 set FC=ifort
 cd "%GITHUB_WORKSPACE%\modflow6"
 pixi run setup -Dnetcdf=true builddir

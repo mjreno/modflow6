@@ -38,8 +38,6 @@ runs:
       shell: bash
       run: |
         mkdir netcdf
-        cp "$GITHUB_WORKSPACE/modflow6/.github/common/temp.f90" netcdf
-        cp "$GITHUB_WORKSPACE/modflow6/.github/common/simple.f90" netcdf
         mkdir netcdf/netCDF4.9.2-NC4-64
         cd netcdf/netCDF4.9.2-NC4-64
         curl https://downloads.unidata.ucar.edu/netcdf-c/4.9.2/netCDF4.9.2-NC4-64.exe -O -J
@@ -53,7 +51,6 @@ runs:
         cd netcdf-fortran-4.6.1_build
         curl https://downloads.unidata.ucar.edu/netcdf-fortran/4.6.1/netcdf-fortran-4.6.1.zip -O -J
         unzip netcdf-fortran-4.6.1.zip
-        ls netcdf-fortran-4.6.1
         mkdir build
 
     - name: Build NetCDF

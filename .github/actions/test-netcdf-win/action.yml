@@ -8,7 +8,7 @@ runs:
       uses: ./modflow6/.github/actions/build-netcdf-win
 
     - name: Build MF6 NetCDF
-      uses: ./modflow6/.github/actions/build-nc-mf6
+      uses: ./modflow6/.github/actions/build-netcdf-mf6
 
     - name: Update flopy
       working-directory: modflow6

@@ -558,10 +558,10 @@ jobs:
 
   netcdf_test:
     name: NetCDF executable testing
-#    needs:
-#      - lint
-#      - build
-#      - smoke_test
+    needs:
+      - lint
+      - build
+      - smoke_test
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false

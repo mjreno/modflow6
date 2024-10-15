@@ -19,6 +19,8 @@ runs:
     - name: Build modflow6
       shell: cmd
       run: |
+        echo "%PKG_CONFIG_PATH%"
+        echo "%PATH%"
         unix2dos -n "%GITHUB_WORKSPACE%\modflow6\.github\common\cn_modflow6.bat" "%TEMP%\cn_modflow6.bat"
         "%ONEAPI_ROOT%\setvars.bat" intel64 vs2022 && "%TEMP%\cn_modflow6.bat"
 

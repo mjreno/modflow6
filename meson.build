@@ -198,6 +198,8 @@ if is_netcdf_build
         netcdfc_compiled_rel / 'include',
         netcdff_compiled_rel / 'fortran'
       ])
+      lnetcdff = fc.find_library('netcdff', required : true)
+      dependencies += [ lnetcdff ]
       code = '''
 program meson_netcdf_link_test
   use netcdf

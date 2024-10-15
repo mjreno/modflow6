@@ -6,8 +6,8 @@ set PATH=%GITHUB_WORKSPACE%\netcdf\netCDF4.9.2-NC4-64\include;%PATH%
 set PATH=%GITHUB_WORKSPACE%\netcdf\netcdf-fortran-4.6.1_build\build\fortran;%PATH%
 set PATH=%GITHUB_WORKSPACE%\netcdf\netCDF4.9.2-NC4-64\lib;%PATH%
 set PATH=%GITHUB_WORKSPACE%\netcdf\netcdf-fortran-4.6.1_build\build;%PATH%
-set LIB=%GITHUB_WORKSPACE%\netcdf\netCDF4.9.2-NC4-64\lib;%LIB%
-set LIB=%GITHUB_WORKSPACE%\netcdf\netcdf-fortran-4.6.1_build\build\fortran;%LIB%
+set LIBPATH=%GITHUB_WORKSPACE%\netcdf\netCDF4.9.2-NC4-64\lib;%LIBPATH%
+set LIBPATH=%GITHUB_WORKSPACE%\netcdf\netcdf-fortran-4.6.1_build\build\fortran;%LIBPATH%
 
 dir %GITHUB_WORKSPACE%\netcdf\netcdf-fortran-4.6.1_build\build
 dir %GITHUB_WORKSPACE%\netcdf\netcdf-fortran-4.6.1_build\build\fortran
@@ -18,7 +18,7 @@ echo "%PATH%"
 cd "%GITHUB_WORKSPACE%\netcdf"
 ifort /include:%GITHUB_WORKSPACE%\netcdf\netCDF4.9.2-NC4-64\include /include:%GITHUB_WORKSPACE%\netcdf\netcdf-fortran-4.6.1_build\build\fortran simple.f90 /link /libpath:%GITHUB_WORKSPACE%\netcdf\netcdf-fortran-4.6.1_build\build\fortran /libpath:%GITHUB_WORKSPACE%\netcdf\netCDF4.9.2-NC4-64\lib netcdff.lib netcdf.lib
 
-.\simple.exe
+simple.exe
 dir .
 
 where nc-config

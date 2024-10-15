@@ -7,6 +7,12 @@ set PATH=%GITHUB_WORKSPACE%\netcdf\netcdf-fortran-4.6.1_build\build\fortran;%PAT
 set PATH=%GITHUB_WORKSPACE%\netcdf\netCDF4.9.2-NC4-64\bin;%PATH%
 set PATH=%GITHUB_WORKSPACE%\netcdf\netcdf-fortran-4.6.1_build\build;%PATH%
 
+dir %GITHUB_WORKSPACE%\netcdf\netcdf-fortran-4.6.1_build\build
+dir %GITHUB_WORKSPACE%\netcdf\netcdf-fortran-4.6.1_build\build\fortran
+
+echo "%PKG_CONFIG_PATH%"
+echo "%PATH%"
+
 set FC=ifort
 cd "%GITHUB_WORKSPACE%\modflow6"
 pixi run setup -Dnetcdf=true builddir

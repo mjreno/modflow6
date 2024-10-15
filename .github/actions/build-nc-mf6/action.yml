@@ -28,4 +28,6 @@ runs:
       if: failure()
       shell: bash
       working-directory: modflow6
-      run: cat builddir/meson-logs/meson-log.txt
+      run: |
+        cat builddir/meson-logs/meson-log.txt
+        cat builddir/build.ninja

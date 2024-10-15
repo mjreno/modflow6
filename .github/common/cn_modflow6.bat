@@ -1,13 +1,13 @@
 echo "hi"
 
-set PKG_CONFIG_PATH=%GITHUB_WORKSPACE%\netcdf\netcdf-fortran-4.6.1_build\build\;%PKG_CONFIG_PATH%
-set PKG_CONFIG_PATH=%GITHUB_WORKSPACE%\netcdf\netCDF4.9.2-NC4-64\lib\pkgconfig\;%PKG_CONFIG_PATH%
-set PATH=%GITHUB_WORKSPACE%\netcdf\netCDF4.9.2-NC4-64\include;%PATH%
-set PATH=%GITHUB_WORKSPACE%\netcdf\netcdf-fortran-4.6.1_build\build\fortran;%PATH%
-set PATH=%GITHUB_WORKSPACE%\netcdf\netCDF4.9.2-NC4-64\lib;%PATH%
-set PATH=%GITHUB_WORKSPACE%\netcdf\netcdf-fortran-4.6.1_build\build;%PATH%
-set LIBPATH=%GITHUB_WORKSPACE%\netcdf\netCDF4.9.2-NC4-64\lib;%LIBPATH%
-set LIBPATH=%GITHUB_WORKSPACE%\netcdf\netcdf-fortran-4.6.1_build\build\fortran;%LIBPATH%
+:: set PKG_CONFIG_PATH=%GITHUB_WORKSPACE%\netcdf\netcdf-fortran-4.6.1_build\build\;%PKG_CONFIG_PATH%
+:: set PKG_CONFIG_PATH=%GITHUB_WORKSPACE%\netcdf\netCDF4.9.2-NC4-64\lib\pkgconfig\;%PKG_CONFIG_PATH%
+:: set PATH=%GITHUB_WORKSPACE%\netcdf\netCDF4.9.2-NC4-64\include;%PATH%
+:: set PATH=%GITHUB_WORKSPACE%\netcdf\netcdf-fortran-4.6.1_build\build\fortran;%PATH%
+:: set PATH=%GITHUB_WORKSPACE%\netcdf\netCDF4.9.2-NC4-64\lib;%PATH%
+:: set PATH=%GITHUB_WORKSPACE%\netcdf\netcdf-fortran-4.6.1_build\build;%PATH%
+:: set LIBPATH=%GITHUB_WORKSPACE%\netcdf\netCDF4.9.2-NC4-64\lib;%LIBPATH%
+:: set LIBPATH=%GITHUB_WORKSPACE%\netcdf\netcdf-fortran-4.6.1_build\build\fortran;%LIBPATH%
 
 :: dir %GITHUB_WORKSPACE%\netcdf\netcdf-fortran-4.6.1_build\build
 :: dir %GITHUB_WORKSPACE%\netcdf\netcdf-fortran-4.6.1_build\build\fortran
@@ -21,10 +21,10 @@ set LIBPATH=%GITHUB_WORKSPACE%\netcdf\netcdf-fortran-4.6.1_build\build\fortran;%
 :: simple.exe
 :: dir .
 
-where nc-config
-where nf-config
-nc-config
-nf-config --all
+:: where nc-config
+:: where nf-config
+:: nc-config
+:: nf-config --all
 
 set FC=ifort
 cd "%GITHUB_WORKSPACE%\modflow6"

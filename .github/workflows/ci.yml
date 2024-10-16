@@ -558,7 +558,7 @@ jobs:
 
   netcdf_test:
     name: NetCDF executable testing
-    needs:
+#    needs:
 #      - lint
 #      - build
 #      - smoke_test
@@ -618,7 +618,7 @@ jobs:
 
   extended_test:
     name: Extended executable testing
-    needs:
+#    needs:
 #      - lint
 #      - build
 #      - smoke_test

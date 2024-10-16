@@ -235,7 +235,7 @@ add_project_link_arguments(fc.get_supported_arguments(link_args), language: 'for
 if is_parallel_build and build_machine.system() == 'windows'
   message('Compiling PETSc Fortran modules')
   petsc_incdir = include_directories([petsc_dir_rel / 'include', petsc_compiled_rel / 'include'])
-  ext_incdir += ['..' / petsc_dir_rel / 'include', petsc_compiled_rel / 'include']
+  ext_incdir += ['..' / petsc_dir_rel / 'include', '..' / petsc_compiled_rel / 'include']
   petsc_src = petsc_dir_abs / 'src'
   sources_petsc = [petsc_src / 'dm/f90-mod/petscdmdamod.F90',
                   petsc_src / 'dm/f90-mod/petscdmmod.F90',

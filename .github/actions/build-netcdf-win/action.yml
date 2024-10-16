@@ -22,7 +22,7 @@ runs:
       shell: bash
       run: echo "date=$(/bin/date -u "+%Y%m%d")" >> "$GITHUB_OUTPUT"
 
-    - name: Get specific version CMake, 3.28.0-msvc1
+    - name: Install latest cmake and ninja
       uses: lukka/get-cmake@latest
       with:
         cmakeVersion: latest
@@ -37,8 +37,7 @@ runs:
     - name: Download NetCDF-C
       shell: bash
       run: |
-        mkdir netcdf
-        mkdir netcdf/netCDF4.9.2-NC4-64
+        mkdir -p netcdf/netCDF4.9.2-NC4-64
         cd netcdf/netCDF4.9.2-NC4-64
         curl https://downloads.unidata.ucar.edu/netcdf-c/4.9.2/netCDF4.9.2-NC4-64.exe -O -J
         7z x netCDF4.9.2-NC4-64.exe -aou
@@ -47,11 +46,10 @@ runs:
       shell: bash
       run: |
         cd netcdf
-        mkdir netcdf-fortran-4.6.1_build
-        cd netcdf-fortran-4.6.1_build
+        mkdir -p netcdf-fortran-4.6.1/build
+        cd netcdf-fortran-4.6.1
         curl https://downloads.unidata.ucar.edu/netcdf-fortran/4.6.1/netcdf-fortran-4.6.1.zip -O -J
         unzip netcdf-fortran-4.6.1.zip
-        mkdir build
 
     - name: Build NetCDF
       shell: cmd

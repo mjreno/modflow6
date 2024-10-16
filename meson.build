@@ -140,7 +140,7 @@ netcdf_dir_rel = '..' /'netcdf'
 netcdf_dir_abs = meson.project_source_root() / '..' / 'netcdf'
 message('NetCDF dir abs: ', netcdf_dir_abs)
 netcdfc_build = 'netCDF4.9.2-NC4-64'
-netcdff_build = 'netcdf-fortran-4.6.1_build' / 'build'
+netcdff_build = 'netcdf-fortran-4.6.1' / 'build'
 netcdfc_compiled_rel = netcdf_dir_rel / netcdfc_build
 netcdfc_compiled_abs = netcdf_dir_abs / netcdfc_build
 netcdff_compiled_rel = netcdf_dir_rel / netcdff_build

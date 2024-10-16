@@ -1,6 +1,8 @@
 name: MODFLOW 6 continuous integration
 on:
   push:
+    branches:
+      - netcdf_ciwin_test2
     paths-ignore:
       - '**.md'
       - '**.pdf'
@@ -557,7 +559,7 @@ jobs:
   netcdf_test:
     name: NetCDF executable testing
     needs:
-      - lint
+#      - lint
       - build
       - smoke_test
     runs-on: ${{ matrix.os }}

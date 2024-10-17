@@ -9,11 +9,6 @@ runs:
       run: |
         unix2dos -n "%GITHUB_WORKSPACE%\modflow6\.github\common\compile_netcdf.bat" "%TEMP%\compile_netcdf.bat"
 
-#    - name: Get date
-#      id: get-date
-#      shell: bash
-#      run: echo "date=$(/bin/date -u "+%Y%m%d")" >> "$GITHUB_OUTPUT"
-
     - name: Install latest cmake and ninja
       uses: lukka/get-cmake@latest
       with:

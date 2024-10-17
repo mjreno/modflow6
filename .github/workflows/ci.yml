@@ -558,10 +558,10 @@ jobs:
 
   netcdf_test:
     name: NetCDF testing
-#    needs:
-#      - lint
-#      - build
-#      - smoke_test
+    needs:
+      - lint
+      - build
+      - smoke_test
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -618,10 +618,10 @@ jobs:
 
   extended_test:
     name: Extended testing
-#    needs:
-#      - lint
-#      - build
-#      - smoke_test
+    needs:
+      - lint
+      - build
+      - smoke_test
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false

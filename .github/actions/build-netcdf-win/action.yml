@@ -9,18 +9,10 @@ runs:
       run: |
         unix2dos -n "%GITHUB_WORKSPACE%\modflow6\.github\common\compile_netcdf.bat" "%TEMP%\compile_netcdf.bat"
 
-#    - name: Hide Strawberry programs
+#    - name: Get date
+#      id: get-date
 #      shell: bash
-#      run: |
-#        mkdir "$RUNNER_TEMP/strawberry"
-#        mv /c/Strawberry/c/bin/gmake "$RUNNER_TEMP/strawberry/gmake"
-#        mv /c/Strawberry/perl/bin/pkg-config "$RUNNER_TEMP/strawberry/pkg-config"
-#        mv /c/Strawberry/perl/bin/pkg-config.bat "$RUNNER_TEMP/strawberry/pkg-config.bat"
-
-    - name: Get date
-      id: get-date
-      shell: bash
-      run: echo "date=$(/bin/date -u "+%Y%m%d")" >> "$GITHUB_OUTPUT"
+#      run: echo "date=$(/bin/date -u "+%Y%m%d")" >> "$GITHUB_OUTPUT"
 
     - name: Install latest cmake and ninja
       uses: lukka/get-cmake@latest

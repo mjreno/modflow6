@@ -155,6 +155,7 @@ endif
 # lists for parallel dependencies and compiler arguments
 dependencies = [ ]
 extra_cmp_args = [ ]
+extended_incdir = [ ]
 
 # load petsc, mpi, and netcdf dependencies/libraries
 if is_parallel_build or is_extended_build
@@ -185,7 +186,6 @@ else
 endif
 
 # find netcdf
-ext_incdir = []
 with_netcdf = false
 if is_netcdf_build
   netcdff = dependency('netcdf', language : 'fortran', static: false, required : true)
@@ -198,7 +198,7 @@ if is_netcdf_build
         netcdfc_compiled_rel / 'include',
         netcdff_compiled_rel / 'fortran'
       ])
-      ext_incdir += [
+      extended_incdir += [
         '..' / netcdfc_compiled_rel / 'include',
         '..' / netcdff_compiled_rel / 'fortran'
       ]
@@ -235,7 +235,7 @@ add_project_link_arguments(fc.get_supported_arguments(link_args), language: 'for
 if is_parallel_build and build_machine.system() == 'windows'
   message('Compiling PETSc Fortran modules')
   petsc_incdir = include_directories([petsc_dir_rel / 'include', petsc_compiled_rel / 'include'])
-  ext_incdir += ['..' / petsc_dir_rel / 'include', '..' / petsc_compiled_rel / 'include']
+  extended_incdir += ['..' / petsc_dir_rel / 'include', '..' / petsc_compiled_rel / 'include']
   petsc_src = petsc_dir_abs / 'src'
   sources_petsc = [petsc_src / 'dm/f90-mod/petscdmdamod.F90',
                   petsc_src / 'dm/f90-mod/petscdmmod.F90',

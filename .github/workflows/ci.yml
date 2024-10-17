@@ -557,7 +557,7 @@ jobs:
           path: modflow6/autotest/.failed
 
   netcdf_test:
-    name: NetCDF executable testing
+    name: NetCDF testing
 #    needs:
 #      - lint
 #      - build
@@ -617,7 +617,7 @@ jobs:
           path: modflow6/autotest/.failed
 
   extended_test:
-    name: Extended executable testing
+    name: Extended testing
 #    needs:
 #      - lint
 #      - build

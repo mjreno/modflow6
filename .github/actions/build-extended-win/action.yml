@@ -1,5 +1,5 @@
-name: Build extended MF6 (Windows)
-description: Build extended MODFLOW 6 on Windows
+name: Build Extended MF6 (Windows)
+description: Build Extended MODFLOW 6 on Windows
 runs:
   using: "composite"
   steps:

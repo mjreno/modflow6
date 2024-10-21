@@ -121,6 +121,10 @@ jobs:
         uses: mamba-org/setup-micromamba@v1
         with:
           environment-file: modflow6/environment.yml
+          create-args: >-
+            xugrid
+            xarray
+            netcdf4
           cache-downloads: true
           cache-environment: true
           init-shell: >-

@@ -117,14 +117,14 @@ jobs:
         working-directory: modflow6
         run: pixi run install
 
+      - name: Install additional netcdf testing packages
+        working-directory: modflow6
+        run: pixi run pip install xugrid xarray netcdf4
+
       - name: Setup Micromamba
         uses: mamba-org/setup-micromamba@v1
         with:
           environment-file: modflow6/environment.yml
-          create-args: >-
-            xugrid
-            xarray
-            netcdf4
           cache-downloads: true
           cache-environment: true
           init-shell: >-

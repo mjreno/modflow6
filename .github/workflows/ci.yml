@@ -1,6 +1,8 @@
 name: MODFLOW 6 continuous integration
 on:
   push:
+    branches:
+      - netcdf_ciwin_test3
     paths-ignore:
       - '**.md'
       - '**.pdf'

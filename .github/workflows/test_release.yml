@@ -15,5 +15,5 @@ jobs:
       branch: netcdf_ciwin_test3
       developmode: true
       full: false
-      run_tests: false
+      run_tests: true
       version: "6.6.0.dev0"

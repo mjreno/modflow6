@@ -1,0 +1,19 @@
+name: MODFLOW 6 test nightly build
+on:
+  push:
+    branches:
+      - netcdf_ciwin_test4
+    paths-ignore:
+      - '**.md'
+jobs:
+  make_dist:
+    name: Make development distribution
+#    uses: MODFLOW-USGS/modflow6/.github/workflows/release.yml@develop
+    uses: mjreno/modflow6/.github/workflows/release.yml@netcdf_ciwin_test4
+    with:
+      approve: false
+      branch: netcdf_ciwin_test4
+      developmode: true
+      full: false
+      run_tests: false
+      version: "6.6.0.dev0"

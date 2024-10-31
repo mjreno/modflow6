@@ -37,6 +37,7 @@ scipy = "*"
 shapely = "*"
 syrupy = "*"
 xmipy = "*"
+pkg-config = "*"
 
 [feature.rtd.dependencies]
 numpy = "*"

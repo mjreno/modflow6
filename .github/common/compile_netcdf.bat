@@ -14,4 +14,5 @@ cmake --fresh -G Ninja -DCMAKE_Fortran_COMPILER="C:/Program Files (x86)/Intel/on
 cmake --build .
 cmake –install .
 
+dir "%GITHUB_WORKSPACE%\netcdf\netcdf-fortran-4.6.1\build"
 dir "%GITHUB_WORKSPACE%\netcdf\netcdf-fortran-4.6.1\build\fortran"

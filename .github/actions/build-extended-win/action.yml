@@ -15,8 +15,8 @@ runs:
       run: |
         echo "%GITHUB_WORKSPACE%\netcdf\netCDF4.9.2-NC4-64\lib\pkgconfig" >> $GITHUB_ENV
         echo "%GITHUB_WORKSPACE%\netcdf\netCDF4.9.2-NC4-64\bin" >> $GITHUB_PATH
-        echo "$GITHUB_WORKSPACE%\netcdf\netcdf-fortran-4.6.1\build\fortran" >> $GITHUB_ENV
-        echo "$GITHUB_WORKSPACE%\netcdf\netcdf-fortran-4.6.1\build\fortran" >> $GITHUB_PATH
+        echo "$GITHUB_WORKSPACE%\netcdf\netcdf-fortran-4.6.1\build" >> $GITHUB_ENV
+        echo "$GITHUB_WORKSPACE%\netcdf\netcdf-fortran-4.6.1\build" >> $GITHUB_PATH
         unix2dos -n "%GITHUB_WORKSPACE%\modflow6\.github\common\compile_modflow6_extended.bat" "%TEMP%\compile_modflow6_extended.bat"
         "%ONEAPI_ROOT%\setvars.bat" intel64 vs2022 && "%TEMP%\compile_modflow6_extended.bat"
 

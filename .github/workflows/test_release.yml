@@ -1,0 +1,19 @@
+name: MODFLOW 6 test nightly build
+on:
+  push:
+    branches:
+      - ci-diagnose-nightly
+    paths-ignore:
+      - '**.md'
+jobs:
+  make_dist:
+    name: Make development distribution
+#    uses: MODFLOW-USGS/modflow6/.github/workflows/release.yml@develop
+    uses: mjreno/modflow6/.github/workflows/release.yml@ci-diagnose-nightly
+    with:
+      approve: false
+      branch: ci-diagnose-nightly
+      developmode: true
+      full: false
+      run_tests: false
+      version: "6.6.0.dev0"

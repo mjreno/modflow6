@@ -27,6 +27,7 @@ runs:
         mkdir -p netcdf/netCDF4.9.2-NC4-64
 
     - name: Download NetCDF-C
+      shell: bash
       uses: nick-fields/retry@v3
       with:
         timeout_minutes: 1
@@ -50,6 +51,7 @@ runs:
         mkdir -p netcdf/netcdf-fortran-4.6.1/build
 
     - name: Download NetCDF-Fortran
+      shell: bash
       uses: nick-fields/retry@v3
       with:
         timeout_minutes: 1

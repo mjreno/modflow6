@@ -23,11 +23,12 @@ runs:
 
     - name: Download NetCDF-C
       uses: nick-fields/retry@v3
-      shell: bash
       with:
         timeout_minutes: 1
         max_attempts: 5
+        retry_on: error
         command: |
+          echo "WITH RETRIES"
           mkdir -p netcdf/netCDF4.9.2-NC4-64
           cd netcdf/netCDF4.9.2-NC4-64
           #curl -O "https://downloads.unidata.ucar.edu/netcdf-c/4.9.2/netCDF4.9.2-NC4-64.exe"
@@ -37,11 +38,12 @@ runs:
 
     - name: Download NetCDF-Fortran
       uses: nick-fields/retry@v3
-      shell: bash
       with:
         timeout_minutes: 1
         max_attempts: 5
+        retry_on: error
         command: |
+          echo "WITH RETRIES"
           mkdir -p netcdf/netcdf-fortran-4.6.1/build
           cd netcdf/netcdf-fortran-4.6.1
           #curl -O "https://downloads.unidata.ucar.edu/netcdf-fortran/4.6.1/netcdf-fortran-4.6.1.zip"

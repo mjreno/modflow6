@@ -21,35 +21,53 @@ runs:
     - name: Setup 7-zip
       uses: milliewalky/setup-7-zip@v1
 
+    - name: Prepare download NetCDF-C
+      shell: bash
+      run: |
+        mkdir -p netcdf/netCDF4.9.2-NC4-64
+
     - name: Download NetCDF-C
       uses: nick-fields/retry@v3
+      working-directory: netcdf/netCDF4.9.2-NC4-64
       with:
         timeout_minutes: 1
         max_attempts: 5
         retry_on: error
         command: |
           echo "WITH RETRIES"
-          mkdir -p netcdf/netCDF4.9.2-NC4-64
-          cd netcdf/netCDF4.9.2-NC4-64
           #curl -O "https://downloads.unidata.ucar.edu/netcdf-c/4.9.2/netCDF4.9.2-NC4-64.exe"
           #curl --url "https://downloads.unidata.ucar.edu/netcdf-c/4.9.2/netCDF4.9.2-NC4-64.exe" -o netCDF4.9.2-NC4-64.exe
           curl -L -o netCDF4.9.2-NC4-64.exe "https://downloads.unidata.ucar.edu/netcdf-c/4.9.2/netCDF4.9.2-NC4-64.exe"
-          7z x netCDF4.9.2-NC4-64.exe -aou
+
+    - name:  Unpack NetCDF-C download
+      working-directory: netcdf/netCDF4.9.2-NC4-64
+      shell: bash
+      run: |
+        7z x netCDF4.9.2-NC4-64.exe -aou
+
+    - name: Prepare download NetCDF-Fortran
+      shell: bash
+      run: |
+        mkdir -p netcdf/netcdf-fortran-4.6.1/build
 
     - name: Download NetCDF-Fortran
       uses: nick-fields/retry@v3
+      working-directory: netcdf/netcdf-fortran-4.6.1
       with:
         timeout_minutes: 1
         max_attempts: 5
         retry_on: error
         command: |
           echo "WITH RETRIES"
-          mkdir -p netcdf/netcdf-fortran-4.6.1/build
-          cd netcdf/netcdf-fortran-4.6.1
           #curl -O "https://downloads.unidata.ucar.edu/netcdf-fortran/4.6.1/netcdf-fortran-4.6.1.zip"
           #curl --url "https://downloads.unidata.ucar.edu/netcdf-fortran/4.6.1/netcdf-fortran-4.6.1.zip" -o netcdf-fortran-4.6.1.zip
           curl -L -o netcdf-fortran-4.6.1.zip "https://downloads.unidata.ucar.edu/netcdf-fortran/4.6.1/netcdf-fortran-4.6.1.zip"
-          unzip netcdf-fortran-4.6.1.zip
+
+    - name: Unpack NetCDF-Fortran download
+      working-directory: netcdf/netcdf-fortran-4.6.1
+      shell: bash
+      run: |
+        unzip netcdf-fortran-4.6.1.zip
 
     - name: Build NetCDF
       shell: cmd

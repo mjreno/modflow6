@@ -27,7 +27,6 @@ runs:
         mkdir -p netcdf/netCDF4.9.2-NC4-64
 
     - name: Download NetCDF-C
-      working-directory: netcdf/netCDF4.9.2-NC4-64
       uses: nick-fields/retry@v3
       with:
         shell: bash
@@ -38,7 +37,7 @@ runs:
           echo "WITH RETRIES"
           #curl -O "https://downloads.unidata.ucar.edu/netcdf-c/4.9.2/netCDF4.9.2-NC4-64.exe"
           #curl --url "https://downloads.unidata.ucar.edu/netcdf-c/4.9.2/netCDF4.9.2-NC4-64.exe" -o netCDF4.9.2-NC4-64.exe
-          curl -L -o netCDF4.9.2-NC4-64.exe "https://downloads.unidata.ucar.edu/netcdf-c/4.9.2/netCDF4.9.2-NC4-64.exe"
+          curl -L -o netcdf/netCDF4.9.2-NC4-64/netCDF4.9.2-NC4-64.exe "https://downloads.unidata.ucar.edu/netcdf-c/4.9.2/netCDF4.9.2-NC4-64.exe"
 
     - name:  Unpack NetCDF-C download
       working-directory: netcdf/netCDF4.9.2-NC4-64
@@ -52,7 +51,6 @@ runs:
         mkdir -p netcdf/netcdf-fortran-4.6.1/build
 
     - name: Download NetCDF-Fortran
-      working-directory: netcdf/netcdf-fortran-4.6.1
       uses: nick-fields/retry@v3
       with:
         shell: bash
@@ -63,7 +61,7 @@ runs:
           echo "WITH RETRIES"
           #curl -O "https://downloads.unidata.ucar.edu/netcdf-fortran/4.6.1/netcdf-fortran-4.6.1.zip"
           #curl --url "https://downloads.unidata.ucar.edu/netcdf-fortran/4.6.1/netcdf-fortran-4.6.1.zip" -o netcdf-fortran-4.6.1.zip
-          curl -L -o netcdf-fortran-4.6.1.zip "https://downloads.unidata.ucar.edu/netcdf-fortran/4.6.1/netcdf-fortran-4.6.1.zip"
+          curl -L -o netcdf/netcdf-fortran-4.6.1/netcdf-fortran-4.6.1.zip "https://downloads.unidata.ucar.edu/netcdf-fortran/4.6.1/netcdf-fortran-4.6.1.zip"
 
     - name: Unpack NetCDF-Fortran download
       working-directory: netcdf/netcdf-fortran-4.6.1

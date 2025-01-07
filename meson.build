@@ -190,7 +190,7 @@ with_netcdf = false
 if is_netcdf_build
   #netcdff = dependency('netcdf', language : 'fortran', static: false, required : true)
   netcdff_libdir = netcdff_compiled_abs / 'fortran'
-  netcdfc_libdir = netcdfc_compiled_abs / 'include'
+  netcdfc_libdir = netcdfc_compiled_abs
   netcdff = fc.find_library('netcdff', dirs: netcdff_libdir, static: false, required : true)
   netcdff = fc.find_library('netcdf', dirs: netcdfc_libdir, static: false, required : true)
   if netcdff.found()

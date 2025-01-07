@@ -196,7 +196,7 @@ if is_netcdf_build
   if netcdff.found() and netcdfc.found()
     with_netcdf = true
     extra_cmp_args += [ '-D__WITH_NETCDF__' ]
-    dependencies += [ netcdff, netcdf ]
+    dependencies += [ netcdff, netcdfc ]
     if build_machine.system() == 'windows'
       netcdf_incdir = include_directories([
         netcdfc_compiled_rel / 'include',

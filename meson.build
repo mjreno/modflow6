@@ -188,7 +188,8 @@ endif
 # find netcdf
 with_netcdf = false
 if is_netcdf_build
-  netcdff = dependency('netcdf', language : 'fortran', static: false, required : true)
+  #netcdff = dependency('netcdf', language : 'fortran', static: false, required : true)
+  netcdff = fc.find_library('netcdff', dirs: netcdff_libdir, static: false, required : true)
   if netcdff.found()
     with_netcdf = true
     extra_cmp_args += [ '-D__WITH_NETCDF__' ]
@@ -203,8 +204,8 @@ if is_netcdf_build
         '..' / netcdff_compiled_rel / 'fortran'
       ]
       netcdff_libdir = netcdff_compiled_abs / 'fortran'
-      lnetcdff = fc.find_library('netcdff', dirs: netcdff_libdir, static: false, required : true)
-      dependencies += [ lnetcdff ]
+      #lnetcdff = fc.find_library('netcdff', dirs: netcdff_libdir, static: false, required : true)
+      #dependencies += [ lnetcdff ]
     endif
   endif
 endif

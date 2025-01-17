@@ -199,8 +199,8 @@ if is_netcdf_build
       #if netcdf.found()
       with_netcdf = true
       extra_cmp_args += [ '-D__WITH_NETCDF__' ]
-      dependencies += [ netcdff ]
-      #dependencies += [ netcdff, netcdfc ]
+      #dependencies += [ netcdff ]
+      dependencies += [ netcdff, netcdfc ]
       #dependencies += [ netcdff, lnetcdff ]
       netcdf_incdir = include_directories([
         netcdfc_compiled_rel / 'include',

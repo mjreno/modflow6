@@ -211,6 +211,7 @@ if is_netcdf_build
     if netcdff.found()
       with_netcdf = true
       extra_cmp_args += [ '-D__WITH_NETCDF__' ]
+      dependencies += [ netcdff ]
     endif
   endif
 endif

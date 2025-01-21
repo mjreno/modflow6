@@ -188,7 +188,14 @@ endif
 # find netcdf
 with_netcdf = false
 if is_netcdf_build
-  netcdff = dependency('netcdf', language : 'fortran', static: false, required : true)
+  if build_machine.system() == 'windows'
+    #cmake = import('cmake') 
+    #netcdff = cmake.dependency('netcdff', modules: [netcdff_compiled_abs / 'netCDF-FortranConfig.cmake']))
+    netcdff = dependency('netcdff', method : 'cmake', cmake_args : ['-DCMAKE_PREFIX_PATH='netcdff_compiled_abs])
+    #netcdff = dependency('netcdf', language : 'fortran', static: false, required : true)
+  else
+    netcdff = dependency('netcdf', language : 'fortran', static: false, required : true)
+  end if
   if netcdff.found()
     with_netcdf = true
     extra_cmp_args += [ '-D__WITH_NETCDF__' ]

@@ -196,7 +196,7 @@ if is_netcdf_build
     #netcdff = dependency('netcdf', language : 'fortran', static: false, required : true)
   else
     netcdff = dependency('netcdf', language : 'fortran', static: false, required : true)
-  end if
+  endif
   if netcdff.found()
     with_netcdf = true
     extra_cmp_args += [ '-D__WITH_NETCDF__' ]

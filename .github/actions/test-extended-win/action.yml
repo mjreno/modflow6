@@ -26,6 +26,14 @@ runs:
       run: |
         cd autotest
         pytest test_gwf_sto01.py -s --keep temp
+
+    - name: REMOVE show failed test
+      if: failure()
+      shell: pixi run bash -e {0}
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+      working-directory: modflow6/autotest
+      run: |
         ls temp
         ls temp/test_mf6model_0-gwf_sto01_0
         cat temp/test_mf6model_0-gwf_sto01_0/mfsim.lst

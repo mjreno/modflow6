@@ -18,6 +18,13 @@ runs:
         GITHUB_TOKEN: ${{ github.token }}
       run: pixi run get-exes
 
+    - name: REMOVE test
+      working-directory: modflow6/autotest
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+      run: pytest test_gwf_sto01.py -s
+
     - name: Convert unix2dos
       shell: cmd
       run: |

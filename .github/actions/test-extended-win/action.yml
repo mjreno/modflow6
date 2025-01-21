@@ -27,6 +27,10 @@ runs:
         cd autotest
         pytest test_gwf_sto01.py -s --keep temp
 
+    - name: Setup tmate session
+      if: ${{ failure() }}
+      uses: mxschmitt/action-tmate@v3
+
     - name: REMOVE show failed test
       if: failure()
       shell: pixi run bash -e {0}

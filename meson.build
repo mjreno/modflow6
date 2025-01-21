@@ -194,9 +194,10 @@ if is_netcdf_build
     #cmake_arg = '-DCMAKE_PREFIX_PATH=' + netcdff_compiled_abs
     #netcdff = dependency('netcdff', method : 'cmake', cmake_args : [cmake_arg])
     nf_dir = netcdff_compiled_abs / 'fortran'
+    nf_dir_rel = netcdff_compiled_rel / 'fortran'
     netcdff = declare_dependency(
       link_args : ['-L' + nf_dir, '-l' + 'netcdff.lib'],
-      include_directories : include_directories(nf_dir)
+      include_directories : include_directories(nf_dir_rel)
     )
     #netcdff = dependency('netcdf', language : 'fortran', static: false, required : true)
   else

@@ -200,8 +200,10 @@ if is_netcdf_build
       with_netcdf = true
       extra_cmp_args += [ '-D__WITH_NETCDF__' ]
       #dependencies += [ netcdff ]
-      dependencies += [ netcdff, netcdfc ]
+      #dependencies += [ netcdff, netcdfc ]
       #dependencies += [ netcdff, lnetcdff ]
+      dependencies += netcdfc
+      dependencies += netcdff
       netcdf_incdir = include_directories([
         netcdfc_compiled_rel / 'include',
         netcdff_compiled_rel / 'fortran'

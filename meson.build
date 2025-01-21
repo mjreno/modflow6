@@ -196,7 +196,7 @@ if is_netcdf_build
     nf_dir = netcdff_compiled_abs / 'fortran'
     nf_dir_rel = netcdff_compiled_rel / 'fortran'
     netcdff = declare_dependency(
-      link_args : ['-L' + nf_dir, '-l' + 'netcdff.lib'],
+      link_args : ['-L' + nf_dir, '-l' + 'netcdff'],
       include_directories : include_directories(nf_dir_rel)
     )
     #netcdff = dependency('netcdf', language : 'fortran', static: false, required : true)

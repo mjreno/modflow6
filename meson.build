@@ -69,8 +69,8 @@ if fc_id == 'intel-cl'
                   ]
   #link_args += ['/ignore:4217', # access through ddlimport might be inefficient
   #              '/ignore:4286'  # same as 4217, but more general
+  #             ]
   link_args += ['/ignore:4217'] # access through ddlimport might be inefficient
-               ]
 elif fc_id == 'intel'
   # linux and macOS
   compile_args += ['-fpe0',              # Activate all floating point exceptions

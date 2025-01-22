@@ -201,7 +201,7 @@ if is_netcdf_build
     nc_dir_rel = netcdfc_compiled_rel / 'include'
     netcdff = declare_dependency(
       #link_args : ['-L' + nf_dir, '-L' + nc_dir, '-l' + 'netcdff', '-l' + 'netcdf', '-l' + 'hdf5'],
-      link_args : ['-L' + nf_dir, '-L' + nc_dir, '-l' + 'netcdff'],
+      link_args : ['-L' + nf_dir, '-L' + nc_dir, '-l' + 'netcdff', '-l' + 'netcdf'],
       include_directories : include_directories(nf_dir_rel, nc_dir_rel)
     )
     #netcdff = dependency('netcdf', language : 'fortran', static: false, required : true)

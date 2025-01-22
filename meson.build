@@ -193,7 +193,7 @@ if is_netcdf_build
     cmake = import('cmake')
     #netcdff = cmake.dependency('netcdff', modules: [netcdff_compiled_abs / 'netCDF-FortranConfig.cmake'])
     cmake_arg = '-DCMAKE_PREFIX_PATH=' + netcdff_compiled_abs
-    netcdff = dependency('netcdf', language : 'fortran', static : false, method : 'cmake', cmake_args : [cmake_arg])
+    netcdff = dependency('netcdff', language : 'fortran', static : false, method : 'cmake', cmake_args : [cmake_arg])
 
 
 #    nf_dir = netcdff_compiled_abs / 'fortran'

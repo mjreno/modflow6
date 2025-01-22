@@ -190,20 +190,22 @@ endif
 with_netcdf = false
 if is_netcdf_build
   if build_machine.system() == 'windows'
-    #cmake = import('cmake') 
-    #netcdff = cmake.dependency('netcdff', modules: [netcdff_compiled_abs / 'netCDF-FortranConfig.cmake']))
+    cmake = import('cmake')
+    netcdff = cmake.dependency('netcdff', modules: [netcdff_compiled_abs / 'netCDF-FortranConfig.cmake'])
     #cmake_arg = '-DCMAKE_PREFIX_PATH=' + netcdff_compiled_abs
     #netcdff = dependency('netcdff', method : 'cmake', cmake_args : [cmake_arg])
-    nf_dir = netcdff_compiled_abs / 'fortran'
+
+
+#    nf_dir = netcdff_compiled_abs / 'fortran'
     #nc_dir = netcdfc_compiled_abs / 'lib'
-    nc_dir = netcdfc_compiled_abs / 'bin'
-    nf_dir_rel = netcdff_compiled_rel / 'fortran'
-    nc_dir_rel = netcdfc_compiled_rel / 'include'
-    netcdff = declare_dependency(
+#    nc_dir = netcdfc_compiled_abs / 'bin'
+#    nf_dir_rel = netcdff_compiled_rel / 'fortran'
+#    nc_dir_rel = netcdfc_compiled_rel / 'include'
+#    netcdff = declare_dependency(
       #link_args : ['-L' + nf_dir, '-L' + nc_dir, '-l' + 'netcdff', '-l' + 'netcdf', '-l' + 'hdf5'],
-      link_args : ['-L' + nf_dir, '-L' + nc_dir, '-l' + 'netcdff', '-l' + 'netcdf'],
-      include_directories : include_directories(nf_dir_rel, nc_dir_rel)
-    )
+#      link_args : ['-L' + nf_dir, '-L' + nc_dir, '-l' + 'netcdff', '-l' + 'netcdf'],
+#      include_directories : include_directories(nf_dir_rel, nc_dir_rel)
+#    )
     #netcdff = dependency('netcdf', language : 'fortran', static: false, required : true)
   else
     netcdff = dependency('netcdf', language : 'fortran', static: false, required : true)

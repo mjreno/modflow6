@@ -67,8 +67,9 @@ if fc_id == 'intel-cl'
                    '/Qdiag-disable:5268', # Line too long
                    '/Qdiag-disable:10448',# ifort deprecation warning
                   ]
-  link_args += ['/ignore:4217', # access through ddlimport might be inefficient
-                '/ignore:4286'  # same as 4217, but more general
+  #link_args += ['/ignore:4217', # access through ddlimport might be inefficient
+  #              '/ignore:4286'  # same as 4217, but more general
+  link_args += ['/ignore:4217'] # access through ddlimport might be inefficient
                ]
 elif fc_id == 'intel'
   # linux and macOS

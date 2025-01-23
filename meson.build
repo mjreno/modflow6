@@ -191,14 +191,14 @@ endif
 with_netcdf = false
 if is_netcdf_build
   if build_machine.system() == 'windows'
-    cmake = import('cmake')
+    #cmake = import('cmake')
     #netcdff = cmake.dependency('netcdff', modules: [netcdff_compiled_abs / 'netCDF-FortranConfig.cmake'])
     #cmake_arg = '-DCMAKE_PREFIX_PATH=' + netcdff_compiled_abs
     #netcdff = dependency('netcdff', method : 'cmake', cmake_args : [cmake_arg])
     #my_cmake_lib_dep = dependency('my_cmake_lib', method: 'cmake', cmake_module_path: 'path/to/cmake/modules')
     nf_dir_rel = netcdff_compiled_rel / 'fortran'
     nf_dir_abs = netcdff_compiled_abs / 'fortran'
-    netcdff = dependency('netcdff', method: 'cmake', cmake_module_path: nf_dir_abs)
+    netcdff = dependency('netcdff', method: 'cmake', cmake_module_path: netcdff_compiled_rel)
 
 
 #    nf_dir = netcdff_compiled_abs / 'fortran'

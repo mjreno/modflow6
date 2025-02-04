@@ -210,11 +210,15 @@ if is_netcdf_build
     if build_machine.system() == 'windows'
       netcdf_incdir = include_directories([
         netcdfc_compiled_rel / 'include',
-        netcdff_compiled_rel / 'fortran'
+        #netcdff_compiled_rel / 'fortran'
+        netcdff_source_rel
       ])
       extended_incdir += [
-        '..' / netcdfc_compiled_rel / 'include',
-        '..' / netcdff_compiled_rel / 'fortran'
+        #'..' / netcdfc_compiled_rel / 'include',
+        #'..' / netcdff_compiled_rel / 'fortran'
+        #'..' / netcdff_source_rel
+        netcdfc_compiled_rel / 'include',
+        netcdff_source_rel
       ]
       #netcdff_libdir = netcdff_compiled_abs / 'fortran'
       #lnetcdff = fc.find_library('netcdff', dirs: netcdff_libdir, static: false, required : true)

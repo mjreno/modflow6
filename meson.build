@@ -200,9 +200,9 @@ if is_netcdf_build
     #nf_dir_abs = netcdff_compiled_abs / 'fortran'
     #netcdff = dependency('netcdf', method: 'cmake', cmake_module_path: netcdff_compiled_rel)
 
-#    nf_dir = netcdff_compiled_abs / 'fortran'
+    nf_dir = netcdff_compiled_abs / 'fortran'
     #nc_dir = netcdfc_compiled_abs / 'lib'
-#    nc_dir = netcdfc_compiled_abs / 'bin'
+    nc_dir = netcdfc_compiled_abs / 'bin'
     nf_dir_rel = netcdff_compiled_rel / 'fortran'
     nc_dir_rel = netcdfc_compiled_rel / 'include'
     netcdff = declare_dependency(

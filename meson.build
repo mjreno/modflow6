@@ -139,11 +139,14 @@ petsc_compiled_abs = petsc_dir_abs / petsc_arch
 netcdf_dir_rel = '..' /'netcdf'
 netcdf_dir_abs = meson.project_source_root() / '..' / 'netcdf'
 netcdfc_build = 'netCDF4.9.2-NC4-64'
+netcdff_src = 'netcdf-fortran-4.6.1' / 'fortran'
 netcdff_build = 'netcdf-fortran-4.6.1' / 'build'
 netcdfc_compiled_rel = netcdf_dir_rel / netcdfc_build
 netcdfc_compiled_abs = netcdf_dir_abs / netcdfc_build
 netcdff_compiled_rel = netcdf_dir_rel / netcdff_build
 netcdff_compiled_abs = netcdf_dir_abs / netcdff_build
+netcdff_source_rel = netcdf_dir_rel / netcdff_src
+netcdff_source_abs = netcdf_dir_abs / netcdff_src
 
 # on windows only with intel
 if build_machine.system() == 'windows' and is_parallel_build
@@ -188,7 +191,15 @@ endif
 # find netcdf
 with_netcdf = false
 if is_netcdf_build
-  netcdff = dependency('netcdf', language : 'fortran', static: false, required : true)
+  if build_machine.system() == 'windows'
+    netcdff_libdir = netcdff_compiled_abs / 'fortran'
+    netcdff = fc.find_library('netcdff',
+                              dirs: [netcdff_libdir, netcdff_source_abs],
+                              static: false,
+                              required : true)
+  else
+    netcdff = dependency('netcdf', language : 'fortran', static: false, required : true)
+  endif
   if netcdff.found()
     with_netcdf = true
     extra_cmp_args += [ '-D__WITH_NETCDF__' ]
@@ -202,9 +213,9 @@ if is_netcdf_build
         '..' / netcdfc_compiled_rel / 'include',
         '..' / netcdff_compiled_rel / 'fortran'
       ]
-      netcdff_libdir = netcdff_compiled_abs / 'fortran'
-      lnetcdff = fc.find_library('netcdff', dirs: netcdff_libdir, static: false, required : true)
-      dependencies += [ lnetcdff ]
+      #netcdff_libdir = netcdff_compiled_abs / 'fortran'
+      #lnetcdff = fc.find_library('netcdff', dirs: netcdff_libdir, static: false, required : true)
+      #dependencies += [ lnetcdff ]
     endif
   endif
 endif

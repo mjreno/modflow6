@@ -1,7 +1,6 @@
 project(
   'MODFLOW 6',
   'fortran',
-  'c',
   version: '6.7.0.dev0',
   license: 'CC0',
   meson_version: '>= 1.1.0',
@@ -68,10 +67,9 @@ if fc_id == 'intel-cl'
                    '/Qdiag-disable:5268', # Line too long
                    '/Qdiag-disable:10448',# ifort deprecation warning
                   ]
-  #link_args += ['/ignore:4217', # access through ddlimport might be inefficient
-  #              '/ignore:4286'  # same as 4217, but more general
-  #             ]
-  #link_args += ['/ignore:4217'] # access through ddlimport might be inefficient
+  link_args += ['/ignore:4217', # access through ddlimport might be inefficient
+                '/ignore:4286'  # same as 4217, but more general
+               ]
 elif fc_id == 'intel'
   # linux and macOS
   compile_args += ['-fpe0',              # Activate all floating point exceptions
@@ -190,30 +188,7 @@ endif
 # find netcdf
 with_netcdf = false
 if is_netcdf_build
-  if build_machine.system() == 'windows'
-    #cmake = import('cmake')
-    #netcdff = cmake.dependency('netcdff', modules: [netcdff_compiled_abs / 'netCDF-FortranConfig.cmake'])
-    #cmake_arg = '-DCMAKE_PREFIX_PATH=' + netcdff_compiled_abs
-    #netcdff = dependency('netcdff', method : 'cmake', cmake_args : [cmake_arg])
-    #my_cmake_lib_dep = dependency('my_cmake_lib', method: 'cmake', cmake_module_path: 'path/to/cmake/modules')
-    #nf_dir_rel = netcdff_compiled_rel / 'fortran'
-    #nf_dir_abs = netcdff_compiled_abs / 'fortran'
-    #netcdff = dependency('netcdf', method: 'cmake', cmake_module_path: netcdff_compiled_rel)
-
-    nf_dir = netcdff_compiled_abs / 'fortran'
-    nc_libdir = netcdfc_compiled_abs / 'lib'
-    nc_bindir = netcdfc_compiled_abs / 'bin'
-    nf_dir_rel = '..' / netcdff_compiled_rel / 'fortran'
-    nc_dir_rel = '..' / netcdfc_compiled_rel / 'include'
-    netcdff = declare_dependency(
-      #link_args : ['-L' + nf_dir, '-L' + nc_dir, '-l' + 'netcdff', '-l' + 'netcdf', '-l' + 'hdf5'],
-      link_args : ['-L' + nf_dir, '-L' + nc_libdir, '-L' + nc_bindir, '-l' + 'netcdff', '-l' + 'netcdf'],
-      include_directories : include_directories(nf_dir_rel, nc_dir_rel)
-    )
-    #netcdff = dependency('netcdf', language : 'fortran', static: false, required : true)
-  else
-    netcdff = dependency('netcdf', language : 'fortran', static: false, required : true)
-  endif
+  netcdff = dependency('netcdf', language : 'fortran', static: false, required : true)
   if netcdff.found()
     with_netcdf = true
     extra_cmp_args += [ '-D__WITH_NETCDF__' ]

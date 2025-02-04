@@ -196,20 +196,20 @@ if is_netcdf_build
     #cmake_arg = '-DCMAKE_PREFIX_PATH=' + netcdff_compiled_abs
     #netcdff = dependency('netcdff', method : 'cmake', cmake_args : [cmake_arg])
     #my_cmake_lib_dep = dependency('my_cmake_lib', method: 'cmake', cmake_module_path: 'path/to/cmake/modules')
-    nf_dir_rel = netcdff_compiled_rel / 'fortran'
-    nf_dir_abs = netcdff_compiled_abs / 'fortran'
-    netcdff = dependency('netcdf', method: 'cmake', cmake_module_path: netcdff_compiled_rel)
+    #nf_dir_rel = netcdff_compiled_rel / 'fortran'
+    #nf_dir_abs = netcdff_compiled_abs / 'fortran'
+    #netcdff = dependency('netcdf', method: 'cmake', cmake_module_path: netcdff_compiled_rel)
 
 #    nf_dir = netcdff_compiled_abs / 'fortran'
     #nc_dir = netcdfc_compiled_abs / 'lib'
 #    nc_dir = netcdfc_compiled_abs / 'bin'
-#    nf_dir_rel = netcdff_compiled_rel / 'fortran'
-#    nc_dir_rel = netcdfc_compiled_rel / 'include'
-#    netcdff = declare_dependency(
+    nf_dir_rel = netcdff_compiled_rel / 'fortran'
+    nc_dir_rel = netcdfc_compiled_rel / 'include'
+    netcdff = declare_dependency(
       #link_args : ['-L' + nf_dir, '-L' + nc_dir, '-l' + 'netcdff', '-l' + 'netcdf', '-l' + 'hdf5'],
-#      link_args : ['-L' + nf_dir, '-L' + nc_dir, '-l' + 'netcdff', '-l' + 'netcdf'],
-#      include_directories : include_directories(nf_dir_rel, nc_dir_rel)
-#    )
+      link_args : ['-L' + nf_dir, '-L' + nc_dir, '-l' + 'netcdff', '-l' + 'netcdf'],
+      include_directories : include_directories(nf_dir_rel, nc_dir_rel)
+    )
     #netcdff = dependency('netcdf', language : 'fortran', static: false, required : true)
   else
     netcdff = dependency('netcdf', language : 'fortran', static: false, required : true)

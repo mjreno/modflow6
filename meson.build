@@ -203,8 +203,8 @@ if is_netcdf_build
     nf_dir = netcdff_compiled_abs / 'fortran'
     nc_libdir = netcdfc_compiled_abs / 'lib'
     nc_bindir = netcdfc_compiled_abs / 'bin'
-    nf_dir_rel = netcdff_compiled_rel / 'fortran'
-    nc_dir_rel = netcdfc_compiled_rel / 'include'
+    nf_dir_rel = '..' / netcdff_compiled_rel / 'fortran'
+    nc_dir_rel = '..' / netcdfc_compiled_rel / 'include'
     netcdff = declare_dependency(
       #link_args : ['-L' + nf_dir, '-L' + nc_dir, '-l' + 'netcdff', '-l' + 'netcdf', '-l' + 'hdf5'],
       link_args : ['-L' + nf_dir, '-L' + nc_libdir, '-L' + nc_bindir, '-l' + 'netcdff', '-l' + 'netcdf'],

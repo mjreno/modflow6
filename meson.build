@@ -195,20 +195,13 @@ if is_netcdf_build
     netcdfc_incdir = netcdfc_compiled_abs / 'include'
     netcdfc_rincdir = netcdfc_compiled_rel / 'include'
     netcdfc_libdir = netcdfc_compiled_abs / 'lib'
-    #netcdff_lib = fc.find_library('netcdff',
-    #                              dirs: [netcdfc_libdir,
-    #                                netcdff_libdir],
-    #                              static: false,
-    #                              required : true)
-    #netcdfc_lib = fc.find_library('netcdf',
-    #                              dirs: [netcdfc_libdir],
-    #                              static: false,
-    #                              required : true)
     netcdff_lib = fc.find_library('netcdff',
-                                  #dirs: [netcdf_dir_abs],
-                                  #dirs: [netcdff_libdir],
                                   dirs: [netcdfc_libdir,
                                     netcdff_libdir],
+                                  static: false,
+                                  required : true)
+    netcdfc_lib = fc.find_library('netcdf',
+                                  dirs: [netcdfc_libdir],
                                   static: false,
                                   required : true)
 
@@ -228,8 +221,8 @@ if is_netcdf_build
 
 
     netcdff = declare_dependency(
-      #dependencies : [netcdfc_lib, netcdff_lib],
-      dependencies : [netcdff_lib],
+      dependencies : [netcdfc_lib, netcdff_lib],
+      #dependencies : [netcdff_lib],
       #link_with: netcdff_lib,
       include_directories : [netcdfc_rincdir, netcdff_rlibdir])
   else

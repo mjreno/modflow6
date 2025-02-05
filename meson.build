@@ -207,7 +207,7 @@ if is_netcdf_build
       include_directories : [netcdfc_incdir, netcdff_libdir])
   else
     netcdff = dependency('netcdf', language : 'fortran', static: false, required : true)
-  end if
+  endif
   if netcdff.found()
     with_netcdf = true
     extra_cmp_args += [ '-D__WITH_NETCDF__' ]

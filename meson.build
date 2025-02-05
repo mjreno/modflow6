@@ -139,14 +139,14 @@ petsc_compiled_abs = petsc_dir_abs / petsc_arch
 netcdf_dir_rel = '..' /'netcdf'
 netcdf_dir_abs = meson.project_source_root() / '..' / 'netcdf'
 netcdfc_build = 'netCDF4.9.2-NC4-64'
-netcdff_src = 'netcdf-fortran-4.6.1' / 'netcdf-fortran-4.6.1' / 'fortran'
 netcdff_build = 'netcdf-fortran-4.6.1' / 'build'
+netcdff_source = 'netcdf-fortran-4.6.1' / 'netcdf-fortran-4.6.1' / 'fortran'
 netcdfc_compiled_rel = netcdf_dir_rel / netcdfc_build
 netcdfc_compiled_abs = netcdf_dir_abs / netcdfc_build
 netcdff_compiled_rel = netcdf_dir_rel / netcdff_build
 netcdff_compiled_abs = netcdf_dir_abs / netcdff_build
-netcdff_source_rel = netcdf_dir_rel / netcdff_src
-netcdff_source_abs = netcdf_dir_abs / netcdff_src
+netcdff_source_rel = netcdf_dir_rel / netcdff_source
+netcdff_source_abs = netcdf_dir_abs / netcdff_source
 
 # on windows only with intel
 if build_machine.system() == 'windows' and is_parallel_build
@@ -197,7 +197,12 @@ if is_netcdf_build
     netcdfc_incdir = netcdfc_compiled_abs / 'include'
     netcdfc_libdir = netcdfc_compiled_abs / 'lib'
     netcdff = fc.find_library('netcdff',
-                              dirs: [netcdff_libdir, netcdff_source_abs, netcdfc_bindir, netcdfc_incdir, netcdfc_libdir],
+                              #dirs: [netcdff_libdir, netcdff_source_abs, netcdfc_bindir, netcdfc_incdir, netcdfc_libdir],
+                              dirs: [netcdfc_incdir,
+                                netcdfc_bindir,
+                                netcdfc_libdir,
+                                netcdff_source_abs,
+                                netcdff_libdir]
                               static: false,
                               required : true)
   else

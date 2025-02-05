@@ -197,11 +197,13 @@ if is_netcdf_build
     netcdfc_incdir = netcdfc_compiled_abs / 'include'
     netcdfc_libdir = netcdfc_compiled_abs / 'lib'
     netcdff = fc.find_library('netcdff',
-                              #dirs: [netcdff_libdir, netcdff_source_abs, netcdfc_bindir, netcdfc_incdir, netcdfc_libdir],
-                              dirs: [netcdfc_incdir,
-                                netcdfc_bindir,
+                              #dirs: [netcdfc_incdir,
+                              #  netcdfc_bindir,
+                              #  netcdfc_libdir,
+                              #  netcdff_source_abs,
+                              #  netcdff_libdir],
+                              dirs: [netcdfc_bindir,
                                 netcdfc_libdir,
-                                netcdff_source_abs,
                                 netcdff_libdir],
                               static: false,
                               required : true)
@@ -220,8 +222,8 @@ if is_netcdf_build
       ])
       extended_incdir += [
         '..' / netcdfc_compiled_rel / 'include',
-        '..' / netcdff_compiled_rel / 'fortran'
-        #'..' / netcdff_source_rel
+        #'..' / netcdff_compiled_rel / 'fortran'
+        '..' / netcdff_source_rel
       ]
       #netcdff_libdir = netcdff_compiled_abs / 'fortran'
       #lnetcdff = fc.find_library('netcdff', dirs: netcdff_libdir, static: false, required : true)

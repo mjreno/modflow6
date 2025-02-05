@@ -202,7 +202,7 @@ if is_netcdf_build
                                 netcdfc_bindir,
                                 netcdfc_libdir,
                                 netcdff_source_abs,
-                                netcdff_libdir]
+                                netcdff_libdir],
                               static: false,
                               required : true)
   else

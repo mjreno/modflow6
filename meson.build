@@ -205,7 +205,8 @@ if is_netcdf_build
     #                              static: false,
     #                              required : true)
     netcdff_lib = fc.find_library('netcdff',
-                                  dirs: [netcdf_dir_abs],
+                                  #dirs: [netcdf_dir_abs],
+                                  dirs: [netcdff_libdir],
                                   static: false,
                                   required : true)
 

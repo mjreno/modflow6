@@ -189,9 +189,9 @@ endif
 with_netcdf = false
 if is_netcdf_build
   if build_machine.system() == 'windows'
-    netcdff_libdir = netcdff_compiled_abs / 'fortran'
+    netcdff_libdir = netcdff_compiled_rel / 'fortran'
     netcdfc_bindir = netcdfc_compiled_abs / 'bin'
-    netcdfc_incdir = netcdfc_compiled_abs / 'include'
+    netcdfc_incdir = netcdfc_compiled_rel / 'include'
     netcdfc_libdir = netcdfc_compiled_abs / 'lib'
     netcdff_lib = fc.find_library('netcdff',
                                   dirs: [netcdfc_libdir,

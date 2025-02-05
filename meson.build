@@ -193,17 +193,27 @@ if is_netcdf_build
     netcdfc_bindir = netcdfc_compiled_abs / 'bin'
     netcdfc_incdir = netcdfc_compiled_abs / 'include'
     netcdfc_libdir = netcdfc_compiled_abs / 'lib'
+    netcdff_lib = fc.find_library('netcdff',
+                                  dirs: [netcdfc_libdir,
+                                    netcdff_libdir],
+                                  static: false,
+                                  required : true)
+    netcdfc_lib = fc.find_library('netcdf',
+                                  dirs: [netcdfc_libdir],
+                                  static: false,
+                                  required : true)
     #my_inc = include_directories(...)
     #my_lib = static_library(...)
     #my_dep = declare_dependency(link_with : my_lib,
     #  include_directories : my_inc)
     #my_shared_lib = shared_library('my_lib', ['source.c', 'utils.c'],
     #  include_directories : ['include_dir'])
-    netcdff_lib = shared_library('netcdff',
-      netcdff_libdir, 
-      include_directories : [netcdfc_incdir])
+    #netcdff_lib = shared_library('netcdff',
+    #  netcdff_libdir,
+    #  include_directories : [netcdfc_incdir])
     netcdff = declare_dependency(
-      link_with: netcdff_lib,
+      dependencies : [netcdfc_lib, netcdff_lib],
+      #link_with: netcdff_lib,
       include_directories : [netcdfc_incdir, netcdff_libdir])
   else
     netcdff = dependency('netcdf', language : 'fortran', static: false, required : true)

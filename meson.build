@@ -202,8 +202,10 @@ if is_netcdf_build
                               #  netcdfc_libdir,
                               #  netcdff_source_abs,
                               #  netcdff_libdir],
-                              dirs: [netcdfc_bindir,
-                                netcdfc_libdir,
+                              #dirs: [netcdfc_bindir,
+                              #  netcdfc_libdir,
+                              #  netcdff_libdir],
+                              dirs: [netcdfc_libdir,
                                 netcdff_libdir],
                               static: false,
                               required : true)
@@ -223,6 +225,8 @@ if is_netcdf_build
       extended_incdir += [
         '..' / netcdfc_compiled_rel / 'include',
         '..' / netcdff_compiled_rel / 'fortran'
+        # if below instead of above
+        # idm code doesn't compile, missing nf defs
         #'..' / netcdff_source_rel
       ]
       #netcdff_libdir = netcdff_compiled_abs / 'fortran'

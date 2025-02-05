@@ -209,7 +209,7 @@ if is_netcdf_build
                                 netcdff_libdir],
                               static: false,
                               required : true)
-    netcdff = fc.find_library('netcdf',
+    netcdfc = fc.find_library('netcdf',
                               dirs: [netcdfc_libdir],
                               static: false,
                               required : true)

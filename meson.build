@@ -140,13 +140,10 @@ netcdf_dir_rel = '..' /'netcdf'
 netcdf_dir_abs = meson.project_source_root() / '..' / 'netcdf'
 netcdfc_build = 'netCDF4.9.2-NC4-64'
 netcdff_build = 'netcdf-fortran-4.6.1' / 'build'
-netcdff_source = 'netcdf-fortran-4.6.1' / 'netcdf-fortran-4.6.1' / 'fortran'
 netcdfc_compiled_rel = netcdf_dir_rel / netcdfc_build
 netcdfc_compiled_abs = netcdf_dir_abs / netcdfc_build
 netcdff_compiled_rel = netcdf_dir_rel / netcdff_build
 netcdff_compiled_abs = netcdf_dir_abs / netcdff_build
-netcdff_source_rel = netcdf_dir_rel / netcdff_source
-netcdff_source_abs = netcdf_dir_abs / netcdff_source
 
 # on windows only with intel
 if build_machine.system() == 'windows' and is_parallel_build
@@ -196,48 +193,37 @@ if is_netcdf_build
     netcdfc_bindir = netcdfc_compiled_abs / 'bin'
     netcdfc_incdir = netcdfc_compiled_abs / 'include'
     netcdfc_libdir = netcdfc_compiled_abs / 'lib'
-    netcdff = fc.find_library('netcdff',
-                              #dirs: [netcdfc_incdir,
-                              #  netcdfc_bindir,
-                              #  netcdfc_libdir,
-                              #  netcdff_source_abs,
-                              #  netcdff_libdir],
-                              #dirs: [netcdfc_bindir,
-                              #  netcdfc_libdir,
-                              #  netcdff_libdir],
-                              dirs: [netcdfc_libdir,
-                                netcdff_libdir],
-                              static: false,
-                              required : true)
-    netcdfc = fc.find_library('netcdf',
-                              dirs: [netcdfc_libdir],
-                              static: false,
-                              required : true)
-    dependencies += [ netcdfc, netcdff ]
+    #my_inc = include_directories(...)
+    #my_lib = static_library(...)
+    #my_dep = declare_dependency(link_with : my_lib,
+    #  include_directories : my_inc)
+    #my_shared_lib = shared_library('my_lib', ['source.c', 'utils.c'],
+    #  include_directories : ['include_dir'])
+    netcdff_lib = shared_library('netcdff',
+      netcdff_libdir, 
+      include_directories : [netcdfc_incdir])
+    netcdff = declare_dependency(
+      link_with: netcdff_lib,
+      include_directories : [netcdfc_incdir, netcdff_libdir])
   else
     netcdff = dependency('netcdf', language : 'fortran', static: false, required : true)
-    dependencies += [ netcdff ]
-  endif
+  end if
   if netcdff.found()
     with_netcdf = true
     extra_cmp_args += [ '-D__WITH_NETCDF__' ]
-    #dependencies += [ netcdff ]
+    dependencies += [ netcdff ]
     if build_machine.system() == 'windows'
       netcdf_incdir = include_directories([
         netcdfc_compiled_rel / 'include',
         netcdff_compiled_rel / 'fortran'
-        #netcdff_source_rel
       ])
       extended_incdir += [
         '..' / netcdfc_compiled_rel / 'include',
         '..' / netcdff_compiled_rel / 'fortran'
-        # if below instead of above
-        # idm code doesn't compile, missing nf defs
-        #'..' / netcdff_source_rel
       ]
-      #netcdff_libdir = netcdff_compiled_abs / 'fortran'
-      #lnetcdff = fc.find_library('netcdff', dirs: netcdff_libdir, static: false, required : true)
-      #dependencies += [ lnetcdff ]
+      netcdff_libdir = netcdff_compiled_abs / 'fortran'
+      lnetcdff = fc.find_library('netcdff', dirs: netcdff_libdir, static: false, required : true)
+      dependencies += [ lnetcdff ]
     endif
   endif
 endif

@@ -209,13 +209,19 @@ if is_netcdf_build
                                 netcdff_libdir],
                               static: false,
                               required : true)
+    netcdff = fc.find_library('netcdf',
+                              dirs: [netcdfc_libdir],
+                              static: false,
+                              required : true)
+    dependencies += [ netcdfc, netcdff ]
   else
     netcdff = dependency('netcdf', language : 'fortran', static: false, required : true)
+    dependencies += [ netcdff ]
   endif
   if netcdff.found()
     with_netcdf = true
     extra_cmp_args += [ '-D__WITH_NETCDF__' ]
-    dependencies += [ netcdff ]
+    #dependencies += [ netcdff ]
     if build_machine.system() == 'windows'
       netcdf_incdir = include_directories([
         netcdfc_compiled_rel / 'include',

@@ -225,6 +225,7 @@ if is_netcdf_build
       #dependencies : [netcdff_lib],
       #link_with: netcdff_lib,
       include_directories : [netcdfc_rincdir, netcdff_rlibdir])
+    dependencies += [ netcdfc_lib, netcdff_lib ]
   else
     netcdff = dependency('netcdf', language : 'fortran', static: false, required : true)
   endif

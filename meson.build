@@ -201,7 +201,7 @@ if is_netcdf_build
                                   static: false,
                                   required : true)
     netcdfc_lib = fc.find_library('netcdf',
-                                  dirs: [netcdfc_libdir],
+                                  dirs: [netcdfc_bindir, netcdfc_libdir],
                                   static: false,
                                   required : true)
 
@@ -220,21 +220,21 @@ if is_netcdf_build
     
 
 
-    #netcdff = declare_dependency(
-    #  dependencies : [netcdfc_lib, netcdff_lib],
+    netcdff = declare_dependency(
+      dependencies : [netcdfc_lib, netcdff_lib],
       #dependencies : [netcdff_lib],
       #link_with: netcdff_lib,
-    #  include_directories : [netcdfc_rincdir, netcdff_rlibdir])
-    #dependencies += [ netcdfc_lib, netcdff_lib ]
-    netcdfc = declare_dependency(
-      dependencies : [netcdfc_lib],
-      include_directories : [netcdfc_rincdir])
-    netcdff = declare_dependency(
-      dependencies : [netcdff_lib],
-      include_directories : [netcdff_rlibdir])
-    if netcdfc.found()
-      dependencies += [ netcdfc ]
-    endif
+      include_directories : [netcdfc_rincdir, netcdff_rlibdir])
+    dependencies += [ netcdfc_lib, netcdff_lib ]
+    #netcdfc = declare_dependency(
+    #  dependencies : [netcdfc_lib],
+    #  include_directories : [netcdfc_rincdir])
+    #netcdff = declare_dependency(
+    #  dependencies : [netcdff_lib],
+    #  include_directories : [netcdff_rlibdir])
+    #if netcdfc.found()
+    #  dependencies += [ netcdfc ]
+    #endif
   else
     netcdff = dependency('netcdf', language : 'fortran', static: false, required : true)
   endif

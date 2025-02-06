@@ -224,7 +224,11 @@ if is_netcdf_build
     netcdff = declare_dependency(
       dependencies : [netcdfc_lib, netcdff_lib],
       #dependencies : [netcdff_lib],
-      link_with: [netcdfc_lib, netcdff_lib],
+      #link_with: [netcdfc_lib, netcdff_lib],
+      #link_whole:
+      #link_args: [-I${NFDIR}/include -L${NFDIR}/lib -lnetcdff],
+      #link_args: ['-L${NFDIR}/lib', '-lnetcdff'],
+      link_args : ['-L' + netcdfc_bindir, '-L' + netcdff_libdir, '-l' + 'netcdf', '-l' + 'netcdff'],
       include_directories : [netcdfc_rincdir, netcdff_rlibdir])
     dependencies += [ netcdfc_lib, netcdff_lib ]
     #netcdfc = declare_dependency(

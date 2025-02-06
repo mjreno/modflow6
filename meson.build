@@ -188,66 +188,11 @@ endif
 # find netcdf
 with_netcdf = false
 if is_netcdf_build
-  if build_machine.system() == 'windows'
-    netcdff_libdir = netcdff_compiled_abs / 'fortran'
-    netcdff_rlibdir = netcdff_compiled_rel / 'fortran'
-    netcdfc_bindir = netcdfc_compiled_abs / 'bin'
-    netcdfc_incdir = netcdfc_compiled_abs / 'include'
-    netcdfc_rincdir = netcdfc_compiled_rel / 'include'
-    netcdfc_libdir = netcdfc_compiled_abs / 'lib'
-    netcdff_lib = fc.find_library('netcdff',
-                                  dirs: [netcdfc_libdir,
-                                    netcdff_libdir],
-                                  static: false,
-                                  required : true)
-    netcdfc_lib = fc.find_library('netcdf',
-                                  dirs: [netcdfc_bindir, netcdfc_libdir],
-                                  #dirs: [netcdfc_bindir],
-                                  static: false,
-                                  required : true)
-
-
-    ###  example                            
-    #my_inc = include_directories(...)
-    #my_lib = static_library(...)
-    #my_dep = declare_dependency(link_with : my_lib,
-    #  include_directories : my_inc)
-    #my_shared_lib = shared_library('my_lib', ['source.c', 'utils.c'],
-    #  include_directories : ['include_dir'])
-    #netcdff_lib = shared_library('netcdff',
-    #  netcdff_libdir,
-    #  include_directories : [netcdfc_incdir])
-    ####
-    
-
-
-    netcdff = declare_dependency(
-      dependencies : [netcdfc_lib, netcdff_lib],
-      #dependencies : [netcdff_lib],
-      #link_with: [netcdfc_lib, netcdff_lib],
-      #link_whole:
-      #link_args: [-I${NFDIR}/include -L${NFDIR}/lib -lnetcdff],
-      #link_args: ['-L${NFDIR}/lib', '-lnetcdff'],
-      link_args : ['-L' + netcdfc_bindir, '-L' + netcdfc_libdir, '-L' + netcdff_libdir, '-l' + 'netcdf', '-l' + 'netcdff'],
-      include_directories : [netcdfc_rincdir, netcdff_rlibdir])
-    dependencies += [ netcdfc_lib, netcdff_lib ]
-    #netcdfc = declare_dependency(
-    #  dependencies : [netcdfc_lib],
-    #  include_directories : [netcdfc_rincdir])
-    #netcdff = declare_dependency(
-    #  dependencies : [netcdff_lib],
-    #  include_directories : [netcdff_rlibdir])
-    #if netcdfc.found()
-    #  dependencies += [ netcdfc ]
-    #endif
-  else
-    netcdff = dependency('netcdf', language : 'fortran', static: false, required : true)
-  endif
+  netcdff = dependency('netcdf', language : 'fortran', static: false, required : true)
   if netcdff.found()
     with_netcdf = true
     extra_cmp_args += [ '-D__WITH_NETCDF__' ]
     dependencies += [ netcdff ]
-    #message('netcdf deps:', dependencies)
     if build_machine.system() == 'windows'
       netcdf_incdir = include_directories([
         netcdfc_compiled_rel / 'include',
@@ -257,9 +202,9 @@ if is_netcdf_build
         '..' / netcdfc_compiled_rel / 'include',
         '..' / netcdff_compiled_rel / 'fortran'
       ]
-      #netcdff_libdir = netcdff_compiled_abs / 'fortran'
-      #lnetcdff = fc.find_library('netcdff', dirs: netcdff_libdir, static: false, required : true)
-      #dependencies += [ lnetcdff ]
+      netcdff_libdir = netcdff_compiled_abs / 'fortran'
+      lnetcdff = fc.find_library('netcdff', dirs: netcdff_libdir, static: false, required : true)
+      dependencies += [ lnetcdff ]
     endif
   endif
 endif

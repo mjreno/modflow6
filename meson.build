@@ -220,12 +220,21 @@ if is_netcdf_build
     
 
 
-    netcdff = declare_dependency(
-      dependencies : [netcdfc_lib, netcdff_lib],
+    #netcdff = declare_dependency(
+    #  dependencies : [netcdfc_lib, netcdff_lib],
       #dependencies : [netcdff_lib],
       #link_with: netcdff_lib,
-      include_directories : [netcdfc_rincdir, netcdff_rlibdir])
-    dependencies += [ netcdfc_lib, netcdff_lib ]
+    #  include_directories : [netcdfc_rincdir, netcdff_rlibdir])
+    #dependencies += [ netcdfc_lib, netcdff_lib ]
+    netcdfc = declare_dependency(
+      dependencies : [netcdfc_lib],
+      include_directories : [netcdfc_rincdir])
+    netcdff = declare_dependency(
+      dependencies : [netcdff_lib],
+      include_directories : [netcdff_rlibdir])
+    if netcdfc.found()
+      dependencies += [ netcdfc ]
+    endif
   else
     netcdff = dependency('netcdf', language : 'fortran', static: false, required : true)
   endif
@@ -233,6 +242,7 @@ if is_netcdf_build
     with_netcdf = true
     extra_cmp_args += [ '-D__WITH_NETCDF__' ]
     dependencies += [ netcdff ]
+    message('netcdf deps:', dependencies)
     if build_machine.system() == 'windows'
       netcdf_incdir = include_directories([
         netcdfc_compiled_rel / 'include',

@@ -201,8 +201,8 @@ if is_netcdf_build
                                   static: false,
                                   required : true)
     netcdfc_lib = fc.find_library('netcdf',
-                                  #dirs: [netcdfc_bindir, netcdfc_libdir],
-                                  dirs: [netcdfc_bindir],
+                                  dirs: [netcdfc_bindir, netcdfc_libdir],
+                                  #dirs: [netcdfc_bindir],
                                   static: false,
                                   required : true)
 
@@ -224,7 +224,7 @@ if is_netcdf_build
     netcdff = declare_dependency(
       dependencies : [netcdfc_lib, netcdff_lib],
       #dependencies : [netcdff_lib],
-      #link_with: netcdff_lib,
+      link_with: [netcdfc_lib, netcdff_lib],
       include_directories : [netcdfc_rincdir, netcdff_rlibdir])
     dependencies += [ netcdfc_lib, netcdff_lib ]
     #netcdfc = declare_dependency(

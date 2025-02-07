@@ -57,3 +57,16 @@ runs:
         echo "/c/Program Files (x86)/Intel/oneAPI/mpi/latest/opt/mpi/libfabric/bin" >> $GITHUB_PATH
         echo "/c/Program Files (x86)/Intel/oneAPI/compiler/latest/bin" >> $GITHUB_PATH
         echo "/c/Program Files (x86)/Intel/oneAPI/mkl/latest/bin" >> $GITHUB_PATH
+
+    - name: Setup extended test environment
+      shell: cmd
+      run: |
+        #echo %PETSC_DIR%\%PETSC_ARCH%\lib>>%GITHUB_PATH%
+        echo %GITHUB_WORKSPACE%\netcdf\netCDF4.9.2-NC4-64\bin>>%GITHUB_PATH%
+        echo %GITHUB_WORKSPACE%\netcdf\netCDF4.9.2-NC4-64\lib>>%GITHUB_PATH%
+        echo %GITHUB_WORKSPACE%\netcdf\netcdf-fortran-4.6.1\build>>%GITHUB_PATH%
+        echo %GITHUB_WORKSPACE%netcdf\netcdf-fortran-4.6.1\build\fortran>>%GITHUB_PATH%
+        echo "C:Program Files (x86)/Intel/oneAPI/mpi/latest/bin">>%GITHUB_PATH%
+        echo "C:Program Files (x86)/Intel/oneAPI/mpi/latest/opt/mpi/libfabric/bin">>%GITHUB_PATH%
+        echo "C:Program Files (x86)/Intel/oneAPI/compiler/latest/bin">>%GITHUB_PATH%
+        echo "C:Program Files (x86)/Intel/oneAPI/mkl/latest/bin">>%GITHUB_PATH%

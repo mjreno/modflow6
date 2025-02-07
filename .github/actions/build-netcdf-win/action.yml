@@ -44,11 +44,11 @@ runs:
     - name: Configure environment
       shell: bash
       run: |
-        echo "LD_LIBRARY_PATH=$GITHUB_WORKSPACE/netcdf/netCDF4.9.2-NC4-64/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
-        echo "LD_LIBRARY_PATH=$GITHUB_WORKSPACE/netcdf/netcdf-fortran-4.6.1/build/fortran:$LD_LIBRARY_PATH" >> $GITHUB_ENV
+        #echo "LD_LIBRARY_PATH=$GITHUB_WORKSPACE/netcdf/netCDF4.9.2-NC4-64/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
+        #echo "LD_LIBRARY_PATH=$GITHUB_WORKSPACE/netcdf/netcdf-fortran-4.6.1/build/fortran:$LD_LIBRARY_PATH" >> $GITHUB_ENV
         #echo "LD_LIBRARY_PATH=/c/Program Files (x86)/Intel/oneAPI/mpi/latest/bin:$LD_LIBRARY_PATH" >> $GITHUB_ENV
-        echo "PKG_CONFIG_PATH=$GITHUB_WORKSPACE/netcdf/netCDF4.9.2-NC4-64/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
-        echo "PKG_CONFIG_PATH=$GITHUB_WORKSPACE/netcdf/netcdf-fortran-4.6.1/build:$PKG_CONFIG_PATH" >> $GITHUB_ENV
+        #echo "PKG_CONFIG_PATH=$GITHUB_WORKSPACE/netcdf/netCDF4.9.2-NC4-64/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
+        #echo "PKG_CONFIG_PATH=$GITHUB_WORKSPACE/netcdf/netcdf-fortran-4.6.1/build:$PKG_CONFIG_PATH" >> $GITHUB_ENV
         echo "$GITHUB_WORKSPACE/netcdf/netCDF4.9.2-NC4-64/bin" >> $GITHUB_PATH
         echo "$GITHUB_WORKSPACE/netcdf/netCDF4.9.2-NC4-64/lib" >> $GITHUB_PATH
         echo "$GITHUB_WORKSPACE/netcdf/netcdf-fortran-4.6.1/build" >> $GITHUB_PATH

@@ -18,31 +18,6 @@ runs:
         GITHUB_TOKEN: ${{ github.token }}
       run: pixi run get-exes
 
-    - name: REMOVE test
-      working-directory: modflow6
-      shell: pixi run bash -e {0}
-      env:
-        GITHUB_TOKEN: ${{ github.token }}
-      run: |
-        cd autotest
-        pytest test_gwf_sto01.py -s --keep temp
-
-    - name: Setup tmate session
-      if: ${{ failure() }}
-      uses: mxschmitt/action-tmate@v3
-
-    - name: REMOVE show failed test
-      if: failure()
-      shell: pixi run bash -e {0}
-      env:
-        GITHUB_TOKEN: ${{ github.token }}
-      working-directory: modflow6/autotest
-      run: |
-        ls temp
-        ls temp/test_mf6model_0-gwf_sto01_0
-        cat temp/test_mf6model_0-gwf_sto01_0/mfsim.lst
-        cat temp/test_mf6model_0-gwf_sto01_0/gwf_sto01.lst
-
     - name: Convert unix2dos
       shell: cmd
       run: |
@@ -64,3 +39,7 @@ runs:
         MARKERS: not developmode
       run: |
         "%ONEAPI_ROOT%\setvars.bat" intel64 vs2022 && "%TEMP%\test_modflow6_extended.bat"
+
+    - name: Setup tmate session
+      if: ${{ failure() }}
+      uses: mxschmitt/action-tmate@v3

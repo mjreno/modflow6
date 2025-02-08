@@ -44,8 +44,6 @@ runs:
     - name: Update path for netcdf libs
       shell: bash
       run: |
-        ls "$GITHUB_WORKSPACE/netcdf/netcdf-fortran-4.6.1/build"
-        ls "$GITHUB_WORKSPACE/netcdf/netcdf-fortran-4.6.1/build/fortran"
         echo "$GITHUB_WORKSPACE/netcdf/netCDF4.9.2-NC4-64/bin" >> $GITHUB_PATH
         echo "$GITHUB_WORKSPACE/netcdf/netCDF4.9.2-NC4-64/lib" >> $GITHUB_PATH
         echo "$GITHUB_WORKSPACE/netcdf/netcdf-fortran-4.6.1/build/fortran" >> $GITHUB_PATH

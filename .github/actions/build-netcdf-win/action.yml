@@ -21,7 +21,8 @@ runs:
         cd netcdf/netCDF4.9.2-NC4-64
         curl https://downloads.unidata.ucar.edu/netcdf-c/4.9.2/netCDF4.9.2-NC4-64.exe -O -J
         cd ../../modflow6
-        pixi run py7zr x ../netcdf/netCDF4.9.2-NC4-64/netCDF4.9.2-NC4-64.exe -aou
+        #pixi run py7zr x ../netcdf/netCDF4.9.2-NC4-64/netCDF4.9.2-NC4-64.exe -aou
+        pixi run py7zr x ../netcdf/netCDF4.9.2-NC4-64/netCDF4.9.2-NC4-64.exe
         ls
         ls ../netcdf/netCDF4.9.2-NC4-64
 

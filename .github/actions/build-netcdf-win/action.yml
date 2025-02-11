@@ -20,7 +20,7 @@ runs:
         mkdir -p netcdf/netCDF4.9.2-NC4-64
         cd netcdf/netCDF4.9.2-NC4-64
         curl https://downloads.unidata.ucar.edu/netcdf-c/4.9.2/netCDF4.9.2-NC4-64.exe -O -J
-        py7zr x netCDF4.9.2-NC4-64.exe -aou
+        pixi run py7zr x netCDF4.9.2-NC4-64.exe -aou
 
     - name: Download NetCDF-Fortran
       shell: bash

@@ -1,6 +1,8 @@
 name: MODFLOW 6 continuous integration
 on:
   push:
+    branches:
+      - py7zr
     paths-ignore:
       - "**.md"
       - "**.pdf"
@@ -521,7 +523,7 @@ jobs:
 
       - name: Install additional netcdf testing packages
         working-directory: modflow6
-        run: pixi run pip install xugrid xarray netcdf4
+        run: pixi run pip install xugrid xarray netcdf4 py7zr
 
       - name: Set LDFLAGS (macOS)
         if: matrix.os == 'macos-13'

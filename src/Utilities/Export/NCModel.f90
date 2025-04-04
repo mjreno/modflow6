@@ -38,10 +38,13 @@ module NCModelExportModule
     type(ModflowInputType) :: mf6_input !< description of modflow6 input
     character(len=LINELENGTH), dimension(:), allocatable :: param_names !< dynamic param tagnames
     type(ReadStateVarType), dimension(:), allocatable :: param_reads !< param read states
+    integer(I4B), dimension(:, :), allocatable :: varids_param
+    integer(I4B), dimension(:, :), allocatable :: varids_aux
     integer(I4B), dimension(:), pointer, contiguous :: mshape => null() !< model shape
     integer(I4B), pointer :: iper !< most recent package rp load
     integer(I4B) :: iper_export !< most recent period of netcdf package export
     integer(I4B) :: nparam !< number of in scope params
+    integer(I4B) :: naux !< number of auxiliary variables
   contains
     procedure :: init => epkg_init
     procedure :: destroy => epkg_destroy
@@ -81,7 +84,6 @@ module NCModelExportModule
     real(DP), dimension(:), pointer, contiguous :: x !< dependent variable pointer
     integer(I4B) :: disenum !< type of discretization
     integer(I4B) :: ncid !< netcdf file descriptor
-    integer(I4B) :: stepcnt !< simulation step count
     integer(I4B) :: totnstp !< simulation total number of steps
     integer(I4B), pointer :: deflate !< variable deflate level
     integer(I4B), pointer :: shuffle !< variable shuffle filter
@@ -102,9 +104,9 @@ module NCModelExportModule
   contains
     procedure :: export_input
     procedure(model_define), deferred :: df
+    procedure(package_export), deferred :: export_df
     procedure(model_step), deferred :: step
     procedure(package_export), deferred :: package_step
-    procedure(package_export_ilayer), deferred :: package_step_ilayer
   end type NCBaseModelExportType
 
   !> @brief abstract interfaces for model netcdf export type
@@ -137,7 +139,7 @@ contains
 
   !> @brief initialize dynamic package export object
   !<
-  subroutine epkg_init(this, mf6_input, mshape, param_names, &
+  subroutine epkg_init(this, mf6_input, mshape, naux, param_names, &
                        nparam)
     use SimVariablesModule, only: idm_context
     use MemoryManagerModule, only: mem_setptr
@@ -146,6 +148,7 @@ contains
     class(ExportPackageType), intent(inout) :: this
     type(ModflowInputType), intent(in) :: mf6_input
     integer(I4B), dimension(:), pointer, contiguous, intent(in) :: mshape !< model shape
+    integer(I4B), intent(in) :: naux
     character(len=LINELENGTH), dimension(:), allocatable, &
       intent(in) :: param_names
     integer(I4B), intent(in) :: nparam
@@ -157,6 +160,7 @@ contains
     this%mf6_input = mf6_input
     this%mshape => mshape
     this%nparam = nparam
+    this%naux = naux
     this%iper_export = 0
 
     input_mempath = create_mem_path(component=mf6_input%component_name, &
@@ -166,6 +170,8 @@ contains
     ! allocate param arrays
     allocate (this%param_names(nparam))
     allocate (this%param_reads(nparam))
+    allocate (this%varids_param(nparam, mshape(1)))
+    allocate (this%varids_aux(naux, mshape(1)))
 
     ! set param arrays
     do n = 1, nparam
@@ -262,7 +268,7 @@ contains
   !<
   subroutine export_init(this, modelname, modeltype, modelfname, nc_fname, &
                          disenum, nctype, iout)
-    use TdisModule, only: datetime0, nstp
+    use TdisModule, only: datetime0, nstp, inats
     use MemoryManagerModule, only: mem_setptr
     use MemoryHelperModule, only: create_mem_path
     use MemoryManagerExtModule, only: mem_set_value
@@ -298,7 +304,6 @@ contains
     this%xname = ''
     this%disenum = disenum
     this%ncid = 0
-    this%stepcnt = 0
     this%totnstp = 0
     this%deflate = -1
     this%shuffle = 0
@@ -371,6 +376,14 @@ contains
       this%datetime = 'days since 1970-01-01T00:00:00'
     end if
 
+    ! TODO: verify this will be set at this point
+    if (inats > 0) then
+      errmsg = 'Adaptive time stepping not currently supported &
+               &with NetCDF exports.'
+      call store_error(errmsg)
+      call store_error_filename(modelfname)
+    end if
+
     ! set total nstp
     this%totnstp = sum(nstp)
   end subroutine export_init
@@ -412,7 +425,7 @@ contains
 
   !> @brief build netcdf variable name
   !<
-  function export_varname(pkgname, tagname, mempath, layer, iper, iaux) &
+  function export_varname(pkgname, tagname, mempath, layer, iaux) &
     result(varname)
     use MemoryManagerModule, only: mem_setptr
     use CharacterStringModule, only: CharacterStringType
@@ -421,7 +434,6 @@ contains
     character(len=*), intent(in) :: tagname
     character(len=*), intent(in) :: mempath
     integer(I4B), optional, intent(in) :: layer
-    integer(I4B), optional, intent(in) :: iper
     integer(I4B), optional, intent(in) :: iaux
     character(len=LINELENGTH) :: varname
     type(CharacterStringType), dimension(:), pointer, &
@@ -450,25 +462,25 @@ contains
         write (varname, '(a,i0)') trim(varname)//'_l', layer
       end if
     end if
-    if (present(iper)) then
-      if (iper > 0) then
-        !write (varname, '(a,i0)') trim(varname)//'_SP', iper
-        write (varname, '(a,i0)') trim(varname)//'_p', iper
-      end if
-    end if
   end function export_varname
 
   !> @brief build netcdf variable longname
   !<
-  function export_longname(longname, pkgname, tagname, layer, iper) result(lname)
+  function export_longname(longname, pkgname, tagname, mempath, layer, iaux) &
+    result(lname)
+    use MemoryManagerModule, only: mem_setptr
+    use CharacterStringModule, only: CharacterStringType
     use InputOutputModule, only: lowcase
     character(len=*), intent(in) :: longname
     character(len=*), intent(in) :: pkgname
     character(len=*), intent(in) :: tagname
+    character(len=*), intent(in) :: mempath
     integer(I4B), optional, intent(in) :: layer
-    integer(I4B), optional, intent(in) :: iper
+    integer(I4B), optional, intent(in) :: iaux
     character(len=LINELENGTH) :: lname
-    character(len=LINELENGTH) :: pname, vname
+    type(CharacterStringType), dimension(:), pointer, &
+      contiguous :: auxnames
+    character(len=LINELENGTH) :: pname, vname, auxname
     pname = pkgname
     vname = tagname
     call lowcase(pname)
@@ -478,14 +490,22 @@ contains
     else
       lname = longname
     end if
+
+    if (present(iaux)) then
+      if (iaux > 0) then
+        if (tagname == 'AUX') then
+          ! reset vname to auxiliary variable name
+          call mem_setptr(auxnames, 'AUXILIARY', mempath)
+          auxname = auxnames(iaux)
+          call lowcase(auxname)
+          lname = trim(lname)//' '//trim(auxname)
+        end if
+      end if
+    end if
+
     if (present(layer)) then
       if (layer > 0) then
         write (lname, '(a,i0)') trim(lname)//' layer=', layer
-      end if
-    end if
-    if (present(iper)) then
-      if (iper > 0) then
-        write (lname, '(a,i0)') trim(lname)//' period=', iper
       end if
     end if
   end function export_longname
@@ -494,12 +514,9 @@ contains
   !<
   subroutine export_input(this)
     use TdisModule, only: kper
-    use ArrayHandlersModule, only: ifind
     class(NCBaseModelExportType), intent(inout) :: this
-    integer(I4B) :: idx, ilayer
+    integer(I4B) :: idx
     class(ExportPackageType), pointer :: export_pkg
-    character(len=LENVARNAME) :: ilayer_varname
-
     do idx = 1, this%pkglist%Count()
       export_pkg => this%get(idx)
       ! last loaded data is not current period
@@ -508,22 +525,8 @@ contains
       if (export_pkg%iper_export >= export_pkg%iper) cycle
       ! set exported iper
       export_pkg%iper_export = export_pkg%iper
-
-      ! initialize ilayer
-      ilayer = 0
-
-      ! set expected ilayer index variable name
-      ilayer_varname = 'I'//trim(export_pkg%mf6_input%subcomponent_type(1:3))
-
-      ! is ilayer variable in param name list
-      ilayer = ifind(export_pkg%param_names, ilayer_varname)
-
-      ! layer index variable is required to be first defined in period block
-      if (ilayer == 1) then
-        call this%package_step_ilayer(export_pkg, ilayer_varname, ilayer)
-      else
-        call this%package_step(export_pkg)
-      end if
+      ! update export package
+      call this%package_step(export_pkg)
     end do
   end subroutine export_input
 

@@ -58,6 +58,10 @@ runs:
         pixi run build builddir
         pixi run test builddir
 
+    - name: Setup tmate session
+      if: ${{ failure() }}
+      uses: mxschmitt/action-tmate@v3
+
     - name: Show Meson logs
       if: failure()
       shell: bash

@@ -48,19 +48,14 @@ runs:
       run: |
         brew install netcdf-fortran
         nc-config --all
-        nf-config
-        which pixi
-        pixi info
-        pixi list
-        ls
+        nf-config --all
+        echo "Install netcdf complete"
 
     - name: Build modflow6
       shell: bash
       working-directory: modflow6
       run: |
-        which pixi
-        pixi info
-        pixi list
+        echo "Build modflow6"
         pixi run setup -Dextended=true builddir
         pixi run build builddir
         pixi run test builddir

@@ -54,13 +54,16 @@ runs:
       shell: bash
       working-directory: modflow6
       run: |
+        which pixi
+        pixi info
+        pixi list
         pixi run setup -Dextended=true builddir
         pixi run build builddir
         pixi run test builddir
 
-    - name: Setup tmate session
-      if: ${{ failure() }}
-      uses: mxschmitt/action-tmate@v3
+#    - name: Setup tmate session
+#      if: ${{ failure() }}
+#      uses: mxschmitt/action-tmate@v3
 
     - name: Show Meson logs
       if: failure()

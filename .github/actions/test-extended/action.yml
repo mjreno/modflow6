@@ -49,6 +49,10 @@ runs:
         brew install netcdf-fortran
         nc-config --all
         nf-config
+        which pixi
+        pixi info
+        pixi list
+        ls
 
     - name: Build modflow6
       shell: bash

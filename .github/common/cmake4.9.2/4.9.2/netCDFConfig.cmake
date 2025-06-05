@@ -16,33 +16,22 @@ macro(set_and_check _var _file)
   endif()
 endmacro()
 
-macro(check_required_components _NAME)
-  foreach(comp ${${_NAME}_FIND_COMPONENTS})
-    if(NOT ${_NAME}_${comp}_FOUND)
-      if(${_NAME}_FIND_REQUIRED_${comp})
-        set(${_NAME}_FOUND FALSE)
-      endif()
-    endif()
-  endforeach()
-endmacro()
-
 ####################################################################################
 
-set(NetCDFVersion "4.9.3")
-#set_and_check(netCDF_INSTALL_PREFIX "C:/Program Files (x86)/netCDF")
-#set_and_check(netCDF_INCLUDE_DIR "C:/Program Files (x86)/netCDF/include")
-#set_and_check(netCDF_LIB_DIR "C:/Program Files (x86)/netCDF/lib")
+set(NetCDFVersion "4.9.2")
+set_and_check(netCDF_INSTALL_PREFIX "${PACKAGE_PREFIX_DIR}")
+set_and_check(netCDF_INCLUDE_DIR "${PACKAGE_PREFIX_DIR}/include")
+set_and_check(netCDF_LIB_DIR "${PACKAGE_PREFIX_DIR}/lib")
+
 set(netCDF_LIBRARIES netCDF::netcdf)
 
 # include target information
 include("${CMAKE_CURRENT_LIST_DIR}/netCDFTargets.cmake")
 
-
-
 # Compiling Options
 #
-set(netCDF_C_COMPILER "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.42.34433/bin/Hostx64/x64/cl.exe")
-set(netCDF_C_COMPILER_FLAGS "/DWIN32 /D_WINDOWS /Zi /Ob0 /Od /RTC1")
+set(netCDF_C_COMPILER "C:/Program Files (x86)/Microsoft Visual Studio/2017/Community/VC/Tools/MSVC/14.16.27023/bin/Hostx86/x64/cl.exe")
+set(netCDF_C_COMPILER_FLAGS "/DWIN32 /D_WINDOWS /W3 /MDd /Zi /Ob0 /Od /RTC1")
 set(netCDF_C_CPP_FLAGS " ")
 set(netCDF_LDFLAGS "/machine:x64 /LARGEADDRESSAWARE /STACK:40000000 /debug /INCREMENTAL")
 set(netCDF_AM_CFLAGS "")
@@ -64,12 +53,4 @@ set(netCDF_HAS_DAP2 no)
 set(netCDF_HAS_DAP4 no)
 set(netCDF_HAS_DISKLESS yes)
 set(netCDF_HAS_MMAP no)
-#if (netCDF_HAS_HDF4 OR netCDF_HAS_HDF5)
-#  include(CMakeFindDependencyMacro)
-#  find_dependency(HDF5)
-#endif ()
-
-if (no)
-  include(CMakeFindDependencyMacro)
-  find_dependency(MPI  EXACT)
-endif()
+set(netCDF_HAS_JNA no)

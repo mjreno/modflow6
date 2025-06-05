@@ -35,6 +35,11 @@ runs:
     - name: Setup oneAPI
       uses: ./modflow6/.github/actions/setup-par-oneapi
 
+    - name: Build NetCDF
+      shell: cmd
+      run: |
+        "%ONEAPI_ROOT%\setvars.bat" intel64 vs2022 && "%TEMP%\compile_netcdf.bat"
+
     - name: Setup tmate session
       if: ${{ failure() }}
       uses: mxschmitt/action-tmate@v3

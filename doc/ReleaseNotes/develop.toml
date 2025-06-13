@@ -32,7 +32,6 @@ section = "fixes"
 subsection = "stress"
 description = "Fixed viscosity ratio assignment in the GWT MAW package when the GWF VSC package is active."
 
-
 [[items]]
 section = "fixes"
 subsection = "internal"

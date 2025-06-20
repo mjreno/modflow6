@@ -30,13 +30,11 @@ module GwfCsubModule
   use GeomUtilModule, only: get_node
   use InputOutputModule, only: extract_idnum_or_bndname
   use BaseDisModule, only: DisBaseType
-  use SimModule, only: count_errors, store_error, store_error_unit, &
-                       store_warning, store_error_filename
+  use SimModule, only: count_errors, store_error, store_warning, &
+                       store_error_filename
   use SimVariablesModule, only: errmsg, warnmsg
-  use SortModule, only: qsort, selectn
-  use BlockParserModule, only: BlockParserType
+  use SortModule, only: selectn
   !
-  use ListModule, only: ListType
   use TableModule, only: TableType, table_cr
   !
   use IMSLinearMisc, only: ims_misc_thomas
@@ -820,7 +818,7 @@ contains
     write (this%iout, '(4x,a,i0)') 'MAXSIG0 = ', this%maxsig0
     write (this%iout, '(1x,a)') &
       'END OF '//trim(adjustl(this%packName))//' DIMENSIONS'
-    !
+
     ! -- verify dimensions were set correctly
     if (.not. found%ninterbeds) then
       write (errmsg, '(a)') &
@@ -1130,11 +1128,11 @@ contains
     integer(I4B) :: node
     type(GwfCsubParamFoundType) :: found
     integer(I4B), dimension(:), pointer, contiguous :: map
-    !
+
     ! -- set map to convert user input data into reduced data
     map => null()
     if (this%dis%nodes < this%dis%nodesuser) map => this%dis%nodeuser
-    !
+
     ! -- update defaults from input context
     call mem_set_value(this%cg_ske_cr, 'CG_SKE_CR', this%input_mempath, &
                        map, found%cg_ske_cr)
@@ -1194,7 +1192,7 @@ contains
     integer(I4B) :: idelay, ndelaybeds, csubno
     integer(I4B) :: ib, ierr, n, nodeu, noder
     character(len=LINELENGTH) :: nodestr
-    !
+
     ! -- set input context pointers
     call mem_setptr(icsubno, 'ICSUBNO', this%input_mempath)
     call mem_setptr(cellid_pkgdata, 'CELLID_PKGDATA', this%input_mempath)
@@ -1309,13 +1307,13 @@ contains
 
       ! -- set rnb
       if (idelay > 0) then
-        this%rnb(csubno) = rnb(n)
         if (rnb(n) < DONE) then
           write (errmsg, '(a,g0,a,1x,a,1x,i0,a)') &
             'RNB (', rnb(n), ') must be greater than or equal to 1', &
             'for packagedata entry', csubno, '.'
           call store_error(errmsg)
         end if
+        this%rnb(csubno) = rnb(n)
       else
         this%rnb(csubno) = DONE
       end if
@@ -1377,9 +1375,8 @@ contains
           write (errmsg, '(a,1x,i0,a)') &
             'BOUNDNAME must be specified for packagedata entry', csubno, '.'
           call store_error(errmsg)
-        else
-          this%boundname(csubno) = bndname
         end if
+        this%boundname(csubno) = bndname
       end if
     end do
 
@@ -6943,7 +6940,7 @@ contains
       !
       ! -- evaluate if there are any observation errors
       if (count_errors() > 0) then
-        call store_error_unit(this%inunit)
+        call store_error_filename(this%input_fname)
       end if
     end if
   end subroutine csub_rp_obs

@@ -370,27 +370,19 @@ contains
     !
     if (this%iper /= kper) return
     !
-    if (this%read_as_arrays) then
-      !
-      ! -- update nodelist based on IEVT input
-      call nodelist_update(this%nodelist, this%nbound, this%maxbound, &
-                           this%dis, this%input_mempath)
-      !
-    else
-      !
-      ! -- process the input list arrays
-      call this%BndExtType%bnd_rp()
-      !
-      ! -- ensure pxdp is monotonically increasing
-      if (this%nseg > 1) then
-        call this%check_pxdp()
-      end if
-      !
-      ! -- Write the list to iout if requested
+    ! -- process the input list arrays
+    call this%BndExtType%bnd_rp()
+    !
+    ! -- ensure pxdp is monotonically increasing
+    if (this%nseg > 1) then
+      call this%check_pxdp()
+    end if
+    !
+    ! -- Write the list to iout if requested
+    if (.not. this%read_as_arrays) then
       if (this%iprpak /= 0) then
         call this%write_list()
       end if
-      !
     end if
     !
     ! -- copy nodelist to nodesontop if not fixed cell
@@ -866,47 +858,6 @@ contains
       !
     end select
   end function evt_bound_value
-
-  !> @brief Update the nodelist based on IEVT input
-  !!
-  !! This is a module scoped routine to check for IEVT input. If array input
-  !! was provided, INIEVT and IEVT will be allocated in the input context.
-  !! If the read state variable INIEVT is set to 1 during this period update,
-  !! IEVT input was read and is used here to update the nodelist.
-  !<
-  subroutine nodelist_update(nodelist, nbound, maxbound, &
-                             dis, input_mempath)
-    ! -- modules
-    use MemoryManagerModule, only: mem_setptr
-    use BaseDisModule, only: DisBaseType
-    ! -- dummy
-    integer(I4B), dimension(:), contiguous, &
-      pointer, intent(inout) :: nodelist
-    class(DisBaseType), pointer, intent(in) :: dis
-    character(len=*), intent(in) :: input_mempath
-    integer(I4B), intent(inout) :: nbound
-    integer(I4B), intent(in) :: maxbound
-    ! -- format
-    character(len=24) :: aname = '     LAYER OR NODE INDEX'
-    ! -- local
-    integer(I4B), dimension(:), contiguous, pointer :: ievt => null()
-    integer(I4B), pointer :: inievt => NULL()
-    !
-    ! -- set pointer to input context INIEVT
-    call mem_setptr(inievt, 'INIEVT', input_mempath)
-    !
-    ! -- check INIEVT read state
-    if (inievt == 1) then
-      ! -- ievt was read this period
-      !
-      ! -- set pointer to input context IEVT
-      call mem_setptr(ievt, 'IEVT', input_mempath)
-      !
-      ! -- update nodelist
-      call dis%nlarray_to_nodelist(ievt, nodelist, &
-                                   maxbound, nbound, aname)
-    end if
-  end subroutine nodelist_update
 
 end module EvtModule
 

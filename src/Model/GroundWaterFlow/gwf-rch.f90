@@ -255,17 +255,7 @@ contains
     !
     if (this%iper /= kper) return
     !
-    if (this%read_as_arrays) then
-      !
-      ! -- update nodelist based on IRCH input
-      call nodelist_update(this%nodelist, this%nbound, this%maxbound, &
-                           this%dis, this%input_mempath)
-      !
-    else
-      !
-      call this%BndExtType%bnd_rp()
-      !
-    end if
+    call this%BndExtType%bnd_rp()
     !
     ! -- copy nodelist to nodesontop if not fixed cell
     if (.not. this%fixed_cell) call this%set_nodesontop()
@@ -524,50 +514,6 @@ contains
       call store_error_filename(this%input_fname)
     end select
   end function rch_bound_value
-
-  !> @brief Update the nodelist based on IRCH input
-  !!
-  !! This is a module scoped routine to check for IRCH
-  !! input. If array input was provided, INIRCH and IRCH
-  !! will be allocated in the input context.  If the read
-  !! state variable INIRCH is set to 1 during this period
-  !! update, IRCH input was read and is used here to update
-  !! the nodelist.
-  !!
-  !<
-  subroutine nodelist_update(nodelist, nbound, maxbound, &
-                             dis, input_mempath)
-    ! -- modules
-    use MemoryManagerModule, only: mem_setptr
-    use BaseDisModule, only: DisBaseType
-    ! -- dummy
-    integer(I4B), dimension(:), contiguous, &
-      pointer, intent(inout) :: nodelist
-    class(DisBaseType), pointer, intent(in) :: dis
-    character(len=*), intent(in) :: input_mempath
-    integer(I4B), intent(inout) :: nbound
-    integer(I4B), intent(in) :: maxbound
-    character(len=24) :: aname = '     LAYER OR NODE INDEX'
-    ! -- local
-    integer(I4B), dimension(:), contiguous, &
-      pointer :: irch => null()
-    integer(I4B), pointer :: inirch => NULL()
-    !
-    ! -- set pointer to input context INIRCH
-    call mem_setptr(inirch, 'INIRCH', input_mempath)
-    !
-    ! -- check INIRCH read state
-    if (inirch == 1) then
-      ! -- irch was read this period
-      !
-      ! -- set pointer to input context IRCH
-      call mem_setptr(irch, 'IRCH', input_mempath)
-      !
-      ! -- update nodelist
-      call dis%nlarray_to_nodelist(irch, nodelist, &
-                                   maxbound, nbound, aname)
-    end if
-  end subroutine nodelist_update
 
 end module RchModule
 

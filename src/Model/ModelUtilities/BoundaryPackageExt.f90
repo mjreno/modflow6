@@ -775,7 +775,7 @@ contains
   !> @brief Update the nodelist based on layer number variable input
   !!
   !! This is a module scoped routine to check for I<filtyp>
-  !! input. If array input was provided, INI<filtype> and I<filtyp>
+  !! input. If array input was provided, INI<filtyp> and I<filtyp>
   !! will be allocated in the input context.  If the read
   !! state variable INI<filtyp> is set to 1 during this period
   !! update, I<filtyp> input was read and is used here to update

@@ -45,7 +45,6 @@ module RchModule
     procedure :: set_nodesontop
     procedure :: define_listlabel => rch_define_listlabel
     procedure :: bound_value => rch_bound_value
-    procedure, private :: default_nodelist
     ! -- for observations
     procedure, public :: bnd_obs_supported => rch_obs_supported
     procedure, public :: bnd_df_obs => rch_df_obs
@@ -240,6 +239,10 @@ contains
     if (this%read_as_arrays) then
       call this%default_nodelist()
     end if
+    !
+    ! -- if fixed_cell option not set, then need to store nodelist
+    !    in the nodesontop array
+    if (.not. this%fixed_cell) call this%set_nodesontop()
   end subroutine rch_read_initial_attr
 
   !> @brief Read and Prepare
@@ -416,47 +419,6 @@ contains
       write (this%listlabel, '(a, a16)') trim(this%listlabel), 'BOUNDARY NAME'
     end if
   end subroutine rch_define_listlabel
-
-  !> @brief Assign default nodelist when READASARRAYS is specified.
-  !!
-  !! Equivalent to reading IRCH as CONSTANT 1
-  !<
-  subroutine default_nodelist(this)
-    ! -- dummy
-    class(RchType) :: this
-    ! -- local
-    integer(I4B) :: il, ir, ic, ncol, nrow, nlay, nodeu, noder, ipos
-    !
-    ! -- set variables
-    if (this%dis%ndim == 3) then
-      nlay = this%dis%mshape(1)
-      nrow = this%dis%mshape(2)
-      ncol = this%dis%mshape(3)
-    elseif (this%dis%ndim == 2) then
-      nlay = this%dis%mshape(1)
-      nrow = 1
-      ncol = this%dis%mshape(2)
-    end if
-    !
-    ! -- Populate nodelist
-    ipos = 1
-    il = 1
-    do ir = 1, nrow
-      do ic = 1, ncol
-        nodeu = get_node(il, ir, ic, nlay, nrow, ncol)
-        noder = this%dis%get_nodenumber(nodeu, 0)
-        this%nodelist(ipos) = noder
-        ipos = ipos + 1
-      end do
-    end do
-    !
-    ! -- Assign nbound
-    this%nbound = ipos - 1
-    !
-    ! -- if fixed_cell option not set, then need to store nodelist
-    !    in the nodesontop array
-    if (.not. this%fixed_cell) call this%set_nodesontop()
-  end subroutine default_nodelist
 
   ! -- Procedures related to observations
 

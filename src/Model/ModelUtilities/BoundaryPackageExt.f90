@@ -47,6 +47,7 @@ module BndExtModule
     procedure :: log_options
     procedure :: nodelist_update
     procedure :: nodelist_update_ilay
+    procedure :: default_nodelist
     procedure :: check_cellid
     procedure :: write_list
     procedure :: bound_value
@@ -553,6 +554,89 @@ contains
     end if
   end subroutine nodelist_update
 
+  !> @brief Update the nodelist based on layer number variable input
+  !!
+  !! This is a module scoped routine to check for I<filtyp>
+  !! input. If array input was provided, INI<filtyp> and I<filtyp>
+  !! will be allocated in the input context.  If the read
+  !! state variable INI<filtyp> is set to 1 during this period
+  !! update, I<filtyp> input was read and is used here to update
+  !! the nodelist.
+  !!
+  !<
+  subroutine nodelist_update_ilay(this)
+    ! -- modules
+    use MemoryManagerModule, only: mem_setptr
+    use ConstantsModule, only: LENVARNAME
+    ! -- dummy
+    class(BndExtType) :: this !< BndExtType object
+    character(len=LENVARNAME) :: ilayname, inilayname
+    character(len=24) :: aname = '     LAYER OR NODE INDEX'
+    ! -- local
+    integer(I4B), dimension(:), contiguous, &
+      pointer :: ilay => null()
+    integer(I4B), pointer :: inilay => NULL()
+    !
+    ! set ilay and read state variable names
+    ilayname = 'I'//trim(this%filtyp)
+    inilayname = 'INI'//trim(this%filtyp)
+    !
+    ! -- set pointer to input context read state variable
+    call mem_setptr(inilay, inilayname, this%input_mempath)
+    !
+    ! -- check read state
+    if (inilay == 1) then
+      ! -- ilay variable was read this period
+      !
+      ! -- set pointer to input context layer index variable
+      call mem_setptr(ilay, ilayname, this%input_mempath)
+      !
+      ! -- update nodelist
+      call this%dis%nlarray_to_nodelist(ilay, this%nodelist, this%maxbound, &
+                                        this%nbound, aname)
+    end if
+  end subroutine nodelist_update_ilay
+
+  !> @brief Assign default nodelist when READASARRAYS is specified.
+  !!
+  !! Equivalent to reading layer number array as CONSTANT 1
+  !<
+  subroutine default_nodelist(this)
+    ! -- dummy
+    class(BndExtType) :: this
+    ! -- local
+    integer(I4B) :: il, ir, ic, ncol, nrow, nlay, nodeu, noder, ipos
+    !
+    if (this%readarraylayer) then
+      !
+      ! -- set variables
+      if (this%dis%ndim == 3) then
+        nlay = this%dis%mshape(1)
+        nrow = this%dis%mshape(2)
+        ncol = this%dis%mshape(3)
+      elseif (this%dis%ndim == 2) then
+        nlay = this%dis%mshape(1)
+        nrow = 1
+        ncol = this%dis%mshape(2)
+      end if
+      !
+      ! -- Populate nodelist
+      ipos = 1
+      il = 1
+      do ir = 1, nrow
+        do ic = 1, ncol
+          nodeu = get_node(il, ir, ic, nlay, nrow, ncol)
+          noder = this%dis%get_nodenumber(nodeu, 0)
+          this%nodelist(ipos) = noder
+          ipos = ipos + 1
+        end do
+      end do
+      !
+      ! -- Assign nbound
+      this%nbound = ipos - 1
+    end if
+  end subroutine default_nodelist
+
   !> @ brief Check for valid cellid
   !<
   subroutine check_cellid(this, ii, cellid, mshape, ndim)
@@ -771,49 +855,6 @@ contains
     nullify (inputtab)
     deallocate (words)
   end subroutine write_list
-
-  !> @brief Update the nodelist based on layer number variable input
-  !!
-  !! This is a module scoped routine to check for I<filtyp>
-  !! input. If array input was provided, INI<filtyp> and I<filtyp>
-  !! will be allocated in the input context.  If the read
-  !! state variable INI<filtyp> is set to 1 during this period
-  !! update, I<filtyp> input was read and is used here to update
-  !! the nodelist.
-  !!
-  !<
-  subroutine nodelist_update_ilay(this)
-    ! -- modules
-    use MemoryManagerModule, only: mem_setptr
-    use ConstantsModule, only: LENVARNAME
-    ! -- dummy
-    class(BndExtType), intent(inout) :: this !< BndExtType object
-    character(len=LENVARNAME) :: ilayname, inilayname
-    character(len=24) :: aname = '     LAYER OR NODE INDEX'
-    ! -- local
-    integer(I4B), dimension(:), contiguous, &
-      pointer :: ilay => null()
-    integer(I4B), pointer :: inilay => NULL()
-    !
-    ! set ilay and read state variable names
-    ilayname = 'I'//trim(this%filtyp)
-    inilayname = 'INI'//trim(this%filtyp)
-    !
-    ! -- set pointer to input context read state variable
-    call mem_setptr(inilay, inilayname, this%input_mempath)
-    !
-    ! -- check read state
-    if (inilay == 1) then
-      ! -- ilay variable was read this period
-      !
-      ! -- set pointer to input context layer index variable
-      call mem_setptr(ilay, ilayname, this%input_mempath)
-      !
-      ! -- update nodelist
-      call this%dis%nlarray_to_nodelist(ilay, this%nodelist, this%maxbound, &
-                                        this%nbound, aname)
-    end if
-  end subroutine nodelist_update_ilay
 
   !> @ brief Return a bound value
     !!

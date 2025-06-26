@@ -26,7 +26,6 @@ module EvtModule
     ! -- logicals
     logical, pointer, private :: segsdefined
     logical, pointer, private :: fixed_cell
-    logical, pointer, private :: read_as_arrays
     logical, pointer, private :: surfratespecified
     ! -- integers
     integer(I4B), pointer, private :: nseg => null() !< number of ET segments
@@ -115,14 +114,12 @@ contains
     ! -- allocate internal members
     allocate (this%segsdefined)
     allocate (this%fixed_cell)
-    allocate (this%read_as_arrays)
     allocate (this%surfratespecified)
     !
     ! -- Set values
     this%nseg = 1
     this%segsdefined = .true.
     this%fixed_cell = .false.
-    this%read_as_arrays = .false.
     this%surfratespecified = .false.
   end subroutine evt_allocate_scalars
 
@@ -153,7 +150,7 @@ contains
                      'DEPTH', this%input_mempath)
     !
     ! -- set list input segment descriptors
-    if (.not. this%read_as_arrays) then
+    if (.not. this%readasarrays) then
       if (this%nseg > 1) then
         !
         ! -- set pxdp and petm input context pointers
@@ -188,7 +185,6 @@ contains
     class(EvtType), intent(inout) :: this
     ! -- local
     logical(LGP) :: found_fixed_cell = .false.
-    logical(LGP) :: found_readasarrays = .false.
     logical(LGP) :: found_surfratespec = .false.
     !
     ! -- source common bound options
@@ -197,40 +193,27 @@ contains
     ! -- update defaults with idm sourced values
     call mem_set_value(this%fixed_cell, 'FIXED_CELL', &
                        this%input_mempath, found_fixed_cell)
-    call mem_set_value(this%read_as_arrays, 'READASARRAYS', &
-                       this%input_mempath, found_readasarrays)
     call mem_set_value(this%surfratespecified, 'SURFRATESPEC', &
                        this%input_mempath, found_surfratespec)
     !
-    if (found_readasarrays) then
-      if (this%dis%supports_layers()) then
-        this%text = texta
-      else
-        errmsg = 'READASARRAYS option is not compatible with selected'// &
-                 ' discretization type.'
-        call store_error(errmsg)
-        call store_error_filename(this%input_fname)
-      end if
-    end if
-    !
-    if (found_readasarrays .and. found_surfratespec) then
-      if (this%read_as_arrays) then
+    if (this%readasarrays) then
+      if (found_surfratespec) then
         errmsg = 'READASARRAYS option is not compatible with the'// &
                  ' SURF_RATE_SPECIFIED option.'
         call store_error(errmsg)
         call store_error_filename(this%input_fname)
       end if
+      !
+      this%text = texta
     end if
     !
     ! -- log evt specific options
-    call this%evt_log_options(found_fixed_cell, found_readasarrays, &
-                              found_surfratespec)
+    call this%evt_log_options(found_fixed_cell, found_surfratespec)
   end subroutine evt_source_options
 
   !> @brief Source options specific to EvtType
   !<
-  subroutine evt_log_options(this, found_fixed_cell, found_readasarrays, &
-                             found_surfratespec)
+  subroutine evt_log_options(this, found_fixed_cell, found_surfratespec)
     ! -- modules
     use MemoryManagerModule, only: mem_reallocate, mem_setptr
     use MemoryManagerExtModule, only: mem_set_value
@@ -238,15 +221,12 @@ contains
     ! -- dummy
     class(EvtType), intent(inout) :: this
     logical(LGP), intent(in) :: found_fixed_cell
-    logical(LGP), intent(in) :: found_readasarrays
     logical(LGP), intent(in) :: found_surfratespec
     ! -- formats
     character(len=*), parameter :: fmtihact = &
       &"(4x, 'EVAPOTRANSPIRATION WILL BE APPLIED TO HIGHEST ACTIVE CELL.')"
     character(len=*), parameter :: fmtfixedcell = &
       &"(4x, 'EVAPOTRANSPIRATION WILL BE APPLIED TO SPECIFIED CELL.')"
-    character(len=*), parameter :: fmtreadasarrays = &
-      &"(4x, 'EVAPOTRANSPIRATION INPUT WILL BE READ AS ARRAYS.')"
     character(len=*), parameter :: fmtsrz = &
       &"(4x, 'ET RATE AT SURFACE WILL BE ZERO.')"
     character(len=*), parameter :: fmtsrs = &
@@ -258,10 +238,6 @@ contains
     !
     if (found_fixed_cell) then
       write (this%iout, fmtfixedcell)
-    end if
-    !
-    if (found_readasarrays) then
-      write (this%iout, fmtreadasarrays)
     end if
     !
     if (found_surfratespec) then
@@ -285,25 +261,13 @@ contains
     ! -- format
     character(len=*), parameter :: fmtnsegerr = &
       &"('Error: In EVT, NSEG must be > 0 but is specified as ',i0)"
-    !
-    ! Dimensions block is not required if:
-    !   (1) discretization is DIS or DISV, and
-    !   (2) READASARRAYS option has been specified.
-    if (this%read_as_arrays) then
-      this%maxbound = this%dis%get_ncpl()
-      !
-      ! -- verify dimensions were set
-      if (this%maxbound <= 0) then
-        write (errmsg, '(a)') &
-          'MAXBOUND must be an integer greater than zero.'
-        call store_error(errmsg)
-        call store_error_filename(this%input_fname)
-      end if
-      !
+
+    ! -- set maxbound
+    call this%BndExtType%source_dimensions()
+
+    if (this%readasarrays) then
+      ! -- base class call is sufficient
     else
-      !
-      ! -- source maxbound
-      call this%BndExtType%source_dimensions()
       !
       ! -- log found options
       write (this%iout, '(/1x,a)') 'PROCESSING '//trim(adjustl(this%text)) &
@@ -323,7 +287,7 @@ contains
           !
         elseif (this%nseg > 1) then
           ! NSEG>1 is supported only if readasarrays is false
-          if (this%read_as_arrays) then
+          if (this%readasarrays) then
             errmsg = 'In the EVT package, NSEG cannot be greater than 1'// &
                      ' when READASARRAYS is used.'
             call store_error(errmsg)
@@ -338,10 +302,6 @@ contains
         'END OF '//trim(adjustl(this%text))//' DIMENSIONS'
       !
     end if
-    !
-    ! -- Call define_listlabel to construct the list label that is written
-    !    when PRINT_INPUT option is used.
-    call this%define_listlabel()
   end subroutine evt_source_dimensions
 
   !> @brief Part of allocate and read
@@ -352,7 +312,7 @@ contains
     ! -- dummy
     class(EvtType), intent(inout) :: this
     !
-    if (this%read_as_arrays) then
+    if (this%readasarrays) then
       call this%default_nodelist()
     end if
     !
@@ -381,9 +341,11 @@ contains
       call this%check_pxdp()
     end if
     !
-    ! -- Write the list to iout if requested
-    if (.not. this%read_as_arrays) then
-      if (this%iprpak /= 0) then
+    if (this%iprpak /= 0) then
+      if (this%readasarrays) then
+        ! no-op
+      else
+        ! -- Write the list to iout
         call this%write_list()
       end if
     end if
@@ -655,7 +617,7 @@ contains
     call mem_deallocate(this%rate, 'RATE', this%memoryPath)
     call mem_deallocate(this%depth, 'DEPTH', this%memoryPath)
     !
-    if (.not. this%read_as_arrays) then
+    if (.not. this%readasarrays) then
       if (this%nseg > 1) then
         call mem_deallocate(this%pxdp, 'PXDP', this%memoryPath)
         call mem_deallocate(this%petm, 'PETM', this%memoryPath)
@@ -670,7 +632,6 @@ contains
     call mem_deallocate(this%nseg)
     deallocate (this%segsdefined)
     deallocate (this%fixed_cell)
-    deallocate (this%read_as_arrays)
     deallocate (this%surfratespecified)
     !
     ! -- Deallocate parent package

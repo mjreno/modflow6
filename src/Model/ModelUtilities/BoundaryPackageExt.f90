@@ -32,7 +32,7 @@ module BndExtModule
     ! -- scalars
     integer(I4B), pointer :: iper
     logical(LGP), pointer :: readarraygrid
-    logical(LGP), pointer :: readarraylayer
+    logical(LGP), pointer :: readasarrays
     ! -- arrays
     integer(I4B), dimension(:, :), pointer, contiguous :: cellid => null() !< input user cellid list
     integer(I4B), dimension(:), pointer, contiguous :: nodeulist => null() !< input user nodelist
@@ -128,6 +128,10 @@ contains
       call this%obs%obs_df(this%iout, this%packName, this%filtyp, this%dis)
       call this%bnd_df_obs()
     end if
+    !
+    ! -- Call define_listlabel to construct the list label that is written
+    !    when PRINT_INPUT option is used.
+    call this%define_listlabel()
   end subroutine bndext_df
 
   subroutine bndext_rp(this)
@@ -144,7 +148,7 @@ contains
     !
     if (this%iper /= kper) return
 
-    if (.not. this%readarraylayer) then
+    if (.not. this%readasarrays) then
       ! -- copy nbound from input context
       call mem_set_value(this%nbound, 'NBOUND', this%input_mempath, &
                          found)
@@ -172,7 +176,7 @@ contains
         call store_error(errmsg)
         call store_error_filename(this%input_fname)
       end if
-    else if (this%readarraylayer) then
+    else if (this%readasarrays) then
       call this%nodelist_update_ilay()
     else
       !
@@ -208,9 +212,9 @@ contains
     !
     ! -- scalars
     deallocate (this%readarraygrid)
-    deallocate (this%readarraylayer)
+    deallocate (this%readasarrays)
     nullify (this%readarraygrid)
-    nullify (this%readarraylayer)
+    nullify (this%readasarrays)
     nullify (this%iper)
     !
     ! -- deallocate
@@ -234,7 +238,6 @@ contains
     class(BndExtType) :: this !< BndExtType object
     ! -- local variables
     character(len=LENMEMPATH) :: input_mempath
-    logical(LGP) :: found
     !
     ! -- set memory path
     input_mempath = create_mem_path(this%name_model, this%packName, idm_context)
@@ -247,15 +250,11 @@ contains
 
     ! -- allocate internal scalars
     allocate (this%readarraygrid)
-    allocate (this%readarraylayer)
+    allocate (this%readasarrays)
 
     ! -- initialize internal scalars
     this%readarraygrid = .false.
-    this%readarraylayer = .false.
-
-    ! -- update internal scalars based on user input
-    call mem_set_value(this%readarraygrid, 'READARRAYGRID', input_mempath, found)
-    call mem_set_value(this%readarraylayer, 'READASARRAYS', input_mempath, found)
+    this%readasarrays = .false.
   end subroutine bndext_allocate_scalars
 
   !> @ brief Allocate package arrays
@@ -315,6 +314,7 @@ contains
     class(BndExtType), intent(inout) :: this !< BndExtType object
     ! -- local variables
     type(BndExtFoundType) :: found
+    logical(LGP) :: found_readarr
     character(len=LENAUXNAME) :: sfacauxname
     integer(I4B) :: n
     !
@@ -328,6 +328,10 @@ contains
     call mem_set_value(sfacauxname, 'AUXMULTNAME', this%input_mempath, &
                        found%auxmultname)
     call mem_set_value(this%inewton, 'INEWTON', this%input_mempath, found%inewton)
+    call mem_set_value(this%readarraygrid, 'READARRAYGRID', this%input_mempath, &
+                       found_readarr)
+    call mem_set_value(this%readasarrays, 'READASARRAYS', this%input_mempath, &
+                       found_readarr)
     !
     ! -- log found options
     call this%log_options(found, sfacauxname)
@@ -393,6 +397,15 @@ contains
       end if
     end if
     !
+    if (this%readasarrays) then
+      if (.not. this%dis%supports_layers()) then
+        errmsg = 'READASARRAYS option is not compatible with selected'// &
+                 ' discretization type.'
+        call store_error(errmsg)
+        call store_error_filename(this%input_fname)
+      end if
+    end if
+    !
     ! -- terminate if errors were detected
     if (count_errors() > 0) then
       call store_error_filename(this%input_fname)
@@ -409,18 +422,24 @@ contains
     character(len=*), intent(in) :: sfacauxname
     ! -- local variables
     ! -- format
+    character(len=*), parameter :: fmtreadasarrays = &
+      &"(4x, 'PACKAGE INPUT WILL BE READ AS LAYER ARRAYS.')"
+    character(len=*), parameter :: fmtreadarraygrid = &
+      &"(4x, 'PACKAGE INPUT WILL BE READ AS GRID ARRAYS.')"
     character(len=*), parameter :: fmtflow = &
       &"(4x, 'FLOWS WILL BE SAVED TO BUDGET FILE SPECIFIED IN OUTPUT CONTROL')"
-    character(len=*), parameter :: fmttas = &
-      &"(4x, 'TIME-ARRAY SERIES DATA WILL BE READ FROM FILE: ', a)"
-    character(len=*), parameter :: fmtts = &
-      &"(4x, 'TIME-SERIES DATA WILL BE READ FROM FILE: ', a)"
-    character(len=*), parameter :: fmtnme = &
-      &"(a, i0, a)"
     !
     ! -- log found options
     write (this%iout, '(/1x,a)') 'PROCESSING '//trim(adjustl(this%text)) &
       //' BASE OPTIONS'
+    !
+    if (this%readasarrays) then
+      write (this%iout, fmtreadasarrays)
+    end if
+    !
+    if (this%readarraygrid) then
+      write (this%iout, fmtreadarraygrid)
+    end if
     !
     if (found%ipakcb) then
       write (this%iout, fmtflow)
@@ -465,19 +484,23 @@ contains
     ! -- local variables
     type(BndExtFoundType) :: found
     !
-    ! -- open dimensions logging block
-    write (this%iout, '(/1x,a)') 'PROCESSING '//trim(adjustl(this%text))// &
-      ' BASE DIMENSIONS'
-    !
-    ! -- update defaults with idm sourced values
-    call mem_set_value(this%maxbound, 'MAXBOUND', this%input_mempath, &
-                       found%maxbound)
-    !
-    write (this%iout, '(4x,a,i7)') 'MAXBOUND = ', this%maxbound
-    !
-    ! -- close logging block
-    write (this%iout, '(1x,a)') &
-      'END OF '//trim(adjustl(this%text))//' BASE DIMENSIONS'
+    if (this%readasarrays) then
+      this%maxbound = this%dis%get_ncpl()
+    else
+      ! -- open dimensions logging block
+      write (this%iout, '(/1x,a)') 'PROCESSING '//trim(adjustl(this%text))// &
+        ' BASE DIMENSIONS'
+
+      ! -- update defaults with idm sourced values
+      call mem_set_value(this%maxbound, 'MAXBOUND', this%input_mempath, &
+                         found%maxbound)
+
+      write (this%iout, '(4x,a,i7)') 'MAXBOUND = ', this%maxbound
+
+      ! -- close logging block
+      write (this%iout, '(1x,a)') &
+        'END OF '//trim(adjustl(this%text))//' BASE DIMENSIONS'
+    end if
     !
     ! -- verify dimensions were set
     if (this%maxbound <= 0) then
@@ -485,10 +508,6 @@ contains
       call store_error(errmsg)
       call store_error_filename(this%input_fname)
     end if
-    !
-    ! -- Call define_listlabel to construct the list label that is written
-    !    when PRINT_INPUT option is used.
-    call this%define_listlabel()
   end subroutine source_dimensions
 
   !> @ brief Update package nodelist
@@ -607,7 +626,7 @@ contains
     ! -- local
     integer(I4B) :: il, ir, ic, ncol, nrow, nlay, nodeu, noder, ipos
     !
-    if (this%readarraylayer) then
+    if (this%readasarrays) then
       !
       ! -- set variables
       if (this%dis%ndim == 3) then

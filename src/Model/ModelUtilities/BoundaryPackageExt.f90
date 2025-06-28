@@ -45,8 +45,9 @@ module BndExtModule
     procedure :: source_options
     procedure :: source_dimensions
     procedure :: log_options
-    procedure :: nodelist_update
-    procedure :: nodelist_update_ilay
+    procedure :: cellid_to_nlist
+    procedure :: nodeu_to_nlist
+    procedure :: layarr_to_nlist
     procedure :: default_nodelist
     procedure :: check_cellid
     procedure :: write_list
@@ -155,33 +156,11 @@ contains
     end if
 
     if (this%readarraygrid) then
-      ! -- Set the nodelist
-      do n = 1, this%nbound
-        nodeuser = this%nodeulist(n)
-        noder = this%dis%get_nodenumber(nodeuser, 1)
-        if (noder >= 0) then
-          this%nodelist(n) = noder
-        else
-          call this%dis%nodeu_to_string(n, nodestr)
-          write (errmsg, *) &
-            ' Cell is outside active grid domain: '// &
-            trim(adjustl(nodestr))
-          call store_error(errmsg)
-        end if
-      end do
-      !
-      ! -- exit if errors were found
-      if (count_errors() > 0) then
-        write (errmsg, *) count_errors(), ' errors encountered.'
-        call store_error(errmsg)
-        call store_error_filename(this%input_fname)
-      end if
+      call this%nodeu_to_nlist()
     else if (this%readasarrays) then
-      call this%nodelist_update_ilay()
+      call this%layarr_to_nlist()
     else
-      !
-      ! -- convert cellids to node numbers
-      call this%nodelist_update()
+      call this%cellid_to_nlist()
       !
       ! -- update boundname string list
       if (this%inamedbound /= 0) then
@@ -515,7 +494,7 @@ contains
     !! Convert period updated cellids to node numbers.
     !!
   !<
-  subroutine nodelist_update(this)
+  subroutine cellid_to_nlist(this)
     ! -- modules
     use SimVariablesModule, only: errmsg
     ! -- dummy
@@ -571,7 +550,44 @@ contains
       call store_error(errmsg)
       call store_error_filename(this%input_fname)
     end if
-  end subroutine nodelist_update
+  end subroutine cellid_to_nlist
+
+  !> @ brief Update package nodelist
+  !!
+  !! Convert period user nodes to reduced nodes
+  !!
+  !<
+  subroutine nodeu_to_nlist(this)
+    ! -- modules
+    use MemoryManagerModule, only: mem_setptr
+    use ConstantsModule, only: LENVARNAME
+    ! -- dummy
+    class(BndExtType) :: this !< BndExtType object
+    integer(I4B) :: n, noder, nodeuser
+    character(len=LINELENGTH) :: nodestr
+
+    ! -- Set the nodelist
+    do n = 1, this%nbound
+      nodeuser = this%nodeulist(n)
+      noder = this%dis%get_nodenumber(nodeuser, 1)
+      if (noder >= 0) then
+        this%nodelist(n) = noder
+      else
+        call this%dis%nodeu_to_string(n, nodestr)
+        write (errmsg, *) &
+          ' Cell is outside active grid domain: '// &
+          trim(adjustl(nodestr))
+        call store_error(errmsg)
+      end if
+    end do
+    !
+    ! -- exit if errors were found
+    if (count_errors() > 0) then
+      write (errmsg, *) count_errors(), ' errors encountered.'
+      call store_error(errmsg)
+      call store_error_filename(this%input_fname)
+    end if
+  end subroutine nodeu_to_nlist
 
   !> @brief Update the nodelist based on layer number variable input
   !!
@@ -583,7 +599,7 @@ contains
   !! the nodelist.
   !!
   !<
-  subroutine nodelist_update_ilay(this)
+  subroutine layarr_to_nlist(this)
     ! -- modules
     use MemoryManagerModule, only: mem_setptr
     use ConstantsModule, only: LENVARNAME
@@ -614,7 +630,7 @@ contains
       call this%dis%nlarray_to_nodelist(ilay, this%nodelist, this%maxbound, &
                                         this%nbound, aname)
     end if
-  end subroutine nodelist_update_ilay
+  end subroutine layarr_to_nlist
 
   !> @brief Assign default nodelist when READASARRAYS is specified.
   !!

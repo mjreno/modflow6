@@ -252,7 +252,7 @@ contains
         call get_isize('MAXBOUND', this%mf6_input%mempath, isize)
         if (isize < 0) then
           call mem_allocate(intptr, 'MAXBOUND', this%mf6_input%mempath)
-          intptr = sum(this%mshape)
+          intptr = product(this%mshape)
         end if
       end if
     case default

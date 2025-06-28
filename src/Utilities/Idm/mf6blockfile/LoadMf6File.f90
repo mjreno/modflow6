@@ -56,6 +56,7 @@ module LoadMf6FileModule
     logical(LGP) :: ts_active !< is timeseries active
     logical(LGP) :: export !< is array export active
     logical(LGP) :: readasarrays
+    logical(LGP) :: readarraygrid
     integer(I4B) :: inamedbound
     integer(I4B) :: iauxiliary
     integer(I4B) :: iout !< inunit for list log
@@ -129,6 +130,7 @@ contains
     this%ts_active = .false.
     this%export = .false.
     this%readasarrays = .false.
+    this%readarraygrid = .false.
     this%inamedbound = 0
     this%iauxiliary = 0
     this%iout = iout
@@ -194,12 +196,13 @@ contains
   !<
   subroutine block_post_process(this, iblk)
     use ConstantsModule, only: LENBOUNDNAME
+    use MemoryManagerModule, only: mem_allocate, get_isize
     use CharacterStringModule, only: CharacterStringType
     use SourceCommonModule, only: set_model_shape
     class(LoadMf6FileType) :: this
     integer(I4B), intent(in) :: iblk
     type(InputParamDefinitionType), pointer :: idt
-    integer(I4B) :: iparam
+    integer(I4B) :: iparam, isize
     integer(I4B), pointer :: intptr
 
     ! update state based on read tags
@@ -212,6 +215,8 @@ contains
           this%inamedbound = 1
         else if (this%block_tags(iparam) == 'READASARRAYS') then
           this%readasarrays = .true.
+        else if (this%block_tags(iparam) == 'READARRAYGRID') then
+          this%readarraygrid = .true.
         else if (this%block_tags(iparam) == 'TS6') then
           this%ts_active = .true.
         else if (this%block_tags(iparam) == 'EXPORT_ARRAY_ASCII') then
@@ -242,6 +247,13 @@ contains
         call set_model_shape(this%mf6_input%pkgtype, this%filename, &
                              this%mf6_input%component_mempath, &
                              this%mf6_input%mempath, this%mshape)
+      else if (this%readarraygrid) then
+        ! maxbound is optional
+        call get_isize('MAXBOUND', this%mf6_input%mempath, isize)
+        if (isize < 0) then
+          call mem_allocate(intptr, 'MAXBOUND', this%mf6_input%mempath)
+          intptr = sum(this%mshape)
+        end if
       end if
     case default
     end select

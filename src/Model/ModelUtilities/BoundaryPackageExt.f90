@@ -144,8 +144,7 @@ contains
     class(BndExtType), intent(inout) :: this !< BndExtType object
     ! -- local variables
     logical(LGP) :: found
-    integer(I4B) :: n, noder, nodeuser
-    character(len=LINELENGTH) :: nodestr
+    integer(I4B) :: n
     !
     if (this%iper /= kper) return
 

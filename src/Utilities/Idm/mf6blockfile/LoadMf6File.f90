@@ -196,13 +196,13 @@ contains
   !<
   subroutine block_post_process(this, iblk)
     use ConstantsModule, only: LENBOUNDNAME
-    use MemoryManagerModule, only: mem_allocate, get_isize
+    use MemoryManagerModule, only: mem_allocate
     use CharacterStringModule, only: CharacterStringType
     use SourceCommonModule, only: set_model_shape
     class(LoadMf6FileType) :: this
     integer(I4B), intent(in) :: iblk
     type(InputParamDefinitionType), pointer :: idt
-    integer(I4B) :: iparam, isize
+    integer(I4B) :: iparam
     integer(I4B), pointer :: intptr
 
     ! update state based on read tags
@@ -247,13 +247,6 @@ contains
         call set_model_shape(this%mf6_input%pkgtype, this%filename, &
                              this%mf6_input%component_mempath, &
                              this%mf6_input%mempath, this%mshape)
-      else if (this%readarraygrid) then
-        ! maxbound is optional
-        call get_isize('MAXBOUND', this%mf6_input%mempath, isize)
-        if (isize < 0) then
-          call mem_allocate(intptr, 'MAXBOUND', this%mf6_input%mempath)
-          intptr = product(this%mshape)
-        end if
       end if
     case default
     end select

@@ -196,7 +196,6 @@ contains
   !<
   subroutine block_post_process(this, iblk)
     use ConstantsModule, only: LENBOUNDNAME
-    use MemoryManagerModule, only: mem_allocate
     use CharacterStringModule, only: CharacterStringType
     use SourceCommonModule, only: set_model_shape
     class(LoadMf6FileType) :: this

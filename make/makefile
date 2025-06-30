@@ -23,6 +23,7 @@ SOURCEDIR16=../src/Model/OverlandFlow
 SOURCEDIR17=../src/Model/ParticleTracking
 SOURCEDIR18=../src/Model/SurfaceWaterFlow
 SOURCEDIR19=../src/Model/TransportModel
+<<<<<<< HEAD
 SOURCEDIR20=../src/Model/TransportModel/InterpolationScheme
 SOURCEDIR21=../src/Solution
 SOURCEDIR22=../src/Solution/LinearMethods
@@ -35,6 +36,20 @@ SOURCEDIR28=../src/Timing
 SOURCEDIR29=../src/Utilities
 SOURCEDIR30=../src/Utilities/ArrayRead
 SOURCEDIR31=../src/Utilities/Export
+=======
+SOURCEDIR20=../src/Solution
+SOURCEDIR21=../src/Solution/LinearMethods
+SOURCEDIR22=../src/Solution/PETSc
+SOURCEDIR23=../src/Solution/ParticleTracker
+SOURCEDIR24=../src/Solution/ParticleTracker/Domain
+SOURCEDIR25=../src/Solution/ParticleTracker/Method
+SOURCEDIR26=../src/Solution/ParticleTracker/Particle
+SOURCEDIR27=../src/Timing
+SOURCEDIR28=../src/Utilities
+SOURCEDIR29=../src/Utilities/ArrayRead
+SOURCEDIR30=../src/Utilities/Export
+SOURCEDIR31=../src/Utilities/Export/tmp
+>>>>>>> ef73b153d8 (rebuild makefiles)
 SOURCEDIR32=../src/Utilities/Idm
 SOURCEDIR33=../src/Utilities/Idm/mf6blockfile
 SOURCEDIR34=../src/Utilities/Idm/netcdf
@@ -185,6 +200,7 @@ $(OBJDIR)/gwf-ghbgidm.o \
 $(OBJDIR)/gwf-evtidm.o \
 $(OBJDIR)/gwf-evtaidm.o \
 $(OBJDIR)/gwf-drnidm.o \
+$(OBJDIR)/gwf-drngidm.o \
 $(OBJDIR)/gwf-disvidm.o \
 $(OBJDIR)/gwf-disuidm.o \
 $(OBJDIR)/gwf-disidm.o \

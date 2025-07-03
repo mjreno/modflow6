@@ -208,7 +208,7 @@ contains
     use SimVariablesModule, only: idm_context, simfile
     use SourceCommonModule, only: idm_component_type
     use ModelPackageInputModule, only: supported_model_packages, &
-                                       NMFMODEL, MODFLOWMODELS
+                                       NMODEL, MODFLOW6MODELS
     class(ModelPackageInputsType) :: this
     character(len=*), intent(in) :: modeltype
     character(len=*), intent(in) :: modelfname
@@ -225,8 +225,8 @@ contains
 
     ! verify user specified model type
     mtype_check = 0
-    do n = 1, NMFMODEL
-      if (modeltype == MODFLOWMODELS(n)) then
+    do n = 1, NMODEL
+      if (modeltype == MODFLOW6MODELS(n)) then
         mtype_check = 1
         exit
       end if
@@ -234,7 +234,8 @@ contains
 
     if (mtype_check == 0) then
       ! -- error and exit for unsupported model type
-      write (errmsg, '(3a)') 'Model type "', trim(modeltype), '" not supported.'
+      write (errmsg, '(3a)') 'Models block model type "', trim(modeltype), &
+        '" is not valid.'
       call store_error(errmsg)
       call store_error_filename(simfile)
     end if

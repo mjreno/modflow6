@@ -205,14 +205,16 @@ contains
   subroutine modelpkgs_init(this, modeltype, modelfname, modelname, iout)
     use MemoryHelperModule, only: create_mem_path
     use MemoryManagerModule, only: mem_allocate
-    use SimVariablesModule, only: idm_context
+    use SimVariablesModule, only: idm_context, simfile
     use SourceCommonModule, only: idm_component_type
-    use ModelPackageInputModule, only: supported_model_packages
+    use ModelPackageInputModule, only: supported_model_packages, &
+                                       NMFMODEL, MODFLOWMODELS
     class(ModelPackageInputsType) :: this
     character(len=*), intent(in) :: modeltype
     character(len=*), intent(in) :: modelfname
     character(len=*), intent(in) :: modelname
     integer(I4B), intent(in) :: iout
+    integer(I4B) :: n, mtype_check
 
     ! initialize object
     this%modeltype = modeltype
@@ -220,6 +222,22 @@ contains
     this%modelname = modelname
     this%component_type = idm_component_type(modeltype)
     this%iout = iout
+
+    ! verify user specified model type
+    mtype_check = 0
+    do n = 1, NMFMODEL
+      if (modeltype == MODFLOWMODELS(n)) then
+        mtype_check = 1
+        exit
+      end if
+    end do
+
+    if (mtype_check == 0) then
+      ! -- error and exit for unsupported model type
+      write (errmsg, '(3a)') 'Model type "', trim(modeltype), '" not supported.'
+      call store_error(errmsg)
+      call store_error_filename(simfile)
+    end if
 
     ! allocate and set model supported package types
     call supported_model_packages(modeltype, this%cunit, this%niunit)

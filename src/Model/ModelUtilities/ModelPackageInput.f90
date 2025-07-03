@@ -28,6 +28,14 @@ module ModelPackageInputModule
   private
   public :: supported_model_packages
   public :: multi_package_type
+  public :: NMFMODEL, MODFLOWMODELS
+
+  !> @brief Valid simulation model types
+  !!
+  integer(I4B), parameter :: NMFMODEL = 10
+  character(len=LENPACKAGETYPE), dimension(NMFMODEL) :: MODFLOWMODELS
+  data MODFLOWMODELS/'CHF6 ', 'GWE6 ', 'GWF6 ', 'GWT6 ', 'OLF6 ', & !  5
+                    &'PRT6 ', '     ', '     ', '     ', '     '/ ! 10
 
 contains
 

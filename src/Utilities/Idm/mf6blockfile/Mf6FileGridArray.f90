@@ -172,7 +172,7 @@ contains
   subroutine reset(this)
     use ConstantsModule, only: DNODATA
     class(GridArrayLoadType), intent(inout) :: this
-    integer(I4B) :: n, m
+    integer(I4B) :: n
 
     this%bound_context%nbound = 0
 

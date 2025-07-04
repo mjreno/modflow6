@@ -180,13 +180,6 @@ contains
       ! reset read state
       this%param_reads(n)%invar = 0
     end do
-
-    ! explicitly reset auxvar array each period
-    do m = 1, this%bound_context%maxbound
-      do n = 1, this%bound_context%naux
-        this%bound_context%auxvar(n, m) = DZERO
-      end do
-    end do
   end subroutine reset
 
   subroutine params_alloc(this)

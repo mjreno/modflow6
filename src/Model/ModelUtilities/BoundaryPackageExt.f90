@@ -559,11 +559,11 @@ contains
   subroutine nodeu_to_nlist(this)
     ! -- modules
     use MemoryManagerModule, only: mem_setptr
-    use ConstantsModule, only: LENVARNAME
     ! -- dummy
     class(BndExtType) :: this !< BndExtType object
-    integer(I4B) :: n, noder, nodeuser
-    character(len=LINELENGTH) :: nodestr
+    integer(I4B) :: n, noder, nodeuser, ninactive
+
+    ninactive = 0
 
     ! -- Set the nodelist
     do n = 1, this%nbound
@@ -572,20 +572,12 @@ contains
       if (noder >= 0) then
         this%nodelist(n) = noder
       else
-        call this%dis%nodeu_to_string(n, nodestr)
-        write (errmsg, *) &
-          ' Cell is outside active grid domain: '// &
-          trim(adjustl(nodestr))
-        call store_error(errmsg)
+        ninactive = ninactive + 1
       end if
     end do
-    !
-    ! -- exit if errors were found
-    if (count_errors() > 0) then
-      write (errmsg, *) count_errors(), ' errors encountered.'
-      call store_error(errmsg)
-      call store_error_filename(this%input_fname)
-    end if
+
+    ! update nbound
+    this%nbound = this%nbound - ninactive
   end subroutine nodeu_to_nlist
 
   !> @brief Update the nodelist based on layer number variable input

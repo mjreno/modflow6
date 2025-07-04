@@ -13,23 +13,27 @@ module GwtIstInputModule
 
   type GwtIstParamFoundType
     logical :: save_flows = .false.
-    logical :: budget_rec = .false.
+    logical :: budfilerec = .false.
     logical :: budget = .false.
     logical :: fileout = .false.
     logical :: budgetfile = .false.
-    logical :: budgetcsv_rec = .false.
+    logical :: budcsvfilerec = .false.
     logical :: budgetcsv = .false.
     logical :: budgetcsvfile = .false.
     logical :: sorption = .false.
     logical :: ord1_decay = .false.
     logical :: zero_order_decay = .false.
-    logical :: cim_filerecord = .false.
-    logical :: cim6 = .false.
-    logical :: cimfmt = .false.
+    logical :: cimfilerec = .false.
+    logical :: cimopt = .false.
     logical :: cimfile = .false.
     logical :: cimprintrecord = .false.
     logical :: print_format = .false.
-    logical :: sorbate_rec = .false.
+    logical :: formatrecord = .false.
+    logical :: columns = .false.
+    logical :: width = .false.
+    logical :: digits = .false.
+    logical :: format = .false.
+    logical :: sorbatefilerec = .false.
     logical :: sorbate = .false.
     logical :: sorbatefile = .false.
     logical :: export_ascii = .false.
@@ -72,13 +76,13 @@ module GwtIstInputModule
     )
 
   type(InputParamDefinitionType), parameter :: &
-    gwtist_budget_rec = InputParamDefinitionType &
+    gwtist_budfilerec = InputParamDefinitionType &
     ( &
     'GWT', & ! component
     'IST', & ! subcomponent
     'OPTIONS', & ! block
     'BUDGET_FILERECORD', & ! tag name
-    'BUDGET_REC', & ! fortran variable
+    'BUDFILEREC', & ! fortran variable
     'RECORD BUDGET FILEOUT BUDGETFILE', & ! type
     '', & ! shape
     '', & ! longname
@@ -144,13 +148,13 @@ module GwtIstInputModule
     )
 
   type(InputParamDefinitionType), parameter :: &
-    gwtist_budgetcsv_rec = InputParamDefinitionType &
+    gwtist_budcsvfilerec = InputParamDefinitionType &
     ( &
     'GWT', & ! component
     'IST', & ! subcomponent
     'OPTIONS', & ! block
     'BUDGETCSV_FILERECORD', & ! tag name
-    'BUDGETCSV_REC', & ! fortran variable
+    'BUDCSVFILEREC', & ! fortran variable
     'RECORD BUDGETCSV FILEOUT BUDGETCSVFILE', & ! type
     '', & ! shape
     '', & ! longname
@@ -252,14 +256,14 @@ module GwtIstInputModule
     )
 
   type(InputParamDefinitionType), parameter :: &
-    gwtist_cim_filerecord = InputParamDefinitionType &
+    gwtist_cimfilerec = InputParamDefinitionType &
     ( &
     'GWT', & ! component
     'IST', & ! subcomponent
     'OPTIONS', & ! block
     'CIM_FILERECORD', & ! tag name
-    'CIM_FILERECORD', & ! fortran variable
-    'RECORD CIM6 FILEOUT CIMFILE', & ! type
+    'CIMFILEREC', & ! fortran variable
+    'RECORD CIM FILEOUT CIMFILE', & ! type
     '', & ! shape
     '', & ! longname
     .false., & ! required
@@ -270,34 +274,16 @@ module GwtIstInputModule
     )
 
   type(InputParamDefinitionType), parameter :: &
-    gwtist_cim6 = InputParamDefinitionType &
+    gwtist_cimopt = InputParamDefinitionType &
     ( &
     'GWT', & ! component
     'IST', & ! subcomponent
     'OPTIONS', & ! block
-    'CIM6', & ! tag name
-    'CIM6', & ! fortran variable
+    'CIM', & ! tag name
+    'CIMOPT', & ! fortran variable
     'KEYWORD', & ! type
     '', & ! shape
-    'cim6 keyword', & ! longname
-    .true., & ! required
-    .true., & ! multi-record
-    .false., & ! preserve case
-    .false., & ! layered
-    .false. & ! timeseries
-    )
-
-  type(InputParamDefinitionType), parameter :: &
-    gwtist_cimfmt = InputParamDefinitionType &
-    ( &
-    'GWT', & ! component
-    'IST', & ! subcomponent
-    'OPTIONS', & ! block
-    'CIMFMT', & ! tag name
-    'CIMFMT', & ! fortran variable
-    'KEYWORD', & ! type
-    '', & ! shape
-    'cim6 format keyword', & ! longname
+    'cim keyword', & ! longname
     .true., & ! required
     .true., & ! multi-record
     .false., & ! preserve case
@@ -331,7 +317,7 @@ module GwtIstInputModule
     'OPTIONS', & ! block
     'CIMPRINTRECORD', & ! tag name
     'CIMPRINTRECORD', & ! fortran variable
-    'RECORD CIMFMT PRINT_FORMAT', & ! type
+    'RECORD CIM PRINT_FORMAT FORMATRECORD', & ! type
     '', & ! shape
     '', & ! longname
     .false., & ! required
@@ -349,24 +335,114 @@ module GwtIstInputModule
     'OPTIONS', & ! block
     'PRINT_FORMAT', & ! tag name
     'PRINT_FORMAT', & ! fortran variable
-    'STRING', & ! type
-    ':', & ! shape
-    'print format string', & ! longname
+    'KEYWORD', & ! type
+    '', & ! shape
+    'keyword to indicate that a print format follows', & ! longname
     .true., & ! required
-    .false., & ! multi-record
+    .true., & ! multi-record
     .false., & ! preserve case
     .false., & ! layered
     .false. & ! timeseries
     )
 
   type(InputParamDefinitionType), parameter :: &
-    gwtist_sorbate_rec = InputParamDefinitionType &
+    gwtist_formatrecord = InputParamDefinitionType &
+    ( &
+    'GWT', & ! component
+    'IST', & ! subcomponent
+    'OPTIONS', & ! block
+    'FORMATRECORD', & ! tag name
+    'FORMATRECORD', & ! fortran variable
+    'RECORD COLUMNS WIDTH DIGITS FORMAT', & ! type
+    '', & ! shape
+    '', & ! longname
+    .true., & ! required
+    .true., & ! multi-record
+    .false., & ! preserve case
+    .false., & ! layered
+    .false. & ! timeseries
+    )
+
+  type(InputParamDefinitionType), parameter :: &
+    gwtist_columns = InputParamDefinitionType &
+    ( &
+    'GWT', & ! component
+    'IST', & ! subcomponent
+    'OPTIONS', & ! block
+    'COLUMNS', & ! tag name
+    'COLUMNS', & ! fortran variable
+    'INTEGER', & ! type
+    '', & ! shape
+    'number of columns', & ! longname
+    .true., & ! required
+    .true., & ! multi-record
+    .false., & ! preserve case
+    .false., & ! layered
+    .false. & ! timeseries
+    )
+
+  type(InputParamDefinitionType), parameter :: &
+    gwtist_width = InputParamDefinitionType &
+    ( &
+    'GWT', & ! component
+    'IST', & ! subcomponent
+    'OPTIONS', & ! block
+    'WIDTH', & ! tag name
+    'WIDTH', & ! fortran variable
+    'INTEGER', & ! type
+    '', & ! shape
+    'width for each number', & ! longname
+    .true., & ! required
+    .true., & ! multi-record
+    .false., & ! preserve case
+    .false., & ! layered
+    .false. & ! timeseries
+    )
+
+  type(InputParamDefinitionType), parameter :: &
+    gwtist_digits = InputParamDefinitionType &
+    ( &
+    'GWT', & ! component
+    'IST', & ! subcomponent
+    'OPTIONS', & ! block
+    'DIGITS', & ! tag name
+    'DIGITS', & ! fortran variable
+    'INTEGER', & ! type
+    '', & ! shape
+    'number of digits', & ! longname
+    .true., & ! required
+    .true., & ! multi-record
+    .false., & ! preserve case
+    .false., & ! layered
+    .false. & ! timeseries
+    )
+
+  type(InputParamDefinitionType), parameter :: &
+    gwtist_format = InputParamDefinitionType &
+    ( &
+    'GWT', & ! component
+    'IST', & ! subcomponent
+    'OPTIONS', & ! block
+    'FORMAT', & ! tag name
+    'FORMAT', & ! fortran variable
+    'STRING', & ! type
+    '', & ! shape
+    'write format', & ! longname
+    .true., & ! required
+    .true., & ! multi-record
+    .false., & ! preserve case
+    .false., & ! layered
+    .false. & ! timeseries
+    )
+
+  type(InputParamDefinitionType), parameter :: &
+    gwtist_sorbatefilerec = InputParamDefinitionType &
     ( &
     'GWT', & ! component
     'IST', & ! subcomponent
     'OPTIONS', & ! block
     'SORBATE_FILERECORD', & ! tag name
-    'SORBATE_REC', & ! fortran variable
+    'SORBATEFILEREC', & ! fortran variable
     'RECORD SORBATE FILEOUT SORBATEFILE', & ! type
     '', & ! shape
     '', & ! longname
@@ -615,23 +691,27 @@ module GwtIstInputModule
     gwt_ist_param_definitions(*) = &
     [ &
     gwtist_save_flows, &
-    gwtist_budget_rec, &
+    gwtist_budfilerec, &
     gwtist_budget, &
     gwtist_fileout, &
     gwtist_budgetfile, &
-    gwtist_budgetcsv_rec, &
+    gwtist_budcsvfilerec, &
     gwtist_budgetcsv, &
     gwtist_budgetcsvfile, &
     gwtist_sorption, &
     gwtist_ord1_decay, &
     gwtist_zero_order_decay, &
-    gwtist_cim_filerecord, &
-    gwtist_cim6, &
-    gwtist_cimfmt, &
+    gwtist_cimfilerec, &
+    gwtist_cimopt, &
     gwtist_cimfile, &
     gwtist_cimprintrecord, &
     gwtist_print_format, &
-    gwtist_sorbate_rec, &
+    gwtist_formatrecord, &
+    gwtist_columns, &
+    gwtist_width, &
+    gwtist_digits, &
+    gwtist_format, &
+    gwtist_sorbatefilerec, &
     gwtist_sorbate, &
     gwtist_sorbatefile, &
     gwtist_export_ascii, &
@@ -673,7 +753,7 @@ module GwtIstInputModule
     [ &
     InputBlockDefinitionType( &
     'OPTIONS', & ! blockname
-    .true., & ! required
+    .false., & ! required
     .false., & ! aggregate
     .false. & ! block_variable
     ), &

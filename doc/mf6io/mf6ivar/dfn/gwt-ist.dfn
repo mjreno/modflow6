@@ -16,9 +16,9 @@ shape
 reader urword
 tagged true
 optional true
+mf6internal budfilerec
 longname
 description
-mf6internal budget_rec
 
 block options
 name budget
@@ -61,9 +61,9 @@ shape
 reader urword
 tagged true
 optional true
+mf6internal budcsvfilerec
 longname
 description
-mf6internal budgetcsv_rec
 
 block options
 name budgetcsv
@@ -102,8 +102,8 @@ name first_order_decay
 type keyword
 reader urword
 optional true
-mf6internal ord1_decay
 longname activate first-order decay
+mf6internal ord1_decay
 description is a text keyword to indicate that first-order decay will occur.  Use of this keyword requires that DECAY and DECAY\_SORBED (if sorption is active) are specified in the GRIDDATA block.
 
 block options
@@ -116,35 +116,26 @@ description is a text keyword to indicate that zero-order decay will occur.  Use
 
 block options
 name cim_filerecord
-type record cim6 fileout cimfile
+type record cim fileout cimfile
 shape
 reader urword
 tagged true
 optional true
+mf6internal cimfilerec
 longname
 description
 
 block options
-name cim6
+name cim
 type keyword
 shape
 in_record true
 reader urword
 tagged true
 optional false
-longname cim6 keyword
-description keyword to specify that record corresponds to an immobile concentration output file specification.
-
-block options
-name cimfmt
-type keyword
-shape
-in_record true
-reader urword
-tagged true
-optional false
-longname cim6 format keyword
-description keyword to specify that record corresponds to an immobile concentration output file format specification.
+longname cim keyword
+mf6internal cimopt
+description keyword to specify that record corresponds to immobile concentration.
 
 block options
 name cimfile
@@ -160,7 +151,7 @@ description name of the output file to write immobile concentrations.  This file
 
 block options
 name cimprintrecord
-type record cimfmt print_format
+type record cim print_format formatrecord
 shape
 reader urword
 optional true
@@ -169,14 +160,69 @@ description
 
 block options
 name print_format
-type string
-shape (:)
-in_record false
+type keyword
+shape
+in_record true
 reader urword
 tagged true
 optional false
-longname print format string
-description format specification string of the type: COLUMNS $<$columns$>$ WIDTH $<$width$>$ DIGITS $<$digits$>$ $<$format$>$, where columns is number of columns, width applies to each number written and digit refers to digits in each number. Supported formats are EXPONENTIAL, FIXED, GENERAL, and SCIENTIFIC.
+longname keyword to indicate that a print format follows
+description keyword to specify format for printing to the listing file.
+
+block options
+name formatrecord
+type record columns width digits format
+shape
+in_record true
+reader urword
+tagged
+optional false
+longname
+description
+
+block options
+name columns
+type integer
+shape
+in_record true
+reader urword
+tagged true
+optional
+longname number of columns
+description number of columns for writing data.
+
+block options
+name width
+type integer
+shape
+in_record true
+reader urword
+tagged true
+optional
+longname width for each number
+description width for writing each number.
+
+block options
+name digits
+type integer
+shape
+in_record true
+reader urword
+tagged true
+optional
+longname number of digits
+description number of digits to use for writing a number.
+
+block options
+name format
+type string
+shape
+in_record true
+reader urword
+tagged false
+optional false
+longname write format
+description write format can be EXPONENTIAL, FIXED, GENERAL, or SCIENTIFIC.
 
 block options
 name sorbate_filerecord
@@ -185,9 +231,9 @@ shape
 reader urword
 tagged true
 optional true
+mf6internal sorbatefilerec
 longname
 description
-mf6internal sorbate_rec
 
 block options
 name sorbate

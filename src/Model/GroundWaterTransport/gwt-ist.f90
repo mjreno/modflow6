@@ -15,7 +15,7 @@ module GwtIstModule
 
   use KindModule, only: DP, I4B
   use ConstantsModule, only: DONE, DZERO, DHALF, LENFTYPE, &
-                             LENPACKAGENAME, &
+                             LENPACKAGENAME, LINELENGTH, &
                              LENBUDTXT, DHNOFLO
   use BndModule, only: BndType
   use BudgetModule, only: BudgetType
@@ -56,7 +56,7 @@ module GwtIstModule
     type(GwtMstType), pointer :: mst => null() !< mobile storage and transfer
     type(BudgetType), pointer :: budget => null() !< budget
     type(OutputControlDataType), pointer :: ocd => null() !< output control data
-
+    character(len=LINELENGTH) :: lstfmt !< lst file CIM print format
     integer(I4B), pointer :: icimout => null() !< unit number for binary cim output
     integer(I4B), pointer :: ibudgetout => null() !< binary budget output file
     integer(I4B), pointer :: ibudcsv => null() !< unit number for csv budget output file
@@ -181,6 +181,11 @@ contains
     call this%ocd%init_dbl('CIM', this%cimnew, this%dis, 'PRINT LAST ', &
                            'COLUMNS 10 WIDTH 11 DIGITS 4 GENERAL ', &
                            this%iout, DHNOFLO)
+
+    ! -- apply user override if provided
+    if (this%lstfmt /= '') then
+      call this%ocd%set_option(trim(this%lstfmt)//" ", 0, this%iout)
+    end if
     !
     ! -- read the data block
     call this%read_data()
@@ -868,6 +873,7 @@ contains
     call mem_allocate(this%kiter, 'KITER', this%memoryPath)
     !
     ! -- Initialize
+    this%lstfmt = ''
     this%icimout = 0
     this%ibudgetout = 0
     this%ibudcsv = 0
@@ -985,11 +991,16 @@ contains
     ! -- dummy
     class(GwtIstType), intent(inout) :: this
     ! -- locals
+    character(len=LINELENGTH) :: prnfmt
+    integer(I4B), pointer :: columns, width, digits
     type(GwtIstParamFoundType) :: found
     character(len=LENVARNAME), dimension(3) :: sorption_method = &
       &[character(len=LENVARNAME) :: 'LINEAR', 'FREUNDLICH', 'LANGMUIR']
     character(len=LINELENGTH) :: sorbate_fname, cim6_fname, budget_fname, &
-                                 budgetcsv_fname, print_format
+                                 budgetcsv_fname
+    allocate (columns)
+    allocate (width)
+    allocate (digits)
     !
     ! -- update defaults with memory sourced values
     call mem_set_value(this%ipakcb, 'SAVE_FLOWS', this%input_mempath, &
@@ -1006,10 +1017,16 @@ contains
                        found%zero_order_decay)
     call mem_set_value(cim6_fname, 'CIMFILE', this%input_mempath, &
                        found%cimfile)
-    call mem_set_value(print_format, 'PRINT_FORMAT', this%input_mempath, &
-                       found%print_format)
     call mem_set_value(sorbate_fname, 'SORBATEFILE', this%input_mempath, &
                        found%sorbatefile)
+    call mem_set_value(columns, 'COLUMNS', this%input_mempath, &
+                       found%columns)
+    call mem_set_value(width, 'WIDTH', this%input_mempath, &
+                       found%width)
+    call mem_set_value(digits, 'DIGITS', this%input_mempath, &
+                       found%digits)
+    call mem_set_value(prnfmt, 'FORMAT', this%input_mempath, &
+                       found%format)
 
     ! -- found side effects
     if (found%save_flows) this%ipakcb = -1
@@ -1034,12 +1051,13 @@ contains
     if (found%ord1_decay) this%idcy = 1
     if (found%zero_order_decay) this%idcy = 2
     if (found%cimfile) then
-      call this%ocd%set_option('FILEOUT '//trim(cim6_fname)//" ", this%inunit, &
+      call this%ocd%set_option('FILEOUT '//trim(cim6_fname)//" ", 0, &
                                this%iout)
     end if
-    if (found%print_format) then
-      call this%ocd%set_option('PRINT_FORMAT '//trim(print_format)//" ", &
-                               this%inunit, this%iout)
+    if (found%columns .and. found%width .and. &
+        found%digits .and. found%format) then
+      write (this%lstfmt, '(a,i0,a,i0,a,i0,a)') 'PRINT_FORMAT COLUMNS ', &
+        columns, ' WIDTH ', width, ' DIGITS ', digits, ' '//trim(prnfmt)
     end if
     if (found%sorbatefile) then
       this%ioutsorbate = getunit()
@@ -1052,6 +1070,10 @@ contains
       call this%log_options(found, cim6_fname, budget_fname, &
                             budgetcsv_fname, sorbate_fname)
     end if
+
+    deallocate (columns)
+    deallocate (width)
+    deallocate (digits)
   end subroutine source_options
 
   !> @brief Write user options to list file

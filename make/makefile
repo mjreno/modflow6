@@ -23,7 +23,6 @@ SOURCEDIR16=../src/Model/OverlandFlow
 SOURCEDIR17=../src/Model/ParticleTracking
 SOURCEDIR18=../src/Model/SurfaceWaterFlow
 SOURCEDIR19=../src/Model/TransportModel
-<<<<<<< HEAD
 SOURCEDIR20=../src/Model/TransportModel/InterpolationScheme
 SOURCEDIR21=../src/Solution
 SOURCEDIR22=../src/Solution/LinearMethods
@@ -36,36 +35,23 @@ SOURCEDIR28=../src/Timing
 SOURCEDIR29=../src/Utilities
 SOURCEDIR30=../src/Utilities/ArrayRead
 SOURCEDIR31=../src/Utilities/Export
-=======
-SOURCEDIR20=../src/Solution
-SOURCEDIR21=../src/Solution/LinearMethods
-SOURCEDIR22=../src/Solution/PETSc
-SOURCEDIR23=../src/Solution/ParticleTracker
-SOURCEDIR24=../src/Solution/ParticleTracker/Domain
-SOURCEDIR25=../src/Solution/ParticleTracker/Method
-SOURCEDIR26=../src/Solution/ParticleTracker/Particle
-SOURCEDIR27=../src/Timing
-SOURCEDIR28=../src/Utilities
-SOURCEDIR29=../src/Utilities/ArrayRead
-SOURCEDIR30=../src/Utilities/Export
-SOURCEDIR31=../src/Utilities/Export/tmp
->>>>>>> ef73b153d8 (rebuild makefiles)
-SOURCEDIR32=../src/Utilities/Idm
-SOURCEDIR33=../src/Utilities/Idm/mf6blockfile
-SOURCEDIR34=../src/Utilities/Idm/netcdf
-SOURCEDIR35=../src/Utilities/Libraries
-SOURCEDIR36=../src/Utilities/Libraries/blas
-SOURCEDIR37=../src/Utilities/Libraries/daglib
-SOURCEDIR38=../src/Utilities/Libraries/rcm
-SOURCEDIR39=../src/Utilities/Libraries/sparsekit
-SOURCEDIR40=../src/Utilities/Libraries/sparskit2
-SOURCEDIR41=../src/Utilities/Matrix
-SOURCEDIR42=../src/Utilities/Memory
-SOURCEDIR43=../src/Utilities/Observation
-SOURCEDIR44=../src/Utilities/OutputControl
-SOURCEDIR45=../src/Utilities/Performance
-SOURCEDIR46=../src/Utilities/TimeSeries
-SOURCEDIR47=../src/Utilities/Vector
+SOURCEDIR32=../src/Utilities/Export/tmp
+SOURCEDIR33=../src/Utilities/Idm
+SOURCEDIR34=../src/Utilities/Idm/mf6blockfile
+SOURCEDIR35=../src/Utilities/Idm/netcdf
+SOURCEDIR36=../src/Utilities/Libraries
+SOURCEDIR37=../src/Utilities/Libraries/blas
+SOURCEDIR38=../src/Utilities/Libraries/daglib
+SOURCEDIR39=../src/Utilities/Libraries/rcm
+SOURCEDIR40=../src/Utilities/Libraries/sparsekit
+SOURCEDIR41=../src/Utilities/Libraries/sparskit2
+SOURCEDIR42=../src/Utilities/Matrix
+SOURCEDIR43=../src/Utilities/Memory
+SOURCEDIR44=../src/Utilities/Observation
+SOURCEDIR45=../src/Utilities/OutputControl
+SOURCEDIR46=../src/Utilities/Performance
+SOURCEDIR47=../src/Utilities/TimeSeries
+SOURCEDIR48=../src/Utilities/Vector
 
 VPATH = \
 ${SOURCEDIR1} \
@@ -114,7 +100,8 @@ ${SOURCEDIR43} \
 ${SOURCEDIR44} \
 ${SOURCEDIR45} \
 ${SOURCEDIR46} \
-${SOURCEDIR47} 
+${SOURCEDIR47} \
+${SOURCEDIR48} 
 
 .SUFFIXES: .f90 .F90 .o
 

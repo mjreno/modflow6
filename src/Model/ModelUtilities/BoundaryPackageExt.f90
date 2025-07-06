@@ -569,7 +569,7 @@ contains
     do n = 1, this%nbound
       nodeuser = this%nodeulist(n)
       noder = this%dis%get_nodenumber(nodeuser, 1)
-      if (noder >= 0) then
+      if (noder > 0) then
         this%nodelist(n) = noder
       else
         ninactive = ninactive + 1

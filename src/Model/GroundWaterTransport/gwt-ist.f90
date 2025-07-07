@@ -166,7 +166,7 @@ contains
   !<
   subroutine ist_ar(this)
     ! -- modules
-    use SimModule, only: store_error, count_errors
+    use SimModule, only: store_error, count_errors, store_error_filename
     use BudgetModule, only: budget_cr
     ! -- dummy
     class(GwtIstType), intent(inout) :: this !< GwtIstType object
@@ -218,7 +218,7 @@ contains
         &both the MST and IST Packages.')
     end if
     if (count_errors() > 0) then
-      call this%parser%StoreErrorUnit()
+      call store_error_filename(this%input_fname)
     end if
   end subroutine ist_ar
 
@@ -1164,7 +1164,8 @@ contains
     ! -- modules
     use ConstantsModule, only: LINELENGTH
     use SimVariablesModule, only: errmsg, warnmsg
-    use SimModule, only: count_errors, store_error, store_warning
+    use SimModule, only: count_errors, store_error, store_warning, &
+                         store_error_filename
     use MemoryManagerModule, only: get_isize, mem_reallocate
     use MemoryManagerExtModule, only: mem_set_value
     use GwtIstInputModule, only: GwtIstParamFoundType
@@ -1343,7 +1344,7 @@ contains
 
     ! -- terminate if errors
     if (count_errors() > 0) then
-      call this%parser%StoreErrorUnit()
+      call store_error_filename(this%input_fname)
     end if
   end subroutine source_data
 

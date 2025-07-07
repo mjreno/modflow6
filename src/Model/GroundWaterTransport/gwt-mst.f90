@@ -134,9 +134,6 @@ contains
     mstobj%inunit = inunit
     mstobj%iout = iout
     mstobj%fmi => fmi
-    !
-    ! -- Initialize block parser
-    call mstobj%parser%Initialize(mstobj%inunit, mstobj%iout)
   end subroutine mst_cr
 
   !> @ brief Allocate and read method for package
@@ -1438,7 +1435,7 @@ contains
 
     ! -- terminate if errors
     if (count_errors() > 0) then
-      call this%parser%StoreErrorUnit()
+      call store_error_filename(this%input_fname)
     end if
 
     ! -- initialize thetam from porosity

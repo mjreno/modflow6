@@ -1190,7 +1190,7 @@ contains
     character(len=LENBOUNDNAME) :: bndname
     real(DP) :: top, botm, baq, q, thick, rval
     integer(I4B) :: idelay, ndelaybeds, csubno
-    integer(I4B) :: ib, ierr, n, nodeu, noder
+    integer(I4B) :: ib, n, nodeu, noder
     character(len=LINELENGTH) :: nodestr
 
     ! -- set input context pointers
@@ -1388,121 +1388,118 @@ contains
     if (ndelaybeds > 0) then
       !
       ! -- reallocate and initialize delay interbed arrays
-      ierr = 0
-      if (ierr == 0) then
-        call mem_allocate(this%idb_nconv_count, 2, &
-                          'IDB_NCONV_COUNT', trim(this%memoryPath))
-        call mem_allocate(this%idbconvert, this%ndelaycells, ndelaybeds, &
-                          'IDBCONVERT', trim(this%memoryPath))
-        call mem_allocate(this%dbdhmax, ndelaybeds, &
-                          'DBDHMAX', trim(this%memoryPath))
-        call mem_allocate(this%dbz, this%ndelaycells, ndelaybeds, &
-                          'DBZ', trim(this%memoryPath))
-        call mem_allocate(this%dbrelz, this%ndelaycells, ndelaybeds, &
-                          'DBRELZ', trim(this%memoryPath))
-        call mem_allocate(this%dbh, this%ndelaycells, ndelaybeds, &
-                          'DBH', trim(this%memoryPath))
-        call mem_allocate(this%dbh0, this%ndelaycells, ndelaybeds, &
-                          'DBH0', trim(this%memoryPath))
-        call mem_allocate(this%dbgeo, this%ndelaycells, ndelaybeds, &
-                          'DBGEO', trim(this%memoryPath))
-        call mem_allocate(this%dbes, this%ndelaycells, ndelaybeds, &
-                          'DBES', trim(this%memoryPath))
-        call mem_allocate(this%dbes0, this%ndelaycells, ndelaybeds, &
-                          'DBES0', trim(this%memoryPath))
-        call mem_allocate(this%dbpcs, this%ndelaycells, ndelaybeds, &
-                          'DBPCS', trim(this%memoryPath))
-        call mem_allocate(this%dbflowtop, ndelaybeds, &
-                          'DBFLOWTOP', trim(this%memoryPath))
-        call mem_allocate(this%dbflowbot, ndelaybeds, &
-                          'DBFLOWBOT', trim(this%memoryPath))
-        call mem_allocate(this%dbdzini, this%ndelaycells, ndelaybeds, &
-                          'DBDZINI', trim(this%memoryPath))
-        call mem_allocate(this%dbthetaini, this%ndelaycells, ndelaybeds, &
-                          'DBTHETAINI', trim(this%memoryPath))
-        call mem_allocate(this%dbcomp, this%ndelaycells, ndelaybeds, &
-                          'DBCOMP', trim(this%memoryPath))
-        call mem_allocate(this%dbtcomp, this%ndelaycells, ndelaybeds, &
-                          'DBTCOMP', trim(this%memoryPath))
-        !
-        ! -- allocate delay bed arrays
-        if (this%iupdatematprop == 0) then
-          call mem_setptr(this%dbdz, 'DBDZINI', trim(this%memoryPath))
-          call mem_setptr(this%dbdz0, 'DBDZINI', trim(this%memoryPath))
-          call mem_setptr(this%dbtheta, 'DBTHETAINI', trim(this%memoryPath))
-          call mem_setptr(this%dbtheta0, 'DBTHETAINI', trim(this%memoryPath))
-        else
-          call mem_allocate(this%dbdz, this%ndelaycells, ndelaybeds, &
-                            'DBDZ', trim(this%memoryPath))
-          call mem_allocate(this%dbdz0, this%ndelaycells, ndelaybeds, &
-                            'DBDZ0', trim(this%memoryPath))
-          call mem_allocate(this%dbtheta, this%ndelaycells, ndelaybeds, &
-                            'DBTHETA', trim(this%memoryPath))
-          call mem_allocate(this%dbtheta0, this%ndelaycells, ndelaybeds, &
-                            'DBTHETA0', trim(this%memoryPath))
+      call mem_allocate(this%idb_nconv_count, 2, &
+                        'IDB_NCONV_COUNT', trim(this%memoryPath))
+      call mem_allocate(this%idbconvert, this%ndelaycells, ndelaybeds, &
+                        'IDBCONVERT', trim(this%memoryPath))
+      call mem_allocate(this%dbdhmax, ndelaybeds, &
+                        'DBDHMAX', trim(this%memoryPath))
+      call mem_allocate(this%dbz, this%ndelaycells, ndelaybeds, &
+                        'DBZ', trim(this%memoryPath))
+      call mem_allocate(this%dbrelz, this%ndelaycells, ndelaybeds, &
+                        'DBRELZ', trim(this%memoryPath))
+      call mem_allocate(this%dbh, this%ndelaycells, ndelaybeds, &
+                        'DBH', trim(this%memoryPath))
+      call mem_allocate(this%dbh0, this%ndelaycells, ndelaybeds, &
+                        'DBH0', trim(this%memoryPath))
+      call mem_allocate(this%dbgeo, this%ndelaycells, ndelaybeds, &
+                        'DBGEO', trim(this%memoryPath))
+      call mem_allocate(this%dbes, this%ndelaycells, ndelaybeds, &
+                        'DBES', trim(this%memoryPath))
+      call mem_allocate(this%dbes0, this%ndelaycells, ndelaybeds, &
+                        'DBES0', trim(this%memoryPath))
+      call mem_allocate(this%dbpcs, this%ndelaycells, ndelaybeds, &
+                        'DBPCS', trim(this%memoryPath))
+      call mem_allocate(this%dbflowtop, ndelaybeds, &
+                        'DBFLOWTOP', trim(this%memoryPath))
+      call mem_allocate(this%dbflowbot, ndelaybeds, &
+                        'DBFLOWBOT', trim(this%memoryPath))
+      call mem_allocate(this%dbdzini, this%ndelaycells, ndelaybeds, &
+                        'DBDZINI', trim(this%memoryPath))
+      call mem_allocate(this%dbthetaini, this%ndelaycells, ndelaybeds, &
+                        'DBTHETAINI', trim(this%memoryPath))
+      call mem_allocate(this%dbcomp, this%ndelaycells, ndelaybeds, &
+                        'DBCOMP', trim(this%memoryPath))
+      call mem_allocate(this%dbtcomp, this%ndelaycells, ndelaybeds, &
+                        'DBTCOMP', trim(this%memoryPath))
+      !
+      ! -- allocate delay bed arrays
+      if (this%iupdatematprop == 0) then
+        call mem_setptr(this%dbdz, 'DBDZINI', trim(this%memoryPath))
+        call mem_setptr(this%dbdz0, 'DBDZINI', trim(this%memoryPath))
+        call mem_setptr(this%dbtheta, 'DBTHETAINI', trim(this%memoryPath))
+        call mem_setptr(this%dbtheta0, 'DBTHETAINI', trim(this%memoryPath))
+      else
+        call mem_allocate(this%dbdz, this%ndelaycells, ndelaybeds, &
+                          'DBDZ', trim(this%memoryPath))
+        call mem_allocate(this%dbdz0, this%ndelaycells, ndelaybeds, &
+                          'DBDZ0', trim(this%memoryPath))
+        call mem_allocate(this%dbtheta, this%ndelaycells, ndelaybeds, &
+                          'DBTHETA', trim(this%memoryPath))
+        call mem_allocate(this%dbtheta0, this%ndelaycells, ndelaybeds, &
+                          'DBTHETA0', trim(this%memoryPath))
+      end if
+      !
+      ! -- allocate delay interbed solution arrays
+      call mem_allocate(this%dbal, this%ndelaycells, &
+                        'DBAL', trim(this%memoryPath))
+      call mem_allocate(this%dbad, this%ndelaycells, &
+                        'DBAD', trim(this%memoryPath))
+      call mem_allocate(this%dbau, this%ndelaycells, &
+                        'DBAU', trim(this%memoryPath))
+      call mem_allocate(this%dbrhs, this%ndelaycells, &
+                        'DBRHS', trim(this%memoryPath))
+      call mem_allocate(this%dbdh, this%ndelaycells, &
+                        'DBDH', trim(this%memoryPath))
+      call mem_allocate(this%dbaw, this%ndelaycells, &
+                        'DBAW', trim(this%memoryPath))
+      !
+      ! -- initialize delay bed counters
+      do n = 1, 2
+        this%idb_nconv_count(n) = 0
+      end do
+      !
+      ! -- initialize delay bed storage
+      do ib = 1, this%ninterbeds
+        idelay = this%idelay(ib)
+        if (idelay == 0) then
+          cycle
         end if
         !
-        ! -- allocate delay interbed solution arrays
-        call mem_allocate(this%dbal, this%ndelaycells, &
-                          'DBAL', trim(this%memoryPath))
-        call mem_allocate(this%dbad, this%ndelaycells, &
-                          'DBAD', trim(this%memoryPath))
-        call mem_allocate(this%dbau, this%ndelaycells, &
-                          'DBAU', trim(this%memoryPath))
-        call mem_allocate(this%dbrhs, this%ndelaycells, &
-                          'DBRHS', trim(this%memoryPath))
-        call mem_allocate(this%dbdh, this%ndelaycells, &
-                          'DBDH', trim(this%memoryPath))
-        call mem_allocate(this%dbaw, this%ndelaycells, &
-                          'DBAW', trim(this%memoryPath))
-        !
-        ! -- initialize delay bed counters
-        do n = 1, 2
-          this%idb_nconv_count(n) = 0
-        end do
-        !
-        ! -- initialize delay bed storage
-        do ib = 1, this%ninterbeds
-          idelay = this%idelay(ib)
-          if (idelay == 0) then
-            cycle
-          end if
-          !
-          ! -- initialize delay interbed variables
-          do n = 1, this%ndelaycells
-            rval = this%thickini(ib) / real(this%ndelaycells, DP)
-            this%dbdzini(n, idelay) = rval
-            this%dbh(n, idelay) = this%h0(ib)
-            this%dbh0(n, idelay) = this%h0(ib)
-            this%dbthetaini(n, idelay) = this%thetaini(ib)
-            this%dbgeo(n, idelay) = DZERO
-            this%dbes(n, idelay) = DZERO
-            this%dbes0(n, idelay) = DZERO
-            this%dbpcs(n, idelay) = this%pcs(ib)
-            this%dbcomp(n, idelay) = DZERO
-            this%dbtcomp(n, idelay) = DZERO
-            if (this%iupdatematprop /= 0) then
-              this%dbdz(n, idelay) = this%dbdzini(n, idelay)
-              this%dbdz0(n, idelay) = this%dbdzini(n, idelay)
-              this%dbtheta(n, idelay) = this%theta(ib)
-              this%dbtheta0(n, idelay) = this%theta(ib)
-            end if
-          end do
-          !
-          ! -- initialize elevation of delay bed cells
-          call this%csub_delay_init_zcell(ib)
-        end do
-        !
-        ! -- initialize delay bed solution arrays
+        ! -- initialize delay interbed variables
         do n = 1, this%ndelaycells
-          this%dbal(n) = DZERO
-          this%dbad(n) = DZERO
-          this%dbau(n) = DZERO
-          this%dbrhs(n) = DZERO
-          this%dbdh(n) = DZERO
-          this%dbaw(n) = DZERO
+          rval = this%thickini(ib) / real(this%ndelaycells, DP)
+          this%dbdzini(n, idelay) = rval
+          this%dbh(n, idelay) = this%h0(ib)
+          this%dbh0(n, idelay) = this%h0(ib)
+          this%dbthetaini(n, idelay) = this%thetaini(ib)
+          this%dbgeo(n, idelay) = DZERO
+          this%dbes(n, idelay) = DZERO
+          this%dbes0(n, idelay) = DZERO
+          this%dbpcs(n, idelay) = this%pcs(ib)
+          this%dbcomp(n, idelay) = DZERO
+          this%dbtcomp(n, idelay) = DZERO
+          if (this%iupdatematprop /= 0) then
+            this%dbdz(n, idelay) = this%dbdzini(n, idelay)
+            this%dbdz0(n, idelay) = this%dbdzini(n, idelay)
+            this%dbtheta(n, idelay) = this%theta(ib)
+            this%dbtheta0(n, idelay) = this%theta(ib)
+          end if
         end do
-      end if
+        !
+        ! -- initialize elevation of delay bed cells
+        call this%csub_delay_init_zcell(ib)
+      end do
+      !
+      ! -- initialize delay bed solution arrays
+      do n = 1, this%ndelaycells
+        this%dbal(n) = DZERO
+        this%dbad(n) = DZERO
+        this%dbau(n) = DZERO
+        this%dbrhs(n) = DZERO
+        this%dbdh(n) = DZERO
+        this%dbaw(n) = DZERO
+      end do
     end if
     !
     ! -- check that ndelaycells is odd when using

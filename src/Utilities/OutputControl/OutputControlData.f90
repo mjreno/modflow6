@@ -34,6 +34,7 @@ module OutputControlDataModule
     procedure :: init_int
     procedure :: init_dbl
     procedure :: set_option
+    procedure :: set_ocfile
     procedure :: ocd_rp_check
     procedure :: ocd_ot
     procedure :: ocd_da
@@ -49,13 +50,13 @@ contains
   end subroutine ocd_cr
 
   !> @ brief Check the output control data type for consistency.
-  subroutine ocd_rp_check(this, inunit)
+  subroutine ocd_rp_check(this, input_fname)
     ! modules
     use ConstantsModule, only: LINELENGTH
-    use SimModule, only: store_error, count_errors, store_error_unit
+    use SimModule, only: store_error, count_errors, store_error_filename
     ! dummy
     class(OutputControlDataType) :: this !< this instance
-    integer(I4B), intent(in) :: inunit !< output unit number
+    character(len=*) :: input_fname
     ! locals
     character(len=LINELENGTH) :: errmsg
     ! formats
@@ -74,7 +75,7 @@ contains
     end if
 
     if (count_errors() > 0) then
-      call store_error_unit(inunit)
+      call store_error_filename(input_fname)
     end if
   end subroutine ocd_rp_check
 
@@ -259,5 +260,24 @@ contains
       call store_error_unit(inunit)
     end select
   end subroutine set_option
+
+  subroutine set_ocfile(this, ocfile, iout)
+    use ConstantsModule, only: MNORMAL
+    use OpenSpecModule, only: access, form
+    use InputOutputModule, only: urword, getunit, openfile
+    ! dummy
+    class(OutputControlDataType) :: this !< OutputControlDataType object
+    character(len=*), intent(in) :: ocfile !< OC output filename
+    integer(I4B), intent(in) :: iout !< Unit number for output
+    ! format
+    character(len=*), parameter :: fmtocsave = &
+      "(4X,A,' INFORMATION WILL BE WRITTEN TO:', &
+      &/,6X,'UNIT NUMBER: ', I0,/,6X, 'FILE NAME: ', A)"
+    this%idataun = getunit()
+    write (iout, fmtocsave) trim(adjustl(this%cname)), this%idataun, &
+      trim(ocfile)
+    call openfile(this%idataun, iout, ocfile, 'DATA(BINARY)', &
+                  form, access, 'REPLACE', MNORMAL)
+  end subroutine set_ocfile
 
 end module OutputControlDataModule

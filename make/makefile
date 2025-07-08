@@ -154,6 +154,7 @@ $(OBJDIR)/sim-namidm.o \
 $(OBJDIR)/prt-prpidm.o \
 $(OBJDIR)/prt-namidm.o \
 $(OBJDIR)/prt-mipidm.o \
+$(OBJDIR)/prt-fmiidm.o \
 $(OBJDIR)/prt-disvidm.o \
 $(OBJDIR)/prt-disidm.o \
 $(OBJDIR)/olf-zdgidm.o \
@@ -174,6 +175,7 @@ $(OBJDIR)/gwt-namidm.o \
 $(OBJDIR)/gwt-mstidm.o \
 $(OBJDIR)/gwt-istidm.o \
 $(OBJDIR)/gwt-icidm.o \
+$(OBJDIR)/gwt-fmiidm.o \
 $(OBJDIR)/gwt-dspidm.o \
 $(OBJDIR)/gwt-disvidm.o \
 $(OBJDIR)/gwt-disuidm.o \
@@ -208,6 +210,7 @@ $(OBJDIR)/gwf-buyidm.o \
 $(OBJDIR)/gwe-ssmidm.o \
 $(OBJDIR)/gwe-namidm.o \
 $(OBJDIR)/gwe-icidm.o \
+$(OBJDIR)/gwe-fmiidm.o \
 $(OBJDIR)/gwe-estidm.o \
 $(OBJDIR)/gwe-eslidm.o \
 $(OBJDIR)/gwe-disvidm.o \

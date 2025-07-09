@@ -209,22 +209,15 @@ contains
   subroutine bndext_allocate_scalars(this)
     ! -- modules
     use MemoryManagerModule, only: mem_setptr
-    use MemoryManagerExtModule, only: mem_set_value
-    use MemoryHelperModule, only: create_mem_path
-    use SimVariablesModule, only: idm_context
     ! -- dummy variables
     class(BndExtType) :: this !< BndExtType object
     ! -- local variables
-    character(len=LENMEMPATH) :: input_mempath
-    !
-    ! -- set memory path
-    input_mempath = create_mem_path(this%name_model, this%packName, idm_context)
     !
     ! -- allocate base BndType scalars
     call this%BndType%allocate_scalars()
     !
     ! -- set IPER pointer
-    call mem_setptr(this%iper, 'IPER', input_mempath)
+    call mem_setptr(this%iper, 'IPER', this%input_mempath)
 
     ! -- allocate internal scalars
     allocate (this%readarraygrid)
@@ -568,7 +561,7 @@ contains
     ! -- Set the nodelist
     do n = 1, this%nbound
       nodeuser = this%nodeulist(n)
-      noder = this%dis%get_nodenumber(nodeuser, 1)
+      noder = this%dis%get_nodenumber(nodeuser, 0)
       if (noder > 0) then
         this%nodelist(n) = noder
       else

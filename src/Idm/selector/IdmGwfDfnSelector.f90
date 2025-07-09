@@ -23,6 +23,7 @@ module IdmGwfDfnSelectorModule
   use GwfRivInputModule
   use GwfStoInputModule
   use GwfWelInputModule
+  use GwfWelgInputModule
 
   implicit none
   private
@@ -94,6 +95,8 @@ contains
       call set_param_pointer(input_definition, gwf_sto_param_definitions)
     case ('WEL')
       call set_param_pointer(input_definition, gwf_wel_param_definitions)
+    case ('WELG')
+      call set_param_pointer(input_definition, gwf_welg_param_definitions)
     case default
     end select
     return
@@ -140,6 +143,8 @@ contains
       call set_param_pointer(input_definition, gwf_sto_aggregate_definitions)
     case ('WEL')
       call set_param_pointer(input_definition, gwf_wel_aggregate_definitions)
+    case ('WELG')
+      call set_param_pointer(input_definition, gwf_welg_aggregate_definitions)
     case default
     end select
     return
@@ -186,6 +191,8 @@ contains
       call set_block_pointer(input_definition, gwf_sto_block_definitions)
     case ('WEL')
       call set_block_pointer(input_definition, gwf_wel_block_definitions)
+    case ('WELG')
+      call set_block_pointer(input_definition, gwf_welg_block_definitions)
     case default
     end select
     return
@@ -231,6 +238,8 @@ contains
       multi_package = gwf_sto_multi_package
     case ('WEL')
       multi_package = gwf_wel_multi_package
+    case ('WELG')
+      multi_package = gwf_welg_multi_package
     case default
       call store_error('Idm selector subcomponent not found; '//&
                        &'component="GWF"'//&
@@ -279,6 +288,8 @@ contains
       call set_subpkg_pointer(subpackages, gwf_sto_subpackages)
     case ('WEL')
       call set_subpkg_pointer(subpackages, gwf_wel_subpackages)
+    case ('WELG')
+      call set_subpkg_pointer(subpackages, gwf_welg_subpackages)
     case default
     end select
     return
@@ -324,6 +335,8 @@ contains
     case ('STO')
       integrated = .true.
     case ('WEL')
+      integrated = .true.
+    case ('WELG')
       integrated = .true.
     case default
     end select

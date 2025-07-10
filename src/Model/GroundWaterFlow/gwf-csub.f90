@@ -503,7 +503,7 @@ contains
 
   !> @ brief Source options for package
   !!
-  !!  Read options block for CSUB package.
+  !!  Source options for CSUB package.
   !!
   !<
   subroutine source_options(this)
@@ -950,7 +950,7 @@ contains
   !<
   subroutine csub_allocate_arrays(this)
     ! -- modules
-    use MemoryManagerModule, only: mem_allocate, mem_setptr
+    use MemoryManagerModule, only: mem_allocate, mem_setptr, mem_checkin
     ! -- dummy variables
     class(GwfCsubType), intent(inout) :: this
     ! -- local variables
@@ -1068,7 +1068,7 @@ contains
       call mem_allocate(this%theta0, iblen, 'THETA0', trim(this%memoryPath))
     end if
     !
-    ! -- delay bed storage - allocated in csub_read_packagedata
+    ! -- delay bed storage - allocated in csub_source_packagedata
     !    after number of delay beds is defined
     !
     ! -- allocate boundname
@@ -1084,7 +1084,11 @@ contains
     ! -- allocate the nodelist and bound arrays
     call mem_allocate(this%nodelistsig0, this%maxsig0, 'NODELISTSIG0', &
                       this%memoryPath)
+
+    ! -- set sig0 input context pointer
     call mem_setptr(this%sig0, 'SIG0', this%input_mempath)
+    call mem_checkin(this%sig0, 'SIG0', this%memoryPath, &
+                     'SIG0', this%input_mempath)
     !
     ! -- set pointers to gwf variables
     call mem_setptr(this%gwfiss, 'ISS', trim(this%name_model))
@@ -1113,10 +1117,6 @@ contains
   end subroutine csub_allocate_arrays
 
   !> @ brief Source griddata for package
-  !!
-  !!  Read delay and no-delay interbed input data for the CSUB package. Method
-  !!  also validates interbed input data.
-  !!
   !<
   subroutine csub_source_griddata(this)
     ! -- modules
@@ -1191,7 +1191,6 @@ contains
     real(DP) :: top, botm, baq, q, thick, rval
     integer(I4B) :: idelay, ndelaybeds, csubno
     integer(I4B) :: ib, n, nodeu, noder
-    character(len=LINELENGTH) :: nodestr
 
     ! -- set input context pointers
     call mem_setptr(icsubno, 'ICSUBNO', this%input_mempath)
@@ -1243,13 +1242,9 @@ contains
       end if
 
       ! -- set node reduced
-      noder = this%dis%get_nodenumber(nodeu, 0)
+      noder = this%dis%get_nodenumber(nodeu, 1)
       if (noder <= 0) then
-        call this%dis%nodeu_to_string(nodeu, nodestr)
-        write (errmsg, *) &
-          ' Cell is outside active grid domain: '// &
-          trim(adjustl(nodestr))
-        call store_error(errmsg)
+        cycle
       end if
 
       ! -- update nodelists
@@ -2052,7 +2047,7 @@ contains
       !
       ! -- period data
       call mem_deallocate(this%nodelistsig0)
-      call mem_deallocate(this%sig0)
+      call mem_deallocate(this%sig0, 'SIG0', this%memoryPath)
       !
       ! -- pointers to gwf variables
       nullify (this%gwfiss)
@@ -2161,7 +2156,6 @@ contains
     integer(I4B), dimension(:), pointer, contiguous :: cellid
     integer(I4B), pointer :: iper
     integer(I4B) :: n, nodeu, noder
-    character(len=LINELENGTH) :: nodestr
     character(len=LINELENGTH) :: title, text
     character(len=20) :: cellstr
     logical(LGP) :: found
@@ -2171,6 +2165,7 @@ contains
 
     call mem_setptr(iper, 'IPER', this%input_mempath)
     if (iper /= kper) then
+      write (this%iout, fmtlsp) trim(this%filtyp)
       call this%csub_rp_obs()
       return
     end if
@@ -2214,13 +2209,9 @@ contains
       end if
 
       ! -- set noder
-      noder = this%dis%get_nodenumber(nodeu, 0)
+      noder = this%dis%get_nodenumber(nodeu, 1)
       if (noder <= 0) then
-        call this%dis%nodeu_to_string(nodeu, nodestr)
-        write (errmsg, *) &
-          ' Cell is outside active grid domain: '// &
-          trim(adjustl(nodestr))
-        call store_error(errmsg)
+        cycle
       end if
 
       this%nodelistsig0(n) = noder
@@ -2233,14 +2224,14 @@ contains
       end if
     end do
     !
-    ! -- finalize the table
-    if (this%iprpak /= 0) then
-      call this%inputtab%finalize_table()
-    end if
-    !
     ! -- terminate if errors encountered
     if (count_errors() > 0) then
       call store_error_filename(this%input_fname)
+    end if
+    !
+    ! -- finalize the table
+    if (this%iprpak /= 0) then
+      call this%inputtab%finalize_table()
     end if
     !
     ! -- read observations

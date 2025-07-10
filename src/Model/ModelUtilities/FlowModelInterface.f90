@@ -358,6 +358,12 @@ contains
         cycle
       end if
 
+      if (fileop /= 'FILEIN') then
+        call store_error('Unexpected packagedata input keyword read: "' &
+                         //trim(fileop)//'".')
+        cycle
+      end if
+
       select case (flowtype)
       case ('GWFBUDGET')
         inunit = getunit()

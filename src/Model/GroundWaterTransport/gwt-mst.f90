@@ -1119,7 +1119,7 @@ contains
       call mem_allocate(this%ratedcys, 1, 'RATEDCYS', this%memoryPath)
       call mem_allocate(this%decayslast, 1, 'DECAYSLAST', this%memoryPath)
     end if
-    call mem_allocate(this%decay_sorbed, this%dis%nodes, 'DECAY_SORBED', &
+    call mem_allocate(this%decay_sorbed, 1, 'DECAY_SORBED', &
                       this%memoryPath)
     !
     ! -- srb
@@ -1190,10 +1190,10 @@ contains
     ! -- update defaults with memory sourced values
     call mem_set_value(this%ipakcb, 'SAVE_FLOWS', this%input_mempath, &
                        found%save_flows)
-    call mem_set_value(this%idcy, 'ORD1_DECAY', this%input_mempath, &
-                       found%ord1_decay)
-    call mem_set_value(this%idcy, 'ZERO_ORDER_DECAY', this%input_mempath, &
-                       found%zero_order_decay)
+    call mem_set_value(this%idcy, 'ORDER1_DECAY', this%input_mempath, &
+                       found%order1_decay)
+    call mem_set_value(this%idcy, 'ORDER0_DECAY', this%input_mempath, &
+                       found%order0_decay)
     call mem_set_value(this%isrb, 'SORPTION', this%input_mempath, &
                        sorption_method, found%sorption)
     call mem_set_value(fname, 'SORBATEFILE', this%input_mempath, &
@@ -1201,8 +1201,8 @@ contains
 
     ! -- found side effects
     if (found%save_flows) this%ipakcb = -1
-    if (found%ord1_decay) this%idcy = DECAY_FIRST_ORDER
-    if (found%zero_order_decay) this%idcy = DECAY_ZERO_ORDER
+    if (found%order1_decay) this%idcy = DECAY_FIRST_ORDER
+    if (found%order0_decay) this%idcy = DECAY_ZERO_ORDER
     if (found%sorption) then
       if (this%isrb == IZERO) then
         call store_error('Unknown sorption type was specified. &
@@ -1223,7 +1223,7 @@ contains
     end if
   end subroutine source_options
 
-  !> @brief Write user options to list file
+  !> @brief Log user options to list file
   !<
   subroutine log_options(this, found, sorbate_fname)
     use GwtMstInputModule, only: GwtMstParamFoundType
@@ -1252,10 +1252,10 @@ contains
     if (found%save_flows) then
       write (this%iout, fmtisvflow)
     end if
-    if (found%ord1_decay) then
+    if (found%order1_decay) then
       write (this%iout, fmtidcy1)
     end if
-    if (found%zero_order_decay) then
+    if (found%order0_decay) then
       write (this%iout, fmtidcy2)
     end if
     if (found%sorption) then
@@ -1299,30 +1299,28 @@ contains
     ! -- reallocate
     if (this%isrb == SORPTION_OFF) then
       call get_isize('BULK_DENSITY', this%input_mempath, asize)
-      if (asize >= 0) &
+      if (asize > 0) &
         call mem_reallocate(this%bulk_density, this%dis%nodes, &
-                            'BULK_DENSITY', trim(this%memoryPath))
+                            'BULK_DENSITY', this%memoryPath)
       call get_isize('DISTCOEF', this%input_mempath, asize)
-      if (asize >= 0) &
+      if (asize > 0) &
         call mem_reallocate(this%distcoef, this%dis%nodes, 'DISTCOEF', &
-                            trim(this%memoryPath))
+                            this%memoryPath)
     end if
     if (this%idcy == DECAY_OFF) then
       call get_isize('DECAY', this%input_mempath, asize)
-      if (asize >= 0) &
-        call mem_reallocate(this%decay, this%dis%nodes, 'DECAY', &
-                            trim(this%memoryPath))
+      if (asize > 0) &
+        call mem_reallocate(this%decay, this%dis%nodes, 'DECAY', this%memoryPath)
     end if
     call get_isize('DECAY_SORBED', this%input_mempath, asize)
-    if (asize >= 0) then
+    if (asize > 0) then
       call mem_reallocate(this%decay_sorbed, this%dis%nodes, &
-                          'DECAY_SORBED', trim(this%memoryPath))
+                          'DECAY_SORBED', this%memoryPath)
     end if
     if (this%isrb == SORPTION_OFF .or. this%isrb == SORPTION_LINEAR) then
       call get_isize('SP2', this%input_mempath, asize)
-      if (asize >= 0) &
-        call mem_reallocate(this%sp2, this%dis%nodes, 'SP2', &
-                            trim(this%memoryPath))
+      if (asize > 0) &
+        call mem_reallocate(this%sp2, this%dis%nodes, 'SP2', this%memoryPath)
     end if
     !
     ! -- update defaults with memory sourced values
@@ -1444,7 +1442,7 @@ contains
     end do
   end subroutine source_data
 
-  !> @brief Write user options to list file
+  !> @brief Log user data to list file
   !<
   subroutine log_data(this, found)
     use GwtMstInputModule, only: GwtMstParamFoundType

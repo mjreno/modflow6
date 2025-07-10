@@ -13,8 +13,8 @@ module GwtMstInputModule
 
   type GwtMstParamFoundType
     logical :: save_flows = .false.
-    logical :: ord1_decay = .false.
-    logical :: zero_order_decay = .false.
+    logical :: order1_decay = .false.
+    logical :: order0_decay = .false.
     logical :: sorption = .false.
     logical :: sorbate_rec = .false.
     logical :: sorbate = .false.
@@ -57,13 +57,13 @@ module GwtMstInputModule
     )
 
   type(InputParamDefinitionType), parameter :: &
-    gwtmst_ord1_decay = InputParamDefinitionType &
+    gwtmst_order1_decay = InputParamDefinitionType &
     ( &
     'GWT', & ! component
     'MST', & ! subcomponent
     'OPTIONS', & ! block
     'FIRST_ORDER_DECAY', & ! tag name
-    'ORD1_DECAY', & ! fortran variable
+    'ORDER1_DECAY', & ! fortran variable
     'KEYWORD', & ! type
     '', & ! shape
     'activate first-order decay', & ! longname
@@ -75,13 +75,13 @@ module GwtMstInputModule
     )
 
   type(InputParamDefinitionType), parameter :: &
-    gwtmst_zero_order_decay = InputParamDefinitionType &
+    gwtmst_order0_decay = InputParamDefinitionType &
     ( &
     'GWT', & ! component
     'MST', & ! subcomponent
     'OPTIONS', & ! block
     'ZERO_ORDER_DECAY', & ! tag name
-    'ZERO_ORDER_DECAY', & ! fortran variable
+    'ORDER0_DECAY', & ! fortran variable
     'KEYWORD', & ! type
     '', & ! shape
     'activate zero-order decay', & ! longname
@@ -330,8 +330,8 @@ module GwtMstInputModule
     gwt_mst_param_definitions(*) = &
     [ &
     gwtmst_save_flows, &
-    gwtmst_ord1_decay, &
-    gwtmst_zero_order_decay, &
+    gwtmst_order1_decay, &
+    gwtmst_order0_decay, &
     gwtmst_sorption, &
     gwtmst_sorbate_rec, &
     gwtmst_sorbate, &

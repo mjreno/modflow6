@@ -13,7 +13,7 @@ name first_order_decay
 type keyword
 reader urword
 optional true
-mf6internal ord1_decay
+mf6internal order1_decay
 longname activate first-order decay
 description is a text keyword to indicate that first-order decay will occur.  Use of this keyword requires that DECAY and DECAY\_SORBED (if sorption is active) are specified in the GRIDDATA block.
 
@@ -22,6 +22,7 @@ name zero_order_decay
 type keyword
 reader urword
 optional true
+mf6internal order0_decay
 longname activate zero-order decay
 description is a text keyword to indicate that zero-order decay will occur.  Use of this keyword requires that DECAY and DECAY\_SORBED (if sorption is active) are specified in the GRIDDATA block.
 

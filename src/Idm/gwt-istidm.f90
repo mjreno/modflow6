@@ -21,8 +21,8 @@ module GwtIstInputModule
     logical :: budgetcsv = .false.
     logical :: budgetcsvfile = .false.
     logical :: sorption = .false.
-    logical :: ord1_decay = .false.
-    logical :: zero_order_decay = .false.
+    logical :: order1_decay = .false.
+    logical :: order0_decay = .false.
     logical :: cimfilerec = .false.
     logical :: cimopt = .false.
     logical :: cimfile = .false.
@@ -220,13 +220,13 @@ module GwtIstInputModule
     )
 
   type(InputParamDefinitionType), parameter :: &
-    gwtist_ord1_decay = InputParamDefinitionType &
+    gwtist_order1_decay = InputParamDefinitionType &
     ( &
     'GWT', & ! component
     'IST', & ! subcomponent
     'OPTIONS', & ! block
     'FIRST_ORDER_DECAY', & ! tag name
-    'ORD1_DECAY', & ! fortran variable
+    'ORDER1_DECAY', & ! fortran variable
     'KEYWORD', & ! type
     '', & ! shape
     'activate first-order decay', & ! longname
@@ -238,13 +238,13 @@ module GwtIstInputModule
     )
 
   type(InputParamDefinitionType), parameter :: &
-    gwtist_zero_order_decay = InputParamDefinitionType &
+    gwtist_order0_decay = InputParamDefinitionType &
     ( &
     'GWT', & ! component
     'IST', & ! subcomponent
     'OPTIONS', & ! block
     'ZERO_ORDER_DECAY', & ! tag name
-    'ZERO_ORDER_DECAY', & ! fortran variable
+    'ORDER0_DECAY', & ! fortran variable
     'KEYWORD', & ! type
     '', & ! shape
     'activate zero-order decay', & ! longname
@@ -699,8 +699,8 @@ module GwtIstInputModule
     gwtist_budgetcsv, &
     gwtist_budgetcsvfile, &
     gwtist_sorption, &
-    gwtist_ord1_decay, &
-    gwtist_zero_order_decay, &
+    gwtist_order1_decay, &
+    gwtist_order0_decay, &
     gwtist_cimfilerec, &
     gwtist_cimopt, &
     gwtist_cimfile, &

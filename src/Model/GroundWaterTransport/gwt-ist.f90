@@ -105,7 +105,6 @@ module GwtIstModule
     procedure :: get_thetaim
     procedure :: ist_calc_csrb
     procedure, private :: ist_allocate_arrays
-    procedure, private :: read_data
 
   end type GwtIstType
 
@@ -187,8 +186,8 @@ contains
       call this%ocd%set_option(trim(this%lstfmt)//" ", 0, this%iout)
     end if
     !
-    ! -- read the data block
-    call this%read_data()
+    ! -- source the data block
+    call this%source_data()
     !
     ! -- set cimnew to the cim start values read from input
     do n = 1, this%dis%nodes
@@ -1011,10 +1010,10 @@ contains
                        found%budgetcsvfile)
     call mem_set_value(this%isrb, 'SORPTION', this%input_mempath, &
                        sorption_method, found%sorption)
-    call mem_set_value(this%idcy, 'ORD1_DECAY', this%input_mempath, &
-                       found%ord1_decay)
-    call mem_set_value(this%idcy, 'ZERO_ORDER_DECAY', this%input_mempath, &
-                       found%zero_order_decay)
+    call mem_set_value(this%idcy, 'ORDER1_DECAY', this%input_mempath, &
+                       found%order1_decay)
+    call mem_set_value(this%idcy, 'ORDER0_DECAY', this%input_mempath, &
+                       found%order0_decay)
     call mem_set_value(cim6_fname, 'CIMFILE', this%input_mempath, &
                        found%cimfile)
     call mem_set_value(sorbate_fname, 'SORBATEFILE', this%input_mempath, &
@@ -1048,8 +1047,8 @@ contains
         call store_error_filename(this%input_fname)
       end if
     end if
-    if (found%ord1_decay) this%idcy = 1
-    if (found%zero_order_decay) this%idcy = 2
+    if (found%order1_decay) this%idcy = 1
+    if (found%order0_decay) this%idcy = 2
     if (found%cimfile) then
       call this%ocd%set_option('FILEOUT '//trim(cim6_fname)//" ", 0, &
                                this%iout)
@@ -1076,7 +1075,7 @@ contains
     deallocate (digits)
   end subroutine source_options
 
-  !> @brief Write user options to list file
+  !> @brief Log user options to list file
   !<
   subroutine log_options(this, found, cim6_fname, budget_fname, &
                          budgetcsv_fname, sorbate_fname)
@@ -1128,10 +1127,10 @@ contains
         write (this%iout, fmtlangmuir)
       end select
     end if
-    if (found%ord1_decay) then
+    if (found%order1_decay) then
       write (this%iout, fmtidcy1)
     end if
-    if (found%zero_order_decay) then
+    if (found%order0_decay) then
       write (this%iout, fmtidcy2)
     end if
     if (found%sorbatefile) then
@@ -1184,30 +1183,28 @@ contains
     ! -- reallocate
     if (this%isrb == 0) then
       call get_isize('BULK_DENSITY', this%input_mempath, asize)
-      if (asize >= 0) &
+      if (asize > 0) &
         call mem_reallocate(this%bulk_density, this%dis%nodes, &
-                            'BULK_DENSITY', trim(this%memoryPath))
+                            'BULK_DENSITY', this%memoryPath)
       call get_isize('DISTCOEF', this%input_mempath, asize)
-      if (asize >= 0) &
+      if (asize > 0) &
         call mem_reallocate(this%distcoef, this%dis%nodes, 'DISTCOEF', &
-                            trim(this%memoryPath))
+                            this%memoryPath)
     end if
     if (this%idcy == 0) then
       call get_isize('DECAY', this%input_mempath, asize)
-      if (asize >= 0) &
-        call mem_reallocate(this%decay, this%dis%nodes, 'DECAY', &
-                            trim(this%memoryPath))
+      if (asize > 0) &
+        call mem_reallocate(this%decay, this%dis%nodes, 'DECAY', this%memoryPath)
     end if
     call get_isize('DECAY_SORBED', this%input_mempath, asize)
-    if (asize >= 0) then
+    if (asize > 0) then
       call mem_reallocate(this%decay_sorbed, this%dis%nodes, &
-                          'DECAY_SORBED', trim(this%memoryPath))
+                          'DECAY_SORBED', this%memoryPath)
     end if
     if (this%isrb < 2) then
       call get_isize('SP2', this%input_mempath, asize)
-      if (asize >= 0) &
-        call mem_reallocate(this%sp2, this%dis%nodes, 'SP2', &
-                            trim(this%memoryPath))
+      if (asize > 0) &
+        call mem_reallocate(this%sp2, this%dis%nodes, 'SP2', this%memoryPath)
     end if
     !
     ! -- update defaults with memory sourced values
@@ -1397,20 +1394,6 @@ contains
     ! -- local
     ! -- format
   end subroutine ist_read_dimensions
-
-  !> @ brief Read data for package
-  !!
-  !!  Read data for package.
-  !!
-  !<
-  subroutine read_data(this)
-    ! -- modules
-    ! -- dummy
-    class(GwtIstType) :: this !< GwtIstType object
-
-    ! -- source data
-    call this%source_data
-  end subroutine read_data
 
   !> @ brief Return thetaim
   !!

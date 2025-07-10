@@ -10,10 +10,11 @@
 !!
 !<
 module apimodule
-  use KindModule, only: DP, I4B
+  use KindModule, only: DP, I4B, LGP
   use ConstantsModule, only: DZERO, LENFTYPE, LENPACKAGENAME
   use MemoryHelperModule, only: create_mem_path
   use BndModule, only: BndType
+  use BndExtModule, only: BndExtType
   use ObsModule, only: DefaultObsIdProcessor
   use TimeSeriesLinkModule, only: TimeSeriesLinkType, &
                                   GetTimeSeriesLinkFromList
@@ -28,9 +29,9 @@ module apimodule
   character(len=LENFTYPE) :: ftype = 'API'
   character(len=LENPACKAGENAME) :: text = '             API'
   !
-  type, extends(BndType) :: ApiType
+  type, extends(BndExtType) :: ApiType
   contains
-    procedure :: bnd_options => api_options
+    procedure :: source_options => api_options
     procedure :: bnd_rp => api_rp
     procedure :: bnd_fc => api_fc
     ! -- methods for observations
@@ -45,7 +46,8 @@ contains
   !!  Create a new USR Package object
   !!
   !<
-  subroutine api_create(packobj, id, ibcnum, inunit, iout, namemodel, pakname)
+  subroutine api_create(packobj, id, ibcnum, inunit, iout, namemodel, pakname, &
+                        mempath)
     ! -- dummy variables
     class(BndType), pointer :: packobj !< pointer to default package type
     integer(I4B), intent(in) :: id !< package id
@@ -54,6 +56,7 @@ contains
     integer(I4B), intent(in) :: iout !< unit number of model listing file
     character(len=*), intent(in) :: namemodel !< model name
     character(len=*), intent(in) :: pakname !< package name
+    character(len=*), intent(in) :: mempath !< input mempath
     ! -- local variables
     type(ApiType), pointer :: apiobj
     !
@@ -62,7 +65,7 @@ contains
     packobj => apiobj
     !
     ! -- create name and memory path
-    call packobj%set_names(ibcnum, namemodel, pakname, ftype)
+    call packobj%set_names(ibcnum, namemodel, pakname, ftype, mempath)
     packobj%text = text
     !
     ! -- allocate scalars
@@ -80,28 +83,25 @@ contains
     packobj%ictMemPath = create_mem_path(namemodel, 'NPF')
   end subroutine api_create
 
-  !> @ brief Read additional options for package
-  !!
-  !!  Read additional options for USR package.
-  !!
+  !> @ brief Source options for package
   !<
-  subroutine api_options(this, option, found)
+  subroutine api_options(this)
+    use MemoryManagerExtModule, only: mem_set_value
     ! -- dummy variables
     class(ApiType), intent(inout) :: this
-    character(len=*), intent(inout) :: option
-    logical, intent(inout) :: found
+    logical(LGP) :: found_mover
     !
-    ! -- process package options
-    select case (option)
-    case ('MOVER')
-      this%imover = 1
-      write (this%iout, '(4x,A)') 'MOVER OPTION ENABLED'
-      found = .true.
-    case default
-      !
-      ! -- No options found
-      found = .false.
-    end select
+    ! source base class options
+    call this%BndExtType%source_options()
+
+    call mem_set_value(this%imover, 'MOVER', this%input_mempath, found_mover)
+
+    ! log package options
+    write (this%iout, '(/1x,a)') 'PROCESSING '//trim(adjustl(this%text)) &
+      //' OPTIONS'
+    if (found_mover) write (this%iout, '(4x,A)') 'MOVER OPTION ENABLED'
+    write (this%iout, '(1x,a)') &
+      'END OF '//trim(adjustl(this%text))//' OPTIONS'
   end subroutine api_options
 
   !> @ brief Read and prepare stress period data for package

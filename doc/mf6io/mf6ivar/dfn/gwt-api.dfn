@@ -1,4 +1,5 @@
 # --------------------- gwt api options ---------------------
+# flopy multi-package
 
 block options
 name boundnames

@@ -87,7 +87,7 @@ contains
     ! -- formats
     character(len=*), parameter :: fmtfmi = &
       "(1x,/1x,'FMI -- FLOW MODEL INTERFACE, VERSION 2, 8/17/2023',            &
-      &' INPUT READ FROM UNIT ', i0, //)"
+      &' INPUT READ FROM MEMPATH: ', A, //)"
     character(len=*), parameter :: fmtfmi0 = &
                     "(1x,/1x,'FMI -- FLOW MODEL INTERFACE,'&
                     &' VERSION 2, 8/17/2023')"
@@ -95,7 +95,7 @@ contains
     ! --print a message identifying the FMI package.
     if (this%iout > 0) then
       if (this%inunit /= 0) then
-        write (this%iout, fmtfmi) this%inunit
+        write (this%iout, fmtfmi) this%input_mempath
       else
         write (this%iout, fmtfmi0)
         if (this%flows_from_file) then

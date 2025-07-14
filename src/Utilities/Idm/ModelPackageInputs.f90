@@ -18,6 +18,7 @@ module ModelPackageInputsModule
   implicit none
   private
   public :: ModelPackageInputsType
+  public :: supported_model
 
   !> @brief derived type for loadable package type
   !!
@@ -104,6 +105,22 @@ contains
       multi_pkg = multi_package_type(mtype_component, ptype_component, pkgtype)
     end if
   end function multi_pkg_type
+
+  !> @brief is this a supported MODFLOW 6 model type
+  !<
+  function supported_model(ctype)
+    use ModelPackageInputModule, only: NMODEL, MODFLOW6MODELS
+    character(len=*), intent(in) :: ctype
+    logical(LGP) :: supported_model
+    integer(I4B) :: n
+    supported_model = .false.
+    do n = 1, NMODEL
+      if (ctype == MODFLOW6MODELS(n)) then
+        supported_model = .true.
+        exit
+      end if
+    end do
+  end function supported_model
 
   !> @brief create a new package type
   !<
@@ -207,14 +224,12 @@ contains
     use MemoryManagerModule, only: mem_allocate
     use SimVariablesModule, only: idm_context, simfile
     use SourceCommonModule, only: idm_component_type
-    use ModelPackageInputModule, only: supported_model_packages, &
-                                       NMODEL, MODFLOW6MODELS
+    use ModelPackageInputModule, only: supported_model_packages
     class(ModelPackageInputsType) :: this
     character(len=*), intent(in) :: modeltype
     character(len=*), intent(in) :: modelfname
     character(len=*), intent(in) :: modelname
     integer(I4B), intent(in) :: iout
-    integer(I4B) :: n, mtype_check
 
     ! initialize object
     this%modeltype = modeltype
@@ -224,15 +239,7 @@ contains
     this%iout = iout
 
     ! verify user specified model type
-    mtype_check = 0
-    do n = 1, NMODEL
-      if (modeltype == MODFLOW6MODELS(n)) then
-        mtype_check = 1
-        exit
-      end if
-    end do
-
-    if (mtype_check == 0) then
+    if (.not. supported_model(modeltype)) then
       ! -- error and exit for unsupported model type
       write (errmsg, '(3a)') 'Models block model type "', trim(modeltype), &
         '" is not valid.'

@@ -27,15 +27,18 @@ module LoadContextModule
 
   enum, bind(C)
     enumerator :: LOAD_UNDEF = 0 !< undefined load type
-    enumerator :: LOAD_LIST = 1 !< list (structarray) based load
-    enumerator :: LOAD_LAYERARRAY = 2 !< readasarrays load
-    enumerator :: LOAD_GRIDARRAY = 3 !< readarraygrid load
+    enumerator :: LIST = 1 !< list (structarray) based load
+    enumerator :: LAYERARRAY = 2 !< readasarrays load
+    enumerator :: GRIDARRAY = 3 !< readarraygrid load
   end enum
 
   enum, bind(C)
-    enumerator :: COMPONENT_UNDEF = 0 !< undefined component type
-    enumerator :: MODEL = 1 !< model component type
-    enumerator :: EXCHANGE = 2 !< exchange component type
+    enumerator :: CONTEXT_UNDEF = 0 !< undefined context type
+    enumerator :: ROOT = 1 !< root context type
+    enumerator :: SIM = 2 !< sim context type
+    enumerator :: MODEL = 3 !< model context type
+    enumerator :: MODELPKG = 4 !< model package context type
+    enumerator :: EXCHANGE = 5 !< exchange context type
   end enum
 
   !> @brief Pointer type for read state variable
@@ -66,7 +69,7 @@ module LoadContextModule
     integer(I4B), pointer :: ncpl => null() !< ncpl associated with model shape
     integer(I4B), pointer :: nodes => null() !< nodes associated with model shape
     integer(I4B) :: loadtype !< enum load type
-    integer(I4B) :: ctype !< enum component type
+    integer(I4B) :: ctxtype !< enum context type
     logical(LGP) :: readarray !< is this an array based load
     type(CharacterStringType), dimension(:), pointer, &
       contiguous :: auxname_cst => null() !< array of auxiliary names
@@ -106,12 +109,29 @@ contains
     this%mf6_input = mf6_input
     this%readarray = .false.
     this%loadtype = LOAD_UNDEF
-    this%ctype = COMPONENT_UNDEF
+    this%ctxtype = CONTEXT_UNDEF
 
-    if (supported_model(trim(mf6_input%component_type)//'6')) then
-      this%ctype = MODEL
-    else if (mf6_input%component_type == 'EXG') then
-      this%ctype = EXCHANGE
+    select case (mf6_input%parent_class)
+    case ('ROOT')
+      this%ctxtype = ROOT
+    case ('SIM')
+      if (mf6_input%subcomponent_type == 'NAM') then
+        this%ctxtype = MODEL
+      else if (mf6_input%subcomponent_type == 'TDIS' .or. &
+               mf6_input%subcomponent_type == 'HPC') then
+        this%ctxtype = SIM
+      else if (mf6_input%component_type == 'EXG') then
+        this%ctxtype = EXCHANGE
+      end if
+    case ('MODEL')
+      this%ctxtype = MODELPKG
+    case default
+    end select
+
+    if (this%ctxtype == CONTEXT_UNDEF) then
+      errmsg = 'LoadContext unidentified context for mempath: '// &
+               trim(mf6_input%mempath)
+      call store_error(errmsg, .true.)
     end if
 
     if (present(blockname)) then
@@ -132,7 +152,7 @@ contains
     do n = 1, size(mf6_input%block_dfns)
       if (mf6_input%block_dfns(n)%blockname == this%blockname) then
         if (mf6_input%block_dfns(n)%aggregate) then
-          this%loadtype = LOAD_LIST
+          this%loadtype = LIST
         end if
       end if
     end do
@@ -144,9 +164,9 @@ contains
         if (idt%blockname == 'OPTIONS') then
           select case (idt%tagname)
           case ('READASARRAYS')
-            this%loadtype = LOAD_LAYERARRAY
+            this%loadtype = LAYERARRAY
           case ('READARRAYGRID')
-            this%loadtype = LOAD_GRIDARRAY
+            this%loadtype = GRIDARRAY
           case default
             ! no-op
           end select
@@ -155,8 +175,8 @@ contains
     end if
 
     ! set as array based load
-    this%readarray = (this%loadtype == LOAD_LAYERARRAY .or. &
-                      this%loadtype == LOAD_GRIDARRAY)
+    this%readarray = (this%loadtype == LAYERARRAY .or. &
+                      this%loadtype == GRIDARRAY)
 
     ! set in scope params for load
     call this%set_params()
@@ -171,22 +191,26 @@ contains
     use MemoryManagerModule, only: mem_setptr
     class(LoadContextType) :: this
 
-    call setptr(this%naux, 'NAUX', this%mf6_input%mempath, local=.true.)
-    call setptr(this%nbound, 'NBOUND', this%mf6_input%mempath, local=.false.)
-    call setptr(this%ncpl, 'NCPL', this%mf6_input%mempath, local=.true.)
-    call setptr(this%nodes, 'NODES', this%mf6_input%mempath, local=.true.)
-    call setptr(this%maxbound, this%named_bound, this%mf6_input%mempath, &
-                local=.true.)
-    call setptr(this%boundnames, 'BOUNDNAMES', this%mf6_input%mempath, &
-                local=.true.)
-    call setptr(this%iprpak, 'IPRPAK', this%mf6_input%mempath, local=.true.)
+    if (this%ctxtype == EXCHANGE .or. &
+        this%ctxtype == MODELPKG) then
+      call setptr(this%naux, 'NAUX', this%mf6_input%mempath, local=.true.)
+      call setptr(this%nbound, 'NBOUND', this%mf6_input%mempath, &
+                  local=.false.)
+      call setptr(this%ncpl, 'NCPL', this%mf6_input%mempath, local=.true.)
+      call setptr(this%nodes, 'NODES', this%mf6_input%mempath, local=.true.)
+      call setptr(this%maxbound, this%named_bound, this%mf6_input%mempath, &
+                  local=.true.)
+      call setptr(this%boundnames, 'BOUNDNAMES', this%mf6_input%mempath, &
+                  local=.true.)
+      call setptr(this%iprpak, 'IPRPAK', this%mf6_input%mempath, local=.true.)
 
-    ! reset nbound
-    this%nbound = 0
+      ! reset nbound
+      this%nbound = 0
+    end if
 
-    ! update ncpl and nodes if not set
-    if (this%blockname == 'PERIOD' .and. &
-        this%ctype == MODEL) then
+    if (this%ctxtype == MODELPKG .and. &
+        this%blockname == 'PERIOD') then
+      ! update ncpl and nodes if not set
       call mem_setptr(this%mshape, 'MODEL_SHAPE', &
                       this%mf6_input%component_mempath)
 
@@ -217,16 +241,15 @@ contains
     integer(I4B), dimension(:, :), pointer, contiguous :: cellid
     integer(I4B), dimension(:), pointer, contiguous :: nodeulist
 
-    if (this%blockname == 'PERIOD' .and. &
-        this%ctype == MODEL) then
-
+    if (this%ctxtype == MODELPKG .and. &
+        this%blockname == 'PERIOD') then
       ! allocate cellid if this is not list input
       if (this%readarray) then
         call mem_allocate(cellid, 0, 0, 'CELLID', this%mf6_input%mempath)
       end if
 
       ! allocate nodeulist
-      if (this%loadtype /= LOAD_GRIDARRAY) then
+      if (this%loadtype /= GRIDARRAY) then
         call mem_allocate(nodeulist, 0, 'NODEULIST', this%mf6_input%mempath)
       end if
 
@@ -237,9 +260,10 @@ contains
                   this%mf6_input%mempath, LENBOUNDNAME)
       call setptr(this%auxvar, this%mf6_input%mempath)
 
-    else if (this%ctype == EXCHANGE) then
-
+    else if (this%ctxtype == EXCHANGE) then
       ! set pointers to arrays
+      call setptr(this%auxname_cst, 'AUXILIARY', &
+                  this%mf6_input%mempath, LENAUXNAME)
       call setptr(this%boundname_cst, 'BOUNDNAME', &
                   this%mf6_input%mempath, LENBOUNDNAME)
       call setptr(this%auxvar, this%mf6_input%mempath)
@@ -267,22 +291,22 @@ contains
 
     select case (idt%datatype)
     case ('INTEGER')
-      if (this%loadtype == LOAD_LIST) then
+      if (this%loadtype == LIST) then
         call allocate_int1d(this%maxbound, idt%mf6varname, &
                             this%mf6_input%mempath)
       end if
     case ('DOUBLE')
-      if (this%loadtype == LOAD_LIST) then
+      if (this%loadtype == LIST) then
         call allocate_dbl1d(this%maxbound, idt%mf6varname, &
                             this%mf6_input%mempath)
       end if
     case ('STRING')
-      if (this%loadtype == LOAD_LIST) then
+      if (this%loadtype == LIST) then
         call allocate_charstr1d(LENBOUNDNAME, this%maxbound, idt%mf6varname, &
                                 this%mf6_input%mempath)
       end if
     case ('INTEGER1D')
-      if (this%loadtype == LOAD_LIST) then
+      if (this%loadtype == LIST) then
         if (idt%shape == 'NCELLDIM') then
           call allocate_int2d(size(this%mshape), this%maxbound, &
                               idt%mf6varname, this%mf6_input%mempath)
@@ -391,7 +415,7 @@ contains
     else if (tagname == 'BOUNDNAME') then
       checkname = 'BOUNDNAMES'
     else if (tagname == 'I'//trim(mf6_input%subcomponent_type(1:3))) then
-      if (this%loadtype == LOAD_LAYERARRAY) in_scope = .true.
+      if (this%loadtype == LAYERARRAY) in_scope = .true.
     else
       select case (mf6_input%subcomponent_type)
       case ('EVT')
@@ -440,7 +464,7 @@ contains
     ! initialize
     keepcnt = 0
 
-    if (this%loadtype == LOAD_LIST) then
+    if (this%loadtype == LIST) then
       ! get aggregate param definition for period block
       aidt => &
         get_aggregate_definition_type(this%mf6_input%aggregate_dfns, &
@@ -455,7 +479,7 @@ contains
 
     ! allocate dfn input params
     do iparam = 1, nparam
-      if (this%loadtype == LOAD_LIST) then
+      if (this%loadtype == LIST) then
         idt => get_param_definition_type(this%mf6_input%param_dfns, &
                                          this%mf6_input%component_type, &
                                          this%mf6_input%subcomponent_type, &

@@ -22,7 +22,7 @@ module ListLoadModule
   private
   public :: ListLoadType
 
-  !> @brief list input loader for dyanmic packages.
+  !> @brief list input loader for dynamic packages.
   !!
   !! Create and update input context for list based period blocks.
   !!

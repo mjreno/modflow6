@@ -51,7 +51,7 @@ module LoadContextModule
 
   !> @brief derived type for boundary package input context
   !!
-  !! Input Load Context for generic dyanmic loaders and
+  !! Input Load Context for generic dynamic loaders and
   !! StructArray based static loads
   !!
   !<

@@ -273,7 +273,8 @@ contains
     integer(I4B) :: iparam
 
     ! set in scope param names
-    call this%ctx%tags(this%param_names, this%nparam, this%input_name)
+    call this%ctx%tags(this%param_names, this%nparam, this%input_name, &
+                       create=.true.)
     call this%ctx%allocate_arrays()
 
     ! allocate and set param_reads pointer array

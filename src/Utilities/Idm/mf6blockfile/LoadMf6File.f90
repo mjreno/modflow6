@@ -555,7 +555,7 @@ contains
     call ctx%init(this%mf6_input, blockname= &
                   this%mf6_input%block_dfns(iblk)%blockname)
     ! set in scope params for load
-    call ctx%tags(param_names, nparam, this%filename, create=.false.)
+    call ctx%tags(param_names, nparam, this%filename)
     ! set input definition for this block
     idt => &
       get_aggregate_definition_type(this%mf6_input%aggregate_dfns, &

@@ -348,7 +348,7 @@ contains
     integer(I4B) :: n
 
     ! initialize allocate_params
-    allocate_params = .true.
+    allocate_params = .false.
 
     ! override default if provided
     if (present(create)) then
@@ -423,7 +423,11 @@ contains
           checkname = 'SURFRATESPEC'
         end if
       case ('MVR', 'MVT', 'MVE')
-        checkname = 'MODELNAMES'
+        if (tagname == 'MNAME' .or. &
+            tagname == 'MNAME1' .or. &
+            tagname == 'MNAME2') then
+          checkname = 'MODELNAMES'
+        end if
       case ('NAM')
         in_scope = .true.
       case default

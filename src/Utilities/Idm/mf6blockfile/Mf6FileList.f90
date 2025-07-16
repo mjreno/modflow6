@@ -99,8 +99,7 @@ contains
     call this%ctx%init(mf6_input)
 
     ! store in scope SA cols for list input
-    call this%ctx%tags(this%param_names, this%nparam, this%input_name, &
-                       create=.false.)
+    call this%ctx%tags(this%param_names, this%nparam, this%input_name)
 
     ! construct and set up the struct array object
     call this%create_structarray()

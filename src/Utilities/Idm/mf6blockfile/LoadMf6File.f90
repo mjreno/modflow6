@@ -28,7 +28,6 @@ module LoadMf6FileModule
                                     get_aggregate_definition_type
   use ModflowInputModule, only: ModflowInputType
   use MemoryManagerModule, only: mem_allocate, mem_setptr
-  use MemoryHelperModule, only: create_mem_path
   use StructArrayModule, only: StructArrayType
   use NCFileVarsModule, only: NCPackageVarsType
   use IdmLoggerModule, only: idm_log_var, idm_log_header, idm_log_close, &

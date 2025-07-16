@@ -17,7 +17,6 @@ module LoadContextModule
   use ModflowInputModule, only: ModflowInputType
   use InputDefinitionModule, only: InputParamDefinitionType
   use CharacterStringModule, only: CharacterStringType
-  use SimVariablesModule, only: iout
 
   implicit none
   private
@@ -111,7 +110,7 @@ contains
     this%loadtype = LOAD_UNDEF
     this%ctxtype = CONTEXT_UNDEF
 
-    select case (mf6_input%parent_class)
+    select case (mf6_input%parent_scope)
     case ('ROOT')
       this%ctxtype = ROOT
     case ('SIM')
@@ -193,16 +192,14 @@ contains
 
     if (this%ctxtype == EXCHANGE .or. &
         this%ctxtype == MODELPKG) then
-      call setptr(this%naux, 'NAUX', this%mf6_input%mempath, local=.true.)
-      call setptr(this%nbound, 'NBOUND', this%mf6_input%mempath, &
-                  local=.false.)
-      call setptr(this%ncpl, 'NCPL', this%mf6_input%mempath, local=.true.)
-      call setptr(this%nodes, 'NODES', this%mf6_input%mempath, local=.true.)
-      call setptr(this%maxbound, this%named_bound, this%mf6_input%mempath, &
-                  local=.true.)
-      call setptr(this%boundnames, 'BOUNDNAMES', this%mf6_input%mempath, &
-                  local=.true.)
-      call setptr(this%iprpak, 'IPRPAK', this%mf6_input%mempath, local=.true.)
+
+      call setptr(this%nbound, 'NBOUND', this%mf6_input%mempath)
+      call setval(this%naux, 'NAUX', this%mf6_input%mempath)
+      call setval(this%ncpl, 'NCPL', this%mf6_input%mempath)
+      call setval(this%nodes, 'NODES', this%mf6_input%mempath)
+      call setval(this%maxbound, this%named_bound, this%mf6_input%mempath)
+      call setval(this%boundnames, 'BOUNDNAMES', this%mf6_input%mempath)
+      call setval(this%iprpak, 'IPRPAK', this%mf6_input%mempath)
 
       ! reset nbound
       this%nbound = 0
@@ -210,7 +207,6 @@ contains
 
     if (this%ctxtype == MODELPKG .and. &
         this%blockname == 'PERIOD') then
-      ! update ncpl and nodes if not set
       call mem_setptr(this%mshape, 'MODEL_SHAPE', &
                       this%mf6_input%component_mempath)
 
@@ -236,7 +232,6 @@ contains
   !<
   subroutine allocate_arrays(this)
     use MemoryManagerModule, only: mem_allocate, mem_setptr, get_isize
-    use MemoryManagerExtModule, only: mem_set_value
     class(LoadContextType) :: this
     integer(I4B), dimension(:, :), pointer, contiguous :: cellid
     integer(I4B), dimension(:), pointer, contiguous :: nodeulist
@@ -278,6 +273,9 @@ contains
     type(InputParamDefinitionType), pointer :: idt
     integer(I4B) :: dimsize
 
+    ! initialize
+    dimsize = 0
+
     if (this%readarray) then
       select case (idt%shape)
       case ('NCPL', 'NAUX NCPL')
@@ -285,7 +283,6 @@ contains
       case ('NODES', 'NAUX NODES')
         dimsize = this%maxbound
       case default
-        dimsize = 0
       end select
     end if
 
@@ -433,7 +430,6 @@ contains
         errmsg = 'LoadContext in_scope needs new check for: '// &
                  trim(idt%tagname)
         call store_error(errmsg, .true.)
-        !call store_error_filename(sourcename)
       end select
     end if
 
@@ -533,7 +529,6 @@ contains
     character(len=*), intent(in) :: mf6varname
     character(len=LENVARNAME) :: varname
     integer(I4B), pointer :: intvar
-
     varname = rsv_name(mf6varname)
     call mem_allocate(intvar, varname, this%mf6_input%mempath)
     intvar = -1
@@ -543,13 +538,17 @@ contains
   !<
   subroutine destroy(this)
     class(LoadContextType) :: this
-    ! deallocate
-    !deallocate (this%naux)
-    !deallocate (this%ncpl)
-    !deallocate (this%nodes)
-    !deallocate (this%maxbound)
-    !deallocate (this%boundnames)
-    !deallocate (this%iprpak)
+
+    if (this%ctxtype == EXCHANGE .or. &
+        this%ctxtype == MODELPKG) then
+      ! deallocate local
+      deallocate (this%naux)
+      deallocate (this%ncpl)
+      deallocate (this%nodes)
+      deallocate (this%maxbound)
+      deallocate (this%boundnames)
+      deallocate (this%iprpak)
+    end if
 
     ! nullify
     nullify (this%naux)
@@ -573,7 +572,6 @@ contains
     character(len=LENVARNAME) :: varname
     integer(I4B) :: ilen
     character(len=2) :: prefix = 'IN'
-
     ilen = len_trim(mf6varname)
     if (ilen > (LENVARNAME - len(prefix))) then
       varname = prefix//mf6varname(1:(LENVARNAME - len(prefix)))
@@ -665,25 +663,34 @@ contains
     end do
   end subroutine allocate_dbl2d
 
+  !> @brief allocate intptr and update from input contextset intptr to varname
+  !!
+  !<
+  subroutine setval(intptr, varname, mempath)
+    use MemoryManagerExtModule, only: mem_set_value
+    integer(I4B), pointer, intent(inout) :: intptr
+    character(len=*), intent(in) :: varname
+    character(len=*), intent(in) :: mempath
+    logical(LGP) :: found
+    allocate (intptr)
+    intptr = 0
+    call mem_set_value(intptr, varname, mempath, found)
+  end subroutine setval
+
   !> @brief set intptr to varname
   !!
   !<
-  subroutine setptr_int(intptr, varname, mempath, local)
+  subroutine setptr_int(intptr, varname, mempath)
     use MemoryManagerModule, only: mem_allocate, mem_setptr, get_isize
     integer(I4B), pointer, intent(inout) :: intptr
     character(len=*), intent(in) :: varname
     character(len=*), intent(in) :: mempath
-    logical(LGP), intent(in) :: local
     integer(I4B) :: isize
     call get_isize(varname, mempath, isize)
     if (isize > -1) then
       call mem_setptr(intptr, varname, mempath)
     else
-      if (local) then
-        allocate (intptr)
-      else
-        call mem_allocate(intptr, varname, mempath)
-      end if
+      call mem_allocate(intptr, varname, mempath)
       intptr = 0
     end if
   end subroutine setptr_int

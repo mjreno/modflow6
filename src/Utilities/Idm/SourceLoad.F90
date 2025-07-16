@@ -32,7 +32,7 @@ contains
   !<
   function create_input_loader(component_type, subcomponent_type, &
                                component_name, subcomponent_name, input_type, &
-                               parent_class, input_fname, component_fname, &
+                               parent_scope, input_fname, component_fname, &
                                nc_vars) &
     result(loader)
     use SourceCommonModule, only: package_source_type, idm_subcomponent_name
@@ -42,7 +42,7 @@ contains
     character(len=*), intent(in) :: component_name
     character(len=*), intent(in) :: subcomponent_name
     character(len=*), intent(in) :: input_type
-    character(len=*), intent(in) :: parent_class
+    character(len=*), intent(in) :: parent_scope
     character(len=*), intent(in) :: input_fname
     character(len=*), intent(in) :: component_fname
     type(NCFileVarsType), pointer, optional, intent(in) :: nc_vars
@@ -56,7 +56,7 @@ contains
                                     subcomponent_name)
     ! create description of input
     mf6_input = getModflowInput(input_type, component_type, subcomponent_type, &
-                                component_name, sc_name, parent_class, &
+                                component_name, sc_name, parent_scope, &
                                 input_fname)
     ! set package source
     source_type = package_source_type(input_fname)

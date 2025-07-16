@@ -149,7 +149,6 @@ contains
                          filename, pkgname, iout)
     use MemoryManagerModule, only: mem_allocate
     use MemoryHelperModule, only: create_mem_path
-    use MemoryManagerExtModule, only: mem_set_value
     use SimVariablesModule, only: idm_context
     use IdmDfnSelectorModule, only: idm_integrated, idm_multi_package
     use SourceCommonModule, only: idm_subcomponent_name

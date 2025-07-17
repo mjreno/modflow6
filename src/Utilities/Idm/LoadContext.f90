@@ -110,7 +110,7 @@ contains
     this%loadtype = LOAD_UNDEF
     this%ctxtype = CONTEXT_UNDEF
 
-    select case (mf6_input%parent_scope)
+    select case (mf6_input%load_scope)
     case ('ROOT')
       this%ctxtype = ROOT
     case ('SIM')

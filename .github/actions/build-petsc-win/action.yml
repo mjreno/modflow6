@@ -37,7 +37,7 @@ runs:
       if: steps.petsc-cache.outputs.cache-hit != 'true'
       shell: bash
       run: |
-        curl https://web.cels.anl.gov/projects/petsc/download/release-snapshots/petsc-3.20.5.tar.gz -O -J
+        curl https://web.cels.anl.gov/projects/petsc/download/release-snapshots/petsc-3.20.5.tar.gz -O
         mkdir petsc
         tar -xzf petsc-3.20.5.tar.gz -C petsc --strip-components=1
 

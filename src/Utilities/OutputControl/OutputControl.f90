@@ -6,7 +6,6 @@ module OutputControlModule
   use SimVariablesModule, only: errmsg
   use OutputControlDataModule, only: OutputControlDataType, ocd_cr
   use InputOutputModule, only: GetUnit, openfile
-  use BlockParserModule, only: BlockParserType ! TODO
 
   implicit none
   private
@@ -24,7 +23,6 @@ module OutputControlModule
     integer(I4B), pointer :: iperoc => null() !< stress period number for next output control
     integer(I4B), pointer :: iocrep => null() !< output control repeat flag (period 0 step 0)
     type(OutputControlDataType), pointer, contiguous :: ocds(:) => null() !< output control objects
-    type(BlockParserType) :: parser ! TODO
   contains
     procedure :: oc_df
     procedure :: oc_rp
@@ -99,7 +97,6 @@ contains
       this%iperoc = iper
       write (this%iout, fmtboc) this%iperoc
     end if
-    this%iperoc = iper
 
     ! Clear io flags
     do ipos = 1, size(this%ocds)
@@ -226,19 +223,19 @@ contains
     character(len=LINELENGTH) :: prnfmt, print_format
     logical(LGP) :: found_budcsv, found_budget
     logical(LGP), dimension(4) :: found_format
-    integer(I4B), pointer :: columns, width, digits
+    integer(I4B), pointer :: columns, width, ndigits
     integer(I4B) :: ipos
 
     found_format = .false.
     allocate (columns)
     allocate (width)
-    allocate (digits)
+    allocate (ndigits)
 
     call mem_set_value(columns, 'COLUMNS', this%input_mempath, &
                        found_format(1))
     call mem_set_value(width, 'WIDTH', this%input_mempath, &
                        found_format(2))
-    call mem_set_value(digits, 'DIGITS', this%input_mempath, &
+    call mem_set_value(ndigits, 'DIGITS', this%input_mempath, &
                        found_format(3))
     call mem_set_value(prnfmt, 'FORMAT', this%input_mempath, &
                        found_format(4))
@@ -257,21 +254,23 @@ contains
       call this%set_ocfile('BUDGET', budgetfn, this%iout)
     end if
 
-    if (found_format(1) .and. found_format(2) .and. &
-        found_format(3) .and. found_format(4)) then
-      write (print_format, '(a,i0,a,i0,a,i0,a)') 'PRINT_FORMAT COLUMNS ', &
-        columns, ' WIDTH ', width, ' DIGITS ', digits, ' '//trim(prnfmt)//' '
+    if (found_format(1) .and. &
+        found_format(2) .and. &
+        found_format(3) .and. &
+        found_format(4)) then
+      write (print_format, '(a,i0,a,i0,a,i0,a)') 'COLUMNS ', columns, &
+        ' WIDTH ', width, ' DIGITS ', ndigits, ' '//trim(prnfmt)//' '
       do ipos = 1, size(this%ocds)
         ocdobjptr => this%ocds(ipos)
         if (ocdobjptr%cname /= 'BUDGET') then
-          call ocdobjptr%set_option(print_format, 0, this%iout)
+          call ocdobjptr%set_prnfmt(print_format, 0)
         end if
       end do
     end if
 
     deallocate (columns)
     deallocate (width)
-    deallocate (digits)
+    deallocate (ndigits)
   end subroutine source_options
 
   subroutine set_ocfile(this, cname, ocfile, iout)

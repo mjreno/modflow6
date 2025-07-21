@@ -33,8 +33,8 @@ module OutputControlDataModule
     procedure :: allocate_scalars => allocate
     procedure :: init_int
     procedure :: init_dbl
-    procedure :: set_option
     procedure :: set_ocfile
+    procedure :: set_prnfmt
     procedure :: ocd_rp_check
     procedure :: ocd_ot
     procedure :: ocd_da
@@ -218,48 +218,18 @@ contains
     this%psm => create_psm()
   end subroutine allocate
 
-  !> @ brief Set FILEOUT and PRINT_FORMAT based on an input string.
-  subroutine set_option(this, linein, inunit, iout)
+  !> @ brief Set PRINT_FORMAT based on an input string.
+  subroutine set_prnfmt(this, prnfmt, inunit)
     ! modules
-    use ConstantsModule, only: MNORMAL
-    use OpenSpecModule, only: access, form
-    use InputOutputModule, only: urword, getunit, openfile
-    use SimModule, only: store_error, store_error_unit, count_errors
+    use InputOutputModule, only: print_format
     ! dummy
     class(OutputControlDataType) :: this !< OutputControlDataType object
-    character(len=*), intent(in) :: linein !< Character string with options
+    character(len=*), intent(in) :: prnfmt
     integer(I4B), intent(in) :: inunit !< Unit number for input
-    integer(I4B), intent(in) :: iout !< Unit number for output
     ! local
-    character(len=len(linein)) :: line
-    integer(I4B) :: lloc, istart, istop, ival
-    real(DP) :: rval
-    ! format
-    character(len=*), parameter :: fmtocsave = &
-      "(4X,A,' INFORMATION WILL BE WRITTEN TO:', &
-      &/,6X,'UNIT NUMBER: ', I0,/,6X, 'FILE NAME: ', A)"
-
-    line(:) = linein(:)
-    lloc = 1
-    call urword(line, lloc, istart, istop, 1, ival, rval, 0, 0)
-    select case (line(istart:istop))
-    case ('FILEOUT')
-      call urword(line, lloc, istart, istop, 0, ival, rval, 0, 0)
-      this%idataun = getunit()
-      write (iout, fmtocsave) trim(adjustl(this%cname)), this%idataun, &
-        line(istart:istop)
-      call openfile(this%idataun, iout, line(istart:istop), 'DATA(BINARY)', &
-                    form, access, 'REPLACE', MNORMAL)
-    case ('PRINT_FORMAT')
-      call urword(line, lloc, istart, istop, 1, ival, rval, 0, 0)
-      call print_format(line(istart:), this%cdatafmp, this%editdesc, &
-                        this%nvaluesp, this%nwidthp, inunit)
-    case default
-      call store_error('Looking for FILEOUT or PRINT_FORMAT.  Found:')
-      call store_error(trim(adjustl(line)))
-      call store_error_unit(inunit)
-    end select
-  end subroutine set_option
+    call print_format(prnfmt, this%cdatafmp, this%editdesc, &
+                      this%nvaluesp, this%nwidthp, inunit)
+  end subroutine set_prnfmt
 
   subroutine set_ocfile(this, ocfile, iout)
     use ConstantsModule, only: MNORMAL

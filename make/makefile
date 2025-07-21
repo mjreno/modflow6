@@ -196,6 +196,7 @@ $(OBJDIR)/gwf-disuidm.o \
 $(OBJDIR)/gwf-disidm.o \
 $(OBJDIR)/gwf-csubidm.o \
 $(OBJDIR)/gwf-chdidm.o \
+$(OBJDIR)/gwf-buyidm.o \
 $(OBJDIR)/gwe-ssmidm.o \
 $(OBJDIR)/gwe-namidm.o \
 $(OBJDIR)/gwe-icidm.o \
@@ -554,6 +555,7 @@ $(OBJDIR)/CircularGeometry.o \
 $(OBJDIR)/ExplicitModel.o \
 $(OBJDIR)/olf-disv1didm.o \
 $(OBJDIR)/olf-cxsidm.o \
+$(OBJDIR)/gwt-srcidm.o \
 $(OBJDIR)/exg-swfgwfidm.o \
 $(OBJDIR)/chf-disv2didm.o \
 $(OBJDIR)/chf-dis2didm.o

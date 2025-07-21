@@ -15,7 +15,6 @@ module GwfWelgInputModule
     logical :: readarraygrid = .false.
     logical :: auxiliary = .false.
     logical :: auxmultname = .false.
-    logical :: boundnames = .false.
     logical :: iprpak = .false.
     logical :: iprflow = .false.
     logical :: ipakcb = .false.
@@ -90,24 +89,6 @@ module GwfWelgInputModule
     'STRING', & ! type
     '', & ! shape
     'name of auxiliary variable for multiplier', & ! longname
-    .false., & ! required
-    .false., & ! multi-record
-    .false., & ! preserve case
-    .false., & ! layered
-    .false. & ! timeseries
-    )
-
-  type(InputParamDefinitionType), parameter :: &
-    gwfwelg_boundnames = InputParamDefinitionType &
-    ( &
-    'GWF', & ! component
-    'WELG', & ! subcomponent
-    'OPTIONS', & ! block
-    'BOUNDNAMES', & ! tag name
-    'BOUNDNAMES', & ! fortran variable
-    'KEYWORD', & ! type
-    '', & ! shape
-    '', & ! longname
     .false., & ! required
     .false., & ! multi-record
     .false., & ! preserve case
@@ -427,7 +408,6 @@ module GwfWelgInputModule
     gwfwelg_readarraygrid, &
     gwfwelg_auxiliary, &
     gwfwelg_auxmultname, &
-    gwfwelg_boundnames, &
     gwfwelg_iprpak, &
     gwfwelg_iprflow, &
     gwfwelg_ipakcb, &

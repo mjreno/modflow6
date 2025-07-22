@@ -76,7 +76,6 @@ contains
   !> @ brief Create a new SSM package
   !!
   !!  Create a new SSM package by defining names, allocating scalars
-  !!  and initializing the parser.
   !<
   subroutine ssm_cr(ssmobj, name_model, input_mempath, inunit, iout, fmi, &
                     eqnsclfac, depvartype)
@@ -104,9 +103,6 @@ contains
     ssmobj%iout = iout
     ssmobj%fmi => fmi
     ssmobj%eqnsclfac => eqnsclfac
-    !
-    ! -- Initialize block parser
-    call ssmobj%parser%Initialize(ssmobj%inunit, ssmobj%iout)
     !
     ! -- Store pointer to labels associated with the current model so that the
     !    package has access to the corresponding dependent variable type
@@ -162,7 +158,7 @@ contains
                             &are present in corresponding GWF model then this &
                             &SSM package should be removed.'
       call store_error(errmsg)
-      call this%parser%StoreErrorUnit()
+      call store_error_filename(this%input_fname)
     end if
     !
     ! -- Allocate arrays
@@ -952,11 +948,9 @@ contains
 
   !> @ brief Set iauxpak array value for package ip
   !!
-  !!  The next call to parser will return the auxiliary name for
-  !!  package ip in the SSM SOURCES block.  The routine searches
-  !!  through the auxiliary names in package ip and sets iauxpak
-  !!  to the column number corresponding to the correct auxiliary
-  !!  column.
+  !!  The routine searches through the auxiliary names in package
+  !!  ip and sets iauxpak to the column number corresponding to the
+  !!  correct auxiliary column.
   !<
   subroutine set_iauxpak(this, ip, packname, auxname)
     ! -- dummy
@@ -970,8 +964,7 @@ contains
     integer(I4B) :: iaux
     !
     ! -- read name of auxiliary column
-    !call this%parser%GetStringCaps(auxname)
-    !auxfound = .false.
+    auxfound = .false.
     do iaux = 1, this%fmi%gwfpackages(ip)%naux
       if (trim(this%fmi%gwfpackages(ip)%auxname(iaux)) == &
           trim(auxname)) then
@@ -983,7 +976,7 @@ contains
       write (errmsg, '(a, a)') &
         'Auxiliary name cannot be found: ', trim(auxname)
       call store_error(errmsg)
-      call this%parser%StoreErrorUnit()
+      call store_error_filename(this%input_fname)
     end if
     !
     ! -- set iauxpak and write message

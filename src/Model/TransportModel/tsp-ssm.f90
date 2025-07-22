@@ -771,7 +771,6 @@ contains
     ! -- modules
     !use KindModule, only: LGP
     use MemoryManagerModule, only: mem_setptr
-    use MemoryManagerExtModule, only: mem_set_value
     use CharacterStringModule, only: CharacterStringType
     ! -- dummy
     class(TspSsmType) :: this
@@ -788,7 +787,7 @@ contains
     call mem_setptr(srctypes, 'SRCTYPE', this%input_mempath)
     call mem_setptr(auxnames, 'AUXNAME', this%input_mempath)
 
-    write (this%iout, '(1x,a)') 'PROCESSING SOURCES'
+    write (this%iout, '(/1x,a)') 'PROCESSING SSM SOURCES'
     do n = 1, size(pnames)
 
       pname = pnames(n)
@@ -822,10 +821,10 @@ contains
 
       if (srctype == 'AUX') then
         this%isrctype(ip) = 1
-        write (this%iout, '(1x,a)') 'AUX SOURCE DETECTED.'
+        write (this%iout, '(4x,a)') 'AUX SOURCE DETECTED.'
       else if (srctype == 'AUXMIXED') then
         this%isrctype(ip) = 2
-        write (this%iout, '(1x,a)') 'AUXMIXED SOURCE DETECTED.'
+        write (this%iout, '(4x,a)') 'AUXMIXED SOURCE DETECTED.'
       else
         write (errmsg, '(a, a)') &
           'SRCTYPE must be AUX or AUXMIXED.  Found: ', trim(srctype)
@@ -836,7 +835,7 @@ contains
       ! -- Find and store the auxiliary column
       call this%set_iauxpak(ip, srctype, auxname)
     end do
-    write (this%iout, '(1x,a)') 'END PROCESSING SOURCES'
+    write (this%iout, '(1x,a)') 'END PROCESSING SSM SOURCES'
 
     ! -- terminate if errors
     if (count_errors() > 0) then
@@ -852,7 +851,6 @@ contains
     ! -- modules
     !use KindModule, only: LGP
     use MemoryManagerModule, only: mem_setptr, get_isize
-    use MemoryManagerExtModule, only: mem_set_value
     use CharacterStringModule, only: CharacterStringType
     ! -- dummy
     class(TspSsmType) :: this
@@ -865,7 +863,11 @@ contains
     ! -- formats
 
     call get_isize('PNAME', this%input_mempath, isize)
-    if (isize == -1) return
+    if (isize == -1) then
+      write (this%iout, '(/1x,a)') &
+        'OPTIONAL SSM FILEINPUT BLOCK INPUT NOT FOUND.'
+      return
+    end if
 
     ! set pointers to input context
     call mem_setptr(pnames, 'PNAME', this%input_mempath)
@@ -874,7 +876,7 @@ contains
     call mem_setptr(fnames, 'SPC6_FILENAME', this%input_mempath)
     call mem_setptr(conditions, 'MIXED', this%input_mempath)
 
-    write (this%iout, '(1x,a)') 'PROCESSING FILEINPUT'
+    write (this%iout, '(/1x,a)') 'PROCESSING SSM FILEINPUT'
     do n = 1, size(pnames)
 
       pname = pnames(n)
@@ -910,10 +912,10 @@ contains
 
       ! verify ftype
       if (ftype == 'SPC6') then
-        write (this%iout, '(1x,a)') 'SPC6 SOURCE DETECTED.'
+        write (this%iout, '(4x,a)') 'SPC6 SOURCE DETECTED:'
       else
         write (errmsg, '(a,a)') &
-          'SRCTYPE must be SPC6.  Found: ', trim(ftype)
+          'SRCTYPE must be SPC6. Found: ', trim(ftype)
         call store_error(errmsg)
         cycle
       end if
@@ -932,13 +934,13 @@ contains
 
       if (condition == 'MIXED') then
         this%isrctype(ip) = 4
-        write (this%iout, '(1x,a,a)') 'ASSIGNED MIXED SSM TYPE TO PACKAGE ', &
+        write (this%iout, '(4x,a,a)') 'ASSIGNED MIXED SSM TYPE TO PACKAGE ', &
           trim(pname)
       else
         this%isrctype(ip) = 3
       end if
     end do
-    write (this%iout, '(1x,a)') 'END PROCESSING FILEINPUT'
+    write (this%iout, '(1x,a)') 'END PROCESSING SSM FILEINPUT'
 
     ! -- terminate if errors
     if (count_errors() > 0) then
@@ -959,11 +961,10 @@ contains
     character(len=*), intent(in) :: packname !< name of package
     character(len=*), intent(in) :: auxname !< name of aux
     ! -- local
-    !character(len=LENAUXNAME) :: auxname
     logical :: auxfound
     integer(I4B) :: iaux
     !
-    ! -- read name of auxiliary column
+    ! -- match package auxiliary
     auxfound = .false.
     do iaux = 1, this%fmi%gwfpackages(ip)%naux
       if (trim(this%fmi%gwfpackages(ip)%auxname(iaux)) == &
@@ -998,7 +999,6 @@ contains
     character(len=*), intent(in) :: packname !< name of package
     character(len=*), intent(in) :: filename !< package input file
     ! -- local
-    !character(len=LINELENGTH) :: filename
     type(TspSpcType), pointer :: ssmiptr
     integer(I4B) :: inunit
     !

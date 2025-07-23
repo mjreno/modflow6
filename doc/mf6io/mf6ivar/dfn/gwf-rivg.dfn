@@ -125,7 +125,7 @@ name maxbound
 type integer
 reader urword
 optional true
-longname maximum number of rivers
+longname maximum number of river cells in any stress period
 description REPLACE maxbound {'{#1}': 'rivers'}
 
 

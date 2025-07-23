@@ -2,7 +2,7 @@
 Multiple ssm sources and sinks using a flow model followed by a
 transport model. Initial conditions and all inflows and outflows are
 assigned a concentration of 100.0 so the simulated concentration must also
-be 100. Each case should give an indentical results- case 0 uses list
+be 100. Each case should give an identical results- case 0 uses list
 based input in the flow model while case 1 uses grid array based input.
 """
 

@@ -22,6 +22,7 @@ module IdmGwfDfnSelectorModule
   use GwfRchInputModule
   use GwfRchaInputModule
   use GwfRivInputModule
+  use GwfRivgInputModule
   use GwfStoInputModule
   use GwfWelInputModule
   use GwfWelgInputModule
@@ -94,6 +95,8 @@ contains
       call set_param_pointer(input_definition, gwf_rcha_param_definitions)
     case ('RIV')
       call set_param_pointer(input_definition, gwf_riv_param_definitions)
+    case ('RIVG')
+      call set_param_pointer(input_definition, gwf_rivg_param_definitions)
     case ('STO')
       call set_param_pointer(input_definition, gwf_sto_param_definitions)
     case ('WEL')
@@ -144,6 +147,8 @@ contains
       call set_param_pointer(input_definition, gwf_rcha_aggregate_definitions)
     case ('RIV')
       call set_param_pointer(input_definition, gwf_riv_aggregate_definitions)
+    case ('RIVG')
+      call set_param_pointer(input_definition, gwf_rivg_aggregate_definitions)
     case ('STO')
       call set_param_pointer(input_definition, gwf_sto_aggregate_definitions)
     case ('WEL')
@@ -194,6 +199,8 @@ contains
       call set_block_pointer(input_definition, gwf_rcha_block_definitions)
     case ('RIV')
       call set_block_pointer(input_definition, gwf_riv_block_definitions)
+    case ('RIVG')
+      call set_block_pointer(input_definition, gwf_rivg_block_definitions)
     case ('STO')
       call set_block_pointer(input_definition, gwf_sto_block_definitions)
     case ('WEL')
@@ -243,6 +250,8 @@ contains
       multi_package = gwf_rcha_multi_package
     case ('RIV')
       multi_package = gwf_riv_multi_package
+    case ('RIVG')
+      multi_package = gwf_rivg_multi_package
     case ('STO')
       multi_package = gwf_sto_multi_package
     case ('WEL')
@@ -295,6 +304,8 @@ contains
       call set_subpkg_pointer(subpackages, gwf_rcha_subpackages)
     case ('RIV')
       call set_subpkg_pointer(subpackages, gwf_riv_subpackages)
+    case ('RIVG')
+      call set_subpkg_pointer(subpackages, gwf_rivg_subpackages)
     case ('STO')
       call set_subpkg_pointer(subpackages, gwf_sto_subpackages)
     case ('WEL')
@@ -344,6 +355,8 @@ contains
     case ('RCHA')
       integrated = .true.
     case ('RIV')
+      integrated = .true.
+    case ('RIVG')
       integrated = .true.
     case ('STO')
       integrated = .true.

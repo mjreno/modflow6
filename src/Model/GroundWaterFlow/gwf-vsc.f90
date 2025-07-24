@@ -173,7 +173,7 @@ contains
     ! -- formats
     character(len=*), parameter :: fmtvsc = &
       "(1x,/1x,'VSC -- Viscosity Package, version 1, 11/15/2022', &
-      &' input read from mempath: ', a)"
+      &' input read from mempath: ', a, /)"
     !
     ! --print a message identifying the viscosity package
     write (this%iout, fmtvsc) this%input_mempath
@@ -950,9 +950,9 @@ contains
     ! -- modules
     use MemoryManagerExtModule, only: mem_set_value
     use GwfVscInputModule, only: GwfVscParamFoundType
-    ! -- dummy variables
+    ! -- dummy
     class(GwfVscType), intent(inout) :: this
-    ! -- local variables
+    ! -- local
     type(GwfVscParamFoundType) :: found
 
     ! update defaults from input context
@@ -977,7 +977,7 @@ contains
     ! -- modules
     use MemoryManagerModule, only: mem_setptr
     use CharacterStringModule, only: CharacterStringType
-    ! -- dummy variables
+    ! -- dummy
     class(GwfVscType), intent(inout) :: this
     integer(I4B), dimension(:), pointer, contiguous :: iviscspec
     type(CharacterStringType), dimension(:), pointer, &
@@ -988,7 +988,7 @@ contains
     character(len=10) :: c10
     character(len=16) :: c16
     integer(I4B) :: n
-    ! format
+    ! -- format
     character(len=*), parameter :: fmterr = &
       "('Invalid value for IRHOSPEC (',i0,') detected in VSC Package. &
       &IRHOSPEC must be > 0 and <= NVISCSPECIES, and duplicate values &
@@ -1040,15 +1040,15 @@ contains
       end if
     end do
 
-    ! -- Check for errors.
+    ! Check for errors.
     if (count_errors() > 0) then
       call store_error_filename(this%input_fname)
     end if
 
     ! log package data
     write (this%iout, '(/,1x,a)') 'Processing VSC PACKAGEDATA block'
-    !
-    ! -- write packagedata information
+
+    ! write packagedata information
     write (this%iout, '(1x,a)') 'Summary of species information in VSC Package'
     write (this%iout, '(1a11,5a17)') &
       'Species', 'DVISCDC', 'CVISCREF', 'Model', 'AUXSPECIESNAME'
@@ -1069,7 +1069,7 @@ contains
 
     write (this%iout, '(1x,a)') 'End of VSC PACKAGEDATA block'
 
-    ! -- deallocate
+    ! deallocate
     deallocate (itemp)
   end subroutine source_packagedata
 
@@ -1208,17 +1208,18 @@ contains
     use OpenSpecModule, only: access, form
     use InputOutputModule, only: getunit, openfile
     use GwfVscInputModule, only: GwfVscParamFoundType
-    ! -- dummy variables
+    ! -- dummy
     class(GwfVscType), intent(inout) :: this
-    ! -- local variables
+    ! -- local
     character(len=LENVARNAME), dimension(2) :: thermal_form = &
       &[character(len=LENVARNAME) :: 'LINEAR', 'NONLINEAR']
     character(len=LINELENGTH) :: viscosityfile
     type(GwfVscParamFoundType) :: found
 
-    ! -- allocate and initialize variables
+    ! initialize variables
+    viscosityfile = ''
 
-    ! -- update defaults from input context
+    ! update defaults from input context
     call mem_set_value(this%viscref, 'VISCREF', this%input_mempath, &
                        found%viscref)
     call mem_set_value(viscosityfile, 'VISCOSITYFILE', this%input_mempath, &
@@ -1288,19 +1289,19 @@ contains
     ! -- local variables
     ! -- formats
     character(len=*), parameter :: fmtfileout = &
-      "(1x, 'VSC', 1x, a, 1x, 'Will be saved to file: ', &
-      &a, 'opened on unit: ', I7)"
+      "(4x, 'VSC', 1x, a, 1x, 'Will be saved to file: ', &
+      &a, ' opened on unit: ', I7)"
     character(len=*), parameter :: fmtlinear = &
-      "(/,1x,'Viscosity will vary linearly with temperature &
+      "(4x,'Viscosity will vary linearly with temperature &
       &change ')"
     character(len=*), parameter :: fmtnonlinear = &
-      "(/,1x,'Viscosity will vary non-linearly with temperature &
+      "(4x,'Viscosity will vary non-linearly with temperature &
       &change ')"
 
     write (this%iout, '(1x,a)') 'Processing VSC OPTIONS block'
 
     if (found%viscref) then
-      write (this%iout, '(1x,a,1pg15.6)') &
+      write (this%iout, '(4x,a,1pg15.6)') &
         'Reference viscosity has been set to: ', this%viscref
     end if
     if (found%viscosityfile) then

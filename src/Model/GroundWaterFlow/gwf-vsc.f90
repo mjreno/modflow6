@@ -173,7 +173,7 @@ contains
     ! -- formats
     character(len=*), parameter :: fmtvsc = &
       "(1x,/1x,'VSC -- Viscosity Package, version 1, 11/15/2022', &
-      &' input read from mempath: ', a, //)"
+      &' input read from mempath: ', a)"
     !
     ! --print a message identifying the viscosity package
     write (this%iout, fmtvsc) this%input_mempath
@@ -955,11 +955,16 @@ contains
     ! -- local variables
     type(GwfVscParamFoundType) :: found
 
-    ! -- update defaults from input context
+    ! update defaults from input context
     call mem_set_value(this%nviscspecies, 'NVISCSPECIES', this%input_mempath, &
                        found%nviscspecies)
 
-    ! -- check dimension
+    ! log dimensions
+    write (this%iout, '(/1x,a)') 'Processing VSC DIMENSIONS block'
+    write (this%iout, '(4x,a,i0)') 'NVISCSPECIES = ', this%nviscspecies
+    write (this%iout, '(1x,a)') 'End of VSC DIMENSIONS block'
+
+    ! check dimension
     if (this%nviscspecies < 1) then
       call store_error('NVISCSPECIES must be greater than zero.')
       call store_error_filename(this%input_fname)
@@ -1000,8 +1005,7 @@ contains
     call mem_setptr(modelnames, 'MODELNAME', this%input_mempath)
     call mem_setptr(auxspeciesnames, 'AUXSPECIESNAME', this%input_mempath)
 
-    write (this%iout, '(1x,a)') 'Procesing VSC PACKAGEDATA block'
-
+    ! process package data
     do n = 1, size(iviscspec)
       modelname = modelnames(n)
       auxspeciesname = auxspeciesnames(n)
@@ -1040,9 +1044,12 @@ contains
     if (count_errors() > 0) then
       call store_error_filename(this%input_fname)
     end if
+
+    ! log package data
+    write (this%iout, '(/,1x,a)') 'Processing VSC PACKAGEDATA block'
     !
     ! -- write packagedata information
-    write (this%iout, '(/,1x,a)') 'Summary of species information in VSC Package'
+    write (this%iout, '(1x,a)') 'Summary of species information in VSC Package'
     write (this%iout, '(1a11,5a17)') &
       'Species', 'DVISCDC', 'CVISCREF', 'Model', 'AUXSPECIESNAME'
     do n = 1, this%nviscspecies
@@ -1059,11 +1066,11 @@ contains
       line = trim(line)//' '//adjustr(c16)
       write (this%iout, '(a)') trim(line)
     end do
-    !
+
+    write (this%iout, '(1x,a)') 'End of VSC PACKAGEDATA block'
+
     ! -- deallocate
     deallocate (itemp)
-    !
-    write (this%iout, '(/,1x,a)') 'End of VSC PACKAGEDATA block'
   end subroutine source_packagedata
 
   !> @brief Sets package data instead of reading from file
@@ -1282,7 +1289,7 @@ contains
     ! -- formats
     character(len=*), parameter :: fmtfileout = &
       "(1x, 'VSC', 1x, a, 1x, 'Will be saved to file: ', &
-      &a, /4x, 'opened on unit: ', I7)"
+      &a, 'opened on unit: ', I7)"
     character(len=*), parameter :: fmtlinear = &
       "(/,1x,'Viscosity will vary linearly with temperature &
       &change ')"
@@ -1293,11 +1300,12 @@ contains
     write (this%iout, '(1x,a)') 'Processing VSC OPTIONS block'
 
     if (found%viscref) then
-      write (this%iout, '(4x,a,1pg15.6)') &
+      write (this%iout, '(1x,a,1pg15.6)') &
         'Reference viscosity has been set to: ', this%viscref
     end if
     if (found%viscosityfile) then
-      write (this%iout, fmtfileout) 'VISCOSITY', viscosityfile, this%ioutvisc
+      write (this%iout, fmtfileout) &
+        'VISCOSITY', trim(viscosityfile), this%ioutvisc
     end if
     if (found%temp_specname) then
       write (this%iout, '(4x, a)') 'Temperature species name set to: '// &
@@ -1345,7 +1353,7 @@ contains
       end if
     end if
 
-    write (this%iout, '(/,1x,a)') 'end of VSC options block'
+    write (this%iout, '(1x,a)') 'end of VSC options block'
   end subroutine log_options
 
   !> @brief Sets options as opposed to reading them from a file

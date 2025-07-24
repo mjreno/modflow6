@@ -1001,15 +1001,14 @@ contains
     allocate (itemp(this%nrhospecies))
     itemp(:) = 0
 
-    ! -- set input context pointers
+    ! set input context pointers
     call mem_setptr(irhospec, 'IRHOSPEC', this%input_mempath)
     call mem_setptr(drhodc, 'DRHODC', this%input_mempath)
     call mem_setptr(crhoref, 'CRHOREF', this%input_mempath)
     call mem_setptr(modelnames, 'MODELNAME', this%input_mempath)
     call mem_setptr(auxspeciesnames, 'AUXSPECIESNAME', this%input_mempath)
 
-    write (this%iout, '(/1x,a)') 'Processing BUY PACKAGEDATA block'
-
+    ! process package data
     do n = 1, size(irhospec)
       modelname = modelnames(n)
       auxspeciesname = auxspeciesnames(n)
@@ -1030,15 +1029,16 @@ contains
       this%cauxspeciesname(irhospec(n)) = trim(auxspeciesname)
     end do
 
-    write (this%iout, '(1x,a)') 'End of BUY PACKAGEDATA block'
-
-    ! -- Check for errors.
+    ! Check for errors.
     if (count_errors() > 0) then
       call store_error_filename(this%input_fname)
     end if
 
-    ! -- write packagedata information
-    write (this%iout, '(/,a)') 'Summary of species information in BUY Package'
+    ! log package data
+    write (this%iout, '(/,1x,a)') 'Processing BUY PACKAGEDATA block'
+
+    ! write packagedata information
+    write (this%iout, '(1x,a)') 'Summary of species information in BUY Package'
     write (this%iout, '(1a11, 4a17)') &
       'SPECIES', 'DRHODC', 'CRHOREF', 'MODEL', &
       'AUXSPECIESNAME'
@@ -1055,6 +1055,8 @@ contains
       line = trim(line)//' '//adjustr(c16)
       write (this%iout, '(a)') trim(line)
     end do
+
+    write (this%iout, '(1x,a)') 'End of BUY PACKAGEDATA block'
 
     ! cleanup
     deallocate (itemp)
@@ -1424,7 +1426,7 @@ contains
     ! -- formats
     character(len=*), parameter :: fmtfileout = &
       "(4x, 'BUY ', 1x, a, 1x, ' will be saved to file: ', &
-      &a, /4x, 'opened on unit: ', I7)"
+      &a, 'opened on unit: ', I7)"
     !
     write (this%iout, '(1x,a)') 'Processing BUY OPTIONS block'
 
@@ -1442,7 +1444,7 @@ contains
     end if
     if (found%densityfile) then
       write (this%iout, fmtfileout) &
-        'DENSITY', densityfile, this%ioutdense
+        'DENSITY', trim(densityfile), this%ioutdense
     end if
 
     write (this%iout, '(1x,a)') 'End of BUY OPTIONS block'

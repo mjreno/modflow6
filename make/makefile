@@ -555,7 +555,6 @@ $(OBJDIR)/CircularGeometry.o \
 $(OBJDIR)/ExplicitModel.o \
 $(OBJDIR)/olf-disv1didm.o \
 $(OBJDIR)/olf-cxsidm.o \
-$(OBJDIR)/gwt-srcidm.o \
 $(OBJDIR)/exg-swfgwfidm.o \
 $(OBJDIR)/chf-disv2didm.o \
 $(OBJDIR)/chf-dis2didm.o

@@ -953,12 +953,12 @@ contains
     ! -- modules
     use MemoryManagerExtModule, only: mem_set_value
     use GwfBuyInputModule, only: GwfBuyParamFoundType
-    ! -- dummy variables
+    ! -- dummy
     class(GwfBuyType), intent(inout) :: this
-    ! -- local variables
+    ! -- local
     type(GwfBuyParamFoundType) :: found
 
-    ! -- update defaults from input context
+    ! update defaults from input context
     call mem_set_value(this%nrhospecies, 'NRHOSPECIES', this%input_mempath, &
                        found%nrhospecies)
 
@@ -980,8 +980,9 @@ contains
     use MemoryManagerModule, only: mem_setptr, mem_allocate
     use MemoryManagerExtModule, only: mem_set_value
     use CharacterStringModule, only: CharacterStringType
-    ! -- dummy variables
+    ! -- dummy
     class(GwfBuyType), intent(inout) :: this
+    ! -- local
     integer(I4B), dimension(:), pointer, contiguous :: irhospec
     type(CharacterStringType), dimension(:), pointer, &
       contiguous :: modelnames, auxspeciesnames
@@ -1376,9 +1377,9 @@ contains
     use OpenSpecModule, only: access, form
     use InputOutputModule, only: getunit, openfile
     use GwfBuyInputModule, only: GwfBuyParamFoundType
-    ! -- dummy variables
+    ! -- dummy
     class(GwfBuyType), intent(inout) :: this
-    ! -- local variables
+    ! -- local
     character(len=LINELENGTH) :: densityfile
     type(GwfBuyParamFoundType) :: found
 
@@ -1426,7 +1427,7 @@ contains
     ! -- formats
     character(len=*), parameter :: fmtfileout = &
       "(4x, 'BUY ', 1x, a, 1x, ' will be saved to file: ', &
-      &a, 'opened on unit: ', I7)"
+      &a, ' opened on unit: ', I7)"
     !
     write (this%iout, '(1x,a)') 'Processing BUY OPTIONS block'
 

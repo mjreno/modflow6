@@ -387,10 +387,10 @@ class Dfn2F90:
                 if len(llist) == 1:
                     longname = llist[0]
                 elif len(llist) > 1:
-                    longname =  f"{llist[0]}&\n"
+                    longname = f"{llist[0]}&\n"
                     for l in llist[1:-1]:
                         longname += f"     & {l}&\n"
-                    longname += f"     & {llist[len(llist)-1]}"
+                    longname += f"     & {llist[len(llist) - 1]}"
 
             inrec = ".false."
             if "in_record" in v:

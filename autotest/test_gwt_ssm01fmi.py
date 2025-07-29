@@ -118,11 +118,6 @@ def get_flow_sim(idx, ws):
         for i in range(nrow):
             q[0, i, 0] = 100.0
             welconc[0, i, 0] = 100.0
-    else:
-        wellist = []
-        for i in range(nrow):
-            wellist.append(((0, i, 0), 100.0, 100.0))
-    if idx == 1:
         wel = flopy.mf6.ModflowGwfwelg(
             gwf,
             auxiliary=["concentration"],
@@ -131,6 +126,9 @@ def get_flow_sim(idx, ws):
             aux=welconc,
         )
     else:
+        wellist = []
+        for i in range(nrow):
+            wellist.append(((0, i, 0), 100.0, 100.0))
         wel = flopy.mf6.ModflowGwfwel(
             gwf,
             stress_period_data=wellist,

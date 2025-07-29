@@ -265,7 +265,7 @@ module GwfRivgInputModule
     'MAXBOUND', & ! fortran variable
     'INTEGER', & ! type
     '', & ! shape
-    'maximum number of rivers', & ! longname
+    'maximum number of river cells in any stress period', & ! longname
     .false., & ! required
     .false., & ! multi-record
     .false., & ! preserve case

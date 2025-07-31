@@ -1,4 +1,5 @@
 # --------------------- gwe esl options ---------------------
+# flopy multi-package
 
 block options
 name auxiliary
@@ -157,6 +158,7 @@ name stress_period_data
 type recarray cellid senerrate aux boundname
 shape (maxbound)
 reader urword
+mf6internal spd
 longname
 description
 

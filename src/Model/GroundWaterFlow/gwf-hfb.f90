@@ -655,8 +655,10 @@ contains
     ! finalize logging
     write (this%iout, '(3x,i0,a,i0)') this%nhfb, &
       ' HFBs READ FOR STRESS PERIOD ', kper
-    call this%check_data()
     write (this%iout, '(1x,a)') 'END READING HFB DATA'
+
+    ! input data check
+    call this%check_data()
   end subroutine source_data
 
   !> @brief Check for hfb's between two unconnected cells and write a warning

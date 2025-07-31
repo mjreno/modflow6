@@ -112,7 +112,7 @@ contains
     call mem_set_value(this%highest_sat, 'HIGHEST_SAT', this%input_mempath, &
                        found%highest_sat)
 
-    write (this%iout, '(1x,a)') 'PROCESSING SRC OPTIONS'
+    write (this%iout, '(/1x,a)') 'PROCESSING SRC OPTIONS'
     if (found%highest_sat) then
       write (this%iout, '(4x,a)') &
         'Mass source loading rate will be applied to the highest cell at or below &
@@ -133,6 +133,7 @@ contains
     call this%BndExtType%bnd_da()
     !
     ! -- arrays
+    call mem_deallocate(this%smassrate, 'SMASSRATE', this%memoryPath)
     if (this%highest_sat) then
       call mem_deallocate(this%nodesontop, "NODESONTOP", this%memoryPath)
     end if
@@ -267,7 +268,6 @@ contains
         this%rhs(i) = DZERO
         cycle
       end if
-      !q = this%bound(1, i)
       q = this%bound_value(1, i)
       this%rhs(i) = -q
     end do

@@ -855,7 +855,7 @@ contains
     map => null()
     if (this%dis%nodes < this%dis%nodesuser) map => this%dis%nodeuser
 
-    ! -- reallocate 
+    ! -- reallocate
     if (this%idcy == DECAY_OFF) then
       call get_isize('DECAY_WATER', this%input_mempath, asize)
       if (asize > 0) &

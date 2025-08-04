@@ -260,8 +260,7 @@ contains
     end if
 
     ! model description string
-    this%model = trim(modelname)//': MODFLOW 6 '//trim(fullname)// &
-                 ' ('//trim(modeltype)//') model'
+    this%model = trim(modeltype)//'6: '//trim(modelname)
 
     ! modflow6 version string
     this%source = 'MODFLOW 6 '//trim(adjustl(VERSION))

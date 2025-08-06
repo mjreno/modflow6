@@ -15,9 +15,9 @@ module GweEslInputModule
     logical :: auxiliary = .false.
     logical :: auxmultname = .false.
     logical :: boundnames = .false.
-    logical :: print_input = .false.
-    logical :: print_flows = .false.
-    logical :: save_flows = .false.
+    logical :: iprpak = .false.
+    logical :: iprflow = .false.
+    logical :: ipakcb = .false.
     logical :: ts_filerecord = .false.
     logical :: ts6 = .false.
     logical :: filein = .false.
@@ -28,7 +28,7 @@ module GweEslInputModule
     logical :: maxbound = .false.
     logical :: cellid = .false.
     logical :: senerrate = .false.
-    logical :: aux = .false.
+    logical :: auxvar = .false.
     logical :: boundname = .false.
   end type GweEslParamFoundType
 
@@ -95,13 +95,13 @@ module GweEslInputModule
     )
 
   type(InputParamDefinitionType), parameter :: &
-    gweesl_print_input = InputParamDefinitionType &
+    gweesl_iprpak = InputParamDefinitionType &
     ( &
     'GWE', & ! component
     'ESL', & ! subcomponent
     'OPTIONS', & ! block
     'PRINT_INPUT', & ! tag name
-    'PRINT_INPUT', & ! fortran variable
+    'IPRPAK', & ! fortran variable
     'KEYWORD', & ! type
     '', & ! shape
     'print input to listing file', & ! longname
@@ -113,13 +113,13 @@ module GweEslInputModule
     )
 
   type(InputParamDefinitionType), parameter :: &
-    gweesl_print_flows = InputParamDefinitionType &
+    gweesl_iprflow = InputParamDefinitionType &
     ( &
     'GWE', & ! component
     'ESL', & ! subcomponent
     'OPTIONS', & ! block
     'PRINT_FLOWS', & ! tag name
-    'PRINT_FLOWS', & ! fortran variable
+    'IPRFLOW', & ! fortran variable
     'KEYWORD', & ! type
     '', & ! shape
     'print calculated flows to listing file', & ! longname
@@ -131,13 +131,13 @@ module GweEslInputModule
     )
 
   type(InputParamDefinitionType), parameter :: &
-    gweesl_save_flows = InputParamDefinitionType &
+    gweesl_ipakcb = InputParamDefinitionType &
     ( &
     'GWE', & ! component
     'ESL', & ! subcomponent
     'OPTIONS', & ! block
     'SAVE_FLOWS', & ! tag name
-    'SAVE_FLOWS', & ! fortran variable
+    'IPAKCB', & ! fortran variable
     'KEYWORD', & ! type
     '', & ! shape
     'save well flows to budget file', & ! longname
@@ -329,13 +329,13 @@ module GweEslInputModule
     )
 
   type(InputParamDefinitionType), parameter :: &
-    gweesl_aux = InputParamDefinitionType &
+    gweesl_auxvar = InputParamDefinitionType &
     ( &
     'GWE', & ! component
     'ESL', & ! subcomponent
     'PERIOD', & ! block
     'AUX', & ! tag name
-    'AUX', & ! fortran variable
+    'AUXVAR', & ! fortran variable
     'DOUBLE1D', & ! type
     'NAUX', & ! shape
     'auxiliary variables', & ! longname
@@ -370,9 +370,9 @@ module GweEslInputModule
     gweesl_auxiliary, &
     gweesl_auxmultname, &
     gweesl_boundnames, &
-    gweesl_print_input, &
-    gweesl_print_flows, &
-    gweesl_save_flows, &
+    gweesl_iprpak, &
+    gweesl_iprflow, &
+    gweesl_ipakcb, &
     gweesl_ts_filerecord, &
     gweesl_ts6, &
     gweesl_filein, &
@@ -383,7 +383,7 @@ module GweEslInputModule
     gweesl_maxbound, &
     gweesl_cellid, &
     gweesl_senerrate, &
-    gweesl_aux, &
+    gweesl_auxvar, &
     gweesl_boundname &
     ]
 

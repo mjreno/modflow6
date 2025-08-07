@@ -808,7 +808,7 @@ contains
                                    "(4x,'ZERO-ORDER DECAY IN THE SOLID "// &
                                    &"PHASE IS ACTIVE. ')"
 
-    write (this%iout, '(1x,a)') 'Setting EST Options'
+    write (this%iout, '(1x,a)') 'PROCESSING ENERGY STORAGE AND TRANSFER OPTIONS'
     if (found%save_flows) write (this%iout, fmtisvflow)
     if (found%ord0_decay_water) then
       write (this%iout, fmtidcy2)
@@ -830,7 +830,8 @@ contains
         'Latent heat of vaporization of the water has been set to: ', &
         this%latheatvap
     end if
-    write (this%iout, '(1x,a,/)') 'End Setting EST Options'
+    write (this%iout, '(1x,a,/)') &
+      'END PROCESSING ENERGY STORAGE AND TRANSFER OPTIONS'
   end subroutine log_options
 
   !> @brief Source EST griddata from input mempath
@@ -892,7 +893,7 @@ contains
     end if
 
     ! -- log griddata
-    write (this%iout, '(1x,a)') 'PROCESSING GRIDDATA'
+    write (this%iout, '(1x,a)') 'PROCESSING ENERGY STORAGE AND TRANSFER GRIDDATA'
     if (found%porosity) &
       write (this%iout, '(4x,a)') 'POROSITY set from input file'
     if (found%decay_water) &
@@ -903,7 +904,8 @@ contains
       write (this%iout, '(4x,a)') 'HEAT_CAPACITY_SOLID set from input file'
     if (found%rhos) &
       write (this%iout, '(4x,a)') 'DENSITY_SOLID set from input file'
-    write (this%iout, '(1x,a)') 'END PROCESSING GRIDDATA'
+    write (this%iout, '(1x,a)') &
+      'END PROCESSING ENERGY STORAGE AND TRANSFER GRIDDATA'
 
     ! -- Check for required decay/production rate coefficients
     if (this%idcy == DECAY_ZERO_ORDER) then

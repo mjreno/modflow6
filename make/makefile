@@ -548,7 +548,6 @@ $(OBJDIR)/MappedMemory.o \
 $(OBJDIR)/NCModel.o \
 $(OBJDIR)/Mf6FileStoInput.o \
 $(OBJDIR)/Mf6FileSetting.o \
-$(OBJDIR)/Mf6FileOcInput.o \
 $(OBJDIR)/Mf6FileList.o \
 $(OBJDIR)/Mf6FileLayerArray.o \
 $(OBJDIR)/Mf6FileGridArray.o \

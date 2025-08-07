@@ -395,7 +395,6 @@ modflow_sources = files(
     'Utilities' / 'Idm' / 'mf6blockfile' / 'Mf6FileGridArray.f90',
     'Utilities' / 'Idm' / 'mf6blockfile' / 'Mf6FileLayerArray.f90',
     'Utilities' / 'Idm' / 'mf6blockfile' / 'Mf6FileList.f90',
-    'Utilities' / 'Idm' / 'mf6blockfile' / 'Mf6FileOcInput.f90',
     'Utilities' / 'Idm' / 'mf6blockfile' / 'Mf6FileSetting.f90',
     'Utilities' / 'Idm' / 'mf6blockfile' / 'Mf6FileStoInput.f90',
     'Utilities' / 'Idm' / 'mf6blockfile' / 'LoadNCInput.F90',

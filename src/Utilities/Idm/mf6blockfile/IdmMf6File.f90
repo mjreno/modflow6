@@ -280,7 +280,6 @@ contains
     class(LayerArrayLoadType), pointer :: arrlayer_loader
     class(SettingLoadType), pointer :: setting_loader
     class(StoInputType), pointer :: sto_loader
-    class(OcInputType), pointer :: oc_loader
 
     ! allocate and set loader
     if (this%mf6_input%subcomponent_type == 'STO') then
@@ -290,8 +289,8 @@ contains
       allocate (setting_loader)
       this%rp_loader => setting_loader
     else if (this%mf6_input%subcomponent_type == 'OC') then
-      allocate (oc_loader)
-      this%rp_loader => oc_loader
+      allocate (setting_loader)
+      this%rp_loader => setting_loader
     else if (this%readasarrays) then
       allocate (arrlayer_loader)
       this%rp_loader => arrlayer_loader

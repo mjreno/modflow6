@@ -76,6 +76,7 @@ contains
       pointer, contiguous :: rtypes
     type(CharacterStringType), dimension(:), &
       pointer, contiguous :: ocsettings
+    integer(I4B), pointer :: nlist
     integer(I4B) :: n, ipos
     character(len=LINELENGTH) :: ocaction, rtype, ocsetting
     ! formats
@@ -104,11 +105,12 @@ contains
       call ocdobjptr%psm%init()
     end do
 
+    call mem_setptr(nlist, 'NBOUND', this%input_mempath)
     call mem_setptr(ocactions, 'OCACTION', this%input_mempath)
     call mem_setptr(rtypes, 'RTYPE', this%input_mempath)
-    call mem_setptr(ocsettings, 'OCSETTING', this%input_mempath)
+    call mem_setptr(ocsettings, 'SETTING', this%input_mempath)
 
-    do n = 1, size(ocactions)
+    do n = 1, nlist
       ocaction = ocactions(n)
       rtype = rtypes(n)
       ocsetting = ocsettings(n)

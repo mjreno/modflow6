@@ -23,7 +23,6 @@ module PrtPrpModule
   use DisvModule, only: DisvType
   use ErrorUtilModule, only: pstop
   use MathUtilModule, only: arange, is_close
-  use ArrayHandlersModule, only: ExpandArray
 
   implicit none
 
@@ -555,8 +554,7 @@ contains
     ! local variables
     type(CharacterStringType), dimension(:), contiguous, &
       pointer :: settings
-    integer(I4B), pointer :: iper
-    character(len=LINELENGTH) :: line
+    integer(I4B), pointer :: iper, nlist
     character(len=LINELENGTH), allocatable :: lines(:)
     integer(I4B) :: n
 
@@ -570,20 +568,18 @@ contains
       ! block release settings), default to a single release at the
       ! start of the first period's first time step.
       allocate (lines(1))
-      line = "FIRST"
-      lines(1) = line
+      lines(1) = "FIRST"
       call this%schedule%advance(lines=lines)
     else if (iper /= kper) then
       return
     end if
 
+    call mem_setptr(nlist, 'NBOUND', this%input_mempath)
     call mem_setptr(settings, 'SETTING', this%input_mempath)
-    allocate (lines(0))
+    allocate (lines(nlist))
 
-    do n = 1, size(settings)
-      call ExpandArray(lines)
-      line = settings(n)
-      lines(n) = line
+    do n = 1, nlist
+      lines(n) = settings(n)
     end do
 
     if (size(lines) > 0) &
@@ -712,7 +708,6 @@ contains
       if (this%idrymeth == 0) then
         write (errmsg, '(a)') 'Unknown dry tracking method.'
         call store_error(errmsg)
-        !call store_error_filename(this%input_fname)
       else
         ! adjust for method zero indexing
         this%idrymeth = this%idrymeth - 1
@@ -742,13 +737,11 @@ contains
 
     if (found%ichkmeth) then
       if (this%ichkmeth == 0) then
-        write (errmsg, '(a)') 'Unsupported coordinate check method.'
-        call store_error(errmsg)
-        write (errmsg, '(a, a)') &
-          'COORDINATE_CHECK_METHOD must be "NONE" or "EAGER"'
+        write (errmsg, '(a)') 'Unsupported coordinate check method. &
+          &COORDINATE_CHECK_METHOD must be "NONE" or "EAGER"'
         call store_error(errmsg)
       else
-        ! adjust for method zero indexing
+        ! adjust for method zero based indexing
         this%ichkmeth = this%ichkmeth - 1
       end if
     end if
@@ -772,6 +765,11 @@ contains
       call openfile(this%itrkcsv, this%iout, trackcsvfile, 'CSV', &
                     filstat_opt='REPLACE')
       write (this%itrkcsv, '(a)') TRACKHEADER
+    end if
+
+    ! terminate if any errors were detected
+    if (count_errors() > 0) then
+      call store_error_filename(this%input_fname)
     end if
 
     ! log found options

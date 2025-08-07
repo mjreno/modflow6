@@ -297,7 +297,7 @@ contains
     idt%shape = ''
     idt%required = .true.
     idt%in_record = .false.
-    idt%preserve_case = .true.
+    idt%preserve_case = .false.
     idt%layered = .false.
     idt%timeseries = .false.
   end function idt_default

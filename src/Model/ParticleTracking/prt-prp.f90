@@ -554,14 +554,17 @@ contains
     ! local variables
     type(CharacterStringType), dimension(:), contiguous, &
       pointer :: settings
-    integer(I4B), pointer :: iper, nlist
+    integer(I4B), pointer :: iper, ionper, nlist
     character(len=LINELENGTH), allocatable :: lines(:)
     integer(I4B) :: n
 
+    ! set pointer to last and next period loaded
     call mem_setptr(iper, 'IPER', this%input_mempath)
+    call mem_setptr(ionper, 'IONPER', this%input_mempath)
 
-    if ((iper > nper) .and. &
-        kper == 1 .and. &
+    if (kper == 1 .and. &
+        (iper == 0) .and. &
+        (ionper > nper) .and. &
         size(this%schedule%time_select%times) == 0) then
       ! If the user hasn't provided any release settings (neither
       ! explicit release times, release time frequency, or period
@@ -570,20 +573,27 @@ contains
       allocate (lines(1))
       lines(1) = "FIRST"
       call this%schedule%advance(lines=lines)
+      deallocate (lines)
+      return
     else if (iper /= kper) then
       return
     end if
 
+    ! set input context pointers
     call mem_setptr(nlist, 'NBOUND', this%input_mempath)
     call mem_setptr(settings, 'SETTING', this%input_mempath)
-    allocate (lines(nlist))
 
+    ! allocate and set input
+    allocate (lines(nlist))
     do n = 1, nlist
       lines(n) = settings(n)
     end do
 
+    ! update schedule
     if (size(lines) > 0) &
       call this%schedule%advance(lines=lines)
+
+    ! cleanup
     deallocate (lines)
   end subroutine prp_rp
 
@@ -706,7 +716,8 @@ contains
     ! update internal state and validate input
     if (found%idrymeth) then
       if (this%idrymeth == 0) then
-        write (errmsg, '(a)') 'Unknown dry tracking method.'
+        write (errmsg, '(a)') 'Unsupported dry tracking method. &
+          &DRY_TRACKING_METHOD must be "DROP", "STOP", or "STAY"'
         call store_error(errmsg)
       else
         ! adjust for method zero indexing
@@ -868,6 +879,7 @@ contains
     integer(I4B), dimension(:), pointer :: cellid
     integer(I4B) :: n, noder, nodeu, rptno
 
+    ! set input context pointers
     call mem_setptr(irptno, 'IRPTNO', this%input_mempath)
     call mem_setptr(cellids, 'CELLID', this%input_mempath)
     call mem_setptr(xrpts, 'XRPT', this%input_mempath)
@@ -929,6 +941,7 @@ contains
         cycle
       end if
 
+      ! set coordinates
       this%rptx(rptno) = xrpts(n)
       this%rpty(rptno) = yrpts(n)
       this%rptz(rptno) = zrpts(n)
@@ -945,6 +958,7 @@ contains
         bndName = ''
       end if
 
+      ! set boundname
       this%rptname(rptno) = bndName
     end do
 
@@ -989,22 +1003,30 @@ contains
     ! allocate times array
     allocate (times(this%nreleasetimes))
 
+    ! check if input array was read
     call get_isize('TIME', this%input_mempath, isize)
 
-    if (isize > 0) then
-      call mem_setptr(time, 'TIME', this%input_mempath)
-
-      do n = 1, size(time)
-        times(n) = time(n)
-      end do
+    if (isize <= 0) then
+      errmsg = "RELEASTIMES block expected when &
+        &NRELEASETIMES dimension is non-zero."
+      call store_error(errmsg)
+      call store_error_filename(this%input_fname)
     end if
+
+    ! set input context pointer
+    call mem_setptr(time, 'TIME', this%input_mempath)
+
+    ! set input data
+    do n = 1, size(time)
+      times(n) = time(n)
+    end do
 
     ! register times with the release schedule
     call this%schedule%time_select%extend(times)
 
     ! make sure times strictly increase
     if (.not. this%schedule%time_select%increasing()) then
-      errmsg = "Release times must strictly increase"
+      errmsg = "RELEASTIMES block entries must strictly increase."
       call store_error(errmsg)
       call store_error_filename(this%input_fname)
     end if

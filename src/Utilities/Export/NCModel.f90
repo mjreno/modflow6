@@ -205,7 +205,6 @@ contains
     character(len=*), intent(in) :: modelfname
     integer(I4B), intent(in) :: nctype
     integer(I4B), intent(in) :: disenum
-    character(len=LINELENGTH) :: fullname
     integer :: values(8)
 
     this%title = ''
@@ -226,15 +225,12 @@ contains
     ! set model specific attributes
     select case (modeltype)
     case ('GWF')
-      fullname = 'Groundwater Flow'
       this%title = trim(modelname)//' hydraulic head'
       this%longname = 'head'
     case ('GWT')
-      fullname = 'Groundwater Transport'
       this%title = trim(modelname)//' concentration'
       this%longname = 'concentration'
     case ('GWE')
-      fullname = 'Groundwater Energy'
       this%title = trim(modelname)//' temperature'
       this%longname = 'temperature'
     case default

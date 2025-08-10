@@ -33,9 +33,9 @@ module Mf6FileSettingLoadModule
   !!
   !<
   type, extends(AsciiDynamicPkgLoadBaseType) :: SettingLoadType
-    type(StructArrayType), pointer :: structarray => null()
-    type(IdtPtrType), dimension(:), allocatable :: idts
-    type(LoadContextType) :: ctx
+    type(StructArrayType), pointer :: structarray => null() !< struct array list based load type
+    type(IdtPtrType), dimension(:), allocatable :: idts !< idts for struct array input cols
+    type(LoadContextType) :: ctx !< input load context
   contains
     procedure :: ainit => oc_init
     procedure :: df
@@ -68,6 +68,7 @@ contains
     ! initialize static loader
     call loader%load(parser, mf6_input, this%nc_vars, this%input_name, iout)
 
+    ! create and allocate load context
     call this%ctx%init(mf6_input)
     call this%ctx%allocate_arrays()
 
@@ -149,8 +150,6 @@ contains
       ! destroy the structured array reader
       call destructStructArray(this%structarray)
     end if
-
-    call this%DynamicPkgLoadType%destroy()
 
     do icol = 1, size(this%idts)
       ! allocate variable in memory manager

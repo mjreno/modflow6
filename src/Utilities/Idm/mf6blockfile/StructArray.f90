@@ -54,7 +54,7 @@ module StructArrayModule
     procedure :: allocate_charstr_type
     procedure :: allocate_int1d_type
     procedure :: allocate_dbl1d_type
-    procedure :: write_struct_vector
+    procedure :: read_param
     procedure :: read_from_parser
     procedure :: read_from_binary
     procedure :: memload_vectors
@@ -756,8 +756,7 @@ contains
     end do
   end subroutine check_reallocate
 
-  subroutine write_struct_vector(this, parser, sv_col, irow, timeseries, &
-                                 iout, auxcol)
+  subroutine read_param(this, parser, sv_col, irow, timeseries, iout, auxcol)
     class(StructArrayType) :: this !< StructArrayType
     type(BlockParserType), intent(inout) :: parser !< block parser to read from
     integer(I4B), intent(in) :: sv_col
@@ -834,7 +833,7 @@ contains
         end if
       end do
     end select
-  end subroutine write_struct_vector
+  end subroutine read_param
 
   !> @brief read from the block parser to fill the StructArrayType
   !<
@@ -866,7 +865,7 @@ contains
       irow = irow + 1
       ! handle line reads by column memtype
       do j = 1, this%ncol
-        call this%write_struct_vector(parser, j, irow, timeseries, iout)
+        call this%read_param(parser, j, irow, timeseries, iout)
       end do
     end do
     ! if deferred shape vectors were read, load to input path

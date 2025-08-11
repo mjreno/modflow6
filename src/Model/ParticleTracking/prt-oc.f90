@@ -238,8 +238,8 @@ contains
                        found%track_release)
     call mem_set_value(evinput, 'TRACK_EXIT', this%input_mempath, &
                        found%track_exit)
-    call mem_set_value(evinput, 'TRACKSFEXIT', this%input_mempath, &
-                       found%tracksfexit)
+    call mem_set_value(evinput, 'TRACK_SUBF_EXIT', this%input_mempath, &
+                       found%track_subf_exit)
     call mem_set_value(evinput, 'TRACK_DROPPED', this%input_mempath, &
                        found%track_dropped)
     call mem_set_value(evinput, 'TRACK_TIMESTEP', this%input_mempath, &
@@ -255,7 +255,7 @@ contains
 
     if (found%track_release) this%trackrelease = .true.
     if (found%track_exit) this%trackfeatexit = .true.
-    if (found%tracksfexit) this%tracksubfexit = .true.
+    if (found%track_subf_exit) this%tracksubfexit = .true.
     if (found%track_dropped) this%trackdropped = .true.
     if (found%track_timestep) this%tracktimestep = .true.
     if (found%track_terminate) this%trackterminate = .true.

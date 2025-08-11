@@ -272,7 +272,6 @@ contains
     use ListLoadModule, only: ListLoadType
     use Mf6FileSettingLoadModule, only: SettingLoadType
     use Mf6FileStoInputModule, only: StoInputType
-    use Mf6FileOcInputModule, only: OcInputType
     use FeatureFlagsModule, only: developmode
     class(Mf6FileDynamicPkgLoadType), intent(inout) :: this
     class(ListLoadType), pointer :: list_loader
@@ -285,10 +284,8 @@ contains
     if (this%mf6_input%subcomponent_type == 'STO') then
       allocate (sto_loader)
       this%rp_loader => sto_loader
-    else if (this%mf6_input%subcomponent_type == 'PRP') then
-      allocate (setting_loader)
-      this%rp_loader => setting_loader
-    else if (this%mf6_input%subcomponent_type == 'OC') then
+    else if (this%mf6_input%subcomponent_type == 'PRP' .or. &
+             this%mf6_input%subcomponent_type == 'OC') then
       allocate (setting_loader)
       this%rp_loader => setting_loader
     else if (this%readasarrays) then

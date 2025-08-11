@@ -27,7 +27,7 @@ module PrtOcInputModule
     logical :: trackcsvfile = .false.
     logical :: track_release = .false.
     logical :: track_exit = .false.
-    logical :: tracksfexit = .false.
+    logical :: track_subf_exit = .false.
     logical :: track_timestep = .false.
     logical :: track_terminate = .false.
     logical :: track_weaksink = .false.
@@ -349,13 +349,13 @@ module PrtOcInputModule
     )
 
   type(InputParamDefinitionType), parameter :: &
-    prtoc_tracksfexit = InputParamDefinitionType &
+    prtoc_track_subf_exit = InputParamDefinitionType &
     ( &
     'PRT', & ! component
     'OC', & ! subcomponent
     'OPTIONS', & ! block
     'TRACK_SUBFEATURE_EXIT', & ! tag name
-    'TRACKSFEXIT', & ! fortran variable
+    'TRACK_SUBF_EXIT', & ! fortran variable
     'KEYWORD', & ! type
     '', & ! shape
     'track cell exits', & ! longname
@@ -860,7 +860,7 @@ module PrtOcInputModule
     prtoc_trackcsvfile, &
     prtoc_track_release, &
     prtoc_track_exit, &
-    prtoc_tracksfexit, &
+    prtoc_track_subf_exit, &
     prtoc_track_timestep, &
     prtoc_track_terminate, &
     prtoc_track_weaksink, &

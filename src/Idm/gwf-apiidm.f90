@@ -13,9 +13,9 @@ module GwfApiInputModule
 
   type GwfApiParamFoundType
     logical :: boundnames = .false.
-    logical :: print_input = .false.
-    logical :: print_flows = .false.
-    logical :: save_flows = .false.
+    logical :: iprpak = .false.
+    logical :: iprflow = .false.
+    logical :: ipakcb = .false.
     logical :: obs_filerecord = .false.
     logical :: obs6 = .false.
     logical :: filein = .false.
@@ -51,13 +51,13 @@ module GwfApiInputModule
     )
 
   type(InputParamDefinitionType), parameter :: &
-    gwfapi_print_input = InputParamDefinitionType &
+    gwfapi_iprpak = InputParamDefinitionType &
     ( &
     'GWF', & ! component
     'API', & ! subcomponent
     'OPTIONS', & ! block
     'PRINT_INPUT', & ! tag name
-    'PRINT_INPUT', & ! fortran variable
+    'IPRPAK', & ! fortran variable
     'KEYWORD', & ! type
     '', & ! shape
     'print input to listing file', & ! longname
@@ -69,13 +69,13 @@ module GwfApiInputModule
     )
 
   type(InputParamDefinitionType), parameter :: &
-    gwfapi_print_flows = InputParamDefinitionType &
+    gwfapi_iprflow = InputParamDefinitionType &
     ( &
     'GWF', & ! component
     'API', & ! subcomponent
     'OPTIONS', & ! block
     'PRINT_FLOWS', & ! tag name
-    'PRINT_FLOWS', & ! fortran variable
+    'IPRFLOW', & ! fortran variable
     'KEYWORD', & ! type
     '', & ! shape
     'print calculated flows to listing file', & ! longname
@@ -87,13 +87,13 @@ module GwfApiInputModule
     )
 
   type(InputParamDefinitionType), parameter :: &
-    gwfapi_save_flows = InputParamDefinitionType &
+    gwfapi_ipakcb = InputParamDefinitionType &
     ( &
     'GWF', & ! component
     'API', & ! subcomponent
     'OPTIONS', & ! block
     'SAVE_FLOWS', & ! tag name
-    'SAVE_FLOWS', & ! fortran variable
+    'IPAKCB', & ! fortran variable
     'KEYWORD', & ! type
     '', & ! shape
     'save api flows to budget file', & ! longname
@@ -216,9 +216,9 @@ module GwfApiInputModule
     gwf_api_param_definitions(*) = &
     [ &
     gwfapi_boundnames, &
-    gwfapi_print_input, &
-    gwfapi_print_flows, &
-    gwfapi_save_flows, &
+    gwfapi_iprpak, &
+    gwfapi_iprflow, &
+    gwfapi_ipakcb, &
     gwfapi_obs_filerecord, &
     gwfapi_obs6, &
     gwfapi_filein, &

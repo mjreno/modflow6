@@ -107,19 +107,10 @@ contains
   !> @brief load routine for static loader
   !<
   function static_load(this, iout) result(rp_loader)
-    use ConstantsModule, only: LENBOUNDNAME
-    use MemoryManagerModule, only: mem_allocate
-    use CharacterStringModule, only: CharacterStringType
-    use IdmDfnSelectorModule, only: idm_multi_package
-    use ModelPackageInputsModule, only: supported_model
     class(Mf6FileStaticPkgLoadType), intent(inout) :: this
     integer(I4B), intent(in) :: iout
     class(DynamicPkgLoadBaseType), pointer :: rp_loader
     class(Mf6FileDynamicPkgLoadType), pointer :: mf6_loader
-    type(CharacterStringType), dimension(:), pointer, contiguous :: cstptr
-    integer(I4B), dimension(:, :), pointer, contiguous :: int2dptr
-    integer(I4B), dimension(:), pointer, contiguous :: int1dptr
-    integer(I4B), pointer :: intptr
 
     ! initialize return pointer
     nullify (rp_loader)
@@ -142,19 +133,6 @@ contains
       ! load static input
       call input_load(this%input_name, this%mf6_input, &
                       this%component_input_name, iout, this%nc_vars)
-
-      ! allocate null bndctx if multi package with no PERIOD block
-      if (supported_model(trim(this%mf6_input%component_type)//'6') .and. &
-          idm_multi_package(this%mf6_input%component_type, &
-                            this%mf6_input%subcomponent_type)) then
-        call mem_allocate(int2dptr, 0, 0, 'CELLID', this%mf6_input%mempath)
-        call mem_allocate(int1dptr, 0, 'NODEULIST', this%mf6_input%mempath)
-        call mem_allocate(int2dptr, 0, 0, 'AUXVAR', this%mf6_input%mempath)
-        call mem_allocate(cstptr, LENBOUNDNAME, 0, 'BOUNDNAME', &
-                          this%mf6_input%mempath)
-        call mem_allocate(intptr, 'IPER', this%mf6_input%mempath)
-        intptr = 0
-      end if
     end if
   end function static_load
 

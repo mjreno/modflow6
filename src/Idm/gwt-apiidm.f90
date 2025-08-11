@@ -13,9 +13,9 @@ module GwtApiInputModule
 
   type GwtApiParamFoundType
     logical :: boundnames = .false.
-    logical :: print_input = .false.
-    logical :: print_flows = .false.
-    logical :: save_flows = .false.
+    logical :: iprpak = .false.
+    logical :: iprflow = .false.
+    logical :: ipakcb = .false.
     logical :: obs_filerecord = .false.
     logical :: obs6 = .false.
     logical :: filein = .false.
@@ -51,13 +51,13 @@ module GwtApiInputModule
     )
 
   type(InputParamDefinitionType), parameter :: &
-    gwtapi_print_input = InputParamDefinitionType &
+    gwtapi_iprpak = InputParamDefinitionType &
     ( &
     'GWT', & ! component
     'API', & ! subcomponent
     'OPTIONS', & ! block
     'PRINT_INPUT', & ! tag name
-    'PRINT_INPUT', & ! fortran variable
+    'IPRPAK', & ! fortran variable
     'KEYWORD', & ! type
     '', & ! shape
     'print input to listing file', & ! longname
@@ -69,13 +69,13 @@ module GwtApiInputModule
     )
 
   type(InputParamDefinitionType), parameter :: &
-    gwtapi_print_flows = InputParamDefinitionType &
+    gwtapi_iprflow = InputParamDefinitionType &
     ( &
     'GWT', & ! component
     'API', & ! subcomponent
     'OPTIONS', & ! block
     'PRINT_FLOWS', & ! tag name
-    'PRINT_FLOWS', & ! fortran variable
+    'IPRFLOW', & ! fortran variable
     'KEYWORD', & ! type
     '', & ! shape
     'print calculated flows to listing file', & ! longname
@@ -87,13 +87,13 @@ module GwtApiInputModule
     )
 
   type(InputParamDefinitionType), parameter :: &
-    gwtapi_save_flows = InputParamDefinitionType &
+    gwtapi_ipakcb = InputParamDefinitionType &
     ( &
     'GWT', & ! component
     'API', & ! subcomponent
     'OPTIONS', & ! block
     'SAVE_FLOWS', & ! tag name
-    'SAVE_FLOWS', & ! fortran variable
+    'IPAKCB', & ! fortran variable
     'KEYWORD', & ! type
     '', & ! shape
     'save api flows to budget file', & ! longname
@@ -216,9 +216,9 @@ module GwtApiInputModule
     gwt_api_param_definitions(*) = &
     [ &
     gwtapi_boundnames, &
-    gwtapi_print_input, &
-    gwtapi_print_flows, &
-    gwtapi_save_flows, &
+    gwtapi_iprpak, &
+    gwtapi_iprflow, &
+    gwtapi_ipakcb, &
     gwtapi_obs_filerecord, &
     gwtapi_obs6, &
     gwtapi_filein, &

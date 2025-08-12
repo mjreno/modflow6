@@ -83,7 +83,7 @@ contains
     packobj%ictMemPath = create_mem_path(namemodel, 'NPF')
   end subroutine api_create
 
-  !> @ brief source options for package
+  !> @ brief Source package options from input context
   !<
   subroutine source_options(this)
     use MemoryManagerExtModule, only: mem_set_value
@@ -106,11 +106,9 @@ contains
     call mem_set_value(this%imover, 'MOVER', this%input_mempath, found%mover)
 
     ! update internal state
-    if (found%ipakcb) then
-      this%ipakcb = -1
-    end if
+    if (found%ipakcb) this%ipakcb = -1
 
-    ! -- enforce 0 or 1 OBS6_FILENAME entries in option block
+    ! enforce 0 or 1 OBS6_FILENAME entries in option block
     if (filein_fname(this%obs%inputFilename, 'OBS6_FILENAME', &
                      this%input_mempath, this%input_fname)) then
       this%obs%active = .true.
@@ -139,7 +137,7 @@ contains
       'END OF '//trim(adjustl(this%text))//' OPTIONS'
   end subroutine source_options
 
-  !> @ brief source package dimensions from input context
+  !> @ brief Source package dimensions from input context
   !<
   subroutine source_dimensions(this)
     use SimVariablesModule, only: errmsg
@@ -151,18 +149,18 @@ contains
     ! -- local variables
     type(GwfApiParamFoundType) :: found
 
-    ! -- update defaults with idm sourced values
+    ! update dimensions from input context
     call mem_set_value(this%maxbound, 'MAXBOUND', this%input_mempath, &
                        found%maxbound)
 
-    ! -- log dimensions
+    ! log dimensions
     write (this%iout, '(/1x,a)') 'PROCESSING '//trim(adjustl(this%text))// &
       ' DIMENSIONS'
     write (this%iout, '(4x,a,i7)') 'MAXBOUND = ', this%maxbound
     write (this%iout, '(1x,a)') &
       'END OF '//trim(adjustl(this%text))//' DIMENSIONS'
 
-    ! -- verify dimensions were set
+    ! verify dimensions
     if (this%maxbound <= 0) then
       write (errmsg, '(a)') 'MAXBOUND must be an integer greater than zero.'
       call store_error(errmsg)

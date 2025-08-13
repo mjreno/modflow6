@@ -2,7 +2,7 @@ module PrtFmiModule
 
   use KindModule, only: DP, I4B
   use ConstantsModule, only: DZERO, LENAUXNAME, LENPACKAGENAME
-  use SimModule, only: store_error, store_error_unit
+  use SimModule, only: store_error
   use SimVariablesModule, only: errmsg
   use FlowModelInterfaceModule, only: FlowModelInterfaceType
   use BaseDisModule, only: DisBaseType
@@ -55,9 +55,6 @@ contains
     ! Set variables
     fmiobj%inunit = inunit
     fmiobj%iout = iout
-    !
-    ! Initialize block parser
-    call fmiobj%parser%Initialize(fmiobj%inunit, fmiobj%iout)
     !
     ! Assign dependent variable label
     fmiobj%depvartype = 'TRACKS          '

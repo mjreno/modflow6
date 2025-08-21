@@ -510,7 +510,7 @@ contains
 
     if (present(layer)) then
       if (layer > 0) then
-        write (lname, '(a,i0)') trim(lname)//' layer=', layer
+        write (lname, '(a,i0)') trim(lname)//' layer ', layer
       end if
     end if
   end function export_longname

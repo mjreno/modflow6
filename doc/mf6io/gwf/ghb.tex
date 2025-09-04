@@ -1,5 +1,9 @@
 Input to the General-Head Boundary (GHB) Package is read from the file that has type ``GHB6'' in the Name File.  Any number of GHB Packages can be specified for a single groundwater flow model.
 
+General-Head Boundary input can be specified using lists or arrays.  List-based input for the GHB package is the default, and is described here.  Instructions for specifying array-based GHB input are described in the next section.
+
+List-based input offers several advantages over the array-based input for specifying general-head boundaries.  First, multiple list entries can be specified for a single cell.  This makes it possible to divide a cell into multiple areas, and assign a different general-head boundary for each area.  In this case, the user would likely specify an auxiliary variable to serve as a multiplier.  This multiplier would be calculated by the user and provided in the input file as the fractional cell area for the individual general-head boundary entries.  Another advantage to using list-based input for specifying general-head boundaries is that boundnames can be specified.  Boundnames work with the Observations capability and can be used to sum boundary heads for entries with the same boundname.  A disadvantage of the list-based input is that one cannot easily assign general-head boundaries to the entire model without specifying a list of model cells.  For this reason \mf also supports array-based input for general-head boundaries.
+
 \vspace{5mm}
 \subsubsection{Structure of Blocks}
 \vspace{5mm}

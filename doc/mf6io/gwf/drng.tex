@@ -1,30 +1,30 @@
 Input to the Drain (DRN) Package is read from the file that has type ``DRN6'' in the Name File.  Any number of DRN Packages can be specified for a single groundwater flow model.
 
-Drain input can be specified using lists or arrays.  List-based input for the DRN package is the default, and is described here.  Instructions for specifying array-based DRN input are described in the next section.
+Drain input can be specified using lists or arrays.  Array-based input for the DRN package is activated by providing READARRAYGRID within the OPTIONS block.  Instructions for specifying list-based drain input is described in the previous section.  Array-based input for the DRN package differs from the READASARRAYS based input used by the RCH and EVT array-based input packages.  READASARRAYS input arrays define a layer of input data for DIS and DISV based model grids, while READARRAYGRID input arrays define data for the entire model grid.  Cells that define no data should contain the DNODATA (3.0E+30) value.
 
-List-based input offers several advantages over the array-based input for specifying drains.  First, multiple list entries can be specified for a single cell.  This makes it possible to divide a cell into multiple areas, and assign a different drain for each area.  In this case, the user would likely specify an auxiliary variable to serve as a multiplier.  This multiplier would be calculated by the user and provided in the input file as the fractional cell area for the individual drain entries.  Another advantage to using list-based input for specifying drains is that boundnames can be specified.  Boundnames work with the Observations capability and can be used to sum drains for entries with the same boundname.  A disadvantage of the list-based input is that one cannot easily assign drains to the entire model without specifying a list of model cells.  For this reason \mf also supports array-based input for drains.
+When array-based input is used for drains, the DIMENSIONS block is optional.  The array size is determined from the model grid when MAXBOUND is not user defined.  When defined, the MAXBOUND dimension represents the maxiumum number of defined drain (non-DNODATA) cells found in any stress period.  Defining MAXBOUND can reduce the memory footprint of the array-based DRN package especially when the number of drains is sparse and the model grid is large.
 
 \vspace{5mm}
 \subsubsection{Structure of Blocks}
 \vspace{5mm}
 
 \noindent \textit{FOR EACH SIMULATION}
-\lstinputlisting[style=blockdefinition]{./mf6ivar/tex/gwf-drn-options.dat}
-\lstinputlisting[style=blockdefinition]{./mf6ivar/tex/gwf-drn-dimensions.dat}
+\lstinputlisting[style=blockdefinition]{./mf6ivar/tex/gwf-drng-options.dat}
+\lstinputlisting[style=blockdefinition]{./mf6ivar/tex/gwf-drng-dimensions.dat}
 \vspace{5mm}
 \noindent \textit{FOR ANY STRESS PERIOD}
-\lstinputlisting[style=blockdefinition]{./mf6ivar/tex/gwf-drn-period.dat}
+\lstinputlisting[style=blockdefinition]{./mf6ivar/tex/gwf-drng-period.dat}
 \packageperioddescription
 
 \vspace{5mm}
 \subsubsection{Explanation of Variables}
 \begin{description}
-\input{./mf6ivar/tex/gwf-drn-desc.tex}
+\input{./mf6ivar/tex/gwf-drng-desc.tex}
 \end{description}
 
 \vspace{5mm}
 \subsubsection{Example Input File}
-\lstinputlisting[style=inputfile]{./mf6ivar/examples/gwf-drn-example.dat}
+\lstinputlisting[style=inputfile]{./mf6ivar/examples/gwf-drng-example.dat}
 
 \vspace{5mm}
 \subsubsection{Available observation types}
@@ -49,4 +49,4 @@ DRN & to-mvr & cellid or boundname & -- & Drain boundary discharge that is avail
 
 \vspace{5mm}
 \subsubsection{Example Observation Input File}
-\lstinputlisting[style=inputfile]{./mf6ivar/examples/gwf-drn-example-obs.dat}
+\lstinputlisting[style=inputfile]{./mf6ivar/examples/gwf-drng-example-obs.dat}

@@ -1,30 +1,30 @@
 Input to the Well (WEL) Package is read from the file that has type ``WEL6'' in the Name File.  Any number of WEL Packages can be specified for a single groundwater flow model.
 
-Well input can be specified using lists or arrays.  List-based input for the WEL package is the default, and is described here.  Instructions for specifying array-based WEL input are described in the next section.
+Well input can be specified using lists or arrays.  Array-based input for the WEL package is activated by providing READARRAYGRID within the OPTIONS block.  Instructions for specifying list-based wells is described in the previous section.  Array-based input for the WEL package differs from the READASARRAYS based input used by the RCH and EVT array-based input packages.  READASARRAYS input arrays define a layer of input data for DIS and DISV based model grids, while READARRAYGRID input arrays define data for the entire model grid.  Cells that define no data should contain the DNODATA (3.0E+30) value.
 
-List-based input offers several advantages over the array-based input for specifying wells.  First, multiple list entries can be specified for a single cell.  This makes it possible to divide a cell into multiple areas, and assign a different well for each area.  In this case, the user would likely specify an auxiliary variable to serve as a multiplier.  This multiplier would be calculated by the user and provided in the input file as the fractional cell area for the individual well entries.  Another advantage to using list-based input for specifying wells is that boundnames can be specified.  Boundnames work with the Observations capability and can be used to sum well discharge for entries with the same boundname.  A disadvantage of the list-based input is that one cannot easily assign wells to the entire model without specifying a list of model cells.  For this reason \mf also supports array-based input for wells.
+When array-based input is used for wells, the DIMENSIONS block is optional.  The array size is determined from the model grid when MAXBOUND is not user defined.  When defined, the MAXBOUND dimension represents the maxiumum number of defined well (non-DNODATA) cells found in any stress period.  Defining MAXBOUND can reduce the memory footprint of the array-based WEL package especially when the number of wells is sparse and the model grid is large.
 
 \vspace{5mm}
 \subsubsection{Structure of Blocks}
 \vspace{5mm}
 
 \noindent \textit{FOR EACH SIMULATION}
-\lstinputlisting[style=blockdefinition]{./mf6ivar/tex/gwf-wel-options.dat}
-\lstinputlisting[style=blockdefinition]{./mf6ivar/tex/gwf-wel-dimensions.dat}
+\lstinputlisting[style=blockdefinition]{./mf6ivar/tex/gwf-welg-options.dat}
+\lstinputlisting[style=blockdefinition]{./mf6ivar/tex/gwf-welg-dimensions.dat}
 \vspace{5mm}
 \noindent \textit{FOR ANY STRESS PERIOD}
-\lstinputlisting[style=blockdefinition]{./mf6ivar/tex/gwf-wel-period.dat}
+\lstinputlisting[style=blockdefinition]{./mf6ivar/tex/gwf-welg-period.dat}
 \packageperioddescription
 
 \vspace{5mm}
 \subsubsection{Explanation of Variables}
 \begin{description}
-\input{./mf6ivar/tex/gwf-wel-desc.tex}
+\input{./mf6ivar/tex/gwf-welg-desc.tex}
 \end{description}
 
 \vspace{5mm}
 \subsubsection{Example Input File}
-\lstinputlisting[style=inputfile]{./mf6ivar/examples/gwf-wel-example.dat}
+\lstinputlisting[style=inputfile]{./mf6ivar/examples/gwf-welg-example.dat}
 
 \vspace{5mm}
 \subsubsection{Available observation types}
@@ -48,4 +48,4 @@ Well Package observations include the simulated well rates (\texttt{wel}), the w
 
 \vspace{5mm}
 \subsubsection{Example Observation Input File}
-\lstinputlisting[style=inputfile]{./mf6ivar/examples/gwf-wel-example-obs.dat}
+\lstinputlisting[style=inputfile]{./mf6ivar/examples/gwf-welg-example-obs.dat}

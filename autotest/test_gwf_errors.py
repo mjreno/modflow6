@@ -148,7 +148,7 @@ def test_empty_folder(function_tmpdir, targets):
     mf6 = targets["mf6"]
     with pytest.raises(RuntimeError):
         # make sure mf6 fails when there is no simulation name file
-        err_str = "mf6: mfsim.nam is not present in working directory."
+        err_str = "mfsim.nam is not present in working directory."
         run_mf6_error(str(function_tmpdir), mf6, err_str)
 
 

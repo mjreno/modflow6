@@ -863,9 +863,9 @@ contains
       end if
       ! update irow index
       irow = irow + 1
-      !
       if (this%deferred_shape) then
       else
+        ! check allocated array size against user bound
         if (irow > this%nrow) then
           write (errmsg, '(a,i0,a)') &
             'Input error: line count exceeds input dimension. Expected rows=', &

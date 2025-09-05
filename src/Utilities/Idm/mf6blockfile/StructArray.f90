@@ -848,6 +848,11 @@ contains
     ! initialize index irow
     irow = 0
 
+    ! reset nrow if deferred shape
+    if (this%deferred_shape) then
+      this%nrow = 0
+    end if
+
     ! read entire block
     do
       ! read next line

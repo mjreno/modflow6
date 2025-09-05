@@ -139,7 +139,7 @@ def test_input_bound(function_tmpdir, targets):
         f.write("END period  1\n")
 
     with pytest.raises(RuntimeError):
-        # make sure mf6 when input dimension is too small
+        # make sure error is set when input dimension is too small
         err_str = "Input error: line count exceeds input dimension. Expected rows=1."
         run_mf6_error(str(function_tmpdir), mf6, err_str)
 

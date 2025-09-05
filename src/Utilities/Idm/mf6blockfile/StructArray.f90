@@ -863,6 +863,17 @@ contains
       end if
       ! update irow index
       irow = irow + 1
+      !
+      if (this%deferred_shape) then
+      else
+        if (irow > this%nrow) then
+          write (errmsg, '(a,i0,a)') &
+            'Input error: line count exceeds input dimension. Expected rows=', &
+            this%nrow, '.'
+          call store_error(errmsg)
+          call parser%StoreErrorUnit()
+        end if
+      end if
       ! handle line reads by column memtype
       do j = 1, this%ncol
         call this%read_param(parser, j, irow, timeseries, iout)

@@ -1,8 +1,8 @@
 Input to the Drain (DRN) Package is read from the file that has type ``DRN6'' in the Name File.  Any number of DRN Packages can be specified for a single groundwater flow model.
 
-Drain input can be specified using lists or arrays.  Array-based input for the DRN package is activated by providing READARRAYGRID within the OPTIONS block.  Instructions for specifying list-based drain input is described in the previous section.  Array-based input for the DRN package differs from the READASARRAYS based input used by the RCH and EVT array-based input packages.  READASARRAYS input arrays define a layer of input data for DIS and DISV based model grids, while READARRAYGRID input arrays define data for the entire model grid.  Cells that define no data should contain the DNODATA (3.0E+30) value.
+Drain input can be specified using lists or grid arrays.  Grid array-based input for the DRN package is activated by providing READARRAYGRID within the OPTIONS block.  Instructions for specifying list-based drain input is described in the previous section.
 
-When array-based input is used for drains, the DIMENSIONS block is optional.  The array size is determined from the model grid when MAXBOUND is not user defined.  When defined, the MAXBOUND dimension represents the maximum number of defined drain (non-DNODATA) cells found in any stress period.  Defining MAXBOUND can reduce the memory footprint of the array-based DRN package especially when the number of drains is sparse and the model grid is large.
+When grid array-based input is used for the drain package, the DIMENSIONS block is optional.  The input array size is determined from the model grid.  Cells that define no data should contain the DNODATA (3.0E+30) value.  When defined, the MAXBOUND dimension represents the maximum number of defined drain (non-DNODATA) cells found in any stress period.  Defining MAXBOUND can reduce the memory footprint of the grid array-based DRN package, especially when the input grid arrays are sparse and the model grid is large.
 
 \vspace{5mm}
 \subsubsection{Structure of Blocks}

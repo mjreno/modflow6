@@ -37,7 +37,7 @@ module Mf6FileSettingLoadModule
     type(IdtPtrType), dimension(:), allocatable :: idts !< idts for struct array input cols
     type(LoadContextType) :: ctx !< input load context
   contains
-    procedure :: ainit => oc_init
+    procedure :: ainit => settingload_init
     procedure :: df
     procedure :: rp
     procedure :: reset
@@ -46,8 +46,9 @@ module Mf6FileSettingLoadModule
 
 contains
 
-  subroutine oc_init(this, mf6_input, component_name, component_input_name, &
-                     input_name, iperblock, parser, iout)
+  subroutine settingload_init(this, mf6_input, component_name, &
+                              component_input_name, input_name, &
+                              iperblock, parser, iout)
     use DefinitionSelectModule, only: idt_default
     use LoadMf6FileModule, only: LoadMf6FileType
     class(SettingLoadType), intent(inout) :: this
@@ -103,7 +104,7 @@ contains
                   'PERIOD', 'SETTING', 'SETTING', 'STRING')
     ! force all setting tokens to be read
     this%idts(icol)%idt%shape = 'LINELENGTH'
-  end subroutine oc_init
+  end subroutine settingload_init
 
   subroutine df(this)
     class(SettingLoadType), intent(inout) :: this

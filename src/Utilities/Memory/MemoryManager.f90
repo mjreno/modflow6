@@ -1296,11 +1296,7 @@ contains
     if (found) then
       isize_old = mt%isize
       if (isize_old > 0) then
-        if (isize_old > nrow) then
-          nrow_old = nrow
-        else
-          nrow_old = size(acharstr1d)
-        end if
+        nrow_old = size(acharstr1d)
       else
         nrow_old = 0
       end if

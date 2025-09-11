@@ -456,7 +456,7 @@ contains
     if (idt%prerelease) then
       dev_msg = 'Input tag "'//trim(idt%tagname)// &
         &'" read from file "'//trim(this%filename)// &
-        &'" is still under development, install the &
+        &'" is still under development. Install the &
         &nightly build or compile from source with IDEVELOPMODE = 1.'
       call dev_feature(dev_msg, this%iout)
     end if

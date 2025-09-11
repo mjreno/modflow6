@@ -612,7 +612,7 @@ module PrtPrpInputModule
     '', & ! shape
     'coordinate checking method', & ! longname
     .false., & ! required
-    .false., & ! prerelease
+    .true., & ! prerelease
     .false., & ! multi-record
     .false., & ! preserve case
     .false., & ! layered

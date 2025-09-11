@@ -129,7 +129,7 @@ module GweNamInputModule
     '', & ! shape
     'flag to scale X and RHS', & ! longname
     .false., & ! required
-    .false., & ! prerelease
+    .true., & ! prerelease
     .false., & ! multi-record
     .false., & ! preserve case
     .false., & ! layered

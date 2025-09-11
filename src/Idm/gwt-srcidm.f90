@@ -300,7 +300,7 @@ module GwtSrcInputModule
     '', & ! shape
     'apply source to highest saturated cell', & ! longname
     .false., & ! required
-    .false., & ! prerelease
+    .true., & ! prerelease
     .false., & ! multi-record
     .false., & ! preserve case
     .false., & ! layered

@@ -383,19 +383,8 @@ contains
       end if
 
       params(n) = this%params(n)
+      if (allocate_params) call this%allocate_param(idt)
     end do
-
-    if (allocate_params) then
-      ! allocate dfn input params
-      do n = 1, nparam
-        idt => &
-          get_param_definition_type(this%mf6_input%param_dfns, &
-                                    this%mf6_input%component_type, &
-                                    this%mf6_input%subcomponent_type, &
-                                    this%blockname, params(n), '')
-        call this%allocate_param(idt)
-      end do
-    end if
   end subroutine tags
 
   !> @brief establish if input parameter is in scope for package load

@@ -341,6 +341,8 @@ contains
   !!
   !<
   subroutine tags(this, params, nparam, input_name, create)
+    use DevFeatureModule, only: dev_feature
+    use SimVariablesModule, only: iout
     use DefinitionSelectModule, only: get_param_definition_type
     class(LoadContextType) :: this
     character(len=LINELENGTH), dimension(:), allocatable, &
@@ -349,6 +351,7 @@ contains
     character(len=*), intent(in) :: input_name
     logical(LGP), optional, intent(in) :: create
     type(InputParamDefinitionType), pointer :: idt
+    character(len=LINELENGTH) :: dev_msg
     logical(LGP) :: allocate_params
     integer(I4B) :: n
 
@@ -364,6 +367,21 @@ contains
     nparam = size(this%params)
     allocate (params(nparam))
     do n = 1, nparam
+      idt => &
+        get_param_definition_type(this%mf6_input%param_dfns, &
+                                  this%mf6_input%component_type, &
+                                  this%mf6_input%subcomponent_type, &
+                                  this%blockname, this%params(n), '')
+
+      ! check if input param is prerelease
+      if (idt%prerelease) then
+        dev_msg = 'Input tag "'//trim(idt%tagname)// &
+          &'" read from file "'//trim(input_name)// &
+          &'" is still under development, install the &
+          &nightly build or compile from source with IDEVELOPMODE = 1.'
+        call dev_feature(dev_msg, iout)
+      end if
+
       params(n) = this%params(n)
     end do
 

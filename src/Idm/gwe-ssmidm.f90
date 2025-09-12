@@ -29,7 +29,8 @@ module GweSsmInputModule
   character(len=16), parameter :: &
     gwe_ssm_subpackages(*) = &
     [ &
-    '                ' &
+    'UTL-SPCA        ', &
+    'UTL-SPC         ' &
     ]
 
   type(InputParamDefinitionType), parameter :: &

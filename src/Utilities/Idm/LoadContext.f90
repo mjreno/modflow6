@@ -205,6 +205,9 @@ contains
       call setval(this%maxbound, this%named_bound, this%mf6_input%mempath)
       call setval(this%boundnames, 'BOUNDNAMES', this%mf6_input%mempath)
       call setval(this%iprpak, 'IPRPAK', this%mf6_input%mempath)
+      if (this%iprpak == 0) then
+        call setval(this%iprpak, 'PRINT_INPUT', this%mf6_input%mempath)
+      end if
 
       ! reset nbound
       this%nbound = 0
@@ -446,6 +449,8 @@ contains
           checkname = 'MODELNAMES'
         end if
       case ('NAM')
+        in_scope = .true.
+      case ('SPCA')
         in_scope = .true.
       case ('SSM')
         if (tagname == 'MIXED') in_scope = .true.

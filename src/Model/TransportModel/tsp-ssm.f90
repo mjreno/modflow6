@@ -857,7 +857,10 @@ contains
     ! -- locals
     type(CharacterStringType), dimension(:), pointer, &
       contiguous :: pnames, ftypes, iotypes, fnames, conditions
+    type(CharacterStringType), dimension(:), pointer, &
+      contiguous :: spc_mempaths
     character(len=LINELENGTH) :: pname, ftype, iotype, fname, condition
+    character(len=LINELENGTH) :: spc_mempath
     integer(I4B) :: n, ip, isize
     logical(LGP) :: found
     ! -- formats
@@ -875,6 +878,7 @@ contains
     call mem_setptr(iotypes, 'FILEIN', this%input_mempath)
     call mem_setptr(fnames, 'SPC6_FILENAME', this%input_mempath)
     call mem_setptr(conditions, 'MIXED', this%input_mempath)
+    call mem_setptr(spc_mempaths, 'SPC6_MEMPATHS', this%input_mempath)
 
     write (this%iout, '(/1x,a)') 'PROCESSING SSM FILEINPUT'
     do n = 1, size(pnames)
@@ -930,7 +934,8 @@ contains
 
       ! -- Use set_ssmivec to read file name and set up
       !    ssmi file object
-      call this%set_ssmivec(ip, pname, fname)
+      spc_mempath = spc_mempaths(n)
+      call this%set_ssmivec(ip, pname, fname, spc_mempath)
 
       if (condition == 'MIXED') then
         this%isrctype(ip) = 4
@@ -990,26 +995,21 @@ contains
   !!
   !!  This routine initializes the SPC input file.
   !<
-  subroutine set_ssmivec(this, ip, packname, filename)
+  subroutine set_ssmivec(this, ip, packname, filename, mempath)
     ! -- module
-    use InputOutputModule, only: openfile, getunit
     ! -- dummy
     class(TspSsmType), intent(inout) :: this !< TspSsmType
     integer(I4B), intent(in) :: ip !< package number
     character(len=*), intent(in) :: packname !< name of package
     character(len=*), intent(in) :: filename !< package input file
+    character(len=*), intent(in) :: mempath !< package input mempath
     ! -- local
     type(TspSpcType), pointer :: ssmiptr
-    integer(I4B) :: inunit
-    !
-    ! -- open file
-    inunit = getunit()
-    call openfile(inunit, this%iout, filename, 'SPC', filstat_opt='OLD')
     !
     ! -- Create the SPC file object
     ssmiptr => this%ssmivec(ip)
-    call ssmiptr%initialize(this%dis, ip, inunit, this%iout, this%name_model, &
-                            trim(packname), this%depvartype)
+    call ssmiptr%initialize(this%dis, ip, this%iout, this%name_model, &
+                            trim(packname), this%depvartype, mempath)
     !
     write (this%iout, '(4x, a, a, a, a, a)') 'USING SPC INPUT FILE ', &
       trim(filename), ' TO SET ', trim(this%depvartype), &

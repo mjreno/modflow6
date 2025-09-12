@@ -29,7 +29,8 @@ module GwtSsmInputModule
   character(len=16), parameter :: &
     gwt_ssm_subpackages(*) = &
     [ &
-    '                ' &
+    'UTL-SPCA        ', &
+    'UTL-SPC         ' &
     ]
 
   type(InputParamDefinitionType), parameter :: &

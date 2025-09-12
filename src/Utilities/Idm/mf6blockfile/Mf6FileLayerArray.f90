@@ -37,6 +37,7 @@ module LayerArrayLoadModule
     type(ReadStateVarType), dimension(:), allocatable :: param_reads !< read states for current load
     type(TimeArraySeriesManagerType), pointer :: tasmanager !< TAS manager
     type(LoadContextType) :: ctx
+    logical(LGP) :: layer_index
   contains
     procedure :: ainit
     procedure :: df
@@ -81,6 +82,7 @@ contains
     nullify (this%aux_tasnames)
     nullify (this%param_tasnames)
     this%tas_active = 0
+    this%layer_index = .false.
     this%iout = iout
 
     ! load static input
@@ -197,8 +199,7 @@ contains
     end do
 
     ! check if layer index variable was read
-    ! TODO: assumes layer index variable is always in scope
-    if (this%param_reads(1)%invar == 0) then
+    if (this%layer_index .and. this%param_reads(1)%invar == 0) then
       ! set to default of 1 without updating invar
       idt => get_param_definition_type(this%mf6_input%param_dfns, &
                                        this%mf6_input%component_type, &
@@ -268,9 +269,11 @@ contains
 
   subroutine params_alloc(this)
     class(LayerArrayLoadType), intent(inout) :: this
-    character(len=LENVARNAME) :: rs_varname
+    character(len=LENVARNAME) :: rs_varname, layer_varname
     integer(I4B), pointer :: intvar
     integer(I4B) :: iparam
+
+    layer_varname = 'I'//trim(this%mf6_input%subcomponent_type)
 
     ! set in scope param names
     call this%ctx%tags(this%param_names, this%nparam, this%input_name, &
@@ -283,6 +286,7 @@ contains
     ! store read state variable pointers
     do iparam = 1, this%nparam
       ! allocate and store name of read state variable
+      if (this%param_names(iparam) == layer_varname) this%layer_index = .true.
       rs_varname = this%ctx%rsv_alloc(this%param_names(iparam))
       call mem_setptr(intvar, rs_varname, this%mf6_input%mempath)
       this%param_reads(iparam)%invar => intvar

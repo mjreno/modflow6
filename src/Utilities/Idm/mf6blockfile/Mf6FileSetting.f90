@@ -93,15 +93,24 @@ contains
   end subroutine df
 
   subroutine rp(this, parser)
+    use IdmLoggerModule, only: idm_log_header, idm_log_close
     class(SettingLoadType), intent(inout) :: this
     type(BlockParserType), pointer, intent(inout) :: parser
 
     ! recreate structarray for period load
     call this%reset()
 
+    ! log lst file header
+    call idm_log_header(this%mf6_input%component_name, &
+                        this%mf6_input%subcomponent_name, this%iout)
+
     ! read from ascii
     this%ctx%nbound = &
       this%structarray%read_from_parser(parser, .false., this%iout)
+
+    ! close logging statement
+    call idm_log_close(this%mf6_input%component_name, &
+                       this%mf6_input%subcomponent_name, this%iout)
   end subroutine rp
 
   subroutine reset(this)

@@ -331,7 +331,7 @@ contains
       contiguous :: fnames
     character(len=LINELENGTH) :: tag, fname, pkgtype
     character(len=LENFTYPE) :: c_type, sc_type
-    character(len=16) :: subpkg, spname
+    character(len=16) :: subpkg, pname
     integer(I4B) :: idx, n, m, isize
 
     ! set pointer to package (idm integrated) subpackage list
@@ -360,8 +360,8 @@ contains
               call mem_setptr(fnames, tag, this%mf6_input%mempath)
               do m = 1, size(fnames)
                 fname = fnames(m)
-                write (spname, '(a,i0)') trim(sc_type)//'_', m
-                call this%subpkg_list%add(pkgtype, c_type, sc_type, spname, &
+                write (pname, '(a,i0)') trim(sc_type)//'_', m
+                call this%subpkg_list%add(pkgtype, c_type, sc_type, pname, &
                                           tag, fname)
               end do
               call this%subpkg_list%set_mempaths(sc_type, tag, fnames)
@@ -371,7 +371,7 @@ contains
             if (filein_fname(fname, tag, this%mf6_input%mempath, &
                              this%input_name)) then
               call this%subpkg_list%add(pkgtype, c_type, sc_type, sc_type, &
-                                        trim(tag), trim(fname))
+                                        tag, fname)
               call this%subpkg_list%set_mempath(sc_type, tag, fname)
             end if
           end if

@@ -53,6 +53,15 @@ tagged false
 longname file name of time series information
 description REPLACE timeseriesfile {}
 
+# --------------------- gwf tvk dimensions ---------------------
+
+block dimensions
+name maxbound
+type integer
+reader urword
+optional true
+longname maximum number of tvk entries
+description REPLACE maxbound {'{#1}': 'tvk'}
 
 # --------------------- gwf tvk period ---------------------
 
@@ -102,7 +111,7 @@ block period
 name tvvalue
 type double precision
 shape
-tagged true
+tagged false
 in_record true
 reader urword
 time_series true

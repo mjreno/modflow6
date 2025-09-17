@@ -17,6 +17,7 @@ module UtlTvkInputModule
     logical :: ts6 = .false.
     logical :: filein = .false.
     logical :: ts6_filename = .false.
+    logical :: maxbound = .false.
     logical :: cellid = .false.
     logical :: tvtype = .false.
     logical :: tvvalue = .false.
@@ -126,6 +127,25 @@ module UtlTvkInputModule
     )
 
   type(InputParamDefinitionType), parameter :: &
+    utltvk_maxbound = InputParamDefinitionType &
+    ( &
+    'UTL', & ! component
+    'TVK', & ! subcomponent
+    'DIMENSIONS', & ! block
+    'MAXBOUND', & ! tag name
+    'MAXBOUND', & ! fortran variable
+    'INTEGER', & ! type
+    '', & ! shape
+    'maximum number of tvk entries', & ! longname
+    .false., & ! required
+    .false., & ! prerelease
+    .false., & ! multi-record
+    .false., & ! preserve case
+    .false., & ! layered
+    .false. & ! timeseries
+    )
+
+  type(InputParamDefinitionType), parameter :: &
     utltvk_cellid = InputParamDefinitionType &
     ( &
     'UTL', & ! component
@@ -190,6 +210,7 @@ module UtlTvkInputModule
     utltvk_ts6, &
     utltvk_filein, &
     utltvk_ts6_filename, &
+    utltvk_maxbound, &
     utltvk_cellid, &
     utltvk_tvtype, &
     utltvk_tvvalue &
@@ -225,6 +246,12 @@ module UtlTvkInputModule
     [ &
     InputBlockDefinitionType( &
     'OPTIONS', & ! blockname
+    .false., & ! required
+    .false., & ! aggregate
+    .false. & ! block_variable
+    ), &
+    InputBlockDefinitionType( &
+    'DIMENSIONS', & ! blockname
     .false., & ! required
     .false., & ! aggregate
     .false. & ! block_variable

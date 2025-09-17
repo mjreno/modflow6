@@ -128,7 +128,7 @@ def build_models(idx, test):
     tvkspd[kper - 1] = spd
 
     tvk = flopy.mf6.ModflowUtltvk(
-        npf, print_input=True, perioddata=tvkspd, filename=tvk_filename
+        npf, print_input=True, maxbound=2, perioddata=tvkspd, filename=tvk_filename
     )
 
     # chd files

@@ -224,6 +224,16 @@ contains
       end if
 
       if (this%nodes == 0) this%nodes = product(this%mshape)
+
+      if (this%maxbound == 0) then
+        if (this%mf6_input%subcomponent_type == 'TVK') then
+          ! K, K22, K33
+          this%maxbound = this%nodes * 3
+        else if (this%mf6_input%subcomponent_type == 'TVS') then
+          ! SY and SS
+          this%maxbound = this%nodes * 2
+        end if
+      end if
     end if
   end subroutine allocate_scalars
 

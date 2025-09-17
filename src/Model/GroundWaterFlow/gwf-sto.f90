@@ -778,14 +778,12 @@ contains
     ! -- modules
     use ConstantsModule, only: LENMEMPATH
     use MemoryManagerExtModule, only: mem_set_value
-    use SourceCommonModule, only: filein_fname
     use GwfStoInputModule, only: GwfStoParamFoundType
     ! -- dummy variables
     class(GwfStoType) :: this !< GwfStoType object
     ! -- local variables
     type(GwfStoParamFoundType) :: found
     character(len=LENMEMPATH) :: tvs6_mempath !< mempath of loaded subpackage
-    character(len=LINELENGTH) :: fname
     !
     ! -- source package input
     call mem_set_value(this%ipakcb, 'IPAKCB', this%input_mempath, found%ipakcb)
@@ -808,12 +806,10 @@ contains
       this%iorig_ss = 0
     end if
     !
-    ! -- enforce 0 or 1 TVS6_FILENAME entries in option block
-    if (filein_fname(fname, 'TVS6_FILENAME', this%input_mempath, &
-                     this%input_fname)) then
-      this%intvs = GetUnit()
-      call openfile(this%intvs, this%iout, fname, 'TVS')
-      call tvs_cr(this%tvs, this%name_model, this%intvs, this%iout)
+    ! -- TVS6 subpackage input file
+    if (found%tvs6_filename) then
+      this%intvs = 1 ! tvs active
+      call tvs_cr(this%tvs, this%name_model, tvs6_mempath, this%intvs, this%iout)
     end if
     !
     if (found%iconf_ss) then

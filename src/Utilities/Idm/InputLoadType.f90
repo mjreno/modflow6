@@ -31,6 +31,8 @@ module InputLoadTypeModule
     character(len=LENCOMPONENTNAME), dimension(:), allocatable :: component_types
     character(len=LENCOMPONENTNAME), dimension(:), &
       allocatable :: subcomponent_types
+    character(len=LENCOMPONENTNAME), dimension(:), &
+      allocatable :: subcomponent_names
     character(len=LINELENGTH), dimension(:), allocatable :: filenames
     character(len=LENMEMPATH) :: mempath
     character(len=LENCOMPONENTNAME) :: component_name
@@ -38,6 +40,8 @@ module InputLoadTypeModule
   contains
     procedure :: create => subpkg_create
     procedure :: add => subpkg_add
+    procedure :: set_mempath => subpkg_mempath
+    procedure :: set_mempaths => subpkg_mempaths
     procedure :: destroy => subpkg_destroy
   end type SubPackageListType
 
@@ -165,32 +169,28 @@ contains
     allocate (this%pkgtypes(0))
     allocate (this%component_types(0))
     allocate (this%subcomponent_types(0))
+    allocate (this%subcomponent_names(0))
     allocate (this%filenames(0))
   end subroutine subpkg_create
 
   !> @brief create a new package type
   !<
   subroutine subpkg_add(this, pkgtype, component_type, subcomponent_type, &
-                        tagname, filename)
+                        subcomponent_name, tagname, filename)
     use ArrayHandlersModule, only: expandarray
-    use MemoryHelperModule, only: create_mem_path
-    use MemoryManagerModule, only: mem_allocate
-    use SimVariablesModule, only: idm_context
     class(SubPackageListType) :: this
     character(len=*), intent(in) :: pkgtype
     character(len=*), intent(in) :: component_type
     character(len=*), intent(in) :: subcomponent_type
+    character(len=*), intent(in) :: subcomponent_name
     character(len=*), intent(in) :: tagname
     character(len=*), intent(in) :: filename
-    character(len=LENVARNAME) :: mempath_tag
-    character(len=LENMEMPATH), pointer :: subpkg_mempath
-    character(len=LINELENGTH), pointer :: input_fname
-    integer(I4B) :: idx, trimlen
 
     ! reallocate
     call expandarray(this%pkgtypes)
     call expandarray(this%component_types)
     call expandarray(this%subcomponent_types)
+    call expandarray(this%subcomponent_names)
     call expandarray(this%filenames)
 
     ! add new package instance
@@ -198,34 +198,80 @@ contains
     this%pkgtypes(this%pnum) = pkgtype
     this%component_types(this%pnum) = component_type
     this%subcomponent_types(this%pnum) = subcomponent_type
+    this%subcomponent_names(this%pnum) = subcomponent_name
     this%filenames(this%pnum) = filename
+  end subroutine subpkg_add
 
-    ! initialize mempath tag
-    mempath_tag = tagname
-    trimlen = len_trim(tagname)
-    idx = 0
+  !> @brief set subpackage mempaths
+  !<
+  subroutine subpkg_mempath(this, subcomponent_type, tagname, filename)
+    use MemoryHelperModule, only: create_mem_path
+    use MemoryManagerModule, only: mem_allocate
+    use SimVariablesModule, only: idm_context
+    class(SubPackageListType) :: this
+    character(len=*), intent(in) :: subcomponent_type
+    character(len=*), intent(in) :: tagname
+    character(len=*), intent(in) :: filename
+    character(len=LENMEMPATH), pointer :: mempath
+    character(len=LINELENGTH), pointer :: input_fname
+    character(len=LENVARNAME) :: mempath_tag
+    integer(I4B) :: idx
 
     ! create mempath tagname
     idx = index(tagname, '_')
-    if (idx > 0) then
-      if (tagname(idx + 1:trimlen) == 'FILENAME') then
-        write (mempath_tag, '(a)') tagname(1:idx)//'MEMPATH'
-      end if
-    end if
+    write (mempath_tag, '(a)') tagname(1:idx)//'MEMPATH'
 
     ! allocate mempath variable for subpackage
-    call mem_allocate(subpkg_mempath, LENMEMPATH, mempath_tag, &
+    call mem_allocate(mempath, LENMEMPATH, mempath_tag, &
                       this%mempath)
 
     ! create and set the mempath
-    subpkg_mempath = &
+    mempath = &
       create_mem_path(this%component_name, &
                       subcomponent_type, idm_context)
 
     ! allocate and initialize filename for subpackage
-    call mem_allocate(input_fname, LINELENGTH, 'INPUT_FNAME', subpkg_mempath)
+    call mem_allocate(input_fname, LINELENGTH, 'INPUT_FNAME', mempath)
     input_fname = filename
-  end subroutine subpkg_add
+  end subroutine subpkg_mempath
+
+  !> @brief set subpackage mempaths
+  !<
+  subroutine subpkg_mempaths(this, subcomponent_type, tagname, fnames)
+    use MemoryHelperModule, only: create_mem_path
+    use MemoryManagerModule, only: mem_allocate
+    use SimVariablesModule, only: idm_context
+    use CharacterStringModule, only: CharacterStringType
+    class(SubPackageListType) :: this
+    character(len=*), intent(in) :: subcomponent_type
+    character(len=*), intent(in) :: tagname
+    type(CharacterStringType), dimension(:), &
+      pointer, contiguous, intent(in) :: fnames
+    type(CharacterStringType), dimension(:), &
+      pointer, contiguous :: mempaths
+    character(len=LINELENGTH), pointer :: input_fname
+    character(len=LENVARNAME) :: mempath_tag, pname
+    character(len=LENMEMPATH) :: mempath
+    character(len=LINELENGTH) :: fname
+    integer(I4B) :: n, idx
+
+    ! create mempath tagname
+    idx = index(tagname, '_')
+    write (mempath_tag, '(a)') tagname(1:idx)//'MEMPATHS'
+
+    call mem_allocate(mempaths, LENMEMPATH, size(fnames), &
+                      mempath_tag, this%mempath)
+
+    do n = 1, size(fnames)
+      fname = fnames(n)
+      write (pname, '(a,i0)') trim(subcomponent_type)//'_', n
+      mempath = &
+        create_mem_path(this%component_name, pname, idm_context)
+      mempaths(n) = trim(mempath)
+      call mem_allocate(input_fname, LINELENGTH, 'INPUT_FNAME', mempath)
+      input_fname = fname
+    end do
+  end subroutine subpkg_mempaths
 
   !> @brief create a new package type
   !<
@@ -235,6 +281,7 @@ contains
     deallocate (this%pkgtypes)
     deallocate (this%component_types)
     deallocate (this%subcomponent_types)
+    deallocate (this%subcomponent_names)
     deallocate (this%filenames)
   end subroutine subpkg_destroy
 
@@ -276,41 +323,56 @@ contains
     use IdmDfnSelectorModule, only: idm_subpackages, idm_integrated, &
                                     idm_multi_package
     use SourceCommonModule, only: filein_fname
+    use MemoryManagerModule, only: mem_setptr, get_isize
+    use CharacterStringModule, only: CharacterStringType
     class(StaticPkgLoadType), intent(inout) :: this
     character(len=16), dimension(:), pointer :: subpkgs
+    type(CharacterStringType), dimension(:), pointer, &
+      contiguous :: fnames
     character(len=LINELENGTH) :: tag, fname, pkgtype
     character(len=LENFTYPE) :: c_type, sc_type
-    character(len=16) :: subpkg
-    integer(I4B) :: idx, n
+    character(len=16) :: subpkg, pname
+    integer(I4B) :: idx, n, m, isize
 
     ! set pointer to package (idm integrated) subpackage list
     subpkgs => idm_subpackages(this%mf6_input%component_type, &
                                this%mf6_input%subcomponent_type)
 
-    ! check if tag matches subpackage
     do n = 1, size(subpkgs)
+      ! check for input matching this supported subpackage
       subpkg = subpkgs(n)
       idx = index(subpkg, '-')
-      ! split sp string into component/subcomponent
+
       if (idx > 0) then
         ! split string in component/subcomponent types
         c_type = subpkg(1:idx - 1)
         sc_type = subpkg(idx + 1:len_trim(subpkg))
+
         if (idm_integrated(c_type, sc_type)) then
-          ! set pkgtype and input filename tag
+          ! construct FILEIN filename tag
           pkgtype = trim(sc_type)//'6'
           tag = trim(pkgtype)//'_FILENAME'
-          ! support single instance of each subpackage
+
           if (idm_multi_package(c_type, sc_type)) then
-            errmsg = 'Multi-instance subpackages not supported. Remove dfn &
-                     &subpackage tagline for package "'//trim(subpkg)//'".'
-            call store_error(errmsg)
-            call store_error_filename(this%input_name)
+            ! multiple instances of this subpackage are supported
+            call get_isize(tag, this%mf6_input%mempath, isize)
+            if (isize > 0) then
+              call mem_setptr(fnames, tag, this%mf6_input%mempath)
+              do m = 1, size(fnames)
+                fname = fnames(m)
+                write (pname, '(a,i0)') trim(sc_type)//'_', m
+                call this%subpkg_list%add(pkgtype, c_type, sc_type, pname, &
+                                          tag, fname)
+              end do
+              call this%subpkg_list%set_mempaths(sc_type, tag, fnames)
+            end if
           else
+            ! restricted to single instance of this subpackage
             if (filein_fname(fname, tag, this%mf6_input%mempath, &
                              this%input_name)) then
-              call this%subpkg_list%add(pkgtype, c_type, sc_type, &
-                                        trim(tag), trim(fname))
+              call this%subpkg_list%add(pkgtype, c_type, sc_type, sc_type, &
+                                        tag, fname)
+              call this%subpkg_list%set_mempath(sc_type, tag, fname)
             end if
           end if
         else

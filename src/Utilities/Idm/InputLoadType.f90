@@ -259,7 +259,7 @@ contains
     idx = index(tagname, '_')
     write (mempath_tag, '(a)') tagname(1:idx)//'MEMPATHS'
 
-    call mem_allocate(mempaths, LINELENGTH, size(fnames), &
+    call mem_allocate(mempaths, LENMEMPATH, size(fnames), &
                       mempath_tag, this%mempath)
 
     do n = 1, size(fnames)

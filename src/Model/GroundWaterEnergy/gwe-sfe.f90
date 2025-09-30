@@ -104,7 +104,7 @@ contains
   !> @brief Create a new sfe package
   !<
   subroutine sfe_create(packobj, id, ibcnum, inunit, iout, namemodel, pakname, &
-                        fmi, eqnsclfac, gwecommon, dvt, dvu, dvua)
+                        fmi, eqnsclfac, gwecommon, dvt, dvu, dvua, input_mempath)
     ! -- dummy
     class(BndType), pointer :: packobj
     integer(I4B), intent(in) :: id
@@ -119,6 +119,7 @@ contains
     character(len=*), intent(in) :: dvt !< For GWE, set to "TEMPERATURE" in TspAptType
     character(len=*), intent(in) :: dvu !< For GWE, set to "energy" in TspAptType
     character(len=*), intent(in) :: dvua !< For GWE, set to "E" in TspAptType
+    character(len=*), intent(in) :: input_mempath
     ! -- local
     type(GweSfeType), pointer :: sfeobj
     !
@@ -127,7 +128,7 @@ contains
     packobj => sfeobj
     !
     ! -- Create name and memory path
-    call packobj%set_names(ibcnum, namemodel, pakname, ftype)
+    call packobj%set_names(ibcnum, namemodel, pakname, ftype, input_mempath)
     packobj%text = text
     !
     ! -- Allocate scalars

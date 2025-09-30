@@ -36,7 +36,7 @@ module ModflowInputModule
     character(len=LENCOMPONENTNAME) :: component_type
     character(len=LENCOMPONENTNAME) :: subcomponent_type
     character(len=LENCOMPONENTNAME) :: component_name
-    character(len=LENCOMPONENTNAME) :: subcomponent_name
+    character(len=LENCOMPONENTNAME*2) :: subcomponent_name
     character(len=LENMEMPATH) :: mempath
     character(len=LENMEMPATH) :: component_mempath
     character(len=LENCOMPONENTNAME) :: load_scope

@@ -86,13 +86,18 @@ contains
   !> @ brief Source package options from input context
   !<
   subroutine source_options(this)
+    use MemoryManagerModule, only: mem_setptr
     use MemoryManagerExtModule, only: mem_set_value
     use InputOutputModule, only: GetUnit, openfile
+    use CharacterStringModule, only: CharacterStringType
     use SourceCommonModule, only: filein_fname
     use GwfApiInputModule, only: GwfApiParamFoundType
     ! -- dummy variables
     class(ApiType), intent(inout) :: this
+    ! -- local variables
     type(GwfApiParamFoundType) :: found
+    type(CharacterStringType), dimension(:), pointer, &
+      contiguous :: obs_mempath
     ! -- formats
     character(len=*), parameter :: fmtflow2 = &
       &"(4x, 'FLOWS WILL BE SAVED TO BUDGET FILE SPECIFIED IN OUTPUT CONTROL')"
@@ -114,6 +119,8 @@ contains
       this%obs%active = .true.
       this%obs%inUnitObs = GetUnit()
       call openfile(this%obs%inUnitObs, this%iout, this%obs%inputFilename, 'OBS')
+      call mem_setptr(obs_mempath, 'OBS6_MEMPATH', this%input_mempath)
+      this%obs%input_mempath = obs_mempath(1)
     end if
 
     ! log package options

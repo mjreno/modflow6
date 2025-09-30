@@ -16,6 +16,7 @@ module SourceCommonModule
   private
   public :: package_source_type
   public :: idm_component_type, idm_subcomponent_type, idm_subcomponent_name
+  public :: idm_utl_type
   public :: set_model_shape
   public :: get_shape_from_string
   public :: get_layered_shape
@@ -111,6 +112,39 @@ contains
     end do
   end function idm_subcomponent_type
 
+  function idm_utl_type(component, subcomponent) &
+    result(utl_type)
+    use IdmDfnSelectorModule, only: idm_integrated
+    character(len=*), intent(in) :: component
+    character(len=*), intent(in) :: subcomponent !< subcomponent, e.g. CHD6
+    character(len=LENCOMPONENTNAME) :: component_type, subcomponent_type
+    logical(LGP) :: utl_type
+    integer(I4B) :: i, ilen, idx
+
+    ! initialize
+    !component_type = idm_component_type(component)
+    component_type = component
+    subcomponent_type = ''
+    idx = 0
+
+    if (idm_integrated(component_type, subcomponent_type)) then
+      ! TODO: set error?
+      utl_type = .false.
+      return
+    end if
+
+    ilen = len_trim(subcomponent)
+    do i = 1, ilen
+      if (subcomponent(i:i) == '6' .or. subcomponent(i:i) == '-') then
+      else
+        idx = idx + 1
+        subcomponent_type(idx:idx) = subcomponent(i:i)
+      end if
+    end do
+
+    utl_type = idm_integrated('UTL', subcomponent_type)
+  end function idm_utl_type
+
   !> @brief model package subcomponent name
   !!
   !! Return the IDM component name, which is the package type for
@@ -124,9 +158,10 @@ contains
     character(len=*), intent(in) :: component_type
     character(len=*), intent(in) :: subcomponent_type
     character(len=*), intent(in) :: sc_name
-    character(len=LENPACKAGENAME) :: subcomponent_name
+    character(len=LENPACKAGENAME*2) :: subcomponent_name
     subcomponent_name = ''
-    if (idm_multi_package(component_type, subcomponent_type)) then
+    if (idm_utl_type(component_type, subcomponent_type) .or. &
+        idm_multi_package(component_type, subcomponent_type)) then
       subcomponent_name = sc_name
     else
       subcomponent_name = subcomponent_type

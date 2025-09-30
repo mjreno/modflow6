@@ -33,7 +33,7 @@ module ModelPackageInputsModule
     character(len=LENCOMPONENTNAME) :: subcomponent_type
     ! package instance attribute arrays
     character(len=LINELENGTH), dimension(:), allocatable :: filenames
-    character(len=LENPACKAGENAME), dimension(:), allocatable :: pkgnames
+    character(len=LENPACKAGENAME*2), dimension(:), allocatable :: pkgnames
     character(len=LENMEMPATH), dimension(:), allocatable :: mempaths
     integer(I4B), dimension(:), allocatable :: inunits
     ! number of package instances
@@ -159,7 +159,7 @@ contains
     character(len=*), intent(in) :: filename
     character(len=*), intent(in) :: pkgname
     integer(I4B), intent(in) :: iout
-    character(len=LENPACKAGENAME) :: sc_name, pname
+    character(len=LENPACKAGENAME*2) :: sc_name, pname
     character(len=LENMEMPATH) :: mempath
     character(len=LINELENGTH), pointer :: cstr
 

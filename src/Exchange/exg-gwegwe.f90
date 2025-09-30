@@ -674,6 +674,7 @@ contains
     ! -- modules
     use ConstantsModule, only: LENVARNAME
     use InputOutputModule, only: getunit, openfile
+    use MemoryManagerModule, only: mem_setptr
     use MemoryManagerExtModule, only: mem_set_value
     use CharacterStringModule, only: CharacterStringType
     use ExgGwegweInputModule, only: ExgGwegweParamFoundType
@@ -682,6 +683,8 @@ contains
     class(GweExchangeType) :: this !<  GweExchangeType
     integer(I4B), intent(in) :: iout
     ! -- local
+    type(CharacterStringType), dimension(:), &
+      pointer, contiguous :: obs_mempaths
     type(ExgGwegweParamFoundType) :: found
     character(len=LENVARNAME), dimension(4) :: adv_scheme = &
       &[character(len=LENVARNAME) :: 'UPSTREAM', 'CENTRAL', 'TVD', 'UTVD']
@@ -746,8 +749,10 @@ contains
     ! -- enforce 0 or 1 OBS6_FILENAME entries in option block
     if (filein_fname(this%obs%inputFilename, 'OBS6_FILENAME', &
                      this%input_mempath, this%filename)) then
+      call mem_setptr(obs_mempaths, 'OBS6_MEMPATH', this%input_mempath)
       this%obs%active = .true.
       this%obs%inUnitObs = GetUnit()
+      this%obs%input_mempath = obs_mempaths(1)
       call openfile(this%obs%inUnitObs, iout, this%obs%inputFilename, 'OBS')
     end if
     !

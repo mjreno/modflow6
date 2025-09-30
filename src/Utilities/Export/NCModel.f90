@@ -13,6 +13,7 @@ module NCModelExportModule
                              DIS, DISU, DISV
   use SimVariablesModule, only: isim_mode, idm_context, errmsg
   use SimModule, only: store_error, store_error_filename
+  use CharacterStringModule, only: CharacterStringType
   use InputLoadTypeModule, only: ModelDynamicPkgsType
   use ModflowInputModule, only: ModflowInputType
   use LoadContextModule, only: ReadStateVarType, rsv_name
@@ -273,7 +274,7 @@ contains
   subroutine export_init(this, modelname, modeltype, modelfname, nc_fname, &
                          disenum, nctype, iout)
     use TdisModule, only: datetime0, nstp, inats
-    use MemoryManagerModule, only: mem_setptr
+    use MemoryManagerModule, only: mem_setptr, get_isize
     use MemoryHelperModule, only: create_mem_path
     use MemoryManagerExtModule, only: mem_set_value
     use InputOutputModule, only: lowcase
@@ -286,9 +287,12 @@ contains
     integer(I4B), intent(in) :: disenum
     integer(I4B), intent(in) :: nctype
     integer(I4B), intent(in) :: iout
+    type(CharacterStringType), dimension(:), pointer, &
+      contiguous :: ncf_mempath
     character(len=LENMEMPATH) :: model_mempath
     type(UtlNcfParamFoundType) :: ncf_found
     logical(LGP) :: found_mempath
+    integer(I4B) :: isize
 
     ! allocate
     allocate (this%deflate)
@@ -348,8 +352,14 @@ contains
     call mem_setptr(this%x, 'X', model_mempath)
 
     ! set ncf_mempath if provided
-    call mem_set_value(this%ncf_mempath, 'NCF6_MEMPATH', this%dis_mempath, &
-                       found_mempath)
+    call get_isize('NCF6_FILENAME', this%dis_mempath, isize)
+    if (isize > 0) then
+      call mem_setptr(ncf_mempath, 'NCF6_MEMPATH', this%dis_mempath)
+      this%ncf_mempath = ncf_mempath(1)
+      found_mempath = .true.
+    else
+      found_mempath = .false.
+    end if
 
     if (found_mempath) then
       call mem_set_value(this%wkt, 'WKT', this%ncf_mempath, &
@@ -433,7 +443,6 @@ contains
   function export_varname(pkgname, tagname, mempath, layer, iaux) &
     result(varname)
     use MemoryManagerModule, only: mem_setptr
-    use CharacterStringModule, only: CharacterStringType
     use InputOutputModule, only: lowcase
     character(len=*), intent(in) :: pkgname
     character(len=*), intent(in) :: tagname
@@ -474,7 +483,6 @@ contains
   function export_longname(longname, pkgname, tagname, mempath, layer, iaux) &
     result(lname)
     use MemoryManagerModule, only: mem_setptr
-    use CharacterStringModule, only: CharacterStringType
     use InputOutputModule, only: lowcase
     character(len=*), intent(in) :: longname
     character(len=*), intent(in) :: pkgname

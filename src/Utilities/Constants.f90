@@ -26,7 +26,7 @@ module ConstantsModule
   integer(I4B), parameter :: LENMEMSEPARATOR = 1 !< maximum length of the memory path separator used, currently a '/'
   integer(I4B), parameter :: LENMEMPATH = &
                              LENCONTEXTNAME + &
-                             2 * LENCOMPONENTNAME + &
+                             3 * LENCOMPONENTNAME + &
                              2 * LENMEMSEPARATOR !< maximum length of the memory path
   integer(I4B), parameter :: LENMEMADDRESS = &
                              LENMEMPATH + &

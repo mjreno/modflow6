@@ -112,6 +112,7 @@ contains
     !  modules
     use ConstantsModule, only: LENVARNAME, DEM6
     use InputOutputModule, only: getunit, openfile
+    use MemoryManagerModule, only: mem_setptr
     use MemoryManagerExtModule, only: mem_set_value
     use CharacterStringModule, only: CharacterStringType
     use ExgOlfgwfInputModule, only: ExgOlfgwfParamFoundType
@@ -120,6 +121,8 @@ contains
     class(OlfGwfExchangeType) :: this !<  GwfExchangeType
     integer(I4B), intent(in) :: iout
     !  local
+    !type(CharacterStringType), dimension(:), &
+    !  pointer, contiguous :: obs_mempaths
     type(ExgOlfgwfParamFoundType) :: found
 
     !  update defaults with idm sourced values
@@ -151,8 +154,10 @@ contains
     ! if (.not. this%is_datacopy) then
     !   if (filein_fname(this%obs%inputFilename, 'OBS6_FILENAME', &
     !                    this%input_mempath, this%filename)) then
+    !     call mem_setptr(obs_mempaths, 'OBS6_MEMPATH', this%input_mempath)
     !     this%obs%active = .true.
     !     this%obs%inUnitObs = GetUnit()
+    !     this%obs%input_mempath = obs_mempaths(1)
     !     call openfile(this%obs%inUnitObs, iout, this%obs%inputFilename, 'OBS')
     !   end if
     ! end if

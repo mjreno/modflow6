@@ -530,15 +530,18 @@ contains
   subroutine source_options(this)
     ! -- modules
     use ConstantsModule, only: MAXCHARLEN, DZERO, MNORMAL
-    use MemoryManagerModule, only: mem_reallocate
+    use MemoryManagerModule, only: mem_reallocate, mem_setptr
     use MemoryManagerExtModule, only: mem_set_value
     use OpenSpecModule, only: access, form
     use InputOutputModule, only: getunit, urdaux, openfile
+    use CharacterStringModule, only: CharacterStringType
     use GwfCsubInputModule, only: GwfCsubParamFoundType
     use SourceCommonModule, only: filein_fname
     ! -- dummy variables
     class(GwfCsubType), intent(inout) :: this
     ! -- local variables
+    type(CharacterStringType), dimension(:), pointer, &
+      contiguous :: obs_mempath
     integer(I4B), pointer :: ibs
     integer(I4B) :: inobs
     character(len=LINELENGTH) :: csv_interbed, csv_coarse
@@ -603,6 +606,8 @@ contains
       this%obs%active = .true.
       inobs = GetUnit()
       call openfile(inobs, this%iout, this%obs%inputFilename, 'OBS')
+      call mem_setptr(obs_mempath, 'OBS6_MEMPATH', this%input_mempath)
+      this%obs%input_mempath = obs_mempath(1)
       this%obs%inUnitObs = inobs
       this%inobspkg = inobs
       call this%obs%obs_df(this%iout, this%packName, this%filtyp, this%dis)

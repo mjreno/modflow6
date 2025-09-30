@@ -277,7 +277,7 @@ contains
   !<
   subroutine source_options(this)
     ! -- modules
-    use MemoryManagerModule, only: mem_reallocate, mem_setptr !, get_isize
+    use MemoryManagerModule, only: mem_reallocate, mem_setptr
     use MemoryManagerExtModule, only: mem_set_value
     use InputOutputModule, only: GetUnit, openfile
     use CharacterStringModule, only: CharacterStringType
@@ -285,6 +285,8 @@ contains
     ! -- dummy variables
     class(BndExtType), intent(inout) :: this !< BndExtType object
     ! -- local variables
+    type(CharacterStringType), dimension(:), &
+      pointer, contiguous :: obs_mempath
     type(BndExtFoundType) :: found
     logical(LGP) :: found_readarr
     character(len=LENAUXNAME) :: sfacauxname
@@ -335,6 +337,8 @@ contains
       this%obs%active = .true.
       this%obs%inUnitObs = GetUnit()
       call openfile(this%obs%inUnitObs, this%iout, this%obs%inputFilename, 'OBS')
+      call mem_setptr(obs_mempath, 'OBS6_MEMPATH', this%input_mempath)
+      this%obs%input_mempath = obs_mempath(1)
     end if
     !
     ! -- no newton specified

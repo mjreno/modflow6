@@ -301,7 +301,7 @@ contains
     integer(I4B) :: isize
     type(SwfDfwParamFoundType) :: found
     type(CharacterStringType), dimension(:), pointer, &
-      contiguous :: obs6_fnames
+      contiguous :: obs6_fnames, obs6_mempaths
 
     ! update defaults with idm sourced values
     call mem_set_value(this%icentral, 'ICENTRAL', &
@@ -342,12 +342,14 @@ contains
       end if
 
       call mem_setptr(obs6_fnames, 'OBS6_FILENAME', this%input_mempath)
+      call mem_setptr(obs6_mempaths, 'OBS6_MEMPATH', this%input_mempath)
 
       found%obs6_filename = .true.
       this%obs%inputFilename = obs6_fnames(1)
       this%obs%active = .true.
       this%inobspkg = GetUnit()
       this%obs%inUnitObs = this%inobspkg
+      this%obs%input_mempath = obs6_mempaths(1)
       call openfile(this%inobspkg, this%iout, this%obs%inputFilename, 'OBS')
       call this%obs%obs_df(this%iout, this%packName, this%filtyp, this%dis)
       call this%dfw_df_obs()

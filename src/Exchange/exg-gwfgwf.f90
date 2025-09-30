@@ -1231,6 +1231,7 @@ contains
     ! -- modules
     use ConstantsModule, only: LENVARNAME, DEM6
     use InputOutputModule, only: getunit, openfile
+    use MemoryManagerModule, only: mem_setptr
     use MemoryManagerExtModule, only: mem_set_value
     use CharacterStringModule, only: CharacterStringType
     use ExgGwfgwfInputModule, only: ExgGwfgwfParamFoundType
@@ -1239,6 +1240,8 @@ contains
     class(GwfExchangeType) :: this !<  GwfExchangeType
     integer(I4B), intent(in) :: iout
     ! -- local
+    type(CharacterStringType), dimension(:), &
+      pointer, contiguous :: obs_mempaths
     type(ExgGwfgwfParamFoundType) :: found
     character(len=LENVARNAME), dimension(3) :: cellavg_method = &
       &[character(len=LENVARNAME) :: 'HARMONIC', 'LOGARITHMIC', 'AMT-LMK']
@@ -1309,8 +1312,10 @@ contains
     if (.not. this%is_datacopy) then
       if (filein_fname(this%obs%inputFilename, 'OBS6_FILENAME', &
                        this%input_mempath, this%filename)) then
+        call mem_setptr(obs_mempaths, 'OBS6_MEMPATH', this%input_mempath)
         this%obs%active = .true.
         this%obs%inUnitObs = GetUnit()
+        this%obs%input_mempath = obs_mempaths(1)
         call openfile(this%obs%inUnitObs, iout, this%obs%inputFilename, 'OBS')
       end if
     end if

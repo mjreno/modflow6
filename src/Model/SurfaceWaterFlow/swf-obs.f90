@@ -35,9 +35,10 @@ contains
   !!
   !! Create observation object, allocate pointers, initialize values
   !<
-  subroutine swf_obs_cr(obs, inobs)
+  subroutine swf_obs_cr(obs, input_mempath, inobs)
     ! -- dummy
     type(SwfObsType), pointer, intent(out) :: obs
+    character(len=*), intent(in) :: input_mempath
     integer(I4B), pointer, intent(in) :: inobs
     !
     allocate (obs)
@@ -45,6 +46,7 @@ contains
     obs%active = .false.
     obs%inputFilename = ''
     obs%inUnitObs => inobs
+    obs%input_mempath = input_mempath
   end subroutine swf_obs_cr
 
   !> @brief Allocate and read

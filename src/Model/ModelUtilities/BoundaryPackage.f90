@@ -1141,7 +1141,9 @@ contains
   subroutine bnd_read_options(this)
     ! -- modules
     use InputOutputModule, only: urdaux
-    use MemoryManagerModule, only: mem_reallocate
+    use MemoryManagerModule, only: mem_reallocate, mem_setptr
+    use MemoryHelperModule, only: create_mem_path
+    use SimVariablesModule, only: idm_context
     ! -- dummy
     class(BndType), intent(inout) :: this !< BndType object
     ! -- local
@@ -1150,6 +1152,9 @@ contains
     character(len=LINELENGTH) :: keyword
     character(len=LENAUXNAME) :: sfacauxname
     character(len=LENAUXNAME), dimension(:), allocatable :: caux
+    character(len=LENMEMPATH) :: input_mempath
+    type(CharacterStringType), dimension(:), &
+      pointer, contiguous :: obs_mempath
     integer(I4B) :: lloc
     integer(I4B) :: istart
     integer(I4B) :: istop
@@ -1273,6 +1278,10 @@ contains
           inobs = GetUnit()
           call openfile(inobs, this%iout, this%obs%inputFilename, 'OBS')
           this%obs%inUnitObs = inobs
+          input_mempath = create_mem_path(this%name_model, this%packName, &
+                                          idm_context)
+          call mem_setptr(obs_mempath, 'OBS6_MEMPATH', input_mempath)
+          this%obs%input_mempath = obs_mempath(1)
           !
           ! -- right now these are options that are only available in the
           !    development version and are not included in the documentation.

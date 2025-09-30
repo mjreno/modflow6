@@ -581,8 +581,8 @@ class IdmDfnSelector:
         self._write_master()
 
     def component(self, component, subcomponent):
-        if subcomponent == 'OBS':
-            return 'UTL'
+        if subcomponent == "OBS":
+            return "UTL"
         return component
 
     def _write_master(self):

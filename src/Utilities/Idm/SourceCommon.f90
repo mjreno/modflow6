@@ -158,7 +158,7 @@ contains
     character(len=*), intent(in) :: component_type
     character(len=*), intent(in) :: subcomponent_type
     character(len=*), intent(in) :: sc_name
-    character(len=LENPACKAGENAME*2) :: subcomponent_name
+    character(len=LENPACKAGENAME) :: subcomponent_name
     subcomponent_name = ''
     if (idm_utl_type(component_type, subcomponent_type) .or. &
         idm_multi_package(component_type, subcomponent_type)) then

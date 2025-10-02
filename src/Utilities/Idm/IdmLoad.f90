@@ -143,7 +143,7 @@ contains
                          supportOpenClose=.true., blockRequired=.false.)
 
     ! create subpackage list
-    call subpkg_list%create(modelname, .true.)
+    call subpkg_list%create(component_type, modelname, .true.)
 
     ! parse options block if detected
     do
@@ -177,7 +177,7 @@ contains
     end do
 
     if (mempath == '') mempath = create_mem_path(modelname, pkgname, idm_context)
-    call subpkg_list%set_names(modelname, pkgname, mempath)
+    call subpkg_list%set_names(subcomponent_type, pkgname, mempath)
 
     ! load idm integrated subpackages
     do n = 1, subpkg_list%pnum
@@ -495,7 +495,7 @@ contains
         write (sc_name, '(a,i0)') trim(sc_type)//'_', n
 
         ! create and set exchange mempath
-        mempath = create_mem_path('EXG', sc_name, idm_context)
+        mempath = create_mem_path(sc_name, 'EXG', idm_context)
         emempaths(n) = mempath
 
         ! allocate and set exgid
@@ -503,7 +503,7 @@ contains
         exgid = n
 
         ! create exchange loader
-        static_loader => create_input_loader('EXG', sc_type, 'EXG', sc_name, &
+        static_loader => create_input_loader('EXG', sc_type, sc_name, 'EXG', &
                                              exgtype, 'SIM', efname, simfile)
         ! load static input
         dynamic_loader => static_loader%load(iout)

@@ -27,7 +27,7 @@ contains
     call mem_check_length(component, LENCOMPONENTNAME, "solution/model/exchange")
 
     if (present(subcomponent)) then
-      call mem_check_length(subcomponent, 2 * LENCOMPONENTNAME, "package")
+      call mem_check_length(subcomponent, LENCOMPONENTNAME, "package")
     end if
 
     if (present(context)) then

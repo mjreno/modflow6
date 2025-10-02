@@ -49,7 +49,7 @@ contains
     class(StaticPkgLoadBaseType), pointer :: loader
     type(ModflowInputType) :: mf6_input
     character(len=LENPACKAGENAME) :: source_type
-    character(len=LENPACKAGENAME*2) :: sc_name
+    character(len=LENPACKAGENAME) :: sc_name
 
     ! set subcomponent name
     sc_name = idm_subcomponent_name(component_type, subcomponent_type, &

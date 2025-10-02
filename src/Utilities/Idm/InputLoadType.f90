@@ -32,9 +32,10 @@ module InputLoadTypeModule
     character(len=LENCOMPONENTNAME), dimension(:), allocatable :: component_types
     character(len=LENCOMPONENTNAME), dimension(:), &
       allocatable :: subcomponent_types
-    character(len=LENCOMPONENTNAME*2), dimension(:), &
+    character(len=LENCOMPONENTNAME), dimension(:), &
       allocatable :: subcomponent_names
     character(len=LINELENGTH), dimension(:), allocatable :: filenames
+    character(len=LENCOMPONENTNAME) :: component_type
     character(len=LENCOMPONENTNAME) :: component_name
     integer(I4B) :: pnum
     logical(LGP) :: multi
@@ -155,13 +156,15 @@ contains
 
   !> @brief create a new package type
   !<
-  subroutine subpkg_create(this, component_name, multi)
+  subroutine subpkg_create(this, component_type, component_name, multi)
     class(SubPackageListType) :: this
+    character(len=*), intent(in) :: component_type
     character(len=*), intent(in) :: component_name
     logical(LGP), intent(in) :: multi
 
     ! initialize
     this%pnum = 0
+    this%component_type = component_type
     this%component_name = component_name
     this%multi = multi
 
@@ -204,11 +207,13 @@ contains
   !<
   subroutine subpkg_names(this, sc_type, sc_name, sc_mempath)
     use MemoryHelperModule, only: create_mem_path
-    use MemoryManagerModule, only: mem_allocate
+    use MemoryManagerModule, only: mem_allocate, mem_setptr
     use ArrayHandlersModule, only: expandarray
     use SimVariablesModule, only: idm_context
     use CharacterStringModule, only: CharacterStringType
-    use IdmDfnSelectorModule, only: idm_multi_package
+    use ModelPackageInputModule, only: multi_package_type
+    use IdmDfnSelectorModule, only: idm_multi_package, idm_integrated
+    use SourceCommonModule, only: idm_utl_type, idm_component_type
     class(SubPackageListType) :: this
     character(len=*), intent(in) :: sc_type !< parent subcomponent type
     character(len=*), intent(in) :: sc_name !< parent subcomponent name
@@ -217,14 +222,90 @@ contains
     integer(I4B), dimension(:), allocatable :: nptypes
     type(CharacterStringType), dimension(:), &
       pointer, contiguous :: mempaths
+    type(CharacterStringType), dimension(:), contiguous, &
+      pointer :: pnames, ftypes
     character(len=LINELENGTH), pointer :: input_fname
     character(len=LENVARNAME) :: mempath_tag
-    character(len=LENMEMPATH) :: mempath
-    integer(I4B) :: n, m, idx
+    character(len=LENVARNAME) :: pname_prefix, pname, ptype, sctype
+    character(len=LENMEMPATH) :: mempath, model_mempath
+    integer(I4B) :: n, m, idx, ipackage
+    logical(LGP) :: multi
 
+    if (size(this%pkgtypes) == 0) return
+    if (idm_utl_type(this%component_type, sc_type)) return
+
+    ! initialize
+    ipackage = 0
+    pname_prefix = ''
     allocate (ptypes(0))
     allocate (nptypes(0))
 
+    ! reset updated readasarrays, readarraygrid types
+    select case (sc_type)
+    case ('EVTA', 'RCHA', &
+          'RIVG', 'CHDG', &
+          'WELG', 'DRNG', &
+          'GHBG')
+      sctype = sc_type(1:3)
+    case default
+      sctype = sc_type
+    end select
+
+    ! set package type
+    ptype = trim(sctype)//'6'
+
+    ! determine if multi instance package
+    if (idm_integrated(this%component_type, sctype)) then
+      multi = idm_multi_package(this%component_type, sctype)
+    else
+      multi = multi_package_type(this%component_type, sctype, ptype)
+    end if
+
+    ! set package name prefix based on parent package
+    if (this%component_type == 'EXG') then
+      ! no-op
+    else
+      model_mempath = create_mem_path(this%component_name, 'NAM', idm_context)
+      call mem_setptr(pnames, 'PNAME', model_mempath)
+      call mem_setptr(ftypes, 'FTYPE', model_mempath)
+
+      ! count for packages of this type
+      idx = 0
+
+      ! count packages, set new pcakage name prefix
+      do n = 1, size(pnames)
+        if (ftypes(n) == ptype) idx = idx + 1
+
+        ! identify row (ipackage) of this package in packages block
+        if (multi) then
+          ! set pname as name from user or IDM name based on package count
+          pname = pnames(n)
+          if (pname == '') then
+            write (pname, '(a,i0)') trim(sctype)//'-', idx
+          end if
+          if (pname == sc_name) then
+            ipackage = idx
+            exit
+          end if
+        else
+          !ptype = ftypes(n)
+          if (ftypes(n) == ptype) then
+            ipackage = idx
+            exit
+          end if
+        end if
+      end do
+
+      if (ipackage == 0) then
+        errmsg = 'ipackage idx 0 for mempath='//trim(sc_mempath)
+        call store_error(errmsg)
+        call store_error_filename('')
+      end if
+      ! set the package name prefix
+      write (pname_prefix, '(a,i0)') trim(sctype), ipackage
+    end if
+
+    ! count number of each package type
     do n = 1, size(this%pkgtypes)
       idx = 0
       do m = 1, size(ptypes)
@@ -241,6 +322,7 @@ contains
       end if
     end do
 
+    ! set subpackage names and mempaths
     do n = 1, size(ptypes)
       mempath_tag = trim(ptypes(n))//'_MEMPATH'
       call mem_allocate(mempaths, LENMEMPATH, nptypes(n), &
@@ -249,13 +331,8 @@ contains
         idx = 0
         if (this%pkgtypes(m) == ptypes(n)) then
           idx = idx + 1
-          if (this%multi) then
-            write (this%subcomponent_names(m), '(a,i0,a)') &
-              trim(sc_name)//'['//trim(this%subcomponent_types(m))//'-', idx, ']'
-          else
-            write (this%subcomponent_names(m), '(a,i0,a)') &
-              trim(sc_type)//'['//trim(this%subcomponent_types(m))//'-', idx, ']'
-          end if
+          write (this%subcomponent_names(m), '(a,i0)') &
+            trim(pname_prefix)//'-'//trim(this%subcomponent_types(m)), idx
           mempath = create_mem_path(this%component_name, &
                                     this%subcomponent_names(m), &
                                     idm_context)
@@ -266,6 +343,7 @@ contains
       end do
     end do
 
+    ! cleanup
     deallocate (ptypes)
     deallocate (nptypes)
   end subroutine subpkg_names
@@ -306,7 +384,8 @@ contains
                                  this%mf6_input%subcomponent_type)
 
     ! create subpackage list
-    call this%subpkg_list%create(this%mf6_input%component_name, &
+    call this%subpkg_list%create(this%mf6_input%component_type, &
+                                 this%mf6_input%component_name, &
                                  is_multi)
 
     ! identify period block definition

@@ -177,7 +177,7 @@ contains
     end do
 
     if (mempath == '') mempath = create_mem_path(modelname, pkgname, idm_context)
-    call subpkg_list%set_names(subcomponent_type, pkgname, mempath)
+    call subpkg_list%set_names(subcomponent_type, pkgname, mempath, modelfname)
 
     ! load idm integrated subpackages
     do n = 1, subpkg_list%pnum

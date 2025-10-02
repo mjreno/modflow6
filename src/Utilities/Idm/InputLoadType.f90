@@ -205,7 +205,7 @@ contains
 
   !> @brief set subpackage mempaths
   !<
-  subroutine subpkg_names(this, sc_type, sc_name, sc_mempath)
+  subroutine subpkg_names(this, sc_type, sc_name, sc_mempath, modelfname)
     use MemoryHelperModule, only: create_mem_path
     use MemoryManagerModule, only: mem_allocate, mem_setptr
     use ArrayHandlersModule, only: expandarray
@@ -218,6 +218,7 @@ contains
     character(len=*), intent(in) :: sc_type !< parent subcomponent type
     character(len=*), intent(in) :: sc_name !< parent subcomponent name
     character(len=*), intent(in) :: sc_mempath !< parent mempath
+    character(len=*), intent(in) :: modelfname !< model name file
     character(len=LINELENGTH), dimension(:), allocatable :: ptypes
     integer(I4B), dimension(:), allocatable :: nptypes
     type(CharacterStringType), dimension(:), &
@@ -231,7 +232,10 @@ contains
     integer(I4B) :: n, m, idx, ipackage
     logical(LGP) :: multi
 
+    ! no subpackages to load
     if (size(this%pkgtypes) == 0) return
+
+    ! assume utility types do not support subpackages
     if (idm_utl_type(this%component_type, sc_type)) return
 
     ! initialize
@@ -288,7 +292,6 @@ contains
             exit
           end if
         else
-          !ptype = ftypes(n)
           if (ftypes(n) == ptype) then
             ipackage = idx
             exit
@@ -297,12 +300,14 @@ contains
       end do
 
       if (ipackage == 0) then
-        errmsg = 'ipackage idx 0 for mempath='//trim(sc_mempath)
+        errmsg = &
+          'Internal IDM error: subpackage load cannot identify &
+          &parent package index, parent="'//trim(sc_name)//'".'
         call store_error(errmsg)
-        call store_error_filename('')
+        call store_error_filename(modelfname)
       end if
       ! set the package name prefix
-      write (pname_prefix, '(a,i0)') trim(sctype), ipackage
+      write (pname_prefix, '(a,i0,a)') trim(sctype), ipackage, '-'
     end if
 
     ! count number of each package type
@@ -332,7 +337,7 @@ contains
         if (this%pkgtypes(m) == ptypes(n)) then
           idx = idx + 1
           write (this%subcomponent_names(m), '(a,i0)') &
-            trim(pname_prefix)//'-'//trim(this%subcomponent_types(m)), idx
+            trim(pname_prefix)//trim(this%subcomponent_types(m)), idx
           mempath = create_mem_path(this%component_name, &
                                     this%subcomponent_names(m), &
                                     idm_context)
@@ -454,7 +459,8 @@ contains
 
     call this%subpkg_list%set_names(this%mf6_input%subcomponent_type, &
                                     this%mf6_input%subcomponent_name, &
-                                    this%mf6_input%mempath)
+                                    this%mf6_input%mempath, &
+                                    this%component_input_name)
   end subroutine create_subpkg_list
 
   subroutine static_destroy(this)

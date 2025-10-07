@@ -43,9 +43,7 @@ contains
     !
     allocate (obs)
     call obs%allocate_scalars()
-    obs%active = .false.
-    obs%inputFilename = ''
-    obs%inUnitObs => inobs
+    obs%inUnitObs = inobs
     obs%input_mempath = input_mempath
   end subroutine swf_obs_cr
 

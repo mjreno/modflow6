@@ -159,11 +159,10 @@ module ObsModule
     ! -- Public members
     integer(I4B), public :: iout = 0 !< model list file unit
     integer(I4B), public :: npakobs = 0 !< number of observations
-    integer(I4B), pointer, public :: inUnitObs => null() !< observation input file unit
-    character(len=LINELENGTH), pointer, public :: inputFilename => null() !< observation input file name
-    character(len=LINELENGTH), pointer, public :: input_mempath => null()
-    character(len=LINELENGTH), pointer, public :: input_fname => null()
-    character(len=2*LENPACKAGENAME + 4), public :: pkgName = '' !< package name
+    integer(I4B), public :: inUnitObs = 0 !< observation input file unit
+    character(len=LINELENGTH), pointer, public :: input_mempath => null() !< observation input mempath
+    character(len=LINELENGTH), pointer, public :: input_fname => null() !< observation input file name
+    character(len=LENPACKAGENAME), public :: pkgName = '' !< package name
     character(len=LENFTYPE), public :: filtyp = '' !< package file type
     !logical, pointer, public :: active => null() !> logical indicating if a observation is active
     logical, pointer, public :: active
@@ -201,8 +200,6 @@ module ObsModule
     procedure, private :: get_obs
     procedure, private :: get_obs_array
     procedure, private :: get_obs_datum
-    procedure, private :: obs_ar1
-    procedure, private :: obs_ar2
     procedure, private :: set_obs_array
     procedure, private :: source_observations
     procedure, private :: source_options
@@ -223,14 +220,12 @@ contains
   !!  - initializes values
   !!
   !<
-  subroutine obs_cr(obs, inobs)
+  subroutine obs_cr(obs)
     ! -- dummy
     type(ObsType), pointer, intent(out) :: obs !< observation ObsType
-    integer(I4B), pointer, intent(in) :: inobs !< observation input file unit
     !
     allocate (obs)
     call obs%allocate_scalars()
-    obs%inUnitObs => inobs
   end subroutine obs_cr
 
   !> @ brief Process IDstring provided for each observation
@@ -278,8 +273,6 @@ contains
       errmsg = 'Error reading data from ID string'
       call store_error(errmsg)
       call store_error_unit(inunitobs)
-      ! TODO
-      !call store_error_filename(input_fname)
     end if
   end subroutine DefaultObsIdProcessor
 
@@ -291,36 +284,46 @@ contains
   !!
   !<
   subroutine obs_df(this, iout, pkgname, filtyp, dis)
+    ! -- modules
+    use MemoryManagerExtModule, only: mem_set_value
     ! -- dummy
     class(ObsType), intent(inout) :: this
     integer(I4B), intent(in) :: iout !< model list file unit
     character(len=*), intent(in) :: pkgname !< package name
     character(len=*), intent(in) :: filtyp !< package file type
     class(DisBaseType), pointer :: dis !< discretization object
+    ! -- local
+    logical(LGP) :: found
+    ! -- formats
+10  format(/, 'The observation utility is active for "', a, '"')
     !
     this%iout = iout
     this%pkgName = pkgname
     this%filtyp = filtyp
     this%dis => dis
-  end subroutine obs_df
-
-  !> @ brief Allocate and read package observations
-  !!
-  !!  Subroutine to allocate and read observations for a package. Subroutine
-  !!
-  !!  - reads OPTIONS block of OBS input file
-  !!  - reads CONTINUOUS blocks of OBS input file
-  !!
-  !<
-  subroutine obs_ar(this)
-    ! -- dummy
-    class(ObsType) :: this
     !
-    call this%obs_ar1(this%pkgName)
-    if (this%active) then
-      call this%obs_ar2(this%dis)
+    if (this%input_mempath /= '') then
+      this%active = .true.
+      !
+      ! -- Indicate that OBS is active
+      write (this%iout, 10) trim(pkgname)
+      !
+      ! -- Source Options block
+      call this%source_options()
+      !
+      ! -- define output formats
+      call this%define_fmts()
+      !
+      ! set input obs file name
+      call mem_set_value(this%input_fname, 'INPUT_FNAME', &
+                         this%input_mempath, found)
+      if (found) then
+        ! reopen input file for error handling
+        this%inUnitObs = GetUnit()
+        call openfile(this%inUnitObs, this%iout, this%input_fname, 'OBS')
+      end if
     end if
-  end subroutine obs_ar
+  end subroutine obs_df
 
   !> @ brief Advance package observations
   !!
@@ -390,7 +393,6 @@ contains
     class(ObserveType), pointer :: obsrv => null()
     !
     deallocate (this%active)
-    deallocate (this%inputFilename)
     deallocate (this%input_mempath)
     deallocate (this%obsData)
     !
@@ -418,9 +420,6 @@ contains
     !
     ! -- deallocate obslist
     call this%obslist%Clear()
-    !
-    ! -- nullify
-    nullify (this%inUnitObs)
   end subroutine obs_da
 
   !> @ brief Save a simulated value
@@ -516,7 +515,6 @@ contains
     class(ObsType) :: this
     !
     allocate (this%active)
-    allocate (this%inputFilename)
     allocate (this%input_mempath)
     allocate (this%input_fname)
     allocate (this%obsOutputList)
@@ -524,62 +522,30 @@ contains
     !
     ! -- Initialize
     this%active = .false.
-    this%inputFilename = ''
     this%input_mempath = ''
     this%input_fname = ''
   end subroutine allocate_scalars
 
-  !> @ brief Read observation options and output formats
+  !> @ brief Allocate and read package observations
   !!
-  !!  Subroutine to read the options block in the observation input file and
-  !!  define output formats.
+  !!  Subroutine to allocate and read observations for a package.
   !!
-  !<
-  subroutine obs_ar1(this, pkgname)
-    ! -- modules
-    use MemoryManagerExtModule, only: mem_set_value
-    ! -- dummy
-    class(ObsType), intent(inout) :: this
-    character(len=*), intent(in) :: pkgname !< package name
-    ! -- local
-    logical(LGP) :: found
-    ! -- formats
-10  format(/, 'The observation utility is active for "', a, '"')
-    !
-    !if (this%inUnitObs > 0) then
-    if (this%input_mempath /= '') then
-      this%active = .true.
-      !
-      ! -- Indicate that OBS is active
-      write (this%iout, 10) trim(pkgname)
-      !
-      ! -- update input filename
-      call mem_set_value(this%input_fname, 'INPUT_FNAME', &
-                         this%input_mempath, found)
-      !
-      ! -- Source Options block
-      call this%source_options()
-      !
-      ! -- define output formats
-      call this%define_fmts()
-    end if
-  end subroutine obs_ar1
-
-  !> @ brief Call procedure provided by package
-  !!
-  !!  Subroutine to call procedure provided by package to interpret IDstring
-  !!  and store required data.
+  !!  - reads OPTIONS block of OBS input file
+  !!  - reads CONTINUOUS blocks of OBS input file
+  !!  - call procedure provided by package to interpret IDstring
+  !!    and store required data.
   !!
   !<
-  subroutine obs_ar2(this, dis)
+  subroutine obs_ar(this)
     ! -- dummy
     class(ObsType), intent(inout) :: this
-    class(DisBaseType) :: dis !< discretization object
     ! -- local
     integer(I4B) :: i
     type(ObsDataType), pointer :: obsDat => null()
     character(len=LENOBSTYPE) :: obsTypeID
     class(ObserveType), pointer :: obsrv => null()
+    !
+    if (.not. this%active) return
     !
     call this%source_observations()
     ! -- allocate and set observation array
@@ -591,10 +557,10 @@ contains
       obsTypeID = obsrv%ObsTypeId
       obsDat => this%get_obs_datum(obsTypeID)
       if (associated(obsDat%ProcessIdPtr)) then
-        call obsDat%ProcessIdPtr(obsrv, dis, &
+        call obsDat%ProcessIdPtr(obsrv, this%dis, &
                                  this%inUnitObs, this%iout)
       else
-        call DefaultObsIdProcessor(obsrv, dis, &
+        call DefaultObsIdProcessor(obsrv, this%dis, &
                                    this%inUnitObs, this%iout)
       end if
     end do
@@ -602,7 +568,7 @@ contains
     if (count_errors() > 0) then
       call store_error_filename(this%input_fname)
     end if
-  end subroutine obs_ar2
+  end subroutine obs_ar
 
   subroutine source_options(this)
     ! -- modules
@@ -924,8 +890,8 @@ contains
       ntabcols = 5
       !
       ! -- initialize table and define columns
-      title = 'OBSERVATIONS READ FROM FILE "'//trim(this%inputFilename)//'"'
-      call table_cr(this%obstab, this%inputFilename, title)
+      title = 'OBSERVATIONS READ FROM FILE "'//trim(this%input_fname)//'"'
+      call table_cr(this%obstab, this%input_fname, title)
       call this%obstab%table_df(ntabrows, ntabcols, this%iout, &
                                 finalize=.FALSE.)
       tag = 'NAME'

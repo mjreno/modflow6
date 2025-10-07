@@ -11,7 +11,7 @@
 !<
 module apimodule
   use KindModule, only: DP, I4B
-  use ConstantsModule, only: DZERO, LENFTYPE, LENPACKAGENAME
+  use ConstantsModule, only: DZERO, LENFTYPE, LENPACKAGENAME, LINELENGTH
   use MemoryHelperModule, only: create_mem_path
   use BndModule, only: BndType
   use ObsModule, only: DefaultObsIdProcessor
@@ -98,6 +98,7 @@ contains
     type(GwfApiParamFoundType) :: found
     type(CharacterStringType), dimension(:), pointer, &
       contiguous :: obs_mempath
+    character(len=LINELENGTH) :: obs_fname
     ! -- formats
     character(len=*), parameter :: fmtflow2 = &
       &"(4x, 'FLOWS WILL BE SAVED TO BUDGET FILE SPECIFIED IN OUTPUT CONTROL')"
@@ -114,11 +115,8 @@ contains
     if (found%ipakcb) this%ipakcb = -1
 
     ! enforce 0 or 1 OBS6_FILENAME entries in option block
-    if (filein_fname(this%obs%inputFilename, 'OBS6_FILENAME', &
+    if (filein_fname(obs_fname, 'OBS6_FILENAME', &
                      this%input_mempath, this%input_fname)) then
-      this%obs%active = .true.
-      this%obs%inUnitObs = GetUnit()
-      call openfile(this%obs%inUnitObs, this%iout, this%obs%inputFilename, 'OBS')
       call mem_setptr(obs_mempath, 'OBS6_MEMPATH', this%input_mempath)
       this%obs%input_mempath = obs_mempath(1)
     end if

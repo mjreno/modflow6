@@ -123,6 +123,7 @@ contains
     !  local
     !type(CharacterStringType), dimension(:), &
     !  pointer, contiguous :: obs_mempaths
+    !character(len=LINELENGTH) :: obs_fname
     type(ExgOlfgwfParamFoundType) :: found
 
     !  update defaults with idm sourced values
@@ -152,13 +153,10 @@ contains
 
     !  enforce 0 or 1 OBS6_FILENAME entries in option block
     ! if (.not. this%is_datacopy) then
-    !   if (filein_fname(this%obs%inputFilename, 'OBS6_FILENAME', &
+    !   if (filein_fname(obs_fname, 'OBS6_FILENAME', &
     !                    this%input_mempath, this%filename)) then
     !     call mem_setptr(obs_mempaths, 'OBS6_MEMPATH', this%input_mempath)
-    !     this%obs%active = .true.
-    !     this%obs%inUnitObs = GetUnit()
     !     this%obs%input_mempath = obs_mempaths(1)
-    !     call openfile(this%obs%inUnitObs, iout, this%obs%inputFilename, 'OBS')
     !   end if
     ! end if
 

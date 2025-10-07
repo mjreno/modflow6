@@ -49,9 +49,7 @@ contains
     !
     allocate (obs)
     call obs%allocate_scalars()
-    obs%active = .false.
-    obs%inputFilename = ''
-    obs%inUnitObs => inobs
+    obs%inUnitObs = inobs
     obs%input_mempath = input_mempath
     obs%depvartype = dvt
   end subroutine tsp_obs_cr

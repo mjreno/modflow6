@@ -99,7 +99,7 @@ contains
     call tasmanager_cr(this%TasManager, dis, this%name_model, this%iout)
     !
     ! -- create obs package
-    call obs_cr(this%obs, this%inobspkg)
+    call obs_cr(this%obs)
     !
     ! -- Write information to model list file
     write (this%iout, 1) trim(this%filtyp), trim(adjustl(this%text)), &
@@ -290,6 +290,7 @@ contains
     type(BndExtFoundType) :: found
     logical(LGP) :: found_readarr
     character(len=LENAUXNAME) :: sfacauxname
+    character(len=LINELENGTH) :: obs_fname
     integer(I4B) :: n
     !
     ! -- update defaults with idm sourced values
@@ -332,11 +333,8 @@ contains
     !
     !
     ! -- enforce 0 or 1 OBS6_FILENAME entries in option block
-    if (filein_fname(this%obs%inputFilename, 'OBS6_FILENAME', &
+    if (filein_fname(obs_fname, 'OBS6_FILENAME', &
                      this%input_mempath, this%input_fname)) then
-      this%obs%active = .true.
-      this%obs%inUnitObs = GetUnit()
-      call openfile(this%obs%inUnitObs, this%iout, this%obs%inputFilename, 'OBS')
       call mem_setptr(obs_mempath, 'OBS6_MEMPATH', this%input_mempath)
       this%obs%input_mempath = obs_mempath(1)
     end if

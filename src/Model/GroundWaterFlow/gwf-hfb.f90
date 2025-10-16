@@ -653,7 +653,7 @@ contains
           noder2 <= 0) then
         call this%dis%nodeu_to_string(nodeu1, node1str)
         call this%dis%nodeu_to_string(nodeu2, node2str)
-        write (warnmsg, '(a,i0,a,i0,a)') &
+        write (warnmsg, '(a)') &
             'HFB connection between inactive cell(s) will be excluded: '&
             &//trim(node1str)//' to '//trim(node2str)//'.'
         call store_warning(warnmsg)

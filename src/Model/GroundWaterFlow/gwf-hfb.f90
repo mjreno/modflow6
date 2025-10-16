@@ -583,6 +583,8 @@ contains
   subroutine source_data(this)
     ! -- modules
     use TdisModule, only: kper
+    use SimVariablesModule, only: warnmsg
+    use SimModule, only: store_warning
     use ConstantsModule, only: LINELENGTH
     use MemoryManagerModule, only: mem_setptr
     use GeomUtilModule, only: get_node
@@ -648,6 +650,11 @@ contains
       noder2 = this%dis%get_nodenumber(nodeu2, 1)
       if (noder1 <= 0 .or. &
           noder2 <= 0) then
+        write (warnmsg, '(a,i0,a,i0,a)') &
+            'HFB connection between inactive cell(s) will be excluded. &
+            &Excluded node pair: ', nodeu1, ' and ', nodeu2, '.'
+        call store_warning(warnmsg)
+        this%nhfb = this%nhfb - 1
         cycle
       else
         this%noden(n) = noder1

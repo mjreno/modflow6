@@ -15,10 +15,12 @@ cases = [
     "gwf_npf_thickstrt07",  # icelltype=-1, using thickstrt, has hfb
     "gwf_npf_thickstrt08",  # icelltype=1, no thickstrt, has hfb
     "gwf_npf_thickstrt09",  # icelltype=-1, no thickstrt, has hfb
+    "gwf_npf_thickstrt10",  # icelltype=-1, no thickstrt, no hfb (cell (1,1,3) inactive)
 ]
-thickstrt = [False, True, True, False, False, False, True, False, False]
-icelltype = [0, 0, -1, 1, -1, 0, -1, 1, -1]
-hfb_on = [False, False, False, False, False, True, True, True, True]
+thickstrt = [False, True, True, False, False, False, True, False, False, False]
+icelltype = [0, 0, -1, 1, -1, 0, -1, 1, -1, -1]
+hfb_on = [False, False, False, False, False, True, True, True, True, True]
+icell_inactive = 9
 
 
 def build_models(idx, test):
@@ -79,6 +81,10 @@ def build_models(idx, test):
         filename=f"{name}.ims",
     )
     sim.register_ims_package(imsgwf, [gwf.name])
+    idomain = np.ones((nlay, nrow, ncol), dtype=int)
+    if idx == icell_inactive:
+        sim.simulation_data.verify_data = False
+        idomain[0, 0, 2] = 0
 
     dis = flopy.mf6.ModflowGwfdis(
         gwf,
@@ -89,7 +95,7 @@ def build_models(idx, test):
         delc=delc,
         top=top,
         botm=botm,
-        idomain=np.ones((nlay, nrow, ncol), dtype=int),
+        idomain=idomain,
     )
 
     # initial conditions
@@ -162,6 +168,8 @@ def check_output(idx, test):
     answer_unconfined_hfb = (6.0, 5.99983342, 5.99966683, 4.00049971, 4.00024986, 4.0)
     answer_unconfined_hfb = np.array(answer_unconfined_hfb)
 
+    answer_hfb_inactive = (6.0, 6.0, 1.0e30, 4.0, 4.0, 4.0)
+
     answer_dict = {
         0: answer_linear,
         1: answer_linear,
@@ -172,6 +180,7 @@ def check_output(idx, test):
         6: answer_confined_thickstart_hfb,
         7: answer_unconfined_hfb,
         8: answer_unconfined_hfb,
+        9: answer_hfb_inactive,
     }
 
     hres = answer_dict[idx]
@@ -190,6 +199,7 @@ def check_output(idx, test):
         6: 1.9980e-03,
         7: 9.9949e-04,
         8: 9.9949e-04,
+        9: 0.0,
     }
     q_answer = q_answer_dict[idx]
     assert np.allclose(q_answer, q_simulated_inflow), (

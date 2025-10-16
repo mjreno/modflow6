@@ -597,6 +597,7 @@ contains
     character(len=LINELENGTH) :: nodenstr, nodemstr
     integer(I4B), pointer :: nbound
     integer(I4B) :: n, nodeu1, nodeu2, noder1, noder2
+    character(len=20) :: node1str, node2str
     ! -- formats
     character(len=*), parameter :: fmthfb = "(i10, 2a10, 1(1pg15.6))"
 
@@ -650,9 +651,11 @@ contains
       noder2 = this%dis%get_nodenumber(nodeu2, 1)
       if (noder1 <= 0 .or. &
           noder2 <= 0) then
+        call this%dis%nodeu_to_string(nodeu1, node1str)
+        call this%dis%nodeu_to_string(nodeu2, node2str)
         write (warnmsg, '(a,i0,a,i0,a)') &
-            'HFB connection between inactive cell(s) will be excluded. &
-            &Excluded node pair: ', nodeu1, ' and ', nodeu2, '.'
+            'HFB connection between inactive cell(s) will be excluded: '&
+            &//trim(node1str)//' to '//trim(node2str)//'.'
         call store_warning(warnmsg)
         this%nhfb = this%nhfb - 1
         cycle

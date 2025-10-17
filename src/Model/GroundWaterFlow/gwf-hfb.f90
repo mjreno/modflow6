@@ -618,7 +618,7 @@ contains
     end if
 
     ! update state
-    do n = 1, this%nhfb
+    do n = 1, nbound
 
       ! set cellid
       cellid1 => cellids1(:, n)

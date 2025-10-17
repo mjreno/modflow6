@@ -51,4 +51,4 @@ description = "Add HIGHEST\\_CELL\\_SATURATION option that changes how the satur
 [[items]]
 section = "fixes"
 subsection = "internal"
-description = "Fixed HFB behavior when a horizontal flow barrier is configured for a cell pair that includes an inactive cell. Previously the connection was excluded but not adjusted for in the defined number of horizontal flow barriers, which can lead to a segmentation fault. A workaround is to only define horizontal flow barriers for active cells. New behavior excludes the connection but adds a warning when an exclusion applies, and adjusts the number of horizontal flow barriers accordingly."
+description = "Fixed HFB behavior when a horizontal flow barrier is configured for a cell pair that includes an inactive cell. Previously the connection was excluded but not adjusted for in the defined number of horizontal flow barriers, which can lead to a segmentation fault. A workaround is to only define horizontal flow barriers for active cells. New behavior excludes the connection and adds a warning when an exclusion applies, and also adjusts the number of horizontal flow barriers accordingly."

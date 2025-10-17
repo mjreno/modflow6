@@ -277,6 +277,7 @@ contains
       this%trackterminate = .true.
       this%trackweaksink = .true.
       this%trackusertime = .true.
+      this%trackdropped = .true.
     end if
 
     if (found%budgetcsvfile) then

@@ -14,8 +14,7 @@ module OlfStoInputModule
   type OlfStoParamFoundType
     logical :: ipakcb = .false.
     logical :: export_ascii = .false.
-    logical :: steady_state = .false.
-    logical :: transient = .false.
+    logical :: storage = .false.
   end type OlfStoParamFoundType
 
   logical :: olf_sto_multi_package = .false.
@@ -65,36 +64,17 @@ module OlfStoInputModule
     )
 
   type(InputParamDefinitionType), parameter :: &
-    olfsto_steady_state = InputParamDefinitionType &
+    olfsto_storage = InputParamDefinitionType &
     ( &
     'OLF', & ! component
     'STO', & ! subcomponent
     'PERIOD', & ! block
-    'STEADY-STATE', & ! tag name
-    'STEADY_STATE', & ! fortran variable
-    'KEYWORD', & ! type
+    'STORAGE', & ! tag name
+    'STORAGE', & ! fortran variable
+    'STRING', & ! type
     '', & ! shape
-    'steady state indicator', & ! longname
-    .false., & ! required
-    .false., & ! developmode
-    .false., & ! multi-record
-    .false., & ! preserve case
-    .false., & ! layered
-    .false. & ! timeseries
-    )
-
-  type(InputParamDefinitionType), parameter :: &
-    olfsto_transient = InputParamDefinitionType &
-    ( &
-    'OLF', & ! component
-    'STO', & ! subcomponent
-    'PERIOD', & ! block
-    'TRANSIENT', & ! tag name
-    'TRANSIENT', & ! fortran variable
-    'KEYWORD', & ! type
-    '', & ! shape
-    'transient indicator', & ! longname
-    .false., & ! required
+    'storage type', & ! longname
+    .true., & ! required
     .false., & ! developmode
     .false., & ! multi-record
     .false., & ! preserve case
@@ -107,22 +87,19 @@ module OlfStoInputModule
     [ &
     olfsto_ipakcb, &
     olfsto_export_ascii, &
-    olfsto_steady_state, &
-    olfsto_transient &
+    olfsto_storage &
     ]
 
   type(InputParamDefinitionType), parameter :: &
-    olf_sto_aggregate_definitions(*) = &
-    [ &
-    InputParamDefinitionType &
+    olfsto_spd = InputParamDefinitionType &
     ( &
-    '', & ! component
-    '', & ! subcomponent
-    '', & ! block
-    '', & ! tag name
-    '', & ! fortran variable
-    '', & ! type
-    '', & ! shape
+    'OLF', & ! component
+    'STO', & ! subcomponent
+    'PERIOD', & ! block
+    'STRESS_PERIOD_DATA', & ! tag name
+    'SPD', & ! fortran variable
+    'RECARRAY STORAGE', & ! type
+    '1', & ! shape
     '', & ! longname
     .false., & ! required
     .false., & ! developmode
@@ -130,7 +107,12 @@ module OlfStoInputModule
     .false., & ! preserve case
     .false., & ! layered
     .false. & ! timeseries
-    ) &
+    )
+
+  type(InputParamDefinitionType), parameter :: &
+    olf_sto_aggregate_definitions(*) = &
+    [ &
+    olfsto_spd &
     ]
 
   type(InputBlockDefinitionType), parameter :: &
@@ -145,7 +127,7 @@ module OlfStoInputModule
     InputBlockDefinitionType( &
     'PERIOD', & ! blockname
     .false., & ! required
-    .false., & ! aggregate
+    .true., & ! aggregate
     .true. & ! block_variable
     ) &
     ]

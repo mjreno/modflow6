@@ -38,23 +38,22 @@ longname stress period number
 description REPLACE iper {}
 
 block period
-name steady-state
-type keyword
-shape
-valid
+name stress_period_data
+type recarray storage
+shape 1
 reader urword
+tagged false
 optional true
-longname steady state indicator
-description keyword to indicate that stress period IPER is steady-state. Steady-state conditions will apply until the TRANSIENT keyword is specified in a subsequent BEGIN PERIOD block.
-mf6internal steady_state
+longname
+description
+mf6internal spd
 
 block period
-name transient
-type keyword
+name storage
+type string
 shape
-valid
+valid steady-state transient
 reader urword
-optional true
-longname transient indicator
-description keyword to indicate that stress period IPER is transient. Transient conditions will apply until the STEADY-STATE keyword is specified in a subsequent BEGIN PERIOD block.
-
+optional false
+longname storage type
+description string to designate storage type for stress period IPER. Designated storage conditions will apply until a new storage type is specified in a subsequent BEGIN PERIOD block. Valid storage types are STEADY-STATE and TRANSIENT.

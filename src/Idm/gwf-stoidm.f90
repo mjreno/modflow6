@@ -26,8 +26,7 @@ module GwfStoInputModule
     logical :: iconvert = .false.
     logical :: ss = .false.
     logical :: sy = .false.
-    logical :: steady_state = .false.
-    logical :: transient = .false.
+    logical :: storage = .false.
   end type GwfStoParamFoundType
 
   logical :: gwf_sto_multi_package = .false.
@@ -306,36 +305,17 @@ module GwfStoInputModule
     )
 
   type(InputParamDefinitionType), parameter :: &
-    gwfsto_steady_state = InputParamDefinitionType &
+    gwfsto_storage = InputParamDefinitionType &
     ( &
     'GWF', & ! component
     'STO', & ! subcomponent
     'PERIOD', & ! block
-    'STEADY-STATE', & ! tag name
-    'STEADY_STATE', & ! fortran variable
-    'KEYWORD', & ! type
+    'STORAGE', & ! tag name
+    'STORAGE', & ! fortran variable
+    'STRING', & ! type
     '', & ! shape
-    'steady state indicator', & ! longname
-    .false., & ! required
-    .false., & ! developmode
-    .false., & ! multi-record
-    .false., & ! preserve case
-    .false., & ! layered
-    .false. & ! timeseries
-    )
-
-  type(InputParamDefinitionType), parameter :: &
-    gwfsto_transient = InputParamDefinitionType &
-    ( &
-    'GWF', & ! component
-    'STO', & ! subcomponent
-    'PERIOD', & ! block
-    'TRANSIENT', & ! tag name
-    'TRANSIENT', & ! fortran variable
-    'KEYWORD', & ! type
-    '', & ! shape
-    'transient indicator', & ! longname
-    .false., & ! required
+    'storage type', & ! longname
+    .true., & ! required
     .false., & ! developmode
     .false., & ! multi-record
     .false., & ! preserve case
@@ -360,22 +340,19 @@ module GwfStoInputModule
     gwfsto_iconvert, &
     gwfsto_ss, &
     gwfsto_sy, &
-    gwfsto_steady_state, &
-    gwfsto_transient &
+    gwfsto_storage &
     ]
 
   type(InputParamDefinitionType), parameter :: &
-    gwf_sto_aggregate_definitions(*) = &
-    [ &
-    InputParamDefinitionType &
+    gwfsto_spd = InputParamDefinitionType &
     ( &
-    '', & ! component
-    '', & ! subcomponent
-    '', & ! block
-    '', & ! tag name
-    '', & ! fortran variable
-    '', & ! type
-    '', & ! shape
+    'GWF', & ! component
+    'STO', & ! subcomponent
+    'PERIOD', & ! block
+    'STRESS_PERIOD_DATA', & ! tag name
+    'SPD', & ! fortran variable
+    'RECARRAY STORAGE', & ! type
+    '1', & ! shape
     '', & ! longname
     .false., & ! required
     .false., & ! developmode
@@ -383,7 +360,12 @@ module GwfStoInputModule
     .false., & ! preserve case
     .false., & ! layered
     .false. & ! timeseries
-    ) &
+    )
+
+  type(InputParamDefinitionType), parameter :: &
+    gwf_sto_aggregate_definitions(*) = &
+    [ &
+    gwfsto_spd &
     ]
 
   type(InputBlockDefinitionType), parameter :: &
@@ -404,7 +386,7 @@ module GwfStoInputModule
     InputBlockDefinitionType( &
     'PERIOD', & ! blockname
     .false., & ! required
-    .false., & ! aggregate
+    .true., & ! aggregate
     .true. & ! block_variable
     ) &
     ]

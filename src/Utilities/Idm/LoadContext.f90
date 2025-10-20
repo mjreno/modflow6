@@ -192,7 +192,10 @@ contains
   !<
   subroutine allocate_scalars(this)
     use MemoryManagerModule, only: mem_setptr
+    use DefinitionSelectModule, only: get_aggregate_definition_type
     class(LoadContextType) :: this
+    integer(I4B) :: istat, bound
+    type(InputParamDefinitionType), pointer :: idt
 
     if (this%ctxtype == EXCHANGE .or. &
         this%ctxtype == MODELPKG .or. &
@@ -208,6 +211,19 @@ contains
 
       ! reset nbound
       this%nbound = 0
+
+      if (this%maxbound == 0 .and. this%loadtype == LIST) then
+        ! get aggregate param definition for period block
+        idt => &
+          get_aggregate_definition_type(this%mf6_input%aggregate_dfns, &
+                                        this%mf6_input%component_type, &
+                                        this%mf6_input%subcomponent_type, &
+                                        this%blockname)
+        read (idt%shape, *, iostat=istat) bound
+        if (istat == 0) then
+          this%maxbound = bound
+        end if
+      end if
     end if
 
     if (this%ctxtype == STRESSPKG .and. &

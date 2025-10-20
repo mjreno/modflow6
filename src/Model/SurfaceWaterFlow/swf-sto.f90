@@ -13,6 +13,7 @@ module SwfStoModule
   use SimModule, only: store_error, store_error_filename
   use BaseDisModule, only: DisBaseType
   use NumericalPackageModule, only: NumericalPackageType
+  use CharacterStringModule, only: CharacterStringType
   use MatrixBaseModule
   use Disv1dModule, only: Disv1dType
   use SwfCxsModule, only: SwfCxsType
@@ -36,7 +37,7 @@ module SwfStoModule
 
     ! -- input context pointers for read and prepare
     integer(I4B), pointer :: iper => null() !< input context loaded period
-    character(len=:), pointer :: storage !< input context storage string
+    type(CharacterStringType), dimension(:), contiguous, pointer :: storage !< input context storage pointer
   contains
     procedure :: sto_ar
     procedure :: sto_rp
@@ -151,6 +152,7 @@ contains
     class(SwfStoType) :: this !< SwfStoType object
     ! -- local variables
     character(len=16) :: css(0:1)
+    character(len=LINELENGTH) :: storage
     ! -- data
     data css(0)/'       TRANSIENT'/
     data css(1)/'    STEADY-STATE'/
@@ -164,13 +166,14 @@ contains
     write (this%iout, '(//,1x,a)') 'PROCESSING STORAGE PERIOD DATA'
     !
     ! -- set period iss
-    if (this%storage == 'STEADY-STATE') then
+    storage = this%storage(1)
+    if (storage == 'STEADY-STATE') then
       this%iss = 1
-    else if (this%storage == 'TRANSIENT') then
+    else if (storage == 'TRANSIENT') then
       this%iss = 0
     else
       write (errmsg, '(a,a)') 'Unknown STORAGE data tag: ', &
-        trim(this%storage)
+        trim(storage)
       call store_error(errmsg)
       call store_error_filename(this%input_fname)
     end if

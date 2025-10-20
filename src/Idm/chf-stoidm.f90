@@ -14,8 +14,7 @@ module ChfStoInputModule
   type ChfStoParamFoundType
     logical :: ipakcb = .false.
     logical :: export_ascii = .false.
-    logical :: steady_state = .false.
-    logical :: transient = .false.
+    logical :: storage = .false.
   end type ChfStoParamFoundType
 
   logical :: chf_sto_multi_package = .false.
@@ -65,36 +64,17 @@ module ChfStoInputModule
     )
 
   type(InputParamDefinitionType), parameter :: &
-    chfsto_steady_state = InputParamDefinitionType &
+    chfsto_storage = InputParamDefinitionType &
     ( &
     'CHF', & ! component
     'STO', & ! subcomponent
     'PERIOD', & ! block
-    'STEADY-STATE', & ! tag name
-    'STEADY_STATE', & ! fortran variable
-    'KEYWORD', & ! type
+    'STORAGE', & ! tag name
+    'STORAGE', & ! fortran variable
+    'STRING', & ! type
     '', & ! shape
-    'steady state indicator', & ! longname
-    .false., & ! required
-    .false., & ! developmode
-    .false., & ! multi-record
-    .false., & ! preserve case
-    .false., & ! layered
-    .false. & ! timeseries
-    )
-
-  type(InputParamDefinitionType), parameter :: &
-    chfsto_transient = InputParamDefinitionType &
-    ( &
-    'CHF', & ! component
-    'STO', & ! subcomponent
-    'PERIOD', & ! block
-    'TRANSIENT', & ! tag name
-    'TRANSIENT', & ! fortran variable
-    'KEYWORD', & ! type
-    '', & ! shape
-    'transient indicator', & ! longname
-    .false., & ! required
+    'storage type', & ! longname
+    .true., & ! required
     .false., & ! developmode
     .false., & ! multi-record
     .false., & ! preserve case
@@ -107,22 +87,19 @@ module ChfStoInputModule
     [ &
     chfsto_ipakcb, &
     chfsto_export_ascii, &
-    chfsto_steady_state, &
-    chfsto_transient &
+    chfsto_storage &
     ]
 
   type(InputParamDefinitionType), parameter :: &
-    chf_sto_aggregate_definitions(*) = &
-    [ &
-    InputParamDefinitionType &
+    chfsto_spd = InputParamDefinitionType &
     ( &
-    '', & ! component
-    '', & ! subcomponent
-    '', & ! block
-    '', & ! tag name
-    '', & ! fortran variable
-    '', & ! type
-    '', & ! shape
+    'CHF', & ! component
+    'STO', & ! subcomponent
+    'PERIOD', & ! block
+    'STRESS_PERIOD_DATA', & ! tag name
+    'SPD', & ! fortran variable
+    'RECARRAY STORAGE', & ! type
+    '1', & ! shape
     '', & ! longname
     .false., & ! required
     .false., & ! developmode
@@ -130,7 +107,12 @@ module ChfStoInputModule
     .false., & ! preserve case
     .false., & ! layered
     .false. & ! timeseries
-    ) &
+    )
+
+  type(InputParamDefinitionType), parameter :: &
+    chf_sto_aggregate_definitions(*) = &
+    [ &
+    chfsto_spd &
     ]
 
   type(InputBlockDefinitionType), parameter :: &
@@ -145,7 +127,7 @@ module ChfStoInputModule
     InputBlockDefinitionType( &
     'PERIOD', & ! blockname
     .false., & ! required
-    .false., & ! aggregate
+    .true., & ! aggregate
     .true. & ! block_variable
     ) &
     ]

@@ -48,8 +48,7 @@ contains
     integer(I4B), intent(in) :: iout !< unit number for output
 
     allocate (oc)
-    call oc%allocate_scalars(name_model)
-    oc%input_mempath = input_mempath
+    call oc%allocate_scalars(name_model, input_mempath)
     oc%inunit = inunit
     oc%iout = iout
   end subroutine oc_cr
@@ -63,6 +62,7 @@ contains
   subroutine oc_rp(this)
     ! modules
     use TdisModule, only: kper
+    use SimModule, only: store_error, store_error_filename
     use MemoryManagerModule, only: mem_setptr
     use CharacterStringModule, only: CharacterStringType
     ! dummy
@@ -79,6 +79,7 @@ contains
     integer(I4B), pointer :: nlist
     integer(I4B) :: n, ipos
     character(len=LINELENGTH) :: ocaction, rtype, ocsetting
+    logical(LGP) :: found_rtype
     ! formats
     character(len=*), parameter :: fmtboc = &
       &"(1X,/1X,'BEGIN READING OUTPUT CONTROL FOR STRESS PERIOD ',I0)"
@@ -115,13 +116,20 @@ contains
       rtype = rtypes(n)
       ocsetting = ocsettings(n)
 
+      found_rtype = .false.
       do ipos = 1, size(this%ocds)
         ocdobjptr => this%ocds(ipos)
         if (rtype == trim(ocdobjptr%cname)) then
+          found_rtype = .true.
           call ocdobjptr%psm%set(ocaction, ocsetting, this%iout)
           call ocdobjptr%ocd_rp_check(this%input_fname)
         end if
       end do
+      if (.not. found_rtype) then
+        call store_error('Input OC period block rtype not found:  "'// &
+                         trim(rtype)//'".')
+        call store_error_filename(this%input_fname)
+      end if
     end do
 
     write (this%iout, fmteoc) this%iperoc
@@ -180,7 +188,7 @@ contains
   end subroutine oc_da
 
   !> @ brief Allocate variables for the output control object
-  subroutine allocate (this, name_model)
+  subroutine allocate (this, name_model, input_mempath)
     ! modules
     use MemoryManagerModule, only: mem_allocate
     use MemoryHelperModule, only: create_mem_path
@@ -188,6 +196,7 @@ contains
     ! dummy
     class(OutputControlType) :: this !< this instance
     character(len=*), intent(in) :: name_model !< name of model
+    character(len=*), intent(in) :: input_mempath !< input mempath of the package
     logical(LGP) :: found
 
     this%memoryPath = create_mem_path(name_model, 'OC')
@@ -201,6 +210,7 @@ contains
     call mem_allocate(this%iocrep, 'IOCREP', this%memoryPath)
 
     this%name_model = name_model
+    this%input_mempath = input_mempath
     this%input_fname = ''
     this%inunit = 0
     this%iout = 0

@@ -39,11 +39,10 @@ contains
     allocate (ocobj)
     !
     ! -- Allocate variables
-    call ocobj%allocate_scalars(name_model)
+    call ocobj%allocate_scalars(name_model, input_mempath)
     !
     ! -- Save unit numbers
     ocobj%inunit = inunit
-    ocobj%input_mempath = input_mempath
     ocobj%iout = iout
   end subroutine oc_cr
 

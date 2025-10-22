@@ -59,18 +59,18 @@ contains
     allocate (ocobj)
 
     ! Allocate scalars
-    call ocobj%allocate_scalars(name_model)
+    call ocobj%allocate_scalars(name_model, input_mempath)
 
     ! Save unit numbers
     ocobj%inunit = inunit
-    ocobj%input_mempath = input_mempath
     ocobj%iout = iout
   end subroutine oc_cr
 
-  subroutine prt_oc_allocate_scalars(this, name_model)
+  subroutine prt_oc_allocate_scalars(this, name_model, input_mempath)
     use MemoryManagerExtModule, only: mem_set_value
     class(PrtOcType) :: this
     character(len=*), intent(in) :: name_model !< name of model
+    character(len=*), intent(in) :: input_mempath !< input mempath of the package
     logical(LGP) :: found
 
     this%memoryPath = create_mem_path(name_model, 'OC')
@@ -98,6 +98,7 @@ contains
     call mem_allocate(this%ntracktimes, 'NTRACKTIMES', this%memoryPath)
 
     this%name_model = name_model
+    this%input_mempath = input_mempath
     this%input_fname = ''
     this%dump_event_trace = .false.
     this%inunit = 0

@@ -286,6 +286,8 @@ contains
   end subroutine source_options
 
   subroutine set_ocfile(this, cname, ocfile, iout)
+    ! modules
+    use SimModule, only: store_error, store_error_filename
     ! dummy
     class(OutputControlType) :: this !< OutputControlDataType object
     character(len=*), intent(in) :: cname !< data object cname
@@ -293,12 +295,20 @@ contains
     integer(I4B), intent(in) :: iout !< Unit number for output
     type(OutputControlDataType), pointer :: ocdobjptr
     integer(I4B) :: ipos
+    logical(LGP) :: found
+    found = .false.
     do ipos = 1, size(this%ocds)
       ocdobjptr => this%ocds(ipos)
       if (cname == trim(ocdobjptr%cname)) then
+        found = .true.
         call ocdobjptr%set_ocfile(ocfile, iout)
       end if
     end do
+    if (.not. found) then
+      call store_error('OC internal error: oc data type not found for name "'// &
+                       trim(cname)//'".')
+      call store_error_filename(this%input_fname)
+    end if
   end subroutine set_ocfile
 
   !> @ brief Determine if it is time to save.
@@ -310,7 +320,7 @@ contains
     character(len=*), intent(in) :: cname !< character string for data name
     ! local
     integer(I4B) :: ipos
-    logical :: found
+    logical(LGP) :: found
     class(OutputControlDataType), pointer :: ocdobjptr
     !
     oc_save = .false.
@@ -336,7 +346,7 @@ contains
     character(len=*), intent(in) :: cname !< character string for data name
     ! local
     integer(I4B) :: ipos
-    logical :: found
+    logical(LGP) :: found
     class(OutputControlDataType), pointer :: ocdobjptr
 
     oc_print = .false.
@@ -363,7 +373,7 @@ contains
     character(len=*), intent(in) :: cname !< character string for data name
     ! -- local
     integer(I4B) :: ipos
-    logical :: found
+    logical(LGP) :: found
     class(OutputControlDataType), pointer :: ocdobjptr
     !
     oc_save_unit = 0

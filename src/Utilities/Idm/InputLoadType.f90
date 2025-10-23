@@ -399,7 +399,6 @@ contains
     do iparam = 1, size(mf6_input%param_dfns)
       idt => mf6_input%param_dfns(iparam)
       if (idt%blockname == 'PERIOD') then
-        ilen = len_trim(idt%tagname)
         if (idt_datatype(idt) == 'KEYSTRING') then
           ilen = len_trim(idt%tagname)
           if (idt%tagname(ilen - 6:ilen) == 'SETTING') then

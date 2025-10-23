@@ -64,7 +64,7 @@ contains
     integer(I4B) :: i, nocdobj, inodata
     type(OutputControlDataType), pointer :: ocdobjptr
     real(DP), dimension(:), pointer, contiguous :: nullvec => null()
-    character(len=LINELENGTH) :: qoutflowfile, stagefile
+    character(len=LINELENGTH) :: stagefile !, qoutflowfile
     type(SwfOcParamFoundType) :: found
     !
     ! -- Initialize variables
@@ -91,13 +91,14 @@ contains
     if (this%input_mempath /= '') then
       write (this%iout, '(/,1x,a,/)') 'PROCESSING OC OPTIONS'
       call this%source_options()
-      call mem_set_value(qoutflowfile, 'QOUTFLOWFILE', this%input_mempath, &
-                         found%qoutflowfile)
+      ! is this a distinct OCD type?
+      !call mem_set_value(qoutflowfile, 'QOUTFLOWFILE', this%input_mempath, &
+      !                   found%qoutflowfile)
       call mem_set_value(stagefile, 'STAGEFILE', this%input_mempath, &
                          found%stagefile)
-      if (found%qoutflowfile) then
-        call this%set_ocfile(name, qoutflowfile, this%iout)
-      end if
+      !if (found%qoutflowfile) then
+      !  call this%set_ocfile(name, qoutflowfile, this%iout)
+      !end if
       if (found%stagefile) then
         call this%set_ocfile(name, stagefile, this%iout)
       end if

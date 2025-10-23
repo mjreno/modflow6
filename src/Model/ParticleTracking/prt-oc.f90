@@ -210,7 +210,7 @@ contains
     ! -- dummy
     class(PrtOcType) :: this
     ! -- local
-    character(len=LINELENGTH) :: trackfile, trackcsv, budgetcsv
+    character(len=LINELENGTH) :: trackfile, trackcsv
     type(PrtOcParamFoundType) :: found
     integer(I4B), pointer :: evinput
     ! formats
@@ -228,9 +228,7 @@ contains
     ! -- source base class options
     call this%OutPutControlType%source_options()
     !
-    ! -- source drain options
-    call mem_set_value(budgetcsv, 'BUDGETCSVFILE', this%input_mempath, &
-                       found%budgetcsvfile)
+    ! -- source options
     call mem_set_value(trackfile, 'TRACKFILE', this%input_mempath, &
                        found%trackfile)
     call mem_set_value(trackcsv, 'TRACKCSVFILE', this%input_mempath, &
@@ -279,12 +277,6 @@ contains
       this%trackweaksink = .true.
       this%trackusertime = .true.
       this%trackdropped = .true.
-    end if
-
-    if (found%budgetcsvfile) then
-      this%ibudcsv = getunit()
-      call openfile(this%ibudcsv, this%iout, budgetcsv, 'CSV', &
-                    filstat_opt='REPLACE')
     end if
 
     if (found%trackfile) then

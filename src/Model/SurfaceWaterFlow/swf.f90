@@ -276,7 +276,7 @@ contains
 
     ! set up output control
     if (this%indfw > 0) then
-      call this%oc%oc_ar('STAGE', this%x, this%dis, DNODATA)
+      call this%oc%oc_ar(this%x, this%dis, DNODATA)
     end if
     call this%budget%set_ibudcsv(this%oc%ibudcsv)
 

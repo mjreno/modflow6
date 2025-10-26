@@ -50,13 +50,12 @@ contains
   !!  Setup head and budget as output control variables.
   !!
   !<
-  subroutine oc_ar(this, name, datavec, dis, dnodata)
+  subroutine oc_ar(this, datavec, dis, dnodata)
     use ConstantsModule, only: LINELENGTH
     use MemoryManagerExtModule, only: mem_set_value
     use SwfOcInputModule, only: SwfOcParamFoundType
     ! -- dummy
     class(SwfOcType) :: this !< SwfOcType object
-    character(len=*), intent(in) :: name
     real(DP), dimension(:), pointer, contiguous, intent(in) :: datavec !< data vector
     class(DisBaseType), pointer, intent(in) :: dis !< model discretization package
     real(DP), intent(in) :: dnodata !< no data value
@@ -64,12 +63,12 @@ contains
     integer(I4B) :: i, nocdobj, inodata
     type(OutputControlDataType), pointer :: ocdobjptr
     real(DP), dimension(:), pointer, contiguous :: nullvec => null()
-    character(len=LINELENGTH) :: stagefile !, qoutflowfile
+    character(len=LINELENGTH) :: stagefile, qoutflowfile
     type(SwfOcParamFoundType) :: found
     !
     ! -- Initialize variables
     inodata = 0
-    nocdobj = 2
+    nocdobj = 3
     allocate (this%ocds(nocdobj))
     do i = 1, nocdobj
       call ocd_cr(ocdobjptr)
@@ -79,7 +78,11 @@ contains
                                 'COLUMNS 10 WIDTH 11 DIGITS 4 GENERAL ', &
                                 this%iout, dnodata)
       case (2)
-        call ocdobjptr%init_dbl(name, datavec, dis, 'PRINT LAST ', &
+        call ocdobjptr%init_dbl('STAGE', datavec, dis, 'PRINT LAST ', &
+                                'COLUMNS 10 WIDTH 11 DIGITS 4 GENERAL ', &
+                                this%iout, dnodata)
+      case (3)
+        call ocdobjptr%init_dbl('QOUTFLOW', datavec, dis, 'PRINT LAST ', &
                                 'COLUMNS 10 WIDTH 11 DIGITS 4 GENERAL ', &
                                 this%iout, dnodata)
       end select
@@ -91,16 +94,15 @@ contains
     if (this%input_mempath /= '') then
       write (this%iout, '(/,1x,a,/)') 'PROCESSING OC OPTIONS'
       call this%source_options()
-      ! is this a distinct OCD type?
-      !call mem_set_value(qoutflowfile, 'QOUTFLOWFILE', this%input_mempath, &
-      !                   found%qoutflowfile)
+      call mem_set_value(qoutflowfile, 'QOUTFLOWFILE', this%input_mempath, &
+                         found%qoutflowfile)
       call mem_set_value(stagefile, 'STAGEFILE', this%input_mempath, &
                          found%stagefile)
-      !if (found%qoutflowfile) then
-      !  call this%set_ocfile(name, qoutflowfile, this%iout)
-      !end if
+      if (found%qoutflowfile) then
+        call this%set_ocfile('QOUTFLOW', qoutflowfile, this%iout)
+      end if
       if (found%stagefile) then
-        call this%set_ocfile(name, stagefile, this%iout)
+        call this%set_ocfile('STAGE', stagefile, this%iout)
       end if
       write (this%iout, '(1x,a)') 'END OF OC OPTIONS'
     end if

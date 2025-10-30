@@ -878,7 +878,7 @@ contains
     call mem_setptr(iotypes, 'FILEIN', this%input_mempath)
     call mem_setptr(fnames, 'SPC6_FILENAME', this%input_mempath)
     call mem_setptr(conditions, 'MIXED', this%input_mempath)
-    call mem_setptr(spc_mempaths, 'SPC6_MEMPATHS', this%input_mempath)
+    call mem_setptr(spc_mempaths, 'SPC6_MEMPATH', this%input_mempath)
 
     write (this%iout, '(/1x,a)') 'PROCESSING SSM FILEINPUT'
     do n = 1, size(pnames)

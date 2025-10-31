@@ -1358,14 +1358,18 @@ contains
     use MemoryManagerModule, only: mem_setptr, get_isize
     use MemoryManagerExtModule, only: mem_set_value
     use CharacterStringModule, only: CharacterStringType
+    use SourceCommonModule, only: filein_fname
     use GwfNpfInputModule, only: GwfNpfParamFoundType
     ! -- dummy
     class(GwfNpftype) :: this
     ! -- locals
+    type(CharacterStringType), dimension(:), pointer, &
+      contiguous :: tvk_mempaths
     character(len=LENVARNAME), dimension(3) :: cellavg_method = &
       &[character(len=LENVARNAME) :: 'LOGARITHMIC', 'AMT-LMK', 'AMT-HMK']
     type(GwfNpfParamFoundType) :: found
-    character(len=LENMEMPATH) :: tvk6_mempath
+    character(len=LENMEMPATH) :: tvk_mempath
+    character(len=LINELENGTH) :: tvk_filename
     !
     ! -- update defaults with idm sourced values
     call mem_set_value(this%iprflow, 'IPRFLOW', this%input_mempath, found%iprflow)
@@ -1398,8 +1402,6 @@ contains
     call mem_set_value(this%wetfct, 'WETFCT', this%input_mempath, found%wetfct)
     call mem_set_value(this%iwetit, 'IWETIT', this%input_mempath, found%iwetit)
     call mem_set_value(this%ihdwet, 'IHDWET', this%input_mempath, found%ihdwet)
-    call mem_set_value(tvk6_mempath, 'TVK6_MEMPATH', this%input_mempath, &
-                       found%tvk6_filename)
     !
     ! -- save flows option active
     if (found%ipakcb) this%ipakcb = -1
@@ -1416,10 +1418,13 @@ contains
       this%iasym = 0
     end if
     !
-    ! -- TVK6 subpackage input file
-    if (found%tvk6_filename) then
+    ! -- TVK6 subpackage
+    if (filein_fname(tvk_filename, 'TVK6_FILENAME', &
+                     this%input_mempath, this%input_fname)) then
+      call mem_setptr(tvk_mempaths, 'TVK6_MEMPATH', this%input_mempath)
+      tvk_mempath = tvk_mempaths(1)
       this%intvk = 1 ! tvk active
-      call tvk_cr(this%tvk, this%name_model, tvk6_mempath, this%intvk, this%iout)
+      call tvk_cr(this%tvk, this%name_model, tvk_mempath, this%intvk, this%iout)
     end if
     !
     ! -- verify ALTERNATIVE_CELL_AVERAGING input value is supported

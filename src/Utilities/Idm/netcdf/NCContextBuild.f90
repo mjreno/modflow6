@@ -51,8 +51,6 @@ contains
                              iout)
     use InputOutputModule, only: lowcase, upcase
     use MemoryHelperModule, only: split_mem_address, split_mem_path
-    use SourceCommonModule, only: idm_subcomponent_type
-    use SourceCommonModule, only: idm_subcomponent_name
     character(len=*), intent(in) :: modeltype
     character(len=*), intent(in) :: modelname
     type(NCFileVarsType), intent(inout) :: nc_vars

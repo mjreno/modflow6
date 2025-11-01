@@ -143,7 +143,7 @@ contains
                          supportOpenClose=.true., blockRequired=.false.)
 
     ! create subpackage list
-    call subpkg_list%create(component_type, modelname, .true.)
+    call subpkg_list%create(component_type, modelname)
 
     ! parse options block if detected
     do

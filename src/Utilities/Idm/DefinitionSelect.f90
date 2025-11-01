@@ -101,8 +101,11 @@ contains
     character(len=LINELENGTH) :: component
     integer(I4B) :: i
 
-    component = component_type
-    if (idm_utl_type(component_type, subcomponent_type)) component = 'UTL'
+    if (idm_utl_type(component_type, subcomponent_type)) then
+      component = 'UTL'
+    else
+      component = component_type
+    end if
 
     nullify (idt)
     do i = 1, size(input_definition_types)
@@ -142,8 +145,11 @@ contains
     character(len=LINELENGTH) :: component
     integer(I4B) :: i
 
-    component = component_type
-    if (idm_utl_type(component_type, subcomponent_type)) component = 'UTL'
+    if (idm_utl_type(component_type, subcomponent_type)) then
+      component = 'UTL'
+    else
+      component = component_type
+    end if
 
     nullify (idt)
     do i = 1, size(input_definition_types)

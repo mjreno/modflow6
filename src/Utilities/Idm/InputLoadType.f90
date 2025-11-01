@@ -38,7 +38,6 @@ module InputLoadTypeModule
     character(len=LENCOMPONENTNAME) :: component_type
     character(len=LENCOMPONENTNAME) :: component_name
     integer(I4B) :: pnum
-    logical(LGP) :: multi
   contains
     procedure :: create => subpkg_create
     procedure :: add => subpkg_add
@@ -156,17 +155,15 @@ contains
 
   !> @brief create a new package type
   !<
-  subroutine subpkg_create(this, component_type, component_name, multi)
+  subroutine subpkg_create(this, component_type, component_name)
     class(SubPackageListType) :: this
     character(len=*), intent(in) :: component_type
     character(len=*), intent(in) :: component_name
-    logical(LGP), intent(in) :: multi
 
     ! initialize
     this%pnum = 0
     this%component_type = component_type
     this%component_name = component_name
-    this%multi = multi
 
     ! allocate arrays
     allocate (this%pkgtypes(0))
@@ -229,7 +226,7 @@ contains
     character(len=LENVARNAME) :: mempath_tag
     character(len=LENVARNAME) :: pname_prefix, pname, ptype, sctype
     character(len=LENMEMPATH) :: mempath, model_mempath
-    integer(I4B) :: n, m, idx, ipackage
+    integer(I4B) :: n, m, idx
     logical(LGP) :: multi
 
     ! no subpackages to load
@@ -239,7 +236,6 @@ contains
     if (idm_utl_type(this%component_type, sc_type)) return
 
     ! initialize
-    ipackage = 0
     pname_prefix = ''
     allocate (ptypes(0))
     allocate (nptypes(0))
@@ -269,45 +265,40 @@ contains
     if (this%component_type == 'EXG') then
       ! no-op
     else
-      model_mempath = create_mem_path(this%component_name, 'NAM', idm_context)
-      call mem_setptr(pnames, 'PNAME', model_mempath)
-      call mem_setptr(ftypes, 'FTYPE', model_mempath)
+      if (multi) then
+        idx = 0
+        model_mempath = create_mem_path(this%component_name, 'NAM', idm_context)
+        call mem_setptr(pnames, 'PNAME', model_mempath)
+        call mem_setptr(ftypes, 'FTYPE', model_mempath)
 
-      ! count for packages of this type
-      idx = 0
-
-      ! count packages, set new pcakage name prefix
-      do n = 1, size(pnames)
-        if (ftypes(n) == ptype) idx = idx + 1
-
-        ! identify row (ipackage) of this package in packages block
-        if (multi) then
-          ! set pname as name from user or IDM name based on package count
-          pname = pnames(n)
-          if (pname == '') then
-            write (pname, '(a,i0)') trim(sctype)//'-', idx
-          end if
-          if (pname == sc_name) then
-            ipackage = idx
-            exit
-          end if
-        else
+        ! identify instance number of the package type to distinguish in name
+        do n = 1, size(pnames)
           if (ftypes(n) == ptype) then
-            ipackage = idx
-            exit
+            idx = idx + 1
+            ! multi packages must match on type and name
+            pname = pnames(n)
+            if (pname == '') then
+              write (pname, '(a,i0)') trim(sctype)//'-', idx
+            end if
+            if (pname == sc_name) then
+              write (pname_prefix, '(a,i0,a)') trim(sctype), idx, '-'
+              exit
+            end if
           end if
-        end if
-      end do
+        end do
 
-      if (ipackage == 0) then
-        errmsg = &
-          'Internal IDM error: subpackage load cannot identify &
-          &parent package index, parent="'//trim(sc_name)//'".'
-        call store_error(errmsg)
-        call store_error_filename(modelfname)
+        if (pname_prefix == '') then
+          errmsg = &
+            'Internal IDM error: subpackage load cannot identify &
+            &package "'//trim(sc_name)//'" in model name file &
+            &packages block.'
+          call store_error(errmsg)
+          call store_error_filename(modelfname)
+        end if
+
+      else
+        write (pname_prefix, '(2a)') trim(sctype), '-'
       end if
-      ! set the package name prefix
-      write (pname_prefix, '(a,i0,a)') trim(sctype), ipackage, '-'
     end if
 
     ! count number of each package type
@@ -329,11 +320,11 @@ contains
 
     ! set subpackage names and mempaths
     do n = 1, size(ptypes)
+      idx = 0
       mempath_tag = trim(ptypes(n))//'_MEMPATH'
       call mem_allocate(mempaths, LENMEMPATH, nptypes(n), &
                         mempath_tag, sc_mempath)
       do m = 1, size(this%pkgtypes)
-        idx = 0
         if (this%pkgtypes(m) == ptypes(n)) then
           idx = idx + 1
           write (this%subcomponent_names(m), '(a,i0)') &
@@ -370,13 +361,11 @@ contains
   !<
   subroutine static_init(this, mf6_input, component_name, component_input_name, &
                          input_name)
-    use IdmDfnSelectorModule, only: idm_multi_package
     class(StaticPkgLoadType), intent(inout) :: this
     type(ModflowInputType), intent(in) :: mf6_input
     character(len=*), intent(in) :: component_name
     character(len=*), intent(in) :: component_input_name
     character(len=*), intent(in) :: input_name
-    logical(LGP) :: is_multi
     integer(I4B) :: iblock
 
     this%mf6_input = mf6_input
@@ -385,13 +374,9 @@ contains
     this%input_name = input_name
     this%iperblock = 0
 
-    is_multi = idm_multi_package(this%mf6_input%component_type, &
-                                 this%mf6_input%subcomponent_type)
-
     ! create subpackage list
     call this%subpkg_list%create(this%mf6_input%component_type, &
-                                 this%mf6_input%component_name, &
-                                 is_multi)
+                                 this%mf6_input%component_name)
 
     ! identify period block definition
     do iblock = 1, size(mf6_input%block_dfns)
@@ -518,7 +503,7 @@ contains
 
     ! set readasarrays and readarraygrid
     if (mf6_input%block_dfns(iperblock)%aggregate) then
-      ! no-op
+      ! no-op, list based input
     else
       do iparam = 1, size(mf6_input%param_dfns)
         idt => mf6_input%param_dfns(iparam)

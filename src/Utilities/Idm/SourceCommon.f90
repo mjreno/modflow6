@@ -112,19 +112,6 @@ contains
     end do
   end function idm_subcomponent_type
 
-  function idm_utl_type(component, subcomponent) &
-    result(utl_type)
-    use IdmDfnSelectorModule, only: idm_integrated
-    character(len=*), intent(in) :: component
-    character(len=*), intent(in) :: subcomponent !< subcomponent, e.g. CHD6
-    logical(LGP) :: utl_type
-    if (idm_integrated(component, subcomponent)) then
-      utl_type = .false.
-    else
-      utl_type = idm_integrated('UTL', subcomponent)
-    end if
-  end function idm_utl_type
-
   !> @brief model package subcomponent name
   !!
   !! Return the IDM component name, which is the package type for
@@ -135,21 +122,46 @@ contains
   function idm_subcomponent_name(component_type, subcomponent_type, sc_name) &
     result(subcomponent_name)
     use IdmDfnSelectorModule, only: idm_multi_package
-    use IdmDfnSelectorModule, only: idm_integrated
     character(len=*), intent(in) :: component_type
     character(len=*), intent(in) :: subcomponent_type
     character(len=*), intent(in) :: sc_name
     character(len=LENPACKAGENAME) :: subcomponent_name
     subcomponent_name = ''
-    if ((component_type == 'UTL' .and. &
-         idm_integrated(component_type, subcomponent_type)) .or. &
-        idm_utl_type(component_type, subcomponent_type) .or. &
+    if (idm_utl_type(component_type, subcomponent_type) .or. &
         idm_multi_package(component_type, subcomponent_type)) then
       subcomponent_name = sc_name
     else
       subcomponent_name = subcomponent_type
     end if
   end function idm_subcomponent_name
+
+  !> @brief is utility type
+  !!
+  !! Is this subcompentent type an idm integrated utility
+  !! type.
+  !!
+  !<
+  function idm_utl_type(component, subcomponent) &
+    result(utl_type)
+    use IdmDfnSelectorModule, only: idm_integrated
+    character(len=*), intent(in) :: component
+    character(len=*), intent(in) :: subcomponent !< subcomponent, e.g. CHD6
+    character(len=LENCOMPONENTNAME) :: subcomponent_type
+    logical(LGP) :: utl_type
+    integer(I4B) :: i, ilen, idx
+    idx = 0
+    ilen = len_trim(subcomponent)
+    subcomponent_type = ''
+    do i = 1, ilen
+      if (subcomponent(i:i) == '6' .or. subcomponent(i:i) == '-') then
+        exit
+      else
+        idx = idx + 1
+        subcomponent_type(idx:idx) = subcomponent(i:i)
+      end if
+    end do
+    utl_type = idm_integrated('UTL', subcomponent_type)
+  end function idm_utl_type
 
   !> @brief input file extension
   !!

@@ -75,6 +75,7 @@ contains
     packobj%iout = iout
     packobj%id = id
     packobj%ibcnum = ibcnum
+    packobj%ncolbnd = 2
     packobj%ictMemPath = create_mem_path(namemodel, 'NPF')
   end subroutine ghb_create
 
@@ -399,7 +400,7 @@ contains
     ! -- modules
     use ConstantsModule, only: DZERO
     ! -- dummy
-    class(GhbType), intent(inout) :: this !< BndExtType object
+    class(GhbType), intent(inout) :: this
     integer(I4B), intent(in) :: col
     integer(I4B), intent(in) :: row
     ! -- result

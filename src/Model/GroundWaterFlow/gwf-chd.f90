@@ -84,6 +84,7 @@ contains
     packobj%iout = iout
     packobj%id = id
     packobj%ibcnum = ibcnum
+    packobj%ncolbnd = 1
     packobj%ictMemPath = create_mem_path(namemodel, 'NPF')
   end subroutine chd_create
 
@@ -443,7 +444,7 @@ contains
     ! -- modules
     use ConstantsModule, only: DZERO
     ! -- dummy variables
-    class(ChdType), intent(inout) :: this !< BndType object
+    class(ChdType), intent(inout) :: this
     integer(I4B), intent(in) :: col
     integer(I4B), intent(in) :: row
     ! -- result

@@ -26,6 +26,7 @@ module GweEslModule
 
     procedure :: allocate_scalars => esl_allocate_scalars
     procedure :: allocate_arrays => esl_allocate_arrays
+    procedure :: bnd_rp => esl_rp
     procedure :: bnd_cf => esl_cf
     procedure :: bnd_ck => esl_ck
     procedure :: bnd_fc => esl_fc
@@ -139,6 +140,25 @@ contains
     call mem_checkin(this%senerrate, 'SENERRATE', this%memoryPath, &
                      'SENERRATE', this%input_mempath)
   end subroutine esl_allocate_arrays
+
+  !> @brief Read and prepare method for package
+  !<
+  subroutine esl_rp(this)
+    ! -- modules
+    use TdisModule, only: kper
+    ! -- dummy
+    class(GweEslType), intent(inout) :: this !< GwtIstType object
+    !
+    if (this%iper /= kper) return
+    !
+    ! -- Call the parent class read and prepare
+    call this%BndExtType%bnd_rp()
+    !
+    ! -- Write the list to iout if requested
+    if (this%iprpak /= 0) then
+      call this%write_list()
+    end if
+  end subroutine esl_rp
 
   !> @brief Check energy source loading boundary condition data
   !<

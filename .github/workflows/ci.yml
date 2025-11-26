@@ -274,9 +274,6 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # intel mac, release mode
-          - os: macos-13
-            debug: false
           # arm mac, release mode
           - os: macos-14
             debug: false
@@ -482,7 +479,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-22.04, macos-13, windows-2022]
+        os: [ubuntu-22.04, macos-14, windows-2022]
     defaults:
       run:
         shell: bash
@@ -629,7 +626,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-22.04, macos-13, windows-2022]
+        os: [ubuntu-22.04, macos-14, windows-2022]
     defaults:
       run:
         shell: bash

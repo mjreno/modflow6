@@ -446,7 +446,7 @@ contains
     ! -- modules
     use ConstantsModule, only: DZERO
     ! -- dummy
-    class(GweCtpType), intent(inout) :: this !< BndExtType object
+    class(GweCtpType), intent(inout) :: this
     integer(I4B), intent(in) :: row
     ! -- result
     real(DP) :: temp
@@ -466,7 +466,7 @@ contains
     ! -- modules
     use ConstantsModule, only: DZERO
     ! -- dummy variables
-    class(GweCtpType), intent(inout) :: this !< BndExtType object
+    class(GweCtpType), intent(inout) :: this
     integer(I4B), intent(in) :: col
     integer(I4B), intent(in) :: row
     ! -- result

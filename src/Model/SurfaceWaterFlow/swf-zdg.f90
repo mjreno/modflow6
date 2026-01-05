@@ -234,7 +234,7 @@ contains
     ! -- modules
     use SwfZdgInputModule, only: SwfZdgParamFoundType
     ! -- dummy variables
-    class(SwfZdgType), intent(inout) :: this !< BndExtType object
+    class(SwfZdgType), intent(inout) :: this
     type(SwfZdgParamFoundType), intent(in) :: found
     ! -- local variables
     ! -- format
@@ -552,7 +552,7 @@ contains
     ! -- modules
     use ConstantsModule, only: DZERO
     ! -- dummy variables
-    class(SwfZdgType), intent(inout) :: this !< BndExtType object
+    class(SwfZdgType), intent(inout) :: this
     integer(I4B), intent(in) :: col
     integer(I4B), intent(in) :: row
     ! -- result

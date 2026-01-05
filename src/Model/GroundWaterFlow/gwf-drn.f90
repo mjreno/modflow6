@@ -247,7 +247,7 @@ contains
     ! -- modules
     use GwfDrnInputModule, only: GwfDrnParamFoundType
     ! -- dummy variables
-    class(DrnType), intent(inout) :: this !< BndExtType object
+    class(DrnType), intent(inout) :: this
     type(GwfDrnParamFoundType), intent(in) :: found
     ! -- local variables
     ! -- format
@@ -612,7 +612,7 @@ contains
   !<
   subroutine drn_store_user_cond(this)
     ! -- dummy
-    class(DrnType), intent(inout) :: this !< BndExtType object
+    class(DrnType), intent(inout) :: this
     ! -- local
     integer(I4B) :: n
     !
@@ -628,7 +628,7 @@ contains
     ! -- modules
     use ConstantsModule, only: DZERO
     ! -- dummy variables
-    class(DrnType), intent(inout) :: this !< BndExtType object
+    class(DrnType), intent(inout) :: this
     integer(I4B), intent(in) :: row
     ! -- result
     real(DP) :: cond

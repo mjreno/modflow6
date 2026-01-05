@@ -189,7 +189,7 @@ contains
     ! -- modules
     use SwfFlwInputModule, only: SwfFlwParamFoundType
     ! -- dummy variables
-    class(SwfFlwType), intent(inout) :: this !< BndExtType object
+    class(SwfFlwType), intent(inout) :: this
     type(SwfFlwParamFoundType), intent(in) :: found
     ! -- local variables
     ! -- format
@@ -439,7 +439,7 @@ contains
     ! -- modules
     use ConstantsModule, only: DZERO
     ! -- dummy variables
-    class(SwfFlwType), intent(inout) :: this !< BndExtType object
+    class(SwfFlwType), intent(inout) :: this
     integer(I4B), intent(in) :: row
     ! -- result
     real(DP) :: q
@@ -461,7 +461,7 @@ contains
     ! -- modules
     use ConstantsModule, only: DZERO
     ! -- dummy variables
-    class(SwfFlwType), intent(inout) :: this !< BndExtType object
+    class(SwfFlwType), intent(inout) :: this
     integer(I4B), intent(in) :: col
     integer(I4B), intent(in) :: row
     ! -- result

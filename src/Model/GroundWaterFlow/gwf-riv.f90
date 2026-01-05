@@ -127,7 +127,7 @@ contains
     ! -- modules
     use GwfRivInputModule, only: GwfRivParamFoundType
     ! -- dummy variables
-    class(RivType), intent(inout) :: this !< BndExtType object
+    class(RivType), intent(inout) :: this
     type(GwfRivParamFoundType), intent(in) :: found
     !
     ! -- log found options
@@ -400,7 +400,7 @@ contains
   !<
   subroutine riv_store_user_cond(this)
     ! -- dummy
-    class(RivType), intent(inout) :: this !< BndExtType object
+    class(RivType), intent(inout) :: this
     ! -- local
     integer(I4B) :: n
     !
@@ -416,7 +416,7 @@ contains
     ! -- modules
     use ConstantsModule, only: DZERO
     ! -- dummy
-    class(RivType), intent(inout) :: this !< BndExtType object
+    class(RivType), intent(inout) :: this
     integer(I4B), intent(in) :: row
     ! -- result
     real(DP) :: cond

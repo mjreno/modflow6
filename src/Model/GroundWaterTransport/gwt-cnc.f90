@@ -453,7 +453,7 @@ contains
     ! -- modules
     use ConstantsModule, only: DZERO
     ! -- dummy variables
-    class(GwtCncType), intent(inout) :: this !< BndExtType object
+    class(GwtCncType), intent(inout) :: this
     integer(I4B), intent(in) :: row
     ! -- result
     real(DP) :: conc

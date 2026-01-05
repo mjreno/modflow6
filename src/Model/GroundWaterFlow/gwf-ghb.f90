@@ -121,7 +121,7 @@ contains
   subroutine log_ghb_options(this, found_mover)
     ! -- modules
     ! -- dummy
-    class(GhbType), intent(inout) :: this !< BndExtType object
+    class(GhbType), intent(inout) :: this
     logical(LGP), intent(in) :: found_mover
     !
     ! -- log found options
@@ -366,7 +366,7 @@ contains
   !<
   subroutine ghb_store_user_cond(this)
     ! -- dummy
-    class(GhbType), intent(inout) :: this !< BndExtType object
+    class(GhbType), intent(inout) :: this
     ! -- local
     integer(I4B) :: n
     !
@@ -382,7 +382,7 @@ contains
     ! -- modules
     use ConstantsModule, only: DZERO
     ! -- dummy variables
-    class(GhbType), intent(inout) :: this !< BndExtType object
+    class(GhbType), intent(inout) :: this
     integer(I4B), intent(in) :: row
     ! -- result
     real(DP) :: cond

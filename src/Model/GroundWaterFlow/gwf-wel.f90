@@ -258,7 +258,7 @@ contains
     ! -- modules
     use GwfWelInputModule, only: GwfWelParamFoundType
     ! -- dummy variables
-    class(WelType), intent(inout) :: this !< BndExtType object
+    class(WelType), intent(inout) :: this
     type(GwfWelParamFoundType), intent(in) :: found
     ! -- local variables
     ! -- format
@@ -639,7 +639,7 @@ contains
     ! -- modules
     use ConstantsModule, only: DZERO
     ! -- dummy variables
-    class(WelType), intent(inout) :: this !< BndExtType object
+    class(WelType), intent(inout) :: this
     integer(I4B), intent(in) :: row
     ! -- result
     real(DP) :: q

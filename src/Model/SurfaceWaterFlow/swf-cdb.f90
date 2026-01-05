@@ -221,7 +221,7 @@ contains
     ! -- modules
     use SwfCdbInputModule, only: SwfCdbParamFoundType
     ! -- dummy variables
-    class(SwfCdbType), intent(inout) :: this !< BndExtType object
+    class(SwfCdbType), intent(inout) :: this
     type(SwfCdbParamFoundType), intent(in) :: found
     ! -- local variables
     ! -- format
@@ -531,7 +531,7 @@ contains
     ! -- modules
     use ConstantsModule, only: DZERO
     ! -- dummy variables
-    class(SwfCdbType), intent(inout) :: this !< BndExtType object
+    class(SwfCdbType), intent(inout) :: this
     integer(I4B), intent(in) :: col
     integer(I4B), intent(in) :: row
     ! -- result

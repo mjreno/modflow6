@@ -216,15 +216,15 @@ contains
     character(len=*), intent(in) :: sc_name !< parent subcomponent name
     character(len=*), intent(in) :: sc_mempath !< parent mempath
     character(len=*), intent(in) :: modelfname !< model name file
-    character(len=LINELENGTH), dimension(:), allocatable :: ptypes
-    integer(I4B), dimension(:), allocatable :: nptypes
+    character(len=LINELENGTH), dimension(:), allocatable :: subptypes
+    integer(I4B), dimension(:), allocatable :: nsubptypes
     type(CharacterStringType), dimension(:), &
       pointer, contiguous :: mempaths
     type(CharacterStringType), dimension(:), contiguous, &
       pointer :: pnames, ftypes
     character(len=LINELENGTH), pointer :: input_fname
     character(len=LENVARNAME) :: mempath_tag
-    character(len=LENVARNAME) :: pname_prefix, pname, ptype, sctype
+    character(len=LENVARNAME) :: pname_prefix, pname, ptype, subcomponent, subpkg
     character(len=LENMEMPATH) :: mempath, model_mempath
     integer(I4B) :: n, m, idx
     logical(LGP) :: multi
@@ -237,28 +237,26 @@ contains
 
     ! initialize
     pname_prefix = ''
-    allocate (ptypes(0))
-    allocate (nptypes(0))
+    allocate (subptypes(0))
+    allocate (nsubptypes(0))
 
     ! reset updated readasarrays, readarraygrid types
     select case (sc_type)
-    case ('EVTA', 'RCHA', &
-          'RIVG', 'CHDG', &
-          'WELG', 'DRNG', &
-          'GHBG')
-      sctype = sc_type(1:3)
+    case ('EVTA', 'RCHA', 'RIVG', 'CHDG', &
+          'WELG', 'DRNG', 'GHBG')
+      subcomponent = sc_type(1:3)
     case default
-      sctype = sc_type
+      subcomponent = sc_type
     end select
 
     ! set package type
-    ptype = trim(sctype)//'6'
+    ptype = trim(subcomponent)//'6'
 
     ! determine if multi instance package
-    if (idm_integrated(this%component_type, sctype)) then
-      multi = idm_multi_package(this%component_type, sctype)
+    if (idm_integrated(this%component_type, subcomponent)) then
+      multi = idm_multi_package(this%component_type, subcomponent)
     else
-      multi = multi_package_type(this%component_type, sctype, ptype)
+      multi = multi_package_type(this%component_type, subcomponent, ptype)
     end if
 
     ! set package name prefix based on parent package
@@ -278,10 +276,10 @@ contains
             ! multi packages must match on type and name
             pname = pnames(n)
             if (pname == '') then
-              write (pname, '(a,i0)') trim(sctype)//'-', idx
+              write (pname, '(a,i0)') trim(subcomponent)//'-', idx
             end if
             if (pname == sc_name) then
-              write (pname_prefix, '(a,i0,a)') trim(sctype), idx, '-'
+              write (pname_prefix, '(a,i0,a)') trim(subcomponent), idx, '-'
               exit
             end if
           end if
@@ -297,35 +295,34 @@ contains
         end if
 
       else
-        write (pname_prefix, '(2a)') trim(sctype), '-'
+        write (pname_prefix, '(2a)') trim(subcomponent), '-'
       end if
     end if
 
-    ! count number of each package type
+    ! count number of each subpackage type
+    subpkg = ''
+    idx = 0
     do n = 1, size(this%pkgtypes)
-      idx = 0
-      do m = 1, size(ptypes)
-        if (ptypes(m) == this%pkgtypes(n)) then
-          nptypes(m) = nptypes(m) + 1
-          idx = m
-        end if
-      end do
-      if (idx == 0) then
-        call expandarray(ptypes)
-        call expandarray(nptypes)
-        ptypes(size(ptypes)) = this%pkgtypes(n)
-        nptypes(size(ptypes)) = 1
+      if (this%pkgtypes(n) /= subpkg) then
+        idx = idx + 1
+        subpkg = this%pkgtypes(n)
+        call expandarray(subptypes)
+        call expandarray(nsubptypes)
+        subptypes(idx) = subpkg
+        nsubptypes(idx) = 1
+      else
+        nsubptypes(idx) = nsubptypes(idx) + 1
       end if
     end do
 
     ! set subpackage names and mempaths
-    do n = 1, size(ptypes)
+    do n = 1, size(subptypes)
       idx = 0
-      mempath_tag = trim(ptypes(n))//'_MEMPATH'
-      call mem_allocate(mempaths, LENMEMPATH, nptypes(n), &
+      mempath_tag = trim(subptypes(n))//'_MEMPATH'
+      call mem_allocate(mempaths, LENMEMPATH, nsubptypes(n), &
                         mempath_tag, sc_mempath)
       do m = 1, size(this%pkgtypes)
-        if (this%pkgtypes(m) == ptypes(n)) then
+        if (this%pkgtypes(m) == subptypes(n)) then
           idx = idx + 1
           write (this%subcomponent_names(m), '(a,i0)') &
             trim(pname_prefix)//trim(this%subcomponent_types(m)), idx
@@ -340,8 +337,8 @@ contains
     end do
 
     ! cleanup
-    deallocate (ptypes)
-    deallocate (nptypes)
+    deallocate (subptypes)
+    deallocate (nsubptypes)
   end subroutine subpkg_names
 
   !> @brief create a new package type

@@ -124,5 +124,5 @@ tagged false
 in_record true
 reader urword
 time_series true
-longname specific storage
+longname time-varying storage
 description is the new value to be assigned as the cell's specific yield or specific storage (or storage coefficient if the STORAGECOEFFICIENT STO package option is specified) . Value applies from the start of the specified stress period, as per SS and SY in the STO package.  Specific storage or specific yield values must be greater than or equal to 0.  If the OPTIONS block includes a TS6 entry (see the ``Time-Variable Input'' section), values can be obtained from a time series by entering the time-series name in place of a numeric value.

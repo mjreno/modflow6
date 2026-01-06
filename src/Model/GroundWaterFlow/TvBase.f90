@@ -254,7 +254,7 @@ contains
       end if
       !
       ! -- Set the variable name
-      varname = this%tv_type(n)
+      varName = this%tv_type(n)
       !
       setval => this%get_pointer_to_value(node, varName)
       if (.not. associated(setval)) then

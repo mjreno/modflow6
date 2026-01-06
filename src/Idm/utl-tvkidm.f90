@@ -193,7 +193,7 @@ module UtlTvkInputModule
     'TVVALUE', & ! fortran variable
     'DOUBLE', & ! type
     '', & ! shape
-    'specific storage', & ! longname
+    'time-varying hydraulic conductivity', & ! longname
     .true., & ! required
     .false., & ! developmode
     .true., & ! multi-record

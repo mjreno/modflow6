@@ -148,19 +148,21 @@ contains
     character(len=*), intent(in) :: subcomponent !< subcomponent, e.g. CHD6
     character(len=LENCOMPONENTNAME) :: subcomponent_type
     logical(LGP) :: utl_type
-    integer(I4B) :: i, ilen, idx
-    idx = 0
-    ilen = len_trim(subcomponent)
-    subcomponent_type = ''
-    do i = 1, ilen
-      if (subcomponent(i:i) == '6' .or. subcomponent(i:i) == '-') then
-        exit
-      else
-        idx = idx + 1
-        subcomponent_type(idx:idx) = subcomponent(i:i)
-      end if
-    end do
-    utl_type = idm_integrated('UTL', subcomponent_type)
+    integer(I4B) :: i, ilen
+    if (component == 'UTL') then
+      utl_type = .true.
+    else
+      ilen = len_trim(subcomponent)
+      subcomponent_type = ''
+      do i = 1, ilen
+        if (subcomponent(i:i) == '6') then
+          exit
+        else
+          subcomponent_type(i:i) = subcomponent(i:i)
+        end if
+      end do
+      utl_type = idm_integrated('UTL', subcomponent_type)
+    end if
   end function idm_utl_type
 
   !> @brief input file extension

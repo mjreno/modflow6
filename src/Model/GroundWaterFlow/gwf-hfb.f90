@@ -601,7 +601,6 @@ contains
     ! -- formats
     character(len=*), parameter :: fmthfb = "(i10, 2a20, 1(1pg15.6))"
 
-
     ! set input context pointers
     call mem_setptr(nbound, 'NBOUND', this%input_mempath)
     call mem_setptr(cellids1, 'CELLID1', this%input_mempath)

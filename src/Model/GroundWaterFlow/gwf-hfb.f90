@@ -616,7 +616,7 @@ contains
     ! log data
     write (this%iout, '(//,1x,a)') 'READING HFB DATA'
     if (this%iprpak > 0) then
-      write (this%iout, '(3a10, 1a15)') 'HFB NUM', 'CELL1', 'CELL2', &
+      write (this%iout, '(a10, 2a20, 1a15)') 'HFB NUM', 'CELL1', 'CELL2', &
         'HYDCHR'
     end if
 

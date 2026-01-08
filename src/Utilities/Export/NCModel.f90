@@ -42,7 +42,7 @@ module NCModelExportModule
     integer(I4B), dimension(:, :), allocatable :: varids_aux
     integer(I4B), dimension(:), pointer, contiguous :: mshape => null() !< model shape
     integer(I4B), pointer :: iper !< most recent package rp load
-    integer(I4B) :: iper_export !< most recent period of netcdf package export
+    integer(I4B) :: eper !< most recent period of netcdf package export
     integer(I4B) :: nparam !< number of in scope params
     integer(I4B) :: naux !< number of auxiliary variables
   contains
@@ -163,7 +163,7 @@ contains
     this%mshape => mshape
     this%nparam = nparam
     this%naux = naux
-    this%iper_export = 0
+    this%eper = 0
 
     input_mempath = create_mem_path(component=mf6_input%component_name, &
                                     subcomponent=mf6_input%subcomponent_name, &
@@ -272,7 +272,7 @@ contains
   !<
   subroutine export_init(this, modelname, modeltype, modelfname, nc_fname, &
                          disenum, nctype, iout)
-    use TdisModule, only: datetime0, nstp, inats
+    use TdisModule, only: datetime0, nper, nstp, inats
     use MemoryManagerModule, only: mem_setptr
     use MemoryHelperModule, only: create_mem_path
     use MemoryManagerExtModule, only: mem_set_value
@@ -390,7 +390,11 @@ contains
     end if
 
     ! set total nstp
-    this%totnstp = sum(nstp)
+    if (isim_mode == MVALIDATE) then
+      this%totnstp = nper
+    else
+      this%totnstp = sum(nstp)
+    end if
   end subroutine export_init
 
   !> @brief retrieve dynamic export object from package list
@@ -524,12 +528,10 @@ contains
     class(ExportPackageType), pointer :: export_pkg
     do idx = 1, this%pkglist%Count()
       export_pkg => this%get(idx)
-      ! last loaded data is not current period
-      if (export_pkg%iper /= kper) cycle
       ! period input already exported
-      if (export_pkg%iper_export >= export_pkg%iper) cycle
+      if (export_pkg%eper >= kper) cycle
       ! set exported iper
-      export_pkg%iper_export = export_pkg%iper
+      export_pkg%eper = kper
       ! update export package
       call this%package_step(export_pkg)
     end do

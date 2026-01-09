@@ -9,9 +9,9 @@ module ModelExportModule
 
   use KindModule, only: DP, I4B, LGP
   use SimModule, only: store_error, store_error_filename
-  use SimVariablesModule, only: errmsg, isim_mode
+  use SimVariablesModule, only: errmsg
   use ConstantsModule, only: LINELENGTH, LENMODELNAME, LENCOMPONENTNAME, &
-                             LENMEMPATH, MVALIDATE
+                             LENMEMPATH
   use ListModule, only: ListType
   use NCModelExportModule, only: NCBaseModelExportType
   use InputLoadTypeModule, only: ModelDynamicPkgsType
@@ -221,9 +221,7 @@ contains
   subroutine post_prepare(this)
     class(ExportModelType), intent(inout) :: this
     if (associated(this%nc_export)) then
-      if (isim_mode == MVALIDATE) then
-        call this%nc_export%export_input()
-      end if
+      call this%nc_export%export_input()
     end if
   end subroutine post_prepare
 

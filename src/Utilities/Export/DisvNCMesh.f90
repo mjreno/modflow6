@@ -117,7 +117,6 @@ contains
   subroutine step(this)
     use ConstantsModule, only: DHNOFLO
     use TdisModule, only: totim
-    use NetCDFCommonModule, only: ixstp
     class(Mesh2dDisvExportType), intent(inout) :: this
     real(DP), dimension(:), pointer, contiguous :: dbl1d
     integer(I4B) :: n, k, nvals, istp
@@ -129,7 +128,7 @@ contains
     nullify (dbl2d)
 
     ! set global step index
-    istp = ixstp()
+    istp = this%istp()
 
     dis_shape(1) = this%disv%ncpl
     dis_shape(2) = this%disv%nlay

@@ -169,6 +169,11 @@ def check_output(idx, test, export, gridded_input):
                 ), f"NetCDF-concentration comparison failure in timestep {timestep + 1}"
                 timestep += 1
 
+    for v in xds.data_vars.keys():
+        assert not v.startswith("dis")
+        assert not v.startswith("ic")
+        assert not v.startswith("dsp")
+
     xds.close()
 
     if gridded_input == "ascii":

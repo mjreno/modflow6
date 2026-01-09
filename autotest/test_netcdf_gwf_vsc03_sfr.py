@@ -213,6 +213,13 @@ def check_output(idx, test, export, gridded_input):
                 ), f"NetCDF-head comparison failure in timestep {kstp + 1}"
                 kstp += 1
 
+    for v in xds.data_vars.keys():
+        assert not v.startswith("rcha")
+        assert not v.startswith("dis")
+        assert not v.startswith("ic")
+        assert not v.startswith("npf")
+        assert not v.startswith("sto")
+
     xds.close()
 
     if gridded_input == "ascii":

@@ -259,13 +259,12 @@ contains
   subroutine step(this)
     use ConstantsModule, only: DHNOFLO
     use TdisModule, only: totim
-    use NetCDFCommonModule, only: ixstp
     class(DisNCStructuredType), intent(inout) :: this
     real(DP), dimension(:), pointer, contiguous :: dbl1d
     integer(I4B) :: n, istp
 
     ! set global step index
-    istp = ixstp()
+    istp = this%istp()
 
     if (size(this%dis%nodeuser) < &
         size(this%dis%nodereduced)) then

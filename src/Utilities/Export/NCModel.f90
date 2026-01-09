@@ -97,6 +97,7 @@ module NCModelExportModule
     procedure :: init => export_init
     procedure :: get => export_get
     procedure :: input_attribute
+    procedure :: istp
     procedure :: destroy => export_destroy
   end type NCModelExportType
 
@@ -432,6 +433,20 @@ contains
     end if
   end function input_attribute
 
+  !> @brief step index for timeseries data
+  !<
+  function istp(this)
+    use TdisModule, only: kstp, kper, nstp
+    class(NCModelExportType), intent(inout) :: this
+    integer(I4B) :: n, istp
+    istp = kstp
+    if (kper > 1) then
+      do n = 1, kper - 1
+        istp = istp + nstp(n)
+      end do
+    end if
+  end function istp
+
   !> @brief build netcdf variable name
   !<
   function export_varname(pkgname, tagname, mempath, layer, iaux) &
@@ -530,10 +545,10 @@ contains
       export_pkg => this%get(idx)
       ! period input already exported
       if (export_pkg%eper >= kper) cycle
-      ! set exported iper
-      export_pkg%eper = kper
       ! update export package
       call this%package_step(export_pkg)
+      ! update exported iper
+      export_pkg%eper = kper
     end do
   end subroutine export_input
 

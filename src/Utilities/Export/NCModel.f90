@@ -273,7 +273,7 @@ contains
   !<
   subroutine export_init(this, modelname, modeltype, modelfname, nc_fname, &
                          disenum, nctype, iout)
-    use TdisModule, only: datetime0, nper, nstp, inats
+    use TdisModule, only: datetime0, nper, nstp
     use MemoryManagerModule, only: mem_setptr
     use MemoryHelperModule, only: create_mem_path
     use MemoryManagerExtModule, only: mem_set_value
@@ -380,14 +380,6 @@ contains
     else
       ! January 1, 1970 at 00:00:00 UTC
       this%datetime = 'days since 1970-01-01T00:00:00'
-    end if
-
-    ! Set error and exit if ATS is on
-    if (inats > 0) then
-      errmsg = 'Adaptive time stepping not currently supported &
-               &with NetCDF exports.'
-      call store_error(errmsg)
-      call store_error_filename(modelfname)
     end if
 
     ! set total nstp

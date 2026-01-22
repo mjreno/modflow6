@@ -650,7 +650,7 @@ def write_md(f, vardict, component, package):
         f.write(s)
 
 
-def write_appendix(blocks):
+def write_appendix(blocks, developmode=True):
     with open(Path(TEX_DIR_PATH) / "appendixA.tex", "w") as f:
         f.write("\\small\n\\begin{longtable}{p{1.5cm} p{1.5cm} p{3cm} c}\n")
         f.write(
@@ -684,7 +684,7 @@ def write_appendix(blocks):
         for b in blocks:
             l = b.strip().split("-")
             component, ftype, blockname = l
-            if f"{component}-{ftype}".lower() in DEVELOP_PKGS:
+            if not developmode and f"{component}-{ftype}".lower() in DEVELOP_PKGS:
                 continue
             if lastftype != ftype:
                 f.write("\\hline\n")
@@ -943,7 +943,7 @@ if __name__ == "__main__":
 
     dfns = get_dfn_files(models)
     blocks = write_variables(developmode=developmode)
-    write_appendix(blocks)
+    write_appendix(blocks, developmode=developmode)
 
     if verbose:
         for block in blocks:

@@ -339,15 +339,6 @@ contains
       call this%check_pxdp()
     end if
     !
-    if (this%iprpak /= 0) then
-      if (this%readasarrays) then
-        ! no-op
-      else
-        ! -- Write the list to iout
-        call this%write_list()
-      end if
-    end if
-    !
     ! -- copy nodelist to nodesontop if not fixed cell
     if (.not. this%fixed_cell) call this%set_nodesontop()
   end subroutine evt_rp

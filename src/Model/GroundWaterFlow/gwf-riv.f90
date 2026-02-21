@@ -187,11 +187,6 @@ contains
     if (this%ivsc == 1) then
       call this%riv_store_user_cond()
     end if
-    !
-    ! -- Write the list to iout if requested
-    if (this%iprpak /= 0) then
-      call this%write_list()
-    end if
   end subroutine riv_rp
 
   !> @brief Check river boundary condition data

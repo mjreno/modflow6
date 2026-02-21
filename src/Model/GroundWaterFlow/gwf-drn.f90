@@ -176,11 +176,6 @@ contains
     if (this%ivsc == 1) then
       call this%drn_store_user_cond()
     end if
-    !
-    ! -- Write the list to iout if requested
-    if (this%iprpak /= 0) then
-      call this%write_list()
-    end if
   end subroutine drn_rp
 
   !> @brief Source options specific to DrnType

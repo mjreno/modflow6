@@ -169,11 +169,6 @@ contains
     if (ierr > 0) then
       call store_error_filename(this%input_fname)
     end if
-    !
-    ! -- Write the list to iout if requested
-    if (this%iprpak /= 0) then
-      call this%write_list()
-    end if
   end subroutine ctp_rp
 
   !> @brief Constant temperature package advance routine

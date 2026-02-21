@@ -178,11 +178,6 @@ contains
     if (this%ivsc == 1) then
       call this%ghb_store_user_cond()
     end if
-    !
-    ! -- Write the list to iout if requested
-    if (this%iprpak /= 0) then
-      call this%write_list()
-    end if
   end subroutine ghb_rp
 
   !> @brief Check ghb boundary condition data

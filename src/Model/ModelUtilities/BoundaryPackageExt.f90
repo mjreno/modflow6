@@ -169,6 +169,11 @@ contains
         end do
       end if
     end if
+    !
+    ! -- Write the list to iout if requested
+    if (this%iprpak /= 0) then
+      call this%write_list()
+    end if
   end subroutine bndext_rp
 
   !> @ brief Deallocate package memory

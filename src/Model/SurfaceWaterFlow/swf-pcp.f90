@@ -258,9 +258,6 @@ contains
     if (this%read_as_arrays) then
       ! no need to do anything because this%precipitation points directly to
       ! the input context precipitation, which is automatically updated by idm
-      if (this%iprpak /= 0) then
-        call this%write_list()
-      end if
     else
       call this%BndExtType%bnd_rp()
     end if

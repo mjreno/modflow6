@@ -153,7 +153,7 @@ module InputLoadTypeModule
 
 contains
 
-  !> @brief create a new package type
+  !> @brief initialize a SubPackageListType object
   !<
   subroutine subpkg_create(this, component_type, component_name)
     class(SubPackageListType) :: this
@@ -341,7 +341,7 @@ contains
     deallocate (nsubptypes)
   end subroutine subpkg_names
 
-  !> @brief create a new package type
+  !> @brief destroy a SubPackageListType object
   !<
   subroutine subpkg_destroy(this)
     class(SubPackageListType) :: this

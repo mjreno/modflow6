@@ -213,13 +213,13 @@ contains
   !<
   subroutine rp(this)
     ! -- modules
-    use TdisModule, only: kper
+    use GeomUtilModule, only: get_node
     ! -- dummy
     class(TvBaseType) :: this
     ! -- local variables
     real(DP), pointer :: setval
     integer(I4B), pointer :: iper, nlist
-    integer(I4B) :: n, node
+    integer(I4B) :: n, nodeu, node
     character(len=LINELENGTH) :: varName, cellstr
     logical :: haveChanges
     ! -- formats
@@ -240,11 +240,25 @@ contains
     haveChanges = .false.
     !
     do n = 1, nlist
-      node = this%dis%get_nodenumber(this%cellid(1, n), &
-                                     this%cellid(2, n), &
-                                     this%cellid(3, n), 0)
-      !
-      ! -- Validate cell ID
+      ! -- set node user
+      if (this%dis%ndim == 1) then
+        nodeu = this%cellid(1, n)
+      elseif (this%dis%ndim == 2) then
+        nodeu = get_node(this%cellid(1, n), 1, &
+                         this%cellid(2, n), &
+                         this%dis%mshape(1), 1, &
+                         this%dis%mshape(2))
+      else
+        nodeu = get_node(this%cellid(1, n), &
+                         this%cellid(2, n), &
+                         this%cellid(3, n), &
+                         this%dis%mshape(1), &
+                         this%dis%mshape(2), &
+                         this%dis%mshape(3))
+      end if
+
+      ! -- set node reduced
+      node = this%dis%get_nodenumber(nodeu, 1)
       if (node < 1 .or. node > this%dis%nodes) then
         call this%dis%noder_to_string(node, cellstr)
         write (errmsg, '(a,2(1x,a))') &
@@ -300,12 +314,15 @@ contains
   !!
   !<
   subroutine ad(this)
+    ! -- modules
+    use GeomUtilModule, only: get_node
     ! -- dummy
     class(TvBaseType) :: this
     ! -- local variables
     character(len=LINELENGTH) :: varName
     integer(I4B), pointer :: iper, nlist
-    integer(I4B) :: n
+    real(DP), pointer :: setval
+    integer(I4B) :: n, node, nodeu
     !
     ! -- check last loaded input period
     call mem_setptr(iper, 'IPER', this%input_mempath)
@@ -314,16 +331,39 @@ contains
     ! -- set input context pointer
     call mem_setptr(nlist, 'NBOUND', this%input_mempath)
     !
-    ! -- Validate changes for period if timeseries is active
+    ! -- Re-apply and validate changes when timeseries is active
     if (nlist > 0 .and. this%ts_active) then
       ! -- Record that changes were made at the current time step
       call this%set_changed_at(kper, kstp)
-      ! -- Reset node K change flags at all time steps except the first of eac
+      ! -- Reset node change flags at all time steps except the first of each period
       call this%reset_change_flags()
-      ! -- Validate all period updated property values
+      ! -- Re-apply time-series-updated values and validate
       do n = 1, nlist
+        if (this%dis%ndim == 1) then
+          nodeu = this%cellid(1, n)
+        elseif (this%dis%ndim == 2) then
+          nodeu = get_node(this%cellid(1, n), 1, &
+                           this%cellid(2, n), &
+                           this%dis%mshape(1), 1, &
+                           this%dis%mshape(2))
+        else
+          nodeu = get_node(this%cellid(1, n), &
+                           this%cellid(2, n), &
+                           this%cellid(3, n), &
+                           this%dis%mshape(1), &
+                           this%dis%mshape(2), &
+                           this%dis%mshape(3))
+        end if
+
+        ! -- set node reduced
+        node = this%dis%get_nodenumber(nodeu, 1)
+        if (node < 1 .or. node > this%dis%nodes) cycle
+        !
         varName = this%tv_type(n)
-        call this%validate_change(n, varName)
+        setval => this%get_pointer_to_value(node, varName)
+        if (associated(setval)) setval = this%tv_value(n)
+        !
+        call this%validate_change(node, varName)
       end do
     end if
     !

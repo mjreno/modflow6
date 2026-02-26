@@ -99,14 +99,13 @@ contains
   !<
   subroutine tvk_source_options(this)
     ! -- modules
+    use MemoryManagerModule, only: get_isize
     use MemoryManagerExtModule, only: mem_set_value
-    use CharacterStringModule, only: CharacterStringType
     use UtlTvkInputModule, only: UtlTvkParamFoundType
     ! -- dummy
     class(TvkType) :: this
     ! -- locals
-    type(CharacterStringType), dimension(:), contiguous, &
-      pointer :: ts6_filenames
+    integer(I4B) :: isize
     type(UtlTvkParamFoundType) :: found
     !
     write (this%iout, '(1x,a)') &
@@ -115,16 +114,13 @@ contains
     ! -- source package input
     call mem_set_value(this%iprpak, 'PRINT_INPUT', this%input_mempath, &
                        found%print_input)
-    call mem_set_value(ts6_filenames, 'TS6_FILENAME', this%input_mempath, &
-                       found%ts6_filename)
     !
     if (found%print_input) then
       write (this%iout, '(4x,a)') 'TIME-VARYING INPUT WILL BE PRINTED.'
     end if
     !
-    if (found%ts6_filename) then
-      this%ts_active = .true.
-    end if
+    call get_isize('TS6_FILENAME', this%input_mempath, isize)
+    if (isize > 0) this%ts_active = .true.
     !
     write (this%iout, '(1x,a)') &
       'END OF '//trim(adjustl(this%packName))//' OPTIONS'

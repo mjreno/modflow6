@@ -5,7 +5,7 @@ import numpy as np
 import pytest
 from framework import TestFramework
 
-cases = ["tvs01"]
+cases = ["tvs01", "tvs02"]
 
 
 def build_models(idx, test):
@@ -37,6 +37,7 @@ def build_models(idx, test):
         transient[i] = True
 
     name = cases[idx]
+    ts = idx == 1
 
     # build MODFLOW 6 files
     ws = test.workspace
@@ -121,7 +122,10 @@ def build_models(idx, test):
     # TVS SP2: Decrease SY1. Check h1 == 3000.823.
     kper = 2
     spd = []
-    spd.append([cellid1, "SY", 0.005])
+    if ts:
+        spd.append([cellid1, "SY", "syh_series"])
+    else:
+        spd.append([cellid1, "SY", 0.005])
     tvsspd[kper - 1] = spd
 
     # TVS SP3: Increase SS1. Check h1 == 300.5323.
@@ -133,19 +137,41 @@ def build_models(idx, test):
     # TVS SP4: Increase SY1. Check h1 == 0.4 approx. (0.399976)
     kper = 4
     spd = []
-    spd.append([cellid1, "SY", 0.02])
+    if ts:
+        spd.append([cellid1, "SY", "syh_series"])
+    else:
+        spd.append([cellid1, "SY", 0.02])
     tvsspd[kper - 1] = spd
 
     # TVS SP5: Revert SS1 and SY1. Check h1 == 0.8.
     kper = 5
     spd = []
     spd.append([cellid1, "SS", 1e-6])
-    spd.append([cellid1, "SY", 0.01])
+    if ts:
+        spd.append([cellid1, "SY", "syh_series"])
+    else:
+        spd.append([cellid1, "SY", 0.01])
     tvsspd[kper - 1] = spd
 
     tvs = flopy.mf6.ModflowUtltvs(
         sto, print_input=True, perioddata=tvsspd, filename=tvs_filename
     )
+
+    if ts:
+        sy_time_series = [
+            (1.0, 0.005),
+            (3.0, 0.02),
+            (4.0, 0.01),
+            (5.0, 0.01),
+        ]
+
+        # Initialize the time series within the TVK package
+        tvs.ts.initialize(
+            filename=f"{gwfname}.ts",
+            timeseries=sy_time_series,
+            time_series_namerecord="syh_series",
+            interpolation_methodrecord="stepwise",
+        )
 
     # output control
     oc = flopy.mf6.ModflowGwfoc(

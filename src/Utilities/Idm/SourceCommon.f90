@@ -145,24 +145,23 @@ contains
     result(utl_type)
     use IdmDfnSelectorModule, only: idm_integrated
     character(len=*), intent(in) :: component
-    character(len=*), intent(in) :: subcomponent !< subcomponent, e.g. CHD6
+    character(len=*), intent(in) :: subcomponent !< subcomponent string, e.g. SPC, SPC6, or SPC-1
     character(len=LENCOMPONENTNAME) :: subcomponent_type
     logical(LGP) :: utl_type
-    integer(I4B) :: i, ilen
-    if (component == 'UTL') then
-      utl_type = .true.
+    integer(I4B) :: ilen, idx
+    ilen = len_trim(subcomponent)
+    subcomponent_type = ''
+    idx = index(subcomponent(1:ilen), '-')
+    if (idx > 0) then
+      ! strip '-N' instance suffix (e.g. SPC-1 -> SPC)
+      subcomponent_type = subcomponent(1:idx - 1)
+    else if (ilen > 0 .and. subcomponent(ilen:ilen) == '6') then
+      ! strip trailing '6' package-type suffix (e.g. SPC6 -> SPC)
+      subcomponent_type = subcomponent(1:ilen - 1)
     else
-      ilen = len_trim(subcomponent)
-      subcomponent_type = ''
-      do i = 1, ilen
-        if (subcomponent(i:i) == '6') then
-          exit
-        else
-          subcomponent_type(i:i) = subcomponent(i:i)
-        end if
-      end do
-      utl_type = idm_integrated('UTL', subcomponent_type)
+      subcomponent_type = subcomponent(1:ilen)
     end if
+    utl_type = idm_integrated('UTL', subcomponent_type)
   end function idm_utl_type
 
   !> @brief input file extension

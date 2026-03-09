@@ -19,12 +19,10 @@ runs:
     - name: Check netcdf DLL resolution (Windows)
       shell: cmd
       run: |
-        echo Custom NetCDF bin:
-        dir "%GITHUB_WORKSPACE%\netcdf\netCDF4.9.3-NC4-64\bin\*.dll"
-        echo.
         echo netcdf.dll on PATH:
-        where netcdf.dll || echo "netcdf.dll not found on PATH"
-        where netCDF.dll || echo "netCDF.dll not found on PATH"
+        where netcdf.dll || echo netcdf.dll not found on PATH
+        echo hdf5.dll on PATH:
+        where hdf5.dll || echo hdf5.dll not found on PATH
 
     - name: Show Meson logs
       if: failure()

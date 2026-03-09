@@ -191,13 +191,12 @@ if is_netcdf_build
     extra_cmp_args += [ '-D__WITH_NETCDF__' ]
     dependencies += [ netcdff ]
     if build_machine.system() == 'windows'
-      _netcdfc_incdir = '.pixi' / 'envs' / 'default' / 'Library' / 'include'
       netcdf_incdir = include_directories([
-        _netcdfc_incdir,
+        netcdfc_compiled_rel / 'include',
         netcdff_compiled_rel / 'fortran'
       ])
       extended_incdir += [
-        '..' / _netcdfc_incdir,
+        '..' / netcdfc_compiled_rel / 'include',
         '..' / netcdff_compiled_rel / 'fortran'
       ]
       netcdff_libdir = netcdff_compiled_abs / 'fortran'

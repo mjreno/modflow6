@@ -16,6 +16,16 @@ runs:
         unix2dos -n "%GITHUB_WORKSPACE%\modflow6\.github\common\compile_modflow6_extended.bat" "%TEMP%\compile_modflow6_extended.bat"
         "%ONEAPI_ROOT%\setvars.bat" intel64 vs2022 && "%TEMP%\compile_modflow6_extended.bat"
 
+    - name: Check netcdf DLL resolution (Windows)
+      shell: cmd
+      run: |
+        echo Custom NetCDF bin:
+        dir "%GITHUB_WORKSPACE%\netcdf\netCDF4.9.3-NC4-64\bin\*.dll"
+        echo.
+        echo netcdf.dll on PATH:
+        where netcdf.dll || echo "netcdf.dll not found on PATH"
+        where netCDF.dll || echo "netCDF.dll not found on PATH"
+
     - name: Show Meson logs
       if: failure()
       shell: bash

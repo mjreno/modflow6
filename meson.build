@@ -191,10 +191,7 @@ if is_netcdf_build
     extra_cmp_args += [ '-D__WITH_NETCDF__' ]
     dependencies += [ netcdff ]
     if build_machine.system() == 'windows'
-      _conda_prefix = run_command(
-        'python', ['-c', 'import os; print(os.environ.get("CONDA_PREFIX", ""))'],
-        check: false).stdout().strip()
-      _netcdfc_incdir = _conda_prefix / 'Library' / 'include'
+      _netcdfc_incdir = '.pixi' / 'envs' / 'default' / 'Library' / 'include'
       netcdf_incdir = include_directories([
         _netcdfc_incdir,
         netcdff_compiled_rel / 'fortran'

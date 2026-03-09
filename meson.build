@@ -197,7 +197,7 @@ if is_netcdf_build
         netcdff_compiled_rel / 'fortran'
       ])
       extended_incdir += [
-        _netcdfc_incdir,
+        '..' / _netcdfc_incdir,
         '..' / netcdff_compiled_rel / 'fortran'
       ]
       netcdff_libdir = netcdff_compiled_abs / 'fortran'

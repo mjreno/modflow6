@@ -89,7 +89,7 @@ description REPLACE iper {}
 
 block period
 name perioddata
-type recarray cellid tvtype tvvalue
+type recarray cellid tv_type tv_value
 shape
 reader urword
 longname
@@ -106,7 +106,7 @@ longname cell identifier
 description REPLACE cellid {}
 
 block period
-name tvtype
+name tv_type
 type string
 shape
 tagged false
@@ -117,7 +117,7 @@ longname
 description Time-Varying storage type.  Supported types are: SS and SY.
 
 block period
-name tvvalue
+name tv_value
 type double precision
 shape
 tagged false

@@ -196,8 +196,8 @@ contains
     !
     ! -- set input context pointers
     call mem_setptr(this%cellid, 'CELLID', this%input_mempath)
-    call mem_setptr(this%tv_type, 'TVTYPE', this%input_mempath)
-    call mem_setptr(this%tv_value, 'TVVALUE', this%input_mempath)
+    call mem_setptr(this%tv_type, 'TV_TYPE', this%input_mempath)
+    call mem_setptr(this%tv_value, 'TV_VALUE', this%input_mempath)
     !
     ! -- Terminate if any errors were encountered
     if (count_errors() > 0) then

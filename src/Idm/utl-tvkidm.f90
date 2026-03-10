@@ -19,8 +19,8 @@ module UtlTvkInputModule
     logical :: ts6_filename = .false.
     logical :: maxbound = .false.
     logical :: cellid = .false.
-    logical :: tvtype = .false.
-    logical :: tvvalue = .false.
+    logical :: tv_type = .false.
+    logical :: tv_value = .false.
   end type UtlTvkParamFoundType
 
   logical :: utl_tvk_multi_package = .false.
@@ -165,13 +165,13 @@ module UtlTvkInputModule
     )
 
   type(InputParamDefinitionType), parameter :: &
-    utltvk_tvtype = InputParamDefinitionType &
+    utltvk_tv_type = InputParamDefinitionType &
     ( &
     'UTL', & ! component
     'TVK', & ! subcomponent
     'PERIOD', & ! block
-    'TVTYPE', & ! tag name
-    'TVTYPE', & ! fortran variable
+    'TV_TYPE', & ! tag name
+    'TV_TYPE', & ! fortran variable
     'STRING', & ! type
     '', & ! shape
     '', & ! longname
@@ -184,13 +184,13 @@ module UtlTvkInputModule
     )
 
   type(InputParamDefinitionType), parameter :: &
-    utltvk_tvvalue = InputParamDefinitionType &
+    utltvk_tv_value = InputParamDefinitionType &
     ( &
     'UTL', & ! component
     'TVK', & ! subcomponent
     'PERIOD', & ! block
-    'TVVALUE', & ! tag name
-    'TVVALUE', & ! fortran variable
+    'TV_VALUE', & ! tag name
+    'TV_VALUE', & ! fortran variable
     'DOUBLE', & ! type
     '', & ! shape
     'time-varying hydraulic conductivity', & ! longname
@@ -212,8 +212,8 @@ module UtlTvkInputModule
     utltvk_ts6_filename, &
     utltvk_maxbound, &
     utltvk_cellid, &
-    utltvk_tvtype, &
-    utltvk_tvvalue &
+    utltvk_tv_type, &
+    utltvk_tv_value &
     ]
 
   type(InputParamDefinitionType), parameter :: &
@@ -224,7 +224,7 @@ module UtlTvkInputModule
     'PERIOD', & ! block
     'PERIODDATA', & ! tag name
     'PERIODDATA', & ! fortran variable
-    'RECARRAY CELLID TVTYPE TVVALUE', & ! type
+    'RECARRAY CELLID TV_TYPE TV_VALUE', & ! type
     '', & ! shape
     '', & ! longname
     .true., & ! required

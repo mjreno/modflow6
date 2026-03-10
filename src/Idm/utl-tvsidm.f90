@@ -20,8 +20,8 @@ module UtlTvsInputModule
     logical :: ts6_filename = .false.
     logical :: maxbound = .false.
     logical :: cellid = .false.
-    logical :: tvtype = .false.
-    logical :: tvvalue = .false.
+    logical :: tv_type = .false.
+    logical :: tv_value = .false.
   end type UtlTvsParamFoundType
 
   logical :: utl_tvs_multi_package = .false.
@@ -185,13 +185,13 @@ module UtlTvsInputModule
     )
 
   type(InputParamDefinitionType), parameter :: &
-    utltvs_tvtype = InputParamDefinitionType &
+    utltvs_tv_type = InputParamDefinitionType &
     ( &
     'UTL', & ! component
     'TVS', & ! subcomponent
     'PERIOD', & ! block
-    'TVTYPE', & ! tag name
-    'TVTYPE', & ! fortran variable
+    'TV_TYPE', & ! tag name
+    'TV_TYPE', & ! fortran variable
     'STRING', & ! type
     '', & ! shape
     '', & ! longname
@@ -204,13 +204,13 @@ module UtlTvsInputModule
     )
 
   type(InputParamDefinitionType), parameter :: &
-    utltvs_tvvalue = InputParamDefinitionType &
+    utltvs_tv_value = InputParamDefinitionType &
     ( &
     'UTL', & ! component
     'TVS', & ! subcomponent
     'PERIOD', & ! block
-    'TVVALUE', & ! tag name
-    'TVVALUE', & ! fortran variable
+    'TV_VALUE', & ! tag name
+    'TV_VALUE', & ! fortran variable
     'DOUBLE', & ! type
     '', & ! shape
     'time-varying storage', & ! longname
@@ -233,8 +233,8 @@ module UtlTvsInputModule
     utltvs_ts6_filename, &
     utltvs_maxbound, &
     utltvs_cellid, &
-    utltvs_tvtype, &
-    utltvs_tvvalue &
+    utltvs_tv_type, &
+    utltvs_tv_value &
     ]
 
   type(InputParamDefinitionType), parameter :: &
@@ -245,7 +245,7 @@ module UtlTvsInputModule
     'PERIOD', & ! block
     'PERIODDATA', & ! tag name
     'PERIODDATA', & ! fortran variable
-    'RECARRAY CELLID TVTYPE TVVALUE', & ! type
+    'RECARRAY CELLID TV_TYPE TV_VALUE', & ! type
     '', & ! shape
     '', & ! longname
     .true., & ! required

@@ -24,16 +24,6 @@ runs:
         GITHUB_TOKEN: ${{ github.token }}
       run: pixi run get-exes
 
-    - name: Copy Unidata netcdf DLLs alongside mf6.exe
-      shell: bash
-      run: |
-        cp $GITHUB_WORKSPACE/netcdf/netCDF4.9.3-NC4-64/bin/hdf5.dll      $GITHUB_WORKSPACE/modflow6/bin/
-        cp $GITHUB_WORKSPACE/netcdf/netCDF4.9.3-NC4-64/bin/hdf5_hl.dll   $GITHUB_WORKSPACE/modflow6/bin/
-        cp $GITHUB_WORKSPACE/netcdf/netCDF4.9.3-NC4-64/bin/netcdf.dll    $GITHUB_WORKSPACE/modflow6/bin/
-        cp $GITHUB_WORKSPACE/netcdf/netCDF4.9.3-NC4-64/bin/zlib1.dll     $GITHUB_WORKSPACE/modflow6/bin/
-        cp $GITHUB_WORKSPACE/netcdf/netCDF4.9.3-NC4-64/bin/libcurl.dll   $GITHUB_WORKSPACE/modflow6/bin/
-        cp $GITHUB_WORKSPACE/netcdf/netcdf-fortran-4.6.2/build/fortran/netcdff.dll $GITHUB_WORKSPACE/modflow6/bin/
-
     - name: Convert unix2dos
       shell: cmd
       run: |

@@ -740,16 +740,22 @@ contains
     use DefinitionSelectModule, only: get_aggregate_definition_type, &
                                       idt_parse_rectype
     type(ModflowInputType), intent(in) :: mf6_input
-    logical(LGP) :: res
+    logical(LGP) :: res, has_period
     type(InputParamDefinitionType), pointer :: aidt, ks_aidt
     character(len=LINELENGTH), allocatable :: cols(:)
-    integer(I4B) :: ncol
+    integer(I4B) :: n, ncol
     res = .false.
+    has_period = .false.
+    do n = 1, size(mf6_input%block_dfns)
+      if (mf6_input%block_dfns(n)%blockname == 'PERIOD') then
+        has_period = .true.
+      end if
+    end do
+    if (.not. has_period) return
     aidt => get_aggregate_definition_type(mf6_input%aggregate_dfns, &
                                           mf6_input%component_type, &
                                           mf6_input%subcomponent_type, &
                                           'PERIOD')
-    if (.not. associated(aidt)) return
     call idt_parse_rectype(aidt, cols, ncol)
     if (ncol >= 2) then
       ks_aidt => find_setting_aggregate(mf6_input, cols, ncol)

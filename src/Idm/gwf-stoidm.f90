@@ -35,7 +35,7 @@ module GwfStoInputModule
   character(len=16), parameter :: &
     gwf_sto_subpackages(*) = &
     [ &
-    '                ' &
+    'UTL-TVS         ' &
     ]
 
   type(InputParamDefinitionType), parameter :: &

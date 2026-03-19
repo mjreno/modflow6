@@ -252,7 +252,9 @@
 		<File RelativePath="..\src\Idm\swf-stoidm.f90"/>
 		<File RelativePath="..\src\Idm\swf-zdgidm.f90"/>
 		<File RelativePath="..\src\Idm\utl-hpcidm.f90"/>
-		<File RelativePath="..\src\Idm\utl-ncfidm.f90"/></Filter>
+		<File RelativePath="..\src\Idm\utl-ncfidm.f90"/>
+		<File RelativePath="..\src\Idm\utl-tvkidm.f90"/>
+		<File RelativePath="..\src\Idm\utl-tvsidm.f90"/></Filter>
 		<Filter Name="Model">
 		<Filter Name="Connection">
 		<File RelativePath="..\src\Model\Connection\CellWithNbrs.f90"/>
@@ -568,6 +570,7 @@
 			<FileConfiguration Name="Release|Win32">
 			<Tool Name="VFFortranCompilerTool" Preprocess="preprocessYes"/></FileConfiguration></File>
 		<File RelativePath="..\src\Utilities\Idm\mf6blockfile\Mf6FileGridArray.f90"/>
+		<File RelativePath="..\src\Utilities\Idm\mf6blockfile\Mf6FileKeystring.f90"/>
 		<File RelativePath="..\src\Utilities\Idm\mf6blockfile\Mf6FileLayerArray.f90"/>
 		<File RelativePath="..\src\Utilities\Idm\mf6blockfile\Mf6FileList.f90"/>
 		<File RelativePath="..\src\Utilities\Idm\mf6blockfile\Mf6FileSetting.f90"/>

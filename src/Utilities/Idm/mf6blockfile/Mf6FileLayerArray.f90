@@ -221,6 +221,9 @@ contains
   subroutine destroy(this)
     class(LayerArrayLoadType), intent(inout) :: this
     !
+    ! nullify ctx pointers (including mshape) before deallocate
+    call this%ctx%destroy()
+    !
     ! deallocate tasmanager
     call this%tasmanager%da()
     deallocate (this%tasmanager)

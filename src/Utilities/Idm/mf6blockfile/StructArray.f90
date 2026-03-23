@@ -918,8 +918,8 @@ contains
   !!   or the end of the member columns.
   !!
   !!   No-value KEYWORD dispatch: a KEYWORD column with no sub-members
-  !!   immediately following (e.g. ALL/FIRST/LAST for PRT-PRP) stores
-  !!   the dispatch keyword and reads nothing further.
+  !!   immediately following stores the dispatch keyword and reads
+  !!   nothing further.
   !!
   !<
   function read_from_parser_keystring(this, parser, timeseries, nleading, &

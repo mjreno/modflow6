@@ -218,8 +218,12 @@ contains
   !<
   subroutine allocate_scalars(this)
     use MemoryManagerModule, only: mem_setptr, get_isize
+    use DefinitionSelectModule, only: get_aggregate_definition_type, &
+                                      idt_parse_rectype
     class(LoadContextType) :: this
-    integer(I4B) :: n, nmembers, isize
+    type(InputParamDefinitionType), pointer :: aidt, ks_aidt
+    character(len=LINELENGTH), allocatable :: cols(:), ks_cols(:)
+    integer(I4B) :: nmembers, ncol, isize
     integer(I4B), pointer :: maxbound_ptr
 
     if (this%ctxtype == EXCHANGE .or. &
@@ -268,16 +272,22 @@ contains
       if (this%nodes == 0) this%nodes = product(this%mshape)
 
       ! scale maxbound by keystring member count; fall back to nodes * nmembers
-      ! when no DIMENSIONS block is present (e.g. TVK/TVS) so the structarray
-      ! is pre-allocated in managed memory before ar_set_pointers runs
+      ! when no DIMENSIONS block is present (e.g. TVK/TVS)
       if (this%loadtype == KEYSTRING .or. this%loadtype == ADVANCED) then
+        ! count members from the KEYSTRING aggregate type definition, which
+        ! names exactly the dispatchable members
         nmembers = 0
-        do n = 1, size(this%mf6_input%param_dfns)
-          if (this%mf6_input%param_dfns(n)%blockname == 'PERIOD' .and. &
-              this%mf6_input%param_dfns(n)%in_record) then
-            nmembers = nmembers + 1
-          end if
-        end do
+        aidt => get_aggregate_definition_type(this%mf6_input%aggregate_dfns, &
+                                              this%mf6_input%component_type, &
+                                              this%mf6_input%subcomponent_type, &
+                                              'PERIOD')
+        call idt_parse_rectype(aidt, cols, ncol)
+        ks_aidt => find_setting_aggregate(this%mf6_input, cols, ncol)
+        if (associated(ks_aidt)) then
+          call idt_parse_rectype(ks_aidt, ks_cols, nmembers)
+        end if
+        if (allocated(cols)) deallocate (cols)
+        if (allocated(ks_cols)) deallocate (ks_cols)
         if (nmembers > 0 .and. this%maxbound > 0) then
           this%maxbound = this%maxbound * nmembers
         else if (nmembers > 0 .and. this%nodes > 0) then
@@ -774,8 +784,6 @@ contains
   !! For each token in the aggregate:
   !!   - RECORD compound group: sub-members are expanded in RECORD type order
   !!   - direct-dispatch param: appended as-is
-  !! Compound sub-members are always contiguous, satisfying the requirement
-  !! of read_from_parser_keystring for correct keyword dispatch.
   !<
   subroutine keystring_member_names(this, member_names, nmembers)
     use InputOutputModule, only: upcase

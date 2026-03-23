@@ -269,7 +269,7 @@ contains
     class(TvBaseType) :: this
     ! -- local variables
     integer(I4B), pointer :: iper, nlist
-    integer(I4B) :: n, node, saved_iprpak
+    integer(I4B) :: n, node
     !
     ! -- check last loaded input period
     call mem_setptr(iper, 'IPER', this%input_mempath)
@@ -283,15 +283,12 @@ contains
       call this%set_changed_at(kper, kstp)
       ! -- Reset node change flags
       call this%reset_change_flags()
-      ! -- Suppress printing during advance re-application
-      saved_iprpak = this%iprpak
-      this%iprpak = 0
+      ! -- Apply row changes
       do n = 1, nlist
         node = this%tv_get_node(n)
         if (node < 1 .or. node > this%dis%nodes) cycle
         call this%apply_row_changes(n, node)
       end do
-      this%iprpak = saved_iprpak
     end if
     !
     if (count_errors() > 0) then

@@ -41,6 +41,28 @@ def _normalize_type(t_raw: str, shape_str: str, ndim: int, aggregate: bool) -> s
     return t_raw.upper()
 
 
+def _wrap_f90_content(raw: str, max_width: int = 60) -> str:
+    """Wrap a string for use in a Fortran string literal.
+
+    Returns the raw text split into newline-separated segments, each at
+    most ``max_width`` characters wide.  The ``| value`` Jinja filter
+    detects the embedded newlines and emits ``// &`` string concatenation
+    so that the generated Fortran source lines stay within the project
+    line-length limit.  Single-segment strings are returned as-is.
+    """
+    llist = textwrap.wrap(raw, max_width)
+    if not llist:
+        return ""
+    if len(llist) == 1:
+        return llist[0]
+    # Preserve the inter-word space at each line break: the space between
+    # the last word of one segment and the first word of the next is dropped
+    # by textwrap.wrap, so add it back as a trailing space on each non-last
+    # segment.  The | value filter will join quoted segments with //.
+    parts = [ln + " " for ln in llist[:-1]] + [llist[-1]]
+    return "\n".join(parts)
+
+
 @dataclass
 class Param:
     """Represents a single input parameter definition from a DFN file."""
@@ -179,19 +201,14 @@ def parse_dfn(dfnfspec: Path, common: Optional[dict] = None) -> DfnFile:
         shape_str = " ".join(shapelist)
 
         t = _normalize_type(t_raw, shape_str, ndim, aggregate_t)
+        if len(t) > 60:
+            t = _wrap_f90_content(t, max_width=60)
 
         # Longname wrapping
         longname = ""
         if vd.get("longname"):
             raw = vd["longname"].replace("'", "")
-            llist = textwrap.wrap(raw, 70)
-            if len(llist) == 1:
-                longname = llist[0]
-            elif len(llist) > 1:
-                longname = f"{llist[0]}&\n"
-                for ln in llist[1:-1]:
-                    longname += f"     & {ln}&\n"
-                longname += f"     & {llist[-1]}"
+            longname = _wrap_f90_content(raw, max_width=60)
 
         required = vd.get("optional", "").lower() != "true"
         developmode = vd.get("developmode", "").lower() == "true"

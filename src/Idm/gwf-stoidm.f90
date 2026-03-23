@@ -86,8 +86,8 @@ module GwfStoInputModule
     'SS_CONFINED_ONLY', & ! fortran variable
     'KEYWORD', & ! type
     '', & ! shape
-    'keyword to indicate specific storage only applied under confined&
-     & conditions', & ! longname
+    'keyword to indicate specific storage only applied under '// &
+    'confined conditions', & ! longname
     .false., & ! required
     .false., & ! developmode
     .false., & ! multi-record

@@ -9,7 +9,7 @@ module TvkModule
   use BaseDisModule, only: DisBaseType
   use ConstantsModule, only: LINELENGTH, LENMEMPATH, DZERO, DNODATA
   use KindModule, only: I4B, DP
-  use MemoryManagerModule, only: mem_setptr, get_isize
+  use MemoryManagerModule, only: mem_setptr
   use MemoryHelperModule, only: create_mem_path
   use SimModule, only: store_error
   use SimVariablesModule, only: errmsg
@@ -32,7 +32,7 @@ module TvkModule
     integer(I4B), pointer :: kchangeper => null() !< NPF last stress period in which any node K (or K22, or K33) values were changed (0 if unchanged from start of simulation)
     integer(I4B), pointer :: kchangestp => null() !< NPF last time step in which any node K (or K22, or K33) values were changed (0 if unchanged from start of simulation)
     integer(I4B), dimension(:), pointer, contiguous :: nodekchange => null() !< NPF grid array of flags indicating for each node whether its K (or K22, or K33) value changed (1) at (kchangeper, kchangestp) or not (0)
-    real(DP), dimension(:), pointer, contiguous :: k_src => null() !< input K values
+    real(DP), dimension(:), pointer, contiguous :: k11_src => null() !< input K values
     real(DP), dimension(:), pointer, contiguous :: k22_src => null() !< input K22 values
     real(DP), dimension(:), pointer, contiguous :: k33_src => null() !< input K33 values
 
@@ -40,7 +40,6 @@ module TvkModule
 
     procedure :: da => tvk_da
     procedure :: ar_set_pointers => tvk_ar_set_pointers
-    procedure :: source_options => tvk_source_options
     procedure :: apply_row_changes => tvk_apply_row_changes
     procedure :: set_changed_at => tvk_set_changed_at
     procedure :: reset_change_flags => tvk_reset_change_flags
@@ -93,39 +92,10 @@ contains
     call mem_setptr(this%nodekchange, 'NODEKCHANGE', npfMemoryPath)
     !
     ! -- set input mempath pointers
-    call mem_setptr(this%k_src, 'K', this%input_mempath)
+    call mem_setptr(this%k11_src, 'K', this%input_mempath)
     call mem_setptr(this%k22_src, 'K22', this%input_mempath)
     call mem_setptr(this%k33_src, 'K33', this%input_mempath)
   end subroutine tvk_ar_set_pointers
-
-  !> @brief Process OPTIONS block values from the input memory path.
-  !<
-  subroutine tvk_source_options(this)
-    ! -- modules
-    use MemoryManagerExtModule, only: mem_set_value
-    use UtlTvkInputModule, only: UtlTvkParamFoundType
-    ! -- dummy
-    class(TvkType) :: this
-    ! -- locals
-    integer(I4B) :: isize
-    type(UtlTvkParamFoundType) :: found
-    !
-    write (this%iout, '(1x,a)') &
-      'PROCESSING '//trim(adjustl(this%packName))//' OPTIONS'
-    !
-    call mem_set_value(this%iprpak, 'PRINT_INPUT', this%input_mempath, &
-                       found%print_input)
-    !
-    if (found%print_input) then
-      write (this%iout, '(4x,a)') 'TIME-VARYING INPUT WILL BE PRINTED.'
-    end if
-    !
-    call get_isize('TS6_FILENAME', this%input_mempath, isize)
-    if (isize > 0) this%ts_active = .true.
-    !
-    write (this%iout, '(1x,a)') &
-      'END OF '//trim(adjustl(this%packName))//' OPTIONS'
-  end subroutine tvk_source_options
 
   !> @brief Apply input K/K22/K33 column changes for period-data row n to node.
   !<
@@ -143,8 +113,8 @@ contains
     !
     ! -- K is processed before K22/K33 so that validate_change can use
     ! -- the already-updated k11 value when ik22overk/ik33overk are set.
-    if (this%k_src(n) /= DNODATA) then
-      this%k11(node) = this%k_src(n)
+    if (this%k11_src(n) /= DNODATA) then
+      this%k11(node) = this%k11_src(n)
       call this%validate_change(node, 'K')
       if (this%iprpak /= 0) then
         call this%dis%noder_to_string(node, cellstr)
@@ -277,7 +247,7 @@ contains
     nullify (this%kchangeper)
     nullify (this%kchangestp)
     nullify (this%nodekchange)
-    nullify (this%k_src)
+    nullify (this%k11_src)
     nullify (this%k22_src)
     nullify (this%k33_src)
     call tvbase_da(this)

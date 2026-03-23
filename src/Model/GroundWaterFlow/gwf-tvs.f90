@@ -35,7 +35,7 @@ module TvsModule
 
     procedure :: da => tvs_da
     procedure :: ar_set_pointers => tvs_ar_set_pointers
-    procedure :: source_options => tvs_source_options
+    procedure :: source_package_options => tvs_source_package_options
     procedure :: apply_row_changes => tvs_apply_row_changes
     procedure :: set_changed_at => tvs_set_changed_at
     procedure :: reset_change_flags => tvs_reset_change_flags
@@ -91,31 +91,17 @@ contains
     call mem_setptr(this%sy_src, 'SY', this%input_mempath)
   end subroutine tvs_ar_set_pointers
 
-  !> @brief Process OPTIONS block values from the input memory path.
+  !> @brief Source TVS-specific options from the input memory path.
   !<
-  subroutine tvs_source_options(this)
-    ! -- modules
-    use MemoryManagerExtModule, only: mem_set_value
-    use UtlTvsInputModule, only: UtlTvsParamFoundType
+  subroutine tvs_source_package_options(this)
     ! -- dummy
     class(TvsType) :: this
     ! -- locals
     integer(I4B) :: isize
-    type(UtlTvsParamFoundType) :: found
     ! -- formats
     character(len=*), parameter :: fmtdsci = &
-      "(4X, 'DISABLE_STORAGE_CHANGE_INTEGRATION OPTION:', /, 1X, &
+      "(4X, 'DISABLE_STORAGE_CHANGE_INTEGRATION OPTION:', /, 6X, &
       &'Storage derivative terms will not be added to STO matrix formulation')"
-    !
-    write (this%iout, '(1x,a)') &
-      'PROCESSING '//trim(adjustl(this%packName))//' OPTIONS'
-    !
-    call mem_set_value(this%iprpak, 'PRINT_INPUT', this%input_mempath, &
-                       found%print_input)
-    !
-    if (found%print_input) then
-      write (this%iout, '(4x,a)') 'TIME-VARYING INPUT WILL BE PRINTED.'
-    end if
     !
     ! -- DISABLE_STORAGE_CHANGE_INTEGRATION is a keyword; check via get_isize
     call get_isize('DISABLE_SC_INT', this%input_mempath, isize)
@@ -123,13 +109,7 @@ contains
       this%integratechanges = 0
       write (this%iout, fmtdsci)
     end if
-    !
-    call get_isize('TS6_FILENAME', this%input_mempath, isize)
-    if (isize > 0) this%ts_active = .true.
-    !
-    write (this%iout, '(1x,a)') &
-      'END OF '//trim(adjustl(this%packName))//' OPTIONS'
-  end subroutine tvs_source_options
+  end subroutine tvs_source_package_options
 
   !> @brief Apply input SS/SY column changes for period-data row n to node.
   !<

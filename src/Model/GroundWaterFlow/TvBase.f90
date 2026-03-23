@@ -14,7 +14,7 @@ module TvBaseModule
   use SimModule, only: count_errors, store_error, store_error_filename, ustop
   use SimVariablesModule, only: errmsg
   use TdisModule, only: kper, nper, kstp
-  use MemoryManagerModule, only: mem_setptr
+  use MemoryManagerModule, only: mem_setptr, get_isize
 
   implicit none
 
@@ -35,7 +35,8 @@ module TvBaseModule
     procedure, private :: tvbase_allocate_scalars
     procedure, private :: tv_get_node
     procedure(ar_set_pointers), deferred :: ar_set_pointers
-    procedure(source_options), deferred :: source_options
+    procedure :: source_options => tvbase_source_options
+    procedure :: source_package_options => tvbase_source_package_options
     procedure(apply_row_changes), deferred :: apply_row_changes
     procedure(set_changed_at), deferred :: set_changed_at
     procedure(reset_change_flags), deferred :: reset_change_flags
@@ -56,15 +57,6 @@ module TvBaseModule
       ! -- dummy
       class(TvBaseType) :: this
     end subroutine
-
-    !> @brief Source package options from the input memory path.
-    !<
-    subroutine source_options(this)
-      ! -- modules
-      import TvBaseType
-      ! -- dummy
-      class(TvBaseType) :: this
-    end subroutine source_options
 
     !> @brief Apply input column changes for period-data row n to node.
     !<
@@ -159,6 +151,52 @@ contains
     ! -- Call standard NumericalPackageType allocate scalars
     call this%NumericalPackageType%allocate_scalars()
   end subroutine tvbase_allocate_scalars
+
+  !> @brief Source common options from the input memory path.
+  !!
+  !! Source common options and call derived package routine to source
+  !! and log any package-specific options within the same block.
+  !<
+  subroutine tvbase_source_options(this)
+    ! -- modules
+    use MemoryManagerExtModule, only: mem_set_value
+    ! -- dummy
+    class(TvBaseType) :: this
+    ! -- locals
+    integer(I4B) :: isize
+    logical(LGP) :: found_print_input
+    !
+    write (this%iout, '(1x,a)') &
+      'PROCESSING '//trim(adjustl(this%packName))//' OPTIONS'
+    !
+    call mem_set_value(this%iprpak, 'PRINT_INPUT', this%input_mempath, &
+                       found_print_input)
+    !
+    if (found_print_input) then
+      write (this%iout, '(4x,a)') 'TIME-VARYING INPUT WILL BE PRINTED.'
+    end if
+    !
+    call get_isize('TS6_FILENAME', this%input_mempath, isize)
+    if (isize > 0) this%ts_active = .true.
+    !
+    ! -- source package-specific options
+    call this%source_package_options()
+    !
+    write (this%iout, '(1x,a)') &
+      'END OF '//trim(adjustl(this%packName))//' OPTIONS'
+  end subroutine tvbase_source_options
+
+  !> @brief Source package-specific options from the input memory path.
+  !!
+  !! Override in derived package to source and log package-specific options.
+  !! Default implementation is a no-op.
+  !<
+  subroutine tvbase_source_package_options(this)
+    ! -- dummy
+    class(TvBaseType) :: this
+    !
+    ! -- no package-specific options in the base class
+  end subroutine tvbase_source_package_options
 
   !> @brief Allocate and read static data for the package.
   !<

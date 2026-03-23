@@ -518,7 +518,7 @@ contains
         if (tagname == 'MIXED') in_scope = .true.
       case default
         errmsg = 'LoadContext in_scope needs new check for: '// &
-                 trim(idt%tagname)
+                 trim(mf6_input%subcomponent_type)//'/'//trim(idt%tagname)
         call store_error(errmsg, .true.)
       end select
     end if
@@ -550,7 +550,8 @@ contains
     ! initialize
     keepcnt = 0
 
-    if (this%loadtype == LIST .or. this%loadtype == KEYSTRING .or. &
+    if (this%loadtype == LIST .or. &
+        this%loadtype == KEYSTRING .or. &
         this%loadtype == ADVANCED) then
       ! get aggregate param definition for period block
       aidt => &
@@ -566,7 +567,8 @@ contains
 
     ! allocate dfn input params
     do iparam = 1, nparam
-      if (this%loadtype == LIST .or. this%loadtype == KEYSTRING .or. &
+      if (this%loadtype == LIST .or. &
+          this%loadtype == KEYSTRING .or. &
           this%loadtype == ADVANCED) then
         ! use found so keystring placeholders are silently skipped
         idt => get_param_definition_type(this%mf6_input%param_dfns, &

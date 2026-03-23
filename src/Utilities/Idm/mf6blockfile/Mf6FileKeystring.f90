@@ -277,7 +277,7 @@ contains
           end if
           if (allocated(rec_cols)) deallocate (rec_cols)
         end do
-        this%structarray%struct_vectors(icol)%num_sub_members = nsub
+        this%structarray%struct_vectors(icol)%nsubmembers = nsub
       end if
     end do
   end subroutine create_structarray

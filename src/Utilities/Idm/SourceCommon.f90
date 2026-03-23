@@ -16,6 +16,7 @@ module SourceCommonModule
   private
   public :: package_source_type
   public :: idm_component_type, idm_subcomponent_type, idm_subcomponent_name
+  public :: idm_pkg_instance_name
   public :: idm_utl_type
   public :: set_model_shape
   public :: get_shape_from_string
@@ -134,6 +135,22 @@ contains
       subcomponent_name = subcomponent_type
     end if
   end function idm_subcomponent_name
+
+  !> @brief default name for a multi-package instance
+  !!
+  !! Return the default '<TYPE>-<N>' name for the Nth instance of a
+  !! multi-package type, where N is the 1-based count of packages of
+  !! this type encountered in an in-order traversal of the model
+  !! namefile packages block.  This is the IDM internal package
+  !! naming convention when user names are not provided.
+  !!
+  !<
+  function idm_pkg_instance_name(pkg_type, inst) result(sc_name)
+    character(len=*), intent(in) :: pkg_type
+    integer(I4B), intent(in) :: inst
+    character(len=LENPACKAGENAME) :: sc_name
+    write (sc_name, '(a,i0)') trim(pkg_type)//'-', inst
+  end function idm_pkg_instance_name
 
   !> @brief is utility type
   !!

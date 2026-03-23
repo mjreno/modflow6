@@ -196,17 +196,21 @@ contains
       call this%param_load(parser, idt, this%mf6_input%mempath, netcdf, iaux)
     end do
 
-    ! check if layer index variable was read
-    ! TODO: assumes layer index variable is always in scope
+    ! check if layer index variable was read; default to 1 if not provided.
+    ! the layer index variable follows the I<TYPE3> naming convention (e.g.
+    ! IEVT, IRCH), consistent with the in_scope check in LoadContext.
     if (this%param_reads(1)%invar == 0) then
-      ! set to default of 1 without updating invar
-      idt => get_param_definition_type(this%mf6_input%param_dfns, &
-                                       this%mf6_input%component_type, &
-                                       this%mf6_input%subcomponent_type, &
-                                       'PERIOD', this%param_names(1), &
-                                       this%input_name)
-      call mem_setptr(int1d, idt%mf6varname, this%mf6_input%mempath)
-      int1d = 1
+      if (this%param_names(1) == &
+          'I'//trim(this%mf6_input%subcomponent_type(1:3))) then
+        idt => get_param_definition_type(this%mf6_input%param_dfns, &
+                                         this%mf6_input%component_type, &
+                                         this%mf6_input%subcomponent_type, &
+                                         'PERIOD', this%param_names(1), &
+                                         this%input_name)
+        ! set to default of 1 without updating invar
+        call mem_setptr(int1d, idt%mf6varname, this%mf6_input%mempath)
+        int1d = 1
+      end if
     end if
 
     if (this%tas_active /= 0) then

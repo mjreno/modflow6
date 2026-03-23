@@ -226,7 +226,7 @@ contains
     ! nothing to do if no subpackages were added
     if (size(this%pkgtypes) == 0) return
 
-    ! UTL packages are leaf nodes: they do not themselves have subpackages
+    ! UTL packages do not themselves have subpackages
     if (idm_utl_type(this%component_type, parent_sctype)) return
 
     ! build subpkg_prefix from the parent package identity
@@ -281,6 +281,7 @@ contains
     use CharacterStringModule, only: CharacterStringType
     use ModelPackageInputModule, only: multi_package_type
     use IdmDfnSelectorModule, only: idm_multi_package, idm_integrated
+    use SourceCommonModule, only: idm_pkg_instance_name
     character(len=*), intent(in) :: component_type
     character(len=*), intent(in) :: component_name
     character(len=*), intent(in) :: parent_sctype
@@ -294,6 +295,9 @@ contains
     logical(LGP) :: multi
 
     subpkg_prefix = ''
+
+    ! EXG (exchange) packages have no model NAM file and don't need a prefix
+    if (component_type == 'EXG') return
 
     ! resolve definition names to the namefile packages block type name
     select case (parent_sctype)
@@ -313,9 +317,6 @@ contains
       multi = multi_package_type(component_type, parent_type, parent_ftype)
     end if
 
-    ! EXG (exchange) packages have no model NAM file and don't need a prefix
-    if (component_type == 'EXG') return
-
     if (multi) then
       ! identify instance number of this package type in the namefile packages
       ! block and use to set subpackage prefix
@@ -328,9 +329,8 @@ contains
         if (ftypes(n) == parent_ftype) then
           parent_inst = parent_inst + 1
           parent_name = pnames(n)
-          if (parent_name == '') then
-            write (parent_name, '(a,i0)') trim(parent_type)//'-', parent_inst
-          end if
+          if (parent_name == '') &
+            parent_name = idm_pkg_instance_name(parent_type, parent_inst)
           if (parent_name == parent_scname) then
             write (subpkg_prefix, '(a,i0,a)') trim(parent_type), parent_inst, '-'
             exit

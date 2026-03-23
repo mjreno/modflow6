@@ -1003,10 +1003,10 @@ contains
         ! KEYWORD column (charstr) without reading another token.
         this%struct_vectors(found_col)%charstr1d(irow) = trim(keyword)
         last_set_col = found_col
-        ! read exactly num_sub_members compound sub-member columns that
+        ! read exactly nsubmembers compound sub-member columns that
         ! immediately follow in the struct array
         do icol = found_col + 1, &
-          found_col + this%struct_vectors(found_col)%num_sub_members
+          found_col + this%struct_vectors(found_col)%nsubmembers
           if (icol > this%ncol) exit
           call this%read_param(parser, icol, irow, timeseries, iout)
           last_set_col = icol

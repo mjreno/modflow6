@@ -119,6 +119,9 @@ contains
 
     ! finalize static load
     call this%finalize()
+
+    ! ensure ts_sas is allocated after load
+    if (.not. allocated(this%ts_sas)) allocate (this%ts_sas(0))
   end subroutine load
 
   !> @brief init

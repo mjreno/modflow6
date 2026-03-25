@@ -225,7 +225,7 @@ contains
     ! -- dummy
     class(TvBaseType) :: this
     ! -- local variables
-    integer(I4B), pointer :: iper, nlist
+    integer(I4B), pointer :: iper, nbound
     integer(I4B) :: n, node
     character(len=LINELENGTH) :: cellstr
     !
@@ -233,12 +233,12 @@ contains
     call mem_setptr(iper, 'IPER', this%input_mempath)
     if (iper /= kper) return
     !
-    call mem_setptr(nlist, 'NBOUND', this%input_mempath)
+    call mem_setptr(nbound, 'NBOUND', this%input_mempath)
     !
     ! -- Reset per-node property change flags
     call this%reset_change_flags()
     !
-    do n = 1, nlist
+    do n = 1, nbound
       node = this%tv_get_node(n)
       if (node < 1 .or. node > this%dis%nodes) then
         call this%dis%noder_to_string(node, cellstr)
@@ -252,7 +252,7 @@ contains
     end do
     !
     ! -- Record that changes were made at the current stress period / time step
-    if (nlist > 0) then
+    if (nbound > 0) then
       call this%set_changed_at(kper, kstp)
     end if
     !
@@ -268,23 +268,23 @@ contains
     ! -- dummy
     class(TvBaseType) :: this
     ! -- local variables
-    integer(I4B), pointer :: iper, nlist
+    integer(I4B), pointer :: iper, nbound
     integer(I4B) :: n, node
     !
     ! -- check last loaded input period
     call mem_setptr(iper, 'IPER', this%input_mempath)
     if (iper /= kper) return
     !
-    call mem_setptr(nlist, 'NBOUND', this%input_mempath)
+    call mem_setptr(nbound, 'NBOUND', this%input_mempath)
     !
     ! -- Re-apply and validate changes when timeseries is active
-    if (nlist > 0 .and. this%ts_active) then
+    if (nbound > 0 .and. this%ts_active) then
       ! -- Record that changes were made at the current time step
       call this%set_changed_at(kper, kstp)
       ! -- Reset node change flags
       call this%reset_change_flags()
       ! -- Apply row changes
-      do n = 1, nlist
+      do n = 1, nbound
         node = this%tv_get_node(n)
         if (node < 1 .or. node > this%dis%nodes) cycle
         call this%apply_row_changes(n, node)

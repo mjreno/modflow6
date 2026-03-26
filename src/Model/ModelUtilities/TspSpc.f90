@@ -12,9 +12,10 @@ module TspSpcModule
                              LENMEMPATH, DZERO, DNODATA, LENFTYPE, &
                              LINELENGTH, LENVARNAME
   use SimVariablesModule, only: errmsg
-  use SimModule, only: store_error, count_errors, store_error_filename
+  use SimModule, only: store_error, count_errors, store_error_filename, ustop
   use MemoryHelperModule, only: create_mem_path
   use MemoryManagerModule, only: mem_setptr, get_isize
+  use MemoryManagerExtModule, only: mem_set_value
   use BaseDisModule, only: DisBaseType
   use TdisModule, only: kper
 
@@ -85,6 +86,7 @@ contains
     ! -- local
     integer(I4B), pointer :: maxbound_ptr
     integer(I4B) :: isize
+    logical(LGP) :: found_print_input
     !
     write (this%packName, '(a,i0)') 'SPC-', id
     this%name_model = name_model
@@ -111,6 +113,13 @@ contains
     !
     call this%allocate_arrays()
     !
+    ! -- read PRINT_INPUT flag from IDM memory
+    call mem_set_value(this%iprpak, 'PRINT_INPUT', this%input_mempath, &
+                       found_print_input)
+    if (found_print_input) then
+      write (this%iout, '(4x,a)') 'TIME-VARYING INPUT WILL BE PRINTED.'
+    end if
+    !
     ! -- check for active time series
     call get_isize('TS6_FILENAME', input_mempath, isize)
     if (isize > 0) this%ts_active = .true.
@@ -120,6 +129,11 @@ contains
     write (this%iout, '(4x,a,a,a,a,a)') 'USING SPC INPUT FILE ', &
       trim(input_fname), ' TO SET ', trim(dvn), &
       'S FOR PACKAGE '//trim(packNameFlow)
+    !
+    if (count_errors() > 0) then
+      call store_error_filename(this%input_fname)
+      call ustop()
+    end if
   end subroutine initialize
 
   !> @brief Allocate package scalars
@@ -202,6 +216,13 @@ contains
     integer(I4B), dimension(:), pointer, contiguous :: bndno_arr
     real(DP), dimension(:), pointer, contiguous :: val_arr
     integer(I4B) :: n, isize
+    ! -- formats
+    character(len=*), parameter :: fmthdr = &
+      &"(1X,/1X,'INPUT VALUES FOR ',A,' PACKAGE (PACKAGE ',A,')')"
+    character(len=*), parameter :: fmtdvhdr = &
+      &"(5X,'NO.',5X,A)"
+    character(len=*), parameter :: fmtdvval = &
+      &"(5X,I6,2X,G12.5)"
     !
     if (this%readasarrays) then
       ! -- array mode: copy depvarname array into dblvec
@@ -211,6 +232,14 @@ contains
         do n = 1, this%maxbound
           this%dblvec(n) = val_arr(n)
         end do
+        if (this%iprpak /= 0) then
+          write (this%iout, fmthdr) trim(this%depvarname), &
+            trim(this%packNameFlow)
+          write (this%iout, fmtdvhdr) trim(this%depvarname)
+          do n = 1, this%maxbound
+            write (this%iout, fmtdvval) n, this%dblvec(n)
+          end do
+        end if
       end if
     else
       ! -- list mode: apply BNDNO-indexed values; DNODATA entries are skipped
@@ -222,6 +251,14 @@ contains
           this%dblvec(bndno_arr(n)) = val_arr(n)
         end if
       end do
+      if (this%iprpak /= 0) then
+        write (this%iout, fmthdr) trim(this%depvarname), &
+          trim(this%packNameFlow)
+        write (this%iout, fmtdvhdr) trim(this%depvarname)
+        do n = 1, this%maxbound
+          write (this%iout, fmtdvval) n, this%dblvec(n)
+        end do
+      end if
     end if
   end subroutine apply_input_values
 
@@ -246,13 +283,15 @@ contains
       return
     end if
     !
+    ! -- When time series are active, spc_ad applies values at every time step
+    if (this%ts_active) return
+    !
     call this%apply_input_values()
   end subroutine spc_rp
 
   !> @brief Advance
   !!
-  !! Re-applies input values after IDM has advanced time series for the
-  !! new time step, then checks flow package consistency.
+  !! Apply advanced input values at each time step.
   !!
   !<
   subroutine spc_ad(this, nbound_flowpack, budtxt)
@@ -260,15 +299,10 @@ contains
     class(TspSpcType), intent(inout) :: this !< TspSpcType object
     integer(I4B), intent(in) :: nbound_flowpack
     character(len=*), intent(in) :: budtxt
-    ! -- local
-    integer(I4B), pointer :: iper
     !
-    ! -- Re-apply if time series are active
+    ! -- Apply updated values from input context
     if (this%ts_active) then
-      call mem_setptr(iper, 'IPER', this%input_mempath)
-      if (iper == kper) then
-        call this%apply_input_values()
-      end if
+      call this%apply_input_values()
     end if
     !
     call this%check_flow_package(nbound_flowpack, budtxt)

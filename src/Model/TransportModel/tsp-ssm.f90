@@ -1010,7 +1010,7 @@ contains
     !
     ! -- determine readasarrays: SPCA has no MAXBOUND; SPC does
     call get_isize('MAXBOUND', spc_mempath, isize)
-    readasarrays = (isize == -1)
+    readasarrays = (isize <= 0)
     !
     ! -- initialize the TspSpcType reader for this package
     ssmiptr => this%ssmivec(ip)

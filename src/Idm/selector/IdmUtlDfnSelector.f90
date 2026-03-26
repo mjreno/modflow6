@@ -9,6 +9,8 @@ module IdmUtlDfnSelectorModule
   use UtlNcfInputModule
   use UtlTvkInputModule
   use UtlTvsInputModule
+  use UtlSpcInputModule
+  use UtlSpcaInputModule
 
   implicit none
   private
@@ -52,6 +54,10 @@ contains
       call set_param_pointer(input_definition, utl_tvk_param_definitions)
     case ('TVS')
       call set_param_pointer(input_definition, utl_tvs_param_definitions)
+    case ('SPC')
+      call set_param_pointer(input_definition, utl_spc_param_definitions)
+    case ('SPCA')
+      call set_param_pointer(input_definition, utl_spca_param_definitions)
     case default
     end select
     return
@@ -70,6 +76,10 @@ contains
       call set_param_pointer(input_definition, utl_tvk_aggregate_definitions)
     case ('TVS')
       call set_param_pointer(input_definition, utl_tvs_aggregate_definitions)
+    case ('SPC')
+      call set_param_pointer(input_definition, utl_spc_aggregate_definitions)
+    case ('SPCA')
+      call set_param_pointer(input_definition, utl_spca_aggregate_definitions)
     case default
     end select
     return
@@ -88,6 +98,10 @@ contains
       call set_block_pointer(input_definition, utl_tvk_block_definitions)
     case ('TVS')
       call set_block_pointer(input_definition, utl_tvs_block_definitions)
+    case ('SPC')
+      call set_block_pointer(input_definition, utl_spc_block_definitions)
+    case ('SPCA')
+      call set_block_pointer(input_definition, utl_spca_block_definitions)
     case default
     end select
     return
@@ -105,6 +119,10 @@ contains
       multi_package = utl_tvk_multi_package
     case ('TVS')
       multi_package = utl_tvs_multi_package
+    case ('SPC')
+      multi_package = utl_spc_multi_package
+    case ('SPCA')
+      multi_package = utl_spca_multi_package
     case default
       call store_error('Idm selector subcomponent not found; '//&
                        &'component="UTL"'//&
@@ -125,6 +143,10 @@ contains
       call set_subpkg_pointer(subpackages, utl_tvk_subpackages)
     case ('TVS')
       call set_subpkg_pointer(subpackages, utl_tvs_subpackages)
+    case ('SPC')
+      call set_subpkg_pointer(subpackages, utl_spc_subpackages)
+    case ('SPCA')
+      call set_subpkg_pointer(subpackages, utl_spca_subpackages)
     case default
     end select
     return
@@ -142,6 +164,10 @@ contains
     case ('TVK')
       integrated = .true.
     case ('TVS')
+      integrated = .true.
+    case ('SPC')
+      integrated = .true.
+    case ('SPCA')
       integrated = .true.
     case default
     end select

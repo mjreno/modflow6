@@ -253,6 +253,8 @@
 		<File RelativePath="..\src\Idm\swf-zdgidm.f90"/>
 		<File RelativePath="..\src\Idm\utl-hpcidm.f90"/>
 		<File RelativePath="..\src\Idm\utl-ncfidm.f90"/>
+		<File RelativePath="..\src\Idm\utl-spcidm.f90"/>
+		<File RelativePath="..\src\Idm\utl-spcaidm.f90"/>
 		<File RelativePath="..\src\Idm\utl-tvkidm.f90"/>
 		<File RelativePath="..\src\Idm\utl-tvsidm.f90"/></Filter>
 		<Filter Name="Model">

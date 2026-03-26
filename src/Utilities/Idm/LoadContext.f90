@@ -526,6 +526,8 @@ contains
         in_scope = .true.
       case ('SSM')
         if (tagname == 'MIXED') in_scope = .true.
+      case ('SPC', 'SPCA')
+        in_scope = .true.
       case default
         errmsg = 'LoadContext in_scope needs new check for: '// &
                  trim(mf6_input%subcomponent_type)//'/'//trim(idt%tagname)

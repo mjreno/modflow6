@@ -301,7 +301,7 @@ contains
 
     ! resolve definition names to the namefile packages block type name
     select case (parent_sctype)
-    case ('EVTA', 'RCHA', 'RIVG', 'CHDG', 'WELG', 'DRNG', 'GHBG')
+    case ('EVTA', 'RCHA', 'SPCA', 'RIVG', 'CHDG', 'WELG', 'DRNG', 'GHBG')
       parent_type = parent_sctype(1:3)
     case default
       parent_type = parent_sctype

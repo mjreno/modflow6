@@ -182,7 +182,8 @@ contains
             this%param_reads(iparam)%invar = 2
           end if
           ! log variable
-          call idm_log_var(param_tag, this%mf6_input%mempath, this%iout, .true.)
+          call idm_log_var(param_tag, this%mf6_input%mempath, this%iout, .true., &
+                           trim(tas_name))
           ! cycle to next input param
           cycle
         else

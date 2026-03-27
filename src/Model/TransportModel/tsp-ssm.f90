@@ -1008,9 +1008,9 @@ contains
     logical(LGP) :: readasarrays
     integer(I4B) :: isize
     !
-    ! -- determine readasarrays: SPCA has no MAXBOUND; SPC does
-    call get_isize('MAXBOUND', spc_mempath, isize)
-    readasarrays = (isize <= 0)
+    ! -- READASARRAYS is a required OPTIONS keyword in SPCA; absent in SPC
+    call get_isize('READASARRAYS', spc_mempath, isize)
+    readasarrays = (isize > 0)
     !
     ! -- initialize the TspSpcType reader for this package
     ssmiptr => this%ssmivec(ip)

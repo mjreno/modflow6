@@ -11,7 +11,7 @@ module TvBaseModule
   use GeomUtilModule, only: get_node
   use KindModule, only: I4B, DP, LGP
   use NumericalPackageModule, only: NumericalPackageType
-  use SimModule, only: count_errors, store_error, store_error_filename, ustop
+  use SimModule, only: count_errors, store_error, store_error_filename
   use SimVariablesModule, only: errmsg
   use TdisModule, only: kper, nper, kstp
   use MemoryManagerModule, only: mem_setptr, get_isize
@@ -215,7 +215,6 @@ contains
     !
     if (count_errors() > 0) then
       call store_error_filename(this%input_fname)
-      call ustop()
     end if
   end subroutine ar
 
@@ -261,7 +260,6 @@ contains
     !
     if (count_errors() > 0) then
       call store_error_filename(this%input_fname)
-      call ustop()
     end if
   end subroutine rp
 
@@ -293,7 +291,6 @@ contains
     !
     if (count_errors() > 0) then
       call store_error_filename(this%input_fname)
-      call ustop()
     end if
   end subroutine ad
 

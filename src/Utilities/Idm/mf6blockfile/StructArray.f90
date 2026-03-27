@@ -629,8 +629,9 @@ contains
   subroutine log_structarray_vars(this, iout)
     class(StructArrayType) :: this !< StructArrayType
     integer(I4B), intent(in) :: iout !< unit number for output
-    integer(I4B) :: j
+    integer(I4B) :: j, nts
     integer(I4B), dimension(:), pointer, contiguous :: int1d
+    character(len=LINELENGTH) :: ts_count_str
 
     ! idm variable logging
     do j = 1, this%ncol
@@ -641,9 +642,11 @@ contains
                          this%struct_vectors(j)%idt%tagname, &
                          this%mempath, iout)
       case (MTYPE_DBL)
-        if (this%struct_vectors(j)%ts_strlocs%count() > 0) then
+        nts = this%struct_vectors(j)%ts_strlocs%count()
+        if (nts > 0) then
+          write (ts_count_str, '(i0, " time-series bound entries")') nts
           call idm_log_var(this%struct_vectors(j)%idt%tagname, &
-                           this%mempath, iout, .false.)
+                           this%mempath, iout, .false., trim(ts_count_str))
         else
           call idm_log_var(this%struct_vectors(j)%dbl1d, &
                            this%struct_vectors(j)%idt%tagname, &
@@ -659,9 +662,11 @@ contains
                          this%struct_vectors(j)%idt%tagname, &
                          this%mempath, iout)
       case (MTYPE_DBL2D)
-        if (this%struct_vectors(j)%ts_strlocs%count() > 0) then
+        nts = this%struct_vectors(j)%ts_strlocs%count()
+        if (nts > 0) then
+          write (ts_count_str, '(i0, " time-series bound entries")') nts
           call idm_log_var(this%struct_vectors(j)%idt%tagname, &
-                           this%mempath, iout, .false.)
+                           this%mempath, iout, .false., trim(ts_count_str))
         else
           call idm_log_var(this%struct_vectors(j)%dbl2d, &
                            this%struct_vectors(j)%idt%tagname, &

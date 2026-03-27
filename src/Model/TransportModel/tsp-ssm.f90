@@ -993,10 +993,6 @@ contains
   !!  Initialize TspSpcType from the input mempath.
   !<
   subroutine set_ssmivec(this, ip, packname, spc_mempath, input_fname)
-    ! -- modules
-    use KindModule, only: LGP
-    use ConstantsModule, only: LENMEMPATH
-    use MemoryManagerModule, only: get_isize
     ! -- dummy
     class(TspSsmType), intent(inout) :: this !< TspSsmType
     integer(I4B), intent(in) :: ip !< package number
@@ -1005,18 +1001,12 @@ contains
     character(len=*), intent(in) :: input_fname !< SPC input file name (for error messages)
     ! -- local
     type(TspSpcType), pointer :: ssmiptr
-    logical(LGP) :: readasarrays
-    integer(I4B) :: isize
-    !
-    ! -- READASARRAYS is a required OPTIONS keyword in SPCA; absent in SPC
-    call get_isize('READASARRAYS', spc_mempath, isize)
-    readasarrays = (isize > 0)
     !
     ! -- initialize the TspSpcType reader for this package
     ssmiptr => this%ssmivec(ip)
     call ssmiptr%initialize(this%dis, ip, spc_mempath, this%iout, &
                             this%name_model, trim(packname), &
-                            this%depvartype, readasarrays, input_fname)
+                            this%depvartype, input_fname)
   end subroutine set_ssmivec
 
   !> @ brief Setup the output table

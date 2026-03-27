@@ -71,7 +71,7 @@ contains
   !!
   !<
   subroutine initialize(this, dis, id, input_mempath, iout, name_model, &
-                        packNameFlow, dvn, readasarrays, input_fname)
+                        packNameFlow, dvn, input_fname)
     ! -- dummy variables
     class(TspSpcType) :: this !< TspSpcType
     class(DisBaseType), pointer, intent(in) :: dis !< discretization package
@@ -81,7 +81,6 @@ contains
     character(len=*), intent(in) :: name_model !< model name
     character(len=*), intent(in) :: packNameFlow !< name of corresponding flow package
     character(len=*), intent(in) :: dvn !< dependent variable name (CONCENTRATION or TEMPERATURE)
-    logical(LGP), intent(in) :: readasarrays !< .true. for array-based input
     character(len=*), intent(in) :: input_fname !< SPC input file name
     ! -- local
     integer(I4B), pointer :: maxbound_ptr
@@ -100,11 +99,14 @@ contains
     this%iout = iout
     this%packNameFlow = packNameFlow
     this%depvarname = dvn
-    this%readasarrays = readasarrays
     this%dis => dis
     !
+    ! -- READASARRAYS is a required OPTIONS keyword in SPCA; absent in SPC
+    call get_isize('READASARRAYS', input_mempath, isize)
+    this%readasarrays = (isize > 0)
+    !
     ! -- set maxbound
-    if (readasarrays) then
+    if (this%readasarrays) then
       this%maxbound = dis%get_ncpl()
     else
       call mem_setptr(maxbound_ptr, 'MAXBOUND', input_mempath)
@@ -120,7 +122,7 @@ contains
       write (this%iout, '(4x,a)') 'TIME-VARYING INPUT WILL BE PRINTED.'
     end if
     !
-    ! -- check for active timeseries
+    ! -- check for idm managed active timeseries
     call get_isize('TS6_FILENAME', input_mempath, isize)
     if (isize > 0) this%ts_active = .true.
     call get_isize('TAS6_FILENAME', input_mempath, isize)

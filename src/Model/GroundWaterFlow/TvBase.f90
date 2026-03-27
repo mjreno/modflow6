@@ -233,6 +233,9 @@ contains
     call mem_setptr(iper, 'IPER', this%input_mempath)
     if (iper /= kper) return
     !
+    ! -- When timeseries are active, ad applies values at every time step
+    if (this%ts_active) return
+    !
     call mem_setptr(nbound, 'NBOUND', this%input_mempath)
     !
     ! -- Reset per-node property change flags
@@ -262,23 +265,20 @@ contains
     end if
   end subroutine rp
 
-  !> @brief Re-apply time-series-updated values for a new time step.
+  !> @brief Apply advanced values at each time step.
   !<
   subroutine ad(this)
     ! -- dummy
     class(TvBaseType) :: this
     ! -- local variables
-    integer(I4B), pointer :: iper, nbound
+    integer(I4B), pointer :: nbound
     integer(I4B) :: n, node
     !
-    ! -- check last loaded input period
-    call mem_setptr(iper, 'IPER', this%input_mempath)
-    if (iper /= kper) return
+    ! -- no-op when timeseries aren't active.
+    if (.not. this%ts_active) return
     !
     call mem_setptr(nbound, 'NBOUND', this%input_mempath)
-    !
-    ! -- Re-apply and validate changes when timeseries is active
-    if (nbound > 0 .and. this%ts_active) then
+    if (nbound > 0) then
       ! -- Record that changes were made at the current time step
       call this%set_changed_at(kper, kstp)
       ! -- Reset node change flags

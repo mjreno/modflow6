@@ -273,7 +273,8 @@ contains
 
       ! scale maxbound by keystring member count; fall back to nodes * nmembers
       ! when no DIMENSIONS block is present (e.g. TVK/TVS)
-      if (this%loadtype == KEYSTRING .or. this%loadtype == ADVANCED) then
+      if (this%loadtype == KEYSTRING .or. &
+          this%loadtype == ADVANCED) then
         ! count members from the KEYSTRING aggregate type definition, which
         ! names exactly the dispatchable members
         nmembers = 0

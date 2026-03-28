@@ -88,20 +88,20 @@ contains
     logical(LGP) :: found_print_input
     !
     write (this%packName, '(a,i0)') 'SPC-', id
+    !
+    call this%allocate_scalars()
+    !
     this%name_model = name_model
     this%memoryPath = create_mem_path(this%name_model, this%packName)
     this%input_mempath = input_mempath
     this%input_fname = input_fname
-    !
-    call this%allocate_scalars()
-    !
     this%id = id
     this%iout = iout
     this%packNameFlow = packNameFlow
     this%depvarname = dvn
     this%dis => dis
     !
-    ! -- READASARRAYS is a required OPTIONS keyword in SPCA; absent in SPC
+    ! -- READASARRAYS determine array or list based input
     call get_isize('READASARRAYS', input_mempath, isize)
     this%readasarrays = (isize > 0)
     !

@@ -119,9 +119,6 @@ contains
 
     ! finalize static load
     call this%finalize()
-
-    ! ensure ts_sas is allocated after load
-    if (.not. allocated(this%ts_sas)) allocate (this%ts_sas(0))
   end subroutine load
 
   !> @brief init
@@ -153,6 +150,9 @@ contains
     if (isize > 0) then
       call mem_setptr(this%mshape, 'MODEL_SHAPE', mf6_input%component_mempath)
     end if
+
+    ! init ts stuctarray list
+    allocate (this%ts_sas(0))
 
     ! log lst file header
     call idm_log_header(this%mf6_input%component_name, &
@@ -669,11 +669,7 @@ contains
   function ts_sa_count(this) result(n)
     class(LoadMf6FileType), intent(in) :: this
     integer(I4B) :: n
-    if (allocated(this%ts_sas)) then
-      n = size(this%ts_sas)
-    else
-      n = 0
-    end if
+    n = size(this%ts_sas)
   end function ts_sa_count
 
   !> @brief Return the n-th saved static StructArray pointer
@@ -1260,16 +1256,11 @@ contains
     end do
 
     if (has_ts) then
-      if (.not. allocated(this%ts_sas)) then
-        allocate (this%ts_sas(1))
-        this%ts_sas(1)%sa => this%structarray
-      else
-        n = size(this%ts_sas)
-        allocate (tmp(n + 1))
-        tmp(1:n) = this%ts_sas
-        tmp(n + 1)%sa => this%structarray
-        call move_alloc(tmp, this%ts_sas)
-      end if
+      n = size(this%ts_sas)
+      allocate (tmp(n + 1))
+      tmp(1:n) = this%ts_sas
+      tmp(n + 1)%sa => this%structarray
+      call move_alloc(tmp, this%ts_sas)
       ! nullify so load_block does not destroy the saved SA
       nullify (this%structarray)
     end if
@@ -1283,16 +1274,13 @@ contains
     use StructArrayModule, only: destructStructArray
     class(LoadMf6FileType), intent(inout) :: this
     integer(I4B) :: n
-
-    if (allocated(this%ts_sas)) then
-      do n = 1, size(this%ts_sas)
-        if (associated(this%ts_sas(n)%sa)) then
-          call destructStructArray(this%ts_sas(n)%sa)
-          nullify (this%ts_sas(n)%sa)
-        end if
-      end do
-      deallocate (this%ts_sas)
-    end if
+    do n = 1, size(this%ts_sas)
+      if (associated(this%ts_sas(n)%sa)) then
+        call destructStructArray(this%ts_sas(n)%sa)
+        nullify (this%ts_sas(n)%sa)
+      end if
+    end do
+    deallocate (this%ts_sas)
   end subroutine cleanup
 
 end module LoadMf6FileModule

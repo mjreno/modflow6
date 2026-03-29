@@ -195,7 +195,8 @@ contains
       if (this%fmi%iatp(ip) /= 0) cycle
       if (this%isrctype(ip) == 3 .or. this%isrctype(ip) == 4) then
         ssmiptr => this%ssmivec(ip)
-        call ssmiptr%spc_rp()
+        call ssmiptr%spc_rp(this%fmi%gwfpackages(ip)%nbound, &
+                            this%fmi%gwfpackages(ip)%budtxt)
       end if
     end do
   end subroutine ssm_rp

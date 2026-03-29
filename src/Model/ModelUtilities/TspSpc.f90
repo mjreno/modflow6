@@ -266,9 +266,11 @@ contains
   !! has been loaded for this stress period.
   !!
   !<
-  subroutine spc_rp(this)
+  subroutine spc_rp(this, nbound_flowpack, budtxt)
     ! -- dummy
     class(TspSpcType), intent(inout) :: this !< TspSpcType object
+    integer(I4B), intent(in) :: nbound_flowpack
+    character(len=*), intent(in) :: budtxt
     ! -- local
     integer(I4B), pointer :: iper
     ! -- formats
@@ -281,10 +283,11 @@ contains
       return
     end if
     !
-    ! -- When timeseries are active, spc_ad applies values at every time step
+    ! -- spc_ad applies each time step
     if (this%ts_active) return
     !
     call this%apply_input_values()
+    call this%check_flow_package(nbound_flowpack, budtxt)
   end subroutine spc_rp
 
   !> @brief Advance
@@ -298,11 +301,10 @@ contains
     integer(I4B), intent(in) :: nbound_flowpack
     character(len=*), intent(in) :: budtxt
     !
-    ! -- Apply updated values from input context
-    if (this%ts_active) then
-      call this%apply_input_values()
-    end if
+    ! -- no-op if timeseries inactive
+    if (.not. this%ts_active) return
     !
+    call this%apply_input_values()
     call this%check_flow_package(nbound_flowpack, budtxt)
   end subroutine spc_ad
 

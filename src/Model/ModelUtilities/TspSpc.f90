@@ -189,12 +189,20 @@ contains
     if (this%readasarrays) then
       ! -- Special handling for reduced grids and readasarrays.
       ! -- If flow and transport are in the same simulation, ientry is a user
-      ! -- node number corresponding to the correct position in dblvec.
-      ! -- If they are in separate simulations, ientry is a reduced node number
-      ! -- and must be converted to a user node number.
+      ! -- node number and corresponds to the correct position in dblvec.
+      ! -- If flow and transport are not in the same simulation, ientry is a
+      ! -- reduced node number, because the list of flows in the budget file
+      ! -- does not include idomain < 1 entries. In that case, ientry must be
+      ! -- converted to a user node number so that it corresponds to a user
+      ! -- array, which includes idomain < 1 values.
       if (nbound_flow == this%maxbound) then
+        ! -- flow and transport are in the same simulation or there
+        ! -- are no idomain < 1 cells.
         value = this%dblvec(ientry)
       else
+        ! -- flow and transport are in separate simulations; nbound_flow
+        ! -- would equal ncpl if in the same simulation, but boundary cells
+        ! -- with idomain < 1 are excluded from the binary budget file.
         nu = this%dis%get_nodeuser(ientry)
         value = this%dblvec(nu)
       end if
@@ -337,6 +345,7 @@ contains
     integer(I4B), intent(in) :: nbound_flowpack
     character(len=*), intent(in) :: budtxt
     !
+    ! -- Check and make sure MAXBOUND is not less than nbound_flowpack
     if (this%maxbound < nbound_flowpack) then
       write (errmsg, '(a,a,a,i0,a,i0,a)') &
         'The SPC Package corresponding to flow package ', &
@@ -351,6 +360,8 @@ contains
       call store_error_filename(this%input_fname)
     end if
     !
+    ! -- If budtxt is RCHA or EVTA, then readasarrays must be used, otherwise
+    !    readasarrays cannot be used
     select case (trim(adjustl(budtxt)))
     case ('RCHA')
       if (.not. this%readasarrays) then

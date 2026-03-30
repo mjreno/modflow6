@@ -289,11 +289,7 @@ contains
         end if
         if (allocated(cols)) deallocate (cols)
         if (allocated(ks_cols)) deallocate (ks_cols)
-        if (nmembers > 0 .and. this%maxbound > 0) then
-          this%maxbound = this%maxbound * nmembers
-        else if (nmembers > 0 .and. this%nodes > 0) then
-          this%maxbound = this%nodes * nmembers
-        end if
+        if (this%maxbound == 0) this%maxbound = this%nodes * nmembers
       end if
     end if
   end subroutine allocate_scalars

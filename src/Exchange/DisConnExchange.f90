@@ -104,12 +104,13 @@ contains
     integer(I4B) :: ival, n
     !
     ! -- update defaults with idm sourced values
-    call mem_set_value(this%naux, 'NAUX', this%input_mempath, found%naux)
+    call mem_set_value(this%naux, 'NAUX', this%input_mempath, found%naux, &
+                       release=.false.)
     call mem_set_value(this%ipakcb, 'IPAKCB', this%input_mempath, found%ipakcb)
     call mem_set_value(this%iprpak, 'IPRPAK', this%input_mempath, found%iprpak)
     call mem_set_value(this%iprflow, 'IPRFLOW', this%input_mempath, found%iprflow)
     call mem_set_value(this%inamedbound, 'BOUNDNAMES', this%input_mempath, &
-                       found%boundnames)
+                       found%boundnames, release=.false.)
     call mem_set_value(this%dev_ifmod_on, 'DEV_IFMOD_ON', this%input_mempath, &
                        found%dev_ifmod_on)
     !
@@ -120,7 +121,7 @@ contains
       call mem_reallocate(this%auxname_cst, LENAUXNAME, this%naux, &
                           'AUXNAME_CST', this%memoryPath)
       call mem_set_value(this%auxname_cst, 'AUXILIARY', this%input_mempath, &
-                         found%auxiliary)
+                         found%auxiliary, release=.false.)
       !
       do n = 1, this%naux
         this%auxname(n) = this%auxname_cst(n)

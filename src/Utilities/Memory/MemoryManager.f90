@@ -797,7 +797,7 @@ contains
     end if
     !
     ! -- update counter
-    nvalues_aint = nvalues_aint + 1
+    nvalues_adbl = nvalues_adbl + 1
     !
     ! -- allocate memory type
     allocate (mt)

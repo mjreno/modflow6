@@ -5,7 +5,7 @@ module MemoryManagerExtModule
   use ConstantsModule, only: MVALIDATE
   use SimVariablesModule, only: isim_mode
   use MemoryTypeModule, only: MemoryType
-  use MemoryManagerModule, only: memorystore, get_from_memorystore
+  use MemoryManagerModule, only: memorystore, get_from_memorystore, mem_release
   use MemoryContainerIteratorModule, only: MemoryContainerIteratorType
 
   implicit none
@@ -13,12 +13,6 @@ module MemoryManagerExtModule
   public :: mem_set_value
   public :: memorystore_remove
   public :: memorystore_release
-
-  ! NOTE(deferred): When release deallocates input context memory, mt%isize and
-  ! the nvalues_* counters in MemoryManagerModule are not updated. This means
-  ! mem_summary_total will report inflated per-type totals (INTEGER, REAL, etc.)
-  ! until a follow-on change zeroes mt%isize in mt_deallocate and decrements the
-  ! nvalues_* counters accordingly.
 
   interface mem_set_value
     module procedure mem_set_value_logical, mem_set_value_int, &
@@ -56,7 +50,7 @@ contains
         ! guard: mt_associated() is false for entries already released via
         ! mem_set_value(..., release=.true.) prior to this call
         if (mt%path == memory_path .and. mt%mt_associated()) then
-          call mt%mt_deallocate()
+          call mem_release(mt)
           removed = .true.
           deallocate (itr)
           exit
@@ -80,7 +74,7 @@ contains
     call get_from_memorystore(varname, memory_path, mt, found, checkfail)
     if (.not. found) return
     if (.not. mt%mt_associated()) return ! guard: already released
-    if (isim_mode /= MVALIDATE) call mt%mt_deallocate()
+    if (isim_mode /= MVALIDATE) call mem_release(mt)
   end subroutine memorystore_release
 
   !> @brief Set pointer to value of memory list logical variable
@@ -107,7 +101,7 @@ contains
       else
         p_mem = .true.
       end if
-      if (do_release) call mt%mt_deallocate()
+      if (do_release) call mem_release(mt)
     end if
   end subroutine mem_set_value_logical
 
@@ -131,7 +125,7 @@ contains
     if (.not. mt%mt_associated()) return ! guard: entry was previously released
     if (mt%memtype(1:index(mt%memtype, ' ')) == 'INTEGER') then
       p_mem = mt%intsclr
-      if (do_release) call mt%mt_deallocate()
+      if (do_release) call mem_release(mt)
     end if
   end subroutine mem_set_value_int
 
@@ -155,7 +149,7 @@ contains
     if (.not. mt%mt_associated()) return ! guard: entry was previously released
 
     p_mem = setval
-    if (do_release) call mt%mt_deallocate()
+    if (do_release) call mem_release(mt)
   end subroutine mem_set_value_int_setval
 
   subroutine mem_set_value_str_mapped_int(p_mem, varname, memory_path, &
@@ -183,7 +177,7 @@ contains
           p_mem = i
         end if
       end do
-      if (do_release) call mt%mt_deallocate()
+      if (do_release) call mem_release(mt)
     end if
   end subroutine mem_set_value_str_mapped_int
 
@@ -215,7 +209,7 @@ contains
       do n = 1, size(mt%alogical1d)
         p_mem(n) = mt%alogical1d(n)
       end do
-      if (do_release) call mt%mt_deallocate()
+      if (do_release) call mem_release(mt)
     end if
   end subroutine mem_set_value_logical1d
 
@@ -254,7 +248,7 @@ contains
           p_mem(n) = mt%alogical1d(n)
         end do
       end if
-      if (do_release) call mt%mt_deallocate()
+      if (do_release) call mem_release(mt)
     end if
   end subroutine mem_set_value_logical1d_mapped
 
@@ -285,7 +279,7 @@ contains
       do n = 1, size(mt%aint1d)
         p_mem(n) = mt%aint1d(n)
       end do
-      if (do_release) call mt%mt_deallocate()
+      if (do_release) call mem_release(mt)
     end if
   end subroutine mem_set_value_int1d
 
@@ -324,7 +318,7 @@ contains
           p_mem(n) = mt%aint1d(n)
         end do
       end if
-      if (do_release) call mt%mt_deallocate()
+      if (do_release) call mem_release(mt)
     end if
   end subroutine mem_set_value_int1d_mapped
 
@@ -358,7 +352,7 @@ contains
           p_mem(i, j) = mt%aint2d(i, j)
         end do
       end do
-      if (do_release) call mt%mt_deallocate()
+      if (do_release) call mem_release(mt)
     end if
   end subroutine mem_set_value_int2d
 
@@ -395,7 +389,7 @@ contains
           end do
         end do
       end do
-      if (do_release) call mt%mt_deallocate()
+      if (do_release) call mem_release(mt)
     end if
   end subroutine mem_set_value_int3d
 
@@ -419,7 +413,7 @@ contains
     if (.not. mt%mt_associated()) return ! guard: entry was previously released
     if (mt%memtype(1:index(mt%memtype, ' ')) == 'DOUBLE') then
       p_mem = mt%dblsclr
-      if (do_release) call mt%mt_deallocate()
+      if (do_release) call mem_release(mt)
     end if
   end subroutine mem_set_value_dbl
 
@@ -450,7 +444,7 @@ contains
       do n = 1, size(mt%adbl1d)
         p_mem(n) = mt%adbl1d(n)
       end do
-      if (do_release) call mt%mt_deallocate()
+      if (do_release) call mem_release(mt)
     end if
   end subroutine mem_set_value_dbl1d
 
@@ -489,7 +483,7 @@ contains
           p_mem(n) = mt%adbl1d(n)
         end do
       end if
-      if (do_release) call mt%mt_deallocate()
+      if (do_release) call mem_release(mt)
     end if
   end subroutine mem_set_value_dbl1d_mapped
 
@@ -523,7 +517,7 @@ contains
           p_mem(i, j) = mt%adbl2d(i, j)
         end do
       end do
-      if (do_release) call mt%mt_deallocate()
+      if (do_release) call mem_release(mt)
     end if
   end subroutine mem_set_value_dbl2d
 
@@ -560,7 +554,7 @@ contains
           end do
         end do
       end do
-      if (do_release) call mt%mt_deallocate()
+      if (do_release) call mem_release(mt)
     end if
   end subroutine mem_set_value_dbl3d
 
@@ -582,7 +576,7 @@ contains
     if (.not. mt%mt_associated()) return ! guard: entry was previously released
     if (mt%memtype(1:index(mt%memtype, ' ')) == 'STRING') then
       p_mem = mt%strsclr
-      if (do_release) call mt%mt_deallocate()
+      if (do_release) call mem_release(mt)
     end if
   end subroutine mem_set_value_str
 
@@ -610,7 +604,7 @@ contains
       do n = 1, size(mt%acharstr1d)
         p_mem(n) = mt%acharstr1d(n)
       end do
-      if (do_release) call mt%mt_deallocate()
+      if (do_release) call mem_release(mt)
     end if
   end subroutine mem_set_value_charstr1d
 

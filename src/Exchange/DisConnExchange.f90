@@ -251,6 +251,7 @@ contains
   subroutine source_data(this, iout)
     ! -- modules
     use MemoryManagerModule, only: mem_setptr
+    use MemoryManagerExtModule, only: memorystore_release
     ! -- dummy
     class(DisConnExchangeType) :: this !< instance of exchange object
     integer(I4B), intent(in) :: iout !< the output file unit
@@ -389,6 +390,15 @@ contains
       call store_error('Errors encountered in exchange input file.')
       call store_error_filename(this%filename)
     end if
+    !
+    call memorystore_release('CELLIDM1', this%input_mempath)
+    call memorystore_release('CELLIDM2', this%input_mempath)
+    call memorystore_release('IHC', this%input_mempath)
+    call memorystore_release('CL1', this%input_mempath)
+    call memorystore_release('CL2', this%input_mempath)
+    call memorystore_release('HWVA', this%input_mempath)
+    call memorystore_release('AUXVAR', this%input_mempath)
+    call memorystore_release('BOUNDNAME', this%input_mempath)
   end subroutine source_data
 
   !> @brief Allocate scalars and initialize to defaults

@@ -2655,7 +2655,8 @@ contains
   !!
   !! Deallocates the data held by mt, zeroes mt%isize, and decrements the
   !! appropriate nvalues_* counter for master entries. no-op when data has
-  !! already been released.
+  !! already been released. Primarily intended to support the release of
+  !! input context memory prior to simulation runtime.
   !<
   subroutine mem_release(mt)
     type(MemoryType), pointer, intent(inout) :: mt

@@ -636,7 +636,7 @@ contains
     end if
     !
     call memorystore_release('ICELL2D', this%input_mempath)
-    ! NCVERT and ICVERT are export dependency for now
+    ! NCVERT and ICVERT are currently an export dependency
     ! call memorystore_release('NCVERT', this%input_mempath)
     ! call memorystore_release('ICVERT', this%input_mempath)
     call memorystore_release('XC', this%input_mempath)

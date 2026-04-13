@@ -50,7 +50,7 @@ contains
         ! guard: mt_associated() is false for entries already released via
         ! mem_set_value(..., release=.true.) prior to this call
         if (mt%path == memory_path .and. mt%mt_associated()) then
-          call mem_release(mt)
+          call mt%mt_deallocate()
           removed = .true.
           deallocate (itr)
           exit

@@ -1210,7 +1210,6 @@ contains
     call memorystore_release('XRPT', this%input_mempath)
     call memorystore_release('YRPT', this%input_mempath)
     call memorystore_release('ZRPT', this%input_mempath)
-    call memorystore_release('BOUNDNAME', this%input_mempath)
   end subroutine prp_packagedata
 
   !> @brief Load explicitly specified release times.

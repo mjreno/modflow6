@@ -1546,7 +1546,6 @@ contains
     end if
 
     call memorystore_release('ICSUBNO', this%input_mempath)
-    ! call memorystore_release('CELLID', this%input_mempath)
     call memorystore_release('CDELAY', this%input_mempath)
     call memorystore_release('PCS0', this%input_mempath)
     call memorystore_release('THICK_FRAC', this%input_mempath)

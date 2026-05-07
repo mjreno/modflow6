@@ -47,7 +47,7 @@ module Mf6FileKeystringModule
   contains
     procedure :: ainit
     procedure :: df
-    procedure :: timeseries_advance
+    procedure :: ts_advance
     procedure :: rp
     procedure :: reset
     procedure :: destroy
@@ -156,10 +156,10 @@ contains
     end do
   end subroutine df
 
-  subroutine timeseries_advance(this)
+  subroutine ts_advance(this)
     class(KeystringLoadType), intent(inout) :: this
     call this%tsmanager%ad()
-  end subroutine timeseries_advance
+  end subroutine ts_advance
 
   subroutine rp(this, parser)
     use IdmLoggerModule, only: idm_log_header, idm_log_close

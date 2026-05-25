@@ -21,7 +21,7 @@ preserve_case true
 reader urword
 optional true
 longname CRS well-known text (WKT2) string
-description is the coordinate reference system (CRS) well-known text string in WKT2 format (ISO 19162:2019), as required by CF-1.11. Written as the ``crs_wkt`` attribute on the projection variable. When omitted, the ``wkt`` value is written to ``crs_wkt`` as a compatibility alias. Ignored when latitude and longitude griddata arrays have been provided.
+description is the coordinate reference system (CRS) well-known text string in WKT2 format (ISO 19162:2019), as required by CF-1.11. Written as the ``crs\_wkt`` attribute on the projection variable. When omitted, the ``wkt`` value is written to ``crs\_wkt`` as a compatibility alias. Ignored when latitude and longitude griddata arrays have been provided.
 
 block options
 name deflate

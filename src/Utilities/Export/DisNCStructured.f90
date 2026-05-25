@@ -16,7 +16,7 @@ module DisNCStructuredModule
   use InputDefinitionModule, only: InputParamDefinitionType
   use CharacterStringModule, only: CharacterStringType
   use NCModelExportModule, only: NCBaseModelExportType, export_varname, &
-                                 export_longname
+                                 export_longname, wkt_to_cf_gridmapping
   use DisModule, only: DisType
   use NetCDFCommonModule, only: nf_verify
   use netcdf
@@ -156,12 +156,13 @@ contains
 
       if (latsz > 0 .and. lonsz > 0) then
         this%latlon = .true.
-        if (this%wkt /= '') then
-          write (warnmsg, '(a)') 'Ignoring user provided NetCDF wkt parameter &
-            &as longitude and latitude arrays have been provided. &
+        if (this%wkt /= '' .or. this%crs_wkt /= '') then
+          write (warnmsg, '(a)') 'Ignoring user provided NetCDF wkt/crs_wkt &
+            &parameter(s) as longitude and latitude arrays have been provided. &
             &Applies to file "'//trim(nc_fname)//'".'
           call store_warning(warnmsg)
           this%wkt = ''
+          this%crs_wkt = ''
           this%gridmap_name = ''
         end if
         call mem_setptr(this%latitude, 'LATITUDE', this%ncf_mempath)
@@ -890,13 +891,32 @@ contains
   subroutine define_gridmap(this)
     class(DisNCStructuredType), intent(inout) :: this
     integer(I4B) :: var_id
-    if (this%wkt /= '') then
+    character(len=LINELENGTH) :: gmname
+    character(len=LENBIGLINE) :: effective_crs_wkt
+
+    if (this%wkt /= '' .or. this%crs_wkt /= '') then
       call nf_verify(nf90_redef(this%ncid), this%nc_fname)
       call nf_verify(nf90_def_var(this%ncid, this%gridmap_name, NF90_INT, &
                                   var_id), this%nc_fname)
-      ! TODO: consider variants epsg_code, spatial_ref, esri_pe_string, wkt, etc
-      call nf_verify(nf90_put_att(this%ncid, var_id, 'crs_wkt', this%wkt), &
-                     this%nc_fname)
+      ! wkt (WKT1, OGC 01-009) -- for legacy/QGIS compatibility
+      if (this%wkt /= '') then
+        call nf_verify(nf90_put_att(this%ncid, var_id, 'wkt', this%wkt), &
+                       this%nc_fname)
+      end if
+      ! crs_wkt (WKT2, ISO 19162:2019) -- required by CF-1.11
+      if (this%crs_wkt /= '') then
+        effective_crs_wkt = this%crs_wkt
+      else
+        effective_crs_wkt = this%wkt
+      end if
+      call nf_verify(nf90_put_att(this%ncid, var_id, 'crs_wkt', &
+                                  trim(effective_crs_wkt)), this%nc_fname)
+      ! grid_mapping_name derived from WKT projection keyword
+      gmname = wkt_to_cf_gridmapping(trim(effective_crs_wkt))
+      if (gmname /= '') then
+        call nf_verify(nf90_put_att(this%ncid, var_id, 'grid_mapping_name', &
+                                    trim(gmname)), this%nc_fname)
+      end if
       call nf_verify(nf90_enddef(this%ncid), this%nc_fname)
       call nf_verify(nf90_put_var(this%ncid, var_id, 1), &
                      this%nc_fname)

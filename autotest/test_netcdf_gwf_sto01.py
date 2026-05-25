@@ -88,18 +88,21 @@ def check_output(idx, test, export, gridded_input):
     # verify format of generated netcdf file
     with nc.Dataset(test.workspace / f"{test.name}.nc") as ds:
         assert ds.data_model == "NETCDF4"
+        proj = ds.variables["projection"]
         if export == "structured":
             cmpr = ds.variables["head"].filters()
             chnk = ds.variables["head"].chunking()
             assert chnk == [1, 1, 5, 5]
-            assert (
-                ds.variables["projection"].getncattr("crs_wkt").lower() == wkt.lower()
-            )
+            assert proj.getncattr("wkt") == wkt
+            assert proj.getncattr("crs_wkt") == wkt
+            assert proj.getncattr("grid_mapping_name") == "transverse_mercator"
         elif export == "ugrid":
             cmpr = ds.variables["head_l1"].filters()
             chnk = ds.variables["head_l1"].chunking()
             assert chnk == [1, 10]
-            assert ds.variables["projection"].getncattr("wkt").lower() == wkt.lower()
+            assert proj.getncattr("wkt") == wkt
+            assert proj.getncattr("crs_wkt") == wkt
+            assert proj.getncattr("grid_mapping_name") == "transverse_mercator"
         assert cmpr["shuffle"]
         assert cmpr["complevel"] == 5
 

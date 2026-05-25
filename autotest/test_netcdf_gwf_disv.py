@@ -184,7 +184,10 @@ def check_output(idx, test, gridded_input):
         assert cmpr["shuffle"]
         assert cmpr["complevel"] == 9
         assert chnk == [1, 3]
-        assert ds.variables["projection"].getncattr("wkt").lower() == wkt.lower()
+        proj = ds.variables["projection"]
+        assert proj.getncattr("wkt") == wkt
+        assert proj.getncattr("crs_wkt") == wkt
+        assert proj.getncattr("grid_mapping_name") == "transverse_mercator"
 
     # Check NetCDF output
     nc_fpth = os.path.join(test.workspace, name + ".nc")

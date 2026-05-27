@@ -35,6 +35,7 @@ module MeshModelModule
     integer(I4B) :: nmesh_face !< number of faces in mesh
     integer(I4B) :: max_nmesh_face_nodes !< max number of nodes in a single face
     integer(I4B) :: time !< number of steps
+    integer(I4B) :: layer !< number of layers
   contains
   end type MeshNCDimIdType
 
@@ -50,6 +51,7 @@ module MeshModelModule
     integer(I4B) :: mesh_face_ybnds !< mesh faces 2D y bounds array
     integer(I4B) :: mesh_face_nodes !< mesh faces 2D nodes array
     integer(I4B) :: time !< time coordinate variable
+    integer(I4B) :: layer !< layer coordinate variable
     integer(I4B), dimension(:), allocatable :: export !< in scope layer export
     integer(I4B), dimension(:), allocatable :: dependent !< layered dependent variables array
   contains
@@ -283,12 +285,8 @@ contains
                                 'units', this%lenunits), this%nc_fname)
     call nf_verify(nf90_put_att(this%ncid, varid, &
                                 'long_name', longname), this%nc_fname)
-    call nf_verify(nf90_put_att(this%ncid, varid, &
-                                'mesh', this%mesh_name), this%nc_fname)
-    call nf_verify(nf90_put_att(this%ncid, varid, &
-                                'location', 'face'), this%nc_fname)
 
-    ! add grid mapping and mf6 attr
+    ! add grid mapping and mf6 attr (mesh, location, coordinates, grid_mapping)
     call ncvar_gridmap(this%ncid, varid, &
                        this%gridmap_name, this%nc_fname)
     call ncvar_mf6attr(this%ncid, varid, layer, iaux, nc_tag, this%nc_fname)
@@ -469,19 +467,12 @@ contains
       call nf_verify(nf90_put_att(this%ncid, this%var_ids%dependent(k), &
                                   'units', this%lenunits), this%nc_fname)
       call nf_verify(nf90_put_att(this%ncid, this%var_ids%dependent(k), &
-                                  'standard_name', this%annotation%stdname), &
-                     this%nc_fname)
-      call nf_verify(nf90_put_att(this%ncid, this%var_ids%dependent(k), &
                                   'long_name', longname), this%nc_fname)
       call nf_verify(nf90_put_att(this%ncid, this%var_ids%dependent(k), &
                                   '_FillValue', (/DHNOFLO/)), &
                      this%nc_fname)
-      call nf_verify(nf90_put_att(this%ncid, this%var_ids%dependent(k), &
-                                  'mesh', this%mesh_name), this%nc_fname)
-      call nf_verify(nf90_put_att(this%ncid, this%var_ids%dependent(k), &
-                                  'location', 'face'), this%nc_fname)
 
-      ! add grid mapping
+      ! add grid mapping (mesh, location, coordinates, grid_mapping)
       call ncvar_gridmap(this%ncid, this%var_ids%dependent(k), &
                          this%gridmap_name, this%nc_fname)
     end do
@@ -713,6 +704,8 @@ contains
     character(len=*), intent(in) :: gridmap_name
     character(len=*), intent(in) :: nc_fname
     if (gridmap_name /= '') then
+      call nf_verify(nf90_put_att(ncid, varid, 'mesh', 'mesh'), nc_fname)
+      call nf_verify(nf90_put_att(ncid, varid, 'location', 'face'), nc_fname)
       call nf_verify(nf90_put_att(ncid, varid, 'coordinates', &
                                   'mesh_face_x mesh_face_y'), nc_fname)
       call nf_verify(nf90_put_att(ncid, varid, 'grid_mapping', &

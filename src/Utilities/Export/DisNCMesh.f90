@@ -425,6 +425,21 @@ contains
                                 this%x_dim), this%nc_fname)
     call nf_verify(nf90_def_dim(this%ncid, 'y', this%dis%nrow, &
                                 this%y_dim), this%nc_fname)
+
+    ! layer
+    call nf_verify(nf90_def_dim(this%ncid, 'layer', this%nlay, &
+                                this%dim_ids%layer), this%nc_fname)
+    call nf_verify(nf90_def_var(this%ncid, 'layer', NF90_INT, &
+                                this%dim_ids%layer, this%var_ids%layer), &
+                   this%nc_fname)
+    call nf_verify(nf90_put_att(this%ncid, this%var_ids%layer, 'units', '1'), &
+                   this%nc_fname)
+    call nf_verify(nf90_put_att(this%ncid, this%var_ids%layer, 'axis', 'Z'), &
+                   this%nc_fname)
+    call nf_verify(nf90_put_att(this%ncid, this%var_ids%layer, 'positive', &
+                                'down'), this%nc_fname)
+    call nf_verify(nf90_put_att(this%ncid, this%var_ids%layer, 'long_name', &
+                                'model layer'), this%nc_fname)
   end subroutine define_dim
 
   !> @brief netcdf export add mesh information
@@ -432,8 +447,8 @@ contains
   subroutine add_mesh_data(this)
     use BaseDisModule, only: dis_transform_xy
     class(Mesh2dDisExportType), intent(inout) :: this
-    integer(I4B) :: cnt, maxvert, m
-    integer(I4B), dimension(:), allocatable :: verts
+    integer(I4B) :: cnt, maxvert, m, k
+    integer(I4B), dimension(:), allocatable :: verts, layers
     real(DP), dimension(:), allocatable :: bnds
     integer(I4B) :: i, j
     real(DP) :: x, y, x_transform, y_transform
@@ -446,6 +461,15 @@ contains
     ! set mesh container variable value to 1
     call nf_verify(nf90_put_var(this%ncid, this%var_ids%mesh, 1), &
                    this%nc_fname)
+
+    ! write layer coordinate data
+    allocate (layers(this%nlay))
+    do k = 1, this%nlay
+      layers(k) = k
+    end do
+    call nf_verify(nf90_put_var(this%ncid, this%var_ids%layer, layers), &
+                   this%nc_fname)
+    deallocate (layers)
 
     ! allocate temporary arrays
     allocate (verts(maxvert))

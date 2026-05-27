@@ -96,6 +96,12 @@ def check_output(idx, test, export, gridded_input):
             assert proj.getncattr("wkt") == wkt
             assert proj.getncattr("crs_wkt") == wkt
             assert proj.getncattr("grid_mapping_name") == "transverse_mercator"
+            layer = ds.variables["layer"]
+            assert layer.getncattr("units") == "1"
+            assert layer.getncattr("axis") == "Z"
+            assert layer.getncattr("positive") == "down"
+            assert layer.getncattr("long_name") == "model layer"
+            assert "standard_name" not in ds.variables["head"].ncattrs()
         elif export == "ugrid":
             cmpr = ds.variables["head_l1"].filters()
             chnk = ds.variables["head_l1"].chunking()
@@ -103,8 +109,17 @@ def check_output(idx, test, export, gridded_input):
             assert proj.getncattr("wkt") == wkt
             assert proj.getncattr("crs_wkt") == wkt
             assert proj.getncattr("grid_mapping_name") == "transverse_mercator"
+            layer = ds.variables["layer"]
+            assert layer.getncattr("units") == "1"
+            assert layer.getncattr("axis") == "Z"
+            assert layer.getncattr("positive") == "down"
+            assert layer.getncattr("long_name") == "model layer"
+            assert "standard_name" not in ds.variables["head_l1"].ncattrs()
         assert cmpr["shuffle"]
         assert cmpr["complevel"] == 5
+        modflow_model = ds.getncattr("modflow_model")
+        assert modflow_model == modflow_model.lower()
+        assert "6:" not in modflow_model
 
     if gridded_input == "netcdf":
         # re-run the simulation in validate mode to generate netcdf input
@@ -259,6 +274,10 @@ def check_output(idx, test, export, gridded_input):
 
     # Check NetCDF input
     nc_fpth = os.path.join(test.workspace, f"{test.name}.{export}.nc")
+    with nc.Dataset(nc_fpth) as input_ds:
+        mi = input_ds.variables["dis_delr"].getncattr("modflow_input")
+        assert mi == mi.lower(), "modflow_input attribute should be lowercase"
+
     if export == "ugrid":
         ds = xu.open_dataset(nc_fpth)
         xds = ds.ugrid.to_dataset()

@@ -202,6 +202,7 @@ contains
   !<
   subroutine set(this, modelname, modeltype, modelfname, nctype, disenum)
     use VersionModule, only: FULLVERSION
+    use InputOutputModule, only: lowcase
     class(NCExportAnnotation), intent(inout) :: this
     character(len=*), intent(in) :: modelname
     character(len=*), intent(in) :: modeltype
@@ -248,18 +249,19 @@ contains
 
     ! set mesh type
     if (nctype == NETCDF_MESH2D) then
-      this%mesh = 'LAYERED'
+      this%mesh = 'layered'
     end if
 
     ! set grid type
     if (disenum == DIS) then
-      this%grid = 'STRUCTURED'
+      this%grid = 'structured'
     else if (disenum == DISV) then
-      this%grid = 'VERTEX'
+      this%grid = 'vertex'
     end if
 
-    ! model description string
-    this%model = trim(modeltype)//'6: '//trim(modelname)
+    ! model description string (lowercase, no version suffix, matching CF convention)
+    this%model = trim(modeltype)//': '//trim(modelname)
+    call lowcase(this%model)
 
     ! modflow6 version string
     this%source = 'MODFLOW 6 '//trim(adjustl(FULLVERSION))
@@ -425,6 +427,7 @@ contains
     if (this%input_attr > 0) then
       attr = trim(this%modelname)//memPathSeparator//trim(pkgname)// &
              memPathSeparator//trim(idt%tagname)
+      call lowcase(attr)
     end if
   end function input_attribute
 
@@ -549,12 +552,11 @@ contains
 
   !> @brief map a WKT string to a CF-1.11 grid_mapping_name
   !!
-  !! Scans the WKT string for PROJECTION["<name>"] and returns the
-  !! corresponding CF grid_mapping_name.  Returns '' for geographic CRS
-  !! (no PROJECTION keyword) or unrecognised projection names.
-  !! No external library dependency -- pure Fortran string operations.
-  !! Covers 5 projections common in groundwater modelling; unrecognised
-  !! projections return '' and grid_mapping_name is silently omitted.
+  !! Accepts either WKT1 (OGC 01-009, PROJECTION["name"]) or WKT2
+  !! (ISO 19162:2019, METHOD["name"]) format.  WKT1 is tried first;
+  !! if PROJECTION[ is absent the WKT2 METHOD[ path is attempted.
+  !! Returns '' for geographic CRS or unrecognised projection names.
+  !! Only common groundwater projections included.
   !<
   pure function wkt_to_cf_gridmapping(wkt) result(gmname)
     character(len=*), intent(in) :: wkt
@@ -565,43 +567,62 @@ contains
     gmname = ''
     proj_name = ''
 
-    ! locate PROJECTION[ in the WKT string
+    ! --- WKT1 path: PROJECTION["name"] ---
     istart = index(wkt, 'PROJECTION[')
+    if (istart /= 0) then
+      istart = istart + len('PROJECTION[')
+      do while (istart <= len(wkt))
+        if (wkt(istart:istart) == '"') exit
+        istart = istart + 1
+      end do
+      if (istart > len(wkt)) return
+      istart = istart + 1
+      iend = index(wkt(istart:), '"')
+      if (iend == 0) return
+      iend = istart + iend - 2
+      if (iend < istart) return
+      proj_name = wkt(istart:iend)
+      select case (trim(proj_name))
+      case ('Transverse_Mercator')
+        gmname = 'transverse_mercator'
+      case ('Lambert_Conformal_Conic_2SP', 'Lambert_Conformal_Conic_1SP')
+        gmname = 'lambert_conformal_conic'
+      case ('Albers_Conic_Equal_Area')
+        gmname = 'albers_conical_equal_area'
+      case ('Mercator_1SP', 'Mercator_2SP')
+        gmname = 'mercator'
+      case ('Polar_Stereographic')
+        gmname = 'polar_stereographic'
+      end select
+      return
+    end if
+
+    ! --- WKT2 path: METHOD["name"] ---
+    istart = index(wkt, 'METHOD[')
     if (istart == 0) return
-
-    ! advance past PROJECTION[
-    istart = istart + len('PROJECTION[')
-
-    ! skip optional whitespace and the opening quote
+    istart = istart + len('METHOD[')
     do while (istart <= len(wkt))
       if (wkt(istart:istart) == '"') exit
       istart = istart + 1
     end do
     if (istart > len(wkt)) return
-    istart = istart + 1 ! skip the opening quote
-
-    ! find the closing quote
+    istart = istart + 1
     iend = index(wkt(istart:), '"')
     if (iend == 0) return
-    iend = istart + iend - 2 ! last char of projection name
-
+    iend = istart + iend - 2
     if (iend < istart) return
     proj_name = wkt(istart:iend)
-
-    ! lookup table: WKT PROJECTION keyword -> CF grid_mapping_name
     select case (trim(proj_name))
-    case ('Transverse_Mercator')
+    case ('Transverse Mercator')
       gmname = 'transverse_mercator'
-    case ('Lambert_Conformal_Conic_2SP', 'Lambert_Conformal_Conic_1SP')
+    case ('Lambert Conic Conformal (2SP)', 'Lambert Conic Conformal (1SP)')
       gmname = 'lambert_conformal_conic'
-    case ('Albers_Conic_Equal_Area')
+    case ('Albers Equal Area')
       gmname = 'albers_conical_equal_area'
-    case ('Mercator_1SP', 'Mercator_2SP')
+    case ('Mercator (variant A)', 'Mercator (variant B)')
       gmname = 'mercator'
-    case ('Polar_Stereographic')
+    case ('Polar Stereographic (variant A)', 'Polar Stereographic (variant B)')
       gmname = 'polar_stereographic'
-    case default
-      gmname = ''
     end select
   end function wkt_to_cf_gridmapping
 

@@ -781,14 +781,18 @@ contains
     end if
 
     ! Z dimension
-    call nf_verify(nf90_def_dim(this%ncid, 'layer', this%dis%nlay, this%dim_ids%z), &
-                   this%nc_fname)
+    call nf_verify(nf90_def_dim(this%ncid, 'layer', this%dis%nlay, &
+                                this%dim_ids%z), this%nc_fname)
     call nf_verify(nf90_def_var(this%ncid, 'layer', NF90_DOUBLE, this%dim_ids%z, &
                                 this%var_ids%z), this%nc_fname)
-    call nf_verify(nf90_put_att(this%ncid, this%var_ids%z, 'units', 'layer'), &
+    call nf_verify(nf90_put_att(this%ncid, this%var_ids%z, 'units', '1'), &
+                   this%nc_fname)
+    call nf_verify(nf90_put_att(this%ncid, this%var_ids%z, 'axis', 'Z'), &
+                   this%nc_fname)
+    call nf_verify(nf90_put_att(this%ncid, this%var_ids%z, 'positive', 'down'), &
                    this%nc_fname)
     call nf_verify(nf90_put_att(this%ncid, this%var_ids%z, 'long_name', &
-                                'layer number'), this%nc_fname)
+                                'model layer'), this%nc_fname)
     !call nf_verify(nf90_put_att(this%ncid, this%var_ids%z, 'bounds', 'z_bnds'), &
     !               this%nc_fname)
     !call nf_verify(nf90_def_var(this%ncid, 'z_bnds', NF90_DOUBLE, &
@@ -873,9 +877,6 @@ contains
     ! put attr
     call nf_verify(nf90_put_att(this%ncid, this%var_ids%dependent, &
                                 'units', this%lenunits), this%nc_fname)
-    call nf_verify(nf90_put_att(this%ncid, this%var_ids%dependent, &
-                                'standard_name', this%annotation%stdname), &
-                   this%nc_fname)
     call nf_verify(nf90_put_att(this%ncid, this%var_ids%dependent, 'long_name', &
                                 this%annotation%longname), this%nc_fname)
     call nf_verify(nf90_put_att(this%ncid, this%var_ids%dependent, '_FillValue', &

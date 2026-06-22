@@ -209,12 +209,10 @@ contains
     use ConstantsModule, only: DNODATA
     use ArrayHandlersModule, only: ifind
     use InputDefinitionModule, only: InputParamDefinitionType
-    use DefinitionSelectModule, only: get_param_definition_type
     use Double1dReaderModule, only: read_dbl1d
-    use Double2dReaderModule, only: read_dbl2d
     use LayeredArrayReaderModule, only: read_dbl1d_layered
     use LoadNCInputModule, only: netcdf_read_array
-    use SourceCommonModule, only: get_shape_from_string, get_layered_shape
+    use SourceCommonModule, only: get_layered_shape
     use IdmLoggerModule, only: idm_log_var
     class(GridArrayLoadType), intent(inout) :: this
     type(BlockParserType), intent(in) :: parser
@@ -222,10 +220,11 @@ contains
     character(len=*), intent(in) :: mempath
     logical(LGP), intent(in) :: layered
     logical(LGP), intent(in) :: netcdf
+    integer(I4B), intent(in) :: iaux
     real(DP), dimension(:), pointer, contiguous :: dbl1d, nodes
     real(DP), dimension(:, :), pointer, contiguous :: dbl2d
     integer(I4B), dimension(:), allocatable :: layer_shape
-    integer(I4B) :: iaux, iparam, n, nlay, nnode
+    integer(I4B) :: iparam, n, nlay, nnode
 
     nnode = 0
 
@@ -246,20 +245,22 @@ contains
 
       call idm_log_var(nodes, idt%tagname, mempath, this%iout)
 
-      do n = 1, this%ctx%nodes
-        if (nodes(n) /= DNODATA) then
-          nnode = nnode + 1
-          dbl1d(nnode) = nodes(n)
-          if (this%ctx%nbound == 0) then
+      if (this%ctx%nbound > 0) then
+        ! nodeulist already established: extract values at known positions
+        do n = 1, this%ctx%nbound
+          dbl1d(n) = nodes(this%nodeulist(n))
+        end do
+        nnode = this%ctx%nbound
+      else
+        ! first array: filter by DNODATA to establish nodeulist
+        do n = 1, this%ctx%nodes
+          if (nodes(n) /= DNODATA) then
+            nnode = nnode + 1
+            dbl1d(nnode) = nodes(n)
             this%nodeulist(nnode) = n
-          else if (this%nodeulist(nnode) /= n) then
-            write (errmsg, '(a,i0)') 'Grid input position mismatch param='// &
-              trim(idt%tagname)//', period=', kper
-            call store_error(errmsg)
-            call store_error_filename(this%input_name)
           end if
-        end if
-      end do
+        end do
+      end if
       deallocate (nodes)
     case ('DOUBLE2D')
       call mem_setptr(dbl2d, idt%mf6varname, mempath)
@@ -278,20 +279,22 @@ contains
 
       call idm_log_var(nodes, idt%tagname, mempath, this%iout)
 
-      do n = 1, this%ctx%nodes
-        if (nodes(n) /= DNODATA) then
-          nnode = nnode + 1
-          dbl2d(iaux, nnode) = nodes(n)
-          if (this%ctx%nbound == 0) then
+      if (this%ctx%nbound > 0) then
+        ! nodeulist already established: extract values at known positions
+        do n = 1, this%ctx%nbound
+          dbl2d(iaux, n) = nodes(this%nodeulist(n))
+        end do
+        nnode = this%ctx%nbound
+      else
+        ! first array: filter by DNODATA to establish nodeulist
+        do n = 1, this%ctx%nodes
+          if (nodes(n) /= DNODATA) then
+            nnode = nnode + 1
+            dbl2d(iaux, nnode) = nodes(n)
             this%nodeulist(nnode) = n
-          else if (this%nodeulist(nnode) /= n) then
-            write (errmsg, '(a,i0)') 'Grid input position mismatch param='// &
-              trim(idt%tagname)//', period=', kper
-            call store_error(errmsg)
-            call store_error_filename(this%input_name)
           end if
-        end if
-      end do
+        end do
+      end if
       deallocate (nodes)
     case default
       errmsg = 'IDM unimplemented. GridArrayLoad::param_load &

@@ -1,20 +1,18 @@
 !> @brief This module contains the GridArrayLoadModule
 !!
 !! This module contains the routines for reading period block
-!! array based input associated with the full grid, such as
-!! with the GHBA package.
+!! grid array-based input for stress packages that use the
+!! READARRAYGRID option (CHD, WEL, DRN, RIV, GHB).
 !!
 !<
 module GridArrayLoadModule
 
   use KindModule, only: I4B, DP, LGP
-  use ConstantsModule, only: DZERO, IZERO, LINELENGTH, LENVARNAME, &
-                             LENTIMESERIESNAME, LENAUXNAME
+  use ConstantsModule, only: LINELENGTH, LENVARNAME
   use SimVariablesModule, only: errmsg
   use SimModule, only: store_error, store_error_filename
   use InputDefinitionModule, only: InputParamDefinitionType
   use MemoryManagerModule, only: mem_allocate, mem_setptr
-  use CharacterStringModule, only: CharacterStringType
   use BlockParserModule, only: BlockParserType
   use ModflowInputModule, only: ModflowInputType
   use LoadContextModule, only: LoadContextType, ReadStateVarType
@@ -104,7 +102,7 @@ contains
     use DefinitionSelectModule, only: get_param_definition_type
     use ArrayHandlersModule, only: ifind
     use SourceCommonModule, only: ifind_charstr
-    use IdmLoggerModule, only: idm_log_header, idm_log_close, idm_log_var
+    use IdmLoggerModule, only: idm_log_header, idm_log_close
     class(GridArrayLoadType), intent(inout) :: this
     type(BlockParserType), pointer, intent(inout) :: parser
     logical(LGP) :: endOfBlock, netcdf, layered
@@ -135,7 +133,7 @@ contains
       ! is param tag an auxvar?
       iaux = ifind_charstr(this%ctx%auxname_cst, param_tag)
 
-      ! any auvxar corresponds to the definition tag 'AUX'
+      ! any auxvar corresponds to the definition tag 'AUX'
       if (iaux > 0) param_tag = 'AUX'
 
       ! set input definition
@@ -168,7 +166,6 @@ contains
   end subroutine destroy
 
   subroutine reset(this)
-    use ConstantsModule, only: DNODATA
     class(GridArrayLoadType), intent(inout) :: this
     integer(I4B) :: n
 
@@ -250,9 +247,8 @@ contains
         do n = 1, this%ctx%nbound
           dbl1d(n) = nodes(this%nodeulist(n))
         end do
-        nnode = this%ctx%nbound
       else
-        ! first array: filter by DNODATA to establish nodeulist
+        ! first array: filter by DNODATA to establish nodeulist and nbound
         do n = 1, this%ctx%nodes
           if (nodes(n) /= DNODATA) then
             nnode = nnode + 1
@@ -260,6 +256,7 @@ contains
             this%nodeulist(nnode) = n
           end if
         end do
+        this%ctx%nbound = nnode
       end if
       deallocate (nodes)
     case ('DOUBLE2D')
@@ -284,9 +281,8 @@ contains
         do n = 1, this%ctx%nbound
           dbl2d(iaux, n) = nodes(this%nodeulist(n))
         end do
-        nnode = this%ctx%nbound
       else
-        ! first array: filter by DNODATA to establish nodeulist
+        ! first array: filter by DNODATA to establish nodeulist and nbound
         do n = 1, this%ctx%nodes
           if (nodes(n) /= DNODATA) then
             nnode = nnode + 1
@@ -294,6 +290,7 @@ contains
             this%nodeulist(nnode) = n
           end if
         end do
+        this%ctx%nbound = nnode
       end if
       deallocate (nodes)
     case default
@@ -302,9 +299,6 @@ contains
       call store_error(errmsg)
       call store_error_filename(this%input_name)
     end select
-
-    ! set nbound
-    if (this%ctx%nbound == 0) this%ctx%nbound = nnode
 
     ! if param is tracked set read state
     iparam = ifind(this%param_names, idt%tagname)

@@ -589,7 +589,9 @@ contains
       if (iper == 0) then
         ! set names
         varname = export_varname(pkgname, idt%tagname, mempath)
-        longname = export_longname(idt%longname, pkgname, idt%tagname, mempath)
+        longname = export_longname(idt%longname, pkgname, idt%tagname, mempath, &
+                                   component_type=idt%component_type, &
+                                   subcomponent_type=idt%subcomponent_type)
 
         allocate (var_id(1))
         axis_sz = dim_ids%nmesh_face
@@ -640,7 +642,9 @@ contains
           ! set names
           varname = export_varname(pkgname, idt%tagname, mempath, layer=k)
           longname = export_longname(idt%longname, pkgname, idt%tagname, &
-                                     mempath, layer=k)
+                                     mempath, layer=k, &
+                                     component_type=idt%component_type, &
+                                     subcomponent_type=idt%subcomponent_type)
 
           call nf_verify(nf90_def_var(ncid, varname, NF90_INT, &
                                       (/dim_ids%nmesh_face/), var_id(k)), &
@@ -714,7 +718,9 @@ contains
       ! set names
       varname = export_varname(pkgname, idt%tagname, mempath, layer=k)
       longname = export_longname(idt%longname, pkgname, idt%tagname, &
-                                 mempath, layer=k)
+                                 mempath, layer=k, &
+                                 component_type=idt%component_type, &
+                                 subcomponent_type=idt%subcomponent_type)
 
       call nf_verify(nf90_def_var(ncid, varname, NF90_INT, &
                                   (/dim_ids%nmesh_face/), var_id(k)), &
@@ -781,7 +787,9 @@ contains
         varname = export_varname(pkgname, idt%tagname, mempath, &
                                  iaux=iaux)
         longname = export_longname(idt%longname, pkgname, idt%tagname, &
-                                   mempath, iaux=iaux)
+                                   mempath, iaux=iaux, &
+                                   component_type=idt%component_type, &
+                                   subcomponent_type=idt%subcomponent_type)
 
         allocate (var_id(1))
         axis_sz = dim_ids%nmesh_face
@@ -833,7 +841,9 @@ contains
           varname = export_varname(pkgname, idt%tagname, mempath, layer=k, &
                                    iaux=iaux)
           longname = export_longname(idt%longname, pkgname, idt%tagname, &
-                                     mempath, layer=k, iaux=iaux)
+                                     mempath, layer=k, iaux=iaux, &
+                                     component_type=idt%component_type, &
+                                     subcomponent_type=idt%subcomponent_type)
 
           call nf_verify(nf90_def_var(ncid, varname, NF90_DOUBLE, &
                                       (/dim_ids%nmesh_face/), var_id(k)), &
@@ -907,7 +917,9 @@ contains
       ! set names
       varname = export_varname(pkgname, idt%tagname, mempath, layer=k)
       longname = export_longname(idt%longname, pkgname, idt%tagname, &
-                                 mempath, layer=k)
+                                 mempath, layer=k, &
+                                 component_type=idt%component_type, &
+                                 subcomponent_type=idt%subcomponent_type)
 
       call nf_verify(nf90_def_var(ncid, varname, NF90_DOUBLE, &
                                   (/dim_ids%nmesh_face/), var_id(k)), &

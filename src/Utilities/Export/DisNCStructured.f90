@@ -432,7 +432,9 @@ contains
     longname = export_longname(idt%longname, &
                                export_pkg%mf6_input%subcomponent_name, &
                                idt%tagname, export_pkg%mf6_input%mempath, &
-                               iaux=iaux)
+                               iaux=iaux, &
+                               component_type=idt%component_type, &
+                               subcomponent_type=idt%subcomponent_type)
 
     ! create the netcdf timeseries variable
     select case (idt%datatype)
@@ -1171,7 +1173,9 @@ contains
           axis_sz = dim_ids%x
         end select
 
-        longname = export_longname(idt%longname, pkgname, idt%tagname, mempath)
+        longname = export_longname(idt%longname, pkgname, idt%tagname, mempath, &
+                                   component_type=idt%component_type, &
+                                   subcomponent_type=idt%subcomponent_type)
 
         ! reenter define mode and create variable
         call nf_verify(nf90_redef(ncid), nc_fname)
@@ -1397,7 +1401,9 @@ contains
 
         varname = export_varname(pkgname, idt%tagname, mempath)
         longname = export_longname(idt%longname, pkgname, idt%tagname, mempath, &
-                                   iaux=iaux)
+                                   iaux=iaux, &
+                                   component_type=idt%component_type, &
+                                   subcomponent_type=idt%subcomponent_type)
 
         ! reenter define mode and create variable
         call nf_verify(nf90_redef(ncid), nc_fname)
@@ -1434,7 +1440,9 @@ contains
       if (iper == 0) then
         varname = export_varname(pkgname, idt%tagname, mempath, iaux=iaux)
         longname = export_longname(idt%longname, pkgname, idt%tagname, mempath, &
-                                   iaux=iaux)
+                                   iaux=iaux, &
+                                   component_type=idt%component_type, &
+                                   subcomponent_type=idt%subcomponent_type)
 
         ! reenter define mode and create variable
         call nf_verify(nf90_redef(ncid), nc_fname)
@@ -1554,7 +1562,9 @@ contains
     character(len=LINELENGTH) :: varname, longname
 
     varname = export_varname(pkgname, idt%tagname, mempath)
-    longname = export_longname(idt%longname, pkgname, idt%tagname, mempath)
+    longname = export_longname(idt%longname, pkgname, idt%tagname, mempath, &
+                               component_type=idt%component_type, &
+                               subcomponent_type=idt%subcomponent_type)
 
     ! reenter define mode and create variable
     call nf_verify(nf90_redef(ncid), nc_fname)

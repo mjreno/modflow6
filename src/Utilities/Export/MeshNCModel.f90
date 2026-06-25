@@ -242,7 +242,9 @@ contains
     longname = export_longname(idt%longname, &
                                export_pkg%mf6_input%subcomponent_name, &
                                idt%tagname, export_pkg%mf6_input%mempath, &
-                               layer=layer, iaux=iaux)
+                               layer=layer, iaux=iaux, &
+                               component_type=idt%component_type, &
+                               subcomponent_type=idt%subcomponent_type)
 
     ! create the netcdf dependent layer variable
     select case (idt%datatype)
@@ -703,11 +705,13 @@ contains
     integer(I4B), intent(in) :: varid
     character(len=*), intent(in) :: gridmap_name
     character(len=*), intent(in) :: nc_fname
+    ! UGRID topology attrs are CRS-independent -- always written on face vars
+    call nf_verify(nf90_put_att(ncid, varid, 'mesh', 'mesh'), nc_fname)
+    call nf_verify(nf90_put_att(ncid, varid, 'location', 'face'), nc_fname)
+    call nf_verify(nf90_put_att(ncid, varid, 'coordinates', &
+                                'mesh_face_x mesh_face_y'), nc_fname)
+    ! grid_mapping only written when a CRS is configured
     if (gridmap_name /= '') then
-      call nf_verify(nf90_put_att(ncid, varid, 'mesh', 'mesh'), nc_fname)
-      call nf_verify(nf90_put_att(ncid, varid, 'location', 'face'), nc_fname)
-      call nf_verify(nf90_put_att(ncid, varid, 'coordinates', &
-                                  'mesh_face_x mesh_face_y'), nc_fname)
       call nf_verify(nf90_put_att(ncid, varid, 'grid_mapping', &
                                   gridmap_name), nc_fname)
     end if

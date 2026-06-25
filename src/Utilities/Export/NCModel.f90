@@ -488,17 +488,20 @@ contains
 
   !> @brief build netcdf variable longname
   !<
-  function export_longname(longname, pkgname, tagname, mempath, layer, iaux) &
-    result(lname)
+  function export_longname(longname, pkgname, tagname, mempath, layer, iaux, &
+                           component_type, subcomponent_type) result(lname)
     use MemoryManagerModule, only: mem_setptr
     use CharacterStringModule, only: CharacterStringType
     use InputOutputModule, only: lowcase
+    use IdmDfnSelectorModule, only: idm_multi_package
     character(len=*), intent(in) :: longname
     character(len=*), intent(in) :: pkgname
     character(len=*), intent(in) :: tagname
     character(len=*), intent(in) :: mempath
     integer(I4B), optional, intent(in) :: layer
     integer(I4B), optional, intent(in) :: iaux
+    character(len=*), optional, intent(in) :: component_type
+    character(len=*), optional, intent(in) :: subcomponent_type
     character(len=LINELENGTH) :: lname
     type(CharacterStringType), dimension(:), pointer, &
       contiguous :: auxnames
@@ -511,6 +514,11 @@ contains
       lname = trim(pname)//' '//trim(vname)
     else
       lname = longname
+      if (present(component_type) .and. present(subcomponent_type)) then
+        if (idm_multi_package(component_type, subcomponent_type)) then
+          lname = trim(pname)//' '//trim(lname)
+        end if
+      end if
     end if
 
     if (present(iaux)) then

@@ -564,9 +564,11 @@ contains
   !! (ISO 19162:2019, METHOD["name"]) format.  WKT1 is tried first;
   !! if PROJECTION[ is absent the WKT2 METHOD[ path is attempted.
   !! Returns '' for geographic CRS or unrecognised projection names.
-  !! Only common groundwater projections included.
+  !! Only common groundwater projections included.  Matching is
+  !! case-insensitive.
   !<
-  pure function wkt_to_cf_gridmapping(wkt) result(gmname)
+  function wkt_to_cf_gridmapping(wkt) result(gmname)
+    use InputOutputModule, only: upcase
     character(len=*), intent(in) :: wkt
     character(len=LINELENGTH) :: gmname
     character(len=LINELENGTH) :: proj_name
@@ -590,16 +592,17 @@ contains
       iend = istart + iend - 2
       if (iend < istart) return
       proj_name = wkt(istart:iend)
+      call upcase(proj_name)
       select case (trim(proj_name))
-      case ('Transverse_Mercator')
+      case ('TRANSVERSE_MERCATOR')
         gmname = 'transverse_mercator'
-      case ('Lambert_Conformal_Conic_2SP', 'Lambert_Conformal_Conic_1SP')
+      case ('LAMBERT_CONFORMAL_CONIC_2SP', 'LAMBERT_CONFORMAL_CONIC_1SP')
         gmname = 'lambert_conformal_conic'
-      case ('Albers_Conic_Equal_Area')
+      case ('ALBERS_CONIC_EQUAL_AREA')
         gmname = 'albers_conical_equal_area'
-      case ('Mercator_1SP', 'Mercator_2SP')
+      case ('MERCATOR_1SP', 'MERCATOR_2SP')
         gmname = 'mercator'
-      case ('Polar_Stereographic')
+      case ('POLAR_STEREOGRAPHIC')
         gmname = 'polar_stereographic'
       end select
       return
@@ -620,16 +623,17 @@ contains
     iend = istart + iend - 2
     if (iend < istart) return
     proj_name = wkt(istart:iend)
+    call upcase(proj_name)
     select case (trim(proj_name))
-    case ('Transverse Mercator')
+    case ('TRANSVERSE MERCATOR')
       gmname = 'transverse_mercator'
-    case ('Lambert Conic Conformal (2SP)', 'Lambert Conic Conformal (1SP)')
+    case ('LAMBERT CONIC CONFORMAL (2SP)', 'LAMBERT CONIC CONFORMAL (1SP)')
       gmname = 'lambert_conformal_conic'
-    case ('Albers Equal Area')
+    case ('ALBERS EQUAL AREA')
       gmname = 'albers_conical_equal_area'
-    case ('Mercator (variant A)', 'Mercator (variant B)')
+    case ('MERCATOR (VARIANT A)', 'MERCATOR (VARIANT B)')
       gmname = 'mercator'
-    case ('Polar Stereographic (variant A)', 'Polar Stereographic (variant B)')
+    case ('POLAR STEREOGRAPHIC (VARIANT A)', 'POLAR STEREOGRAPHIC (VARIANT B)')
       gmname = 'polar_stereographic'
     end select
   end function wkt_to_cf_gridmapping

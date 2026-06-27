@@ -82,7 +82,7 @@ WKT2 = (
     'ID["EPSG",26918]]'
 )
 
-# small model appropriate for convension checks
+# small model appropriate for convention checks
 NLAY, NROW, NCOL = 2, 3, 3
 DELR = DELC = [100.0, 100.0, 100.0]
 TOP = 20.0

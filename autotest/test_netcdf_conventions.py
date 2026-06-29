@@ -19,6 +19,19 @@ attributes for every combination of:
 
 The test is focused on attribute presence and value correctness.  Data
 round-trip correctness is covered by other tests.
+
+Conventions
+-----------
+CF-1.11  (https://cfconventions.org/cf-conventions/cf-conventions.html)
+  5.6  grid_mapping, crs_wkt, grid_mapping_name on the projection variable
+  4.3  vertical (layer) coordinate: axis, positive, units
+  4.4  time coordinate: standard_name, units, calendar
+
+UGRID-1.0  (https://ugrid-conventions.github.io/ugrid-conventions/)
+  mesh topology variable; face-indexed data variables carrying mesh,
+  location, and coordinates unconditionally (CRS-independent)
+
+MF6 internal: modflow_model, modflow_grid, modflow_input
 """
 
 import flopy

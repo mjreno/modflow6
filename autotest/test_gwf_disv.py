@@ -58,6 +58,7 @@ def build_models(idx, test):
 def check_output(idx, test):
     fname = Path(test.workspace) / grb_filename
     grbobj = flopy.mf6.utils.MfGrdFile(fname)
+    assert grbobj.version == (1 if grbobj.crs is None else 2)
     ncpl = grbobj._datadict["NCPL"]
     ia = grbobj._datadict["IA"]
     ja = grbobj._datadict["JA"]

@@ -82,8 +82,8 @@ def check_output(idx, test, export, gridded_input):
     # verify crs data string in grb version 2 file
     fname = os.path.join(test.workspace, test.name + ".dis.grb")
     grbobj = flopy.mf6.utils.MfGrdFile(fname)
-    crs = grbobj._datadict["CRS"]
-    assert crs == wkt
+    assert grbobj.version == 2
+    assert grbobj.crs == wkt
 
     # verify format of generated netcdf file
     with nc.Dataset(test.workspace / f"{test.name}.nc") as ds:

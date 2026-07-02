@@ -572,13 +572,18 @@ contains
     character(len=*), intent(in) :: wkt
     character(len=LINELENGTH) :: gmname
     character(len=LINELENGTH) :: proj_name
+    character(len=LENBIGLINE) :: wkt_upper
     integer :: istart, iend
 
     gmname = ''
     proj_name = ''
 
+    ! uppercase copy for case-insensitive keyword search
+    wkt_upper = wkt
+    call upcase(wkt_upper)
+
     ! --- WKT1 path: PROJECTION["name"] ---
-    istart = index(wkt, 'PROJECTION[')
+    istart = index(wkt_upper, 'PROJECTION[')
     if (istart /= 0) then
       istart = istart + len('PROJECTION[')
       do while (istart <= len(wkt))
@@ -609,7 +614,7 @@ contains
     end if
 
     ! --- WKT2 path: METHOD["name"] ---
-    istart = index(wkt, 'METHOD[')
+    istart = index(wkt_upper, 'METHOD[')
     if (istart == 0) return
     istart = istart + len('METHOD[')
     do while (istart <= len(wkt))

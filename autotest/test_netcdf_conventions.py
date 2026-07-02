@@ -354,6 +354,37 @@ def _check_projection(ds, fmt, ncf_config, label=""):
     )
 
 
+def _check_coord_gridmapping(ds, fmt, ncf_config, label=""):
+    """Verify that coordinate variables carry grid_mapping when CRS is set."""
+    ctx = f" [{label}]" if label else ""
+
+    if not _has_crs(ncf_config):
+        return
+
+    if fmt == "structured":
+        for coord in ("x", "y"):
+            assert "grid_mapping" in ds.variables[coord].ncattrs(), (
+                f"{coord} coordinate missing grid_mapping "
+                f"(ncf_config={ncf_config!r}){ctx}"
+            )
+            assert ds.variables[coord].getncattr("grid_mapping") == "projection", (
+                f"{coord} grid_mapping must be 'projection'{ctx}"
+            )
+    else:
+        for coord in (
+            "mesh_node_x",
+            "mesh_node_y",
+            "mesh_face_x",
+            "mesh_face_y",
+        ):
+            assert "grid_mapping" in ds.variables[coord].ncattrs(), (
+                f"{coord} missing grid_mapping (ncf_config={ncf_config!r}){ctx}"
+            )
+            assert ds.variables[coord].getncattr("grid_mapping") == "projection", (
+                f"{coord} grid_mapping must be 'projection'{ctx}"
+            )
+
+
 def _check_data_var(var, vname, fmt, ncf_config, label=""):
     """Common assertions for any data variable (output or input)."""
     ctx = f" [{label}]" if label else ""
@@ -381,6 +412,7 @@ def _check_output_nc(ds, name, fmt, ncf_config):
     _check_layer_coord(ds, label="output")
     _check_time_coord(ds, label="output")
     _check_projection(ds, fmt, ncf_config, label="output")
+    _check_coord_gridmapping(ds, fmt, ncf_config, label="output")
 
     if fmt == "structured":
         assert "head" in ds.variables, "head variable missing from structured output"
@@ -511,6 +543,7 @@ def _check_input_nc(ds, name, fmt, ncf_config):
     _check_global_attrs(ds, name, fmt, ncf_config, label="input")
     _check_layer_coord(ds, label="input")
     _check_projection(ds, fmt, ncf_config, label="input")
+    _check_coord_gridmapping(ds, fmt, ncf_config, label="input")
     # time coord only present on period-data variables; don't require it on input
 
     if fmt == "structured":

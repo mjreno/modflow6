@@ -169,9 +169,9 @@ contains
         call mem_setptr(this%longitude, 'LONGITUDE', this%ncf_mempath)
       end if
 
-      if (this%wkt /= '') then
+      if (this%gridmap_name /= '') then
         if (this%dis%angrot /= DZERO) then
-          write (warnmsg, '(a)') 'WKT parameter set with structured rotated &
+          write (warnmsg, '(a)') 'CRS parameter set with structured rotated &
             &grid. Projected coordinates will have grid local values. &
             &Applies to file "'//trim(nc_fname)//'".'
           call store_warning(warnmsg)
@@ -816,7 +816,7 @@ contains
                                 'projection_y_coordinate'), this%nc_fname)
     call nf_verify(nf90_put_att(this%ncid, this%var_ids%y, 'long_name', &
                                 'Northing'), this%nc_fname)
-    if (this%wkt /= '') then
+    if (this%gridmap_name /= '') then
       call nf_verify(nf90_put_att(this%ncid, this%var_ids%y, 'grid_mapping', &
                                   this%gridmap_name), this%nc_fname)
     end if
@@ -839,7 +839,7 @@ contains
                                 'projection_x_coordinate'), this%nc_fname)
     call nf_verify(nf90_put_att(this%ncid, this%var_ids%x, 'long_name', &
                                 'Easting'), this%nc_fname)
-    if (this%wkt /= '') then
+    if (this%gridmap_name /= '') then
       call nf_verify(nf90_put_att(this%ncid, this%var_ids%x, 'grid_mapping', &
                                   this%gridmap_name), this%nc_fname)
     end if

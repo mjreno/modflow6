@@ -561,7 +561,7 @@ contains
     call nf_verify(nf90_put_att(this%ncid, this%var_ids%mesh_node_x, &
                                 'long_name', 'Easting'), this%nc_fname)
 
-    if (this%wkt /= '') then
+    if (this%gridmap_name /= '') then
       ! associate with projection
       call nf_verify(nf90_put_att(this%ncid, this%var_ids%mesh_node_x, &
                                   'grid_mapping', this%gridmap_name), &
@@ -582,7 +582,7 @@ contains
     call nf_verify(nf90_put_att(this%ncid, this%var_ids%mesh_node_y, &
                                 'long_name', 'Northing'), this%nc_fname)
 
-    if (this%wkt /= '') then
+    if (this%gridmap_name /= '') then
       ! associate with projection
       call nf_verify(nf90_put_att(this%ncid, this%var_ids%mesh_node_y, &
                                   'grid_mapping', this%gridmap_name), &
@@ -604,7 +604,7 @@ contains
                                 'long_name', 'Easting'), this%nc_fname)
     call nf_verify(nf90_put_att(this%ncid, this%var_ids%mesh_face_x, 'bounds', &
                                 'mesh_face_xbnds'), this%nc_fname)
-    if (this%wkt /= '') then
+    if (this%gridmap_name /= '') then
       ! associate with projection
       call nf_verify(nf90_put_att(this%ncid, this%var_ids%mesh_face_x, &
                                   'grid_mapping', this%gridmap_name), &
@@ -634,7 +634,7 @@ contains
     call nf_verify(nf90_put_att(this%ncid, this%var_ids%mesh_face_y, 'bounds', &
                                 'mesh_face_ybnds'), this%nc_fname)
 
-    if (this%wkt /= '') then
+    if (this%gridmap_name /= '') then
       ! associate with projection
       call nf_verify(nf90_put_att(this%ncid, this%var_ids%mesh_face_y, &
                                   'grid_mapping', this%gridmap_name), &

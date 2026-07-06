@@ -897,7 +897,7 @@ contains
     real(DP), dimension(:, :, :), pointer, contiguous :: dbl3d
     real(DP), dimension(:), pointer, contiguous :: dbl1d
     integer(I4B) :: axis_dim, nvals, k
-    integer(NF90_INT), dimension(:), allocatable :: var_id
+    integer(I4B), dimension(:), allocatable :: var_id
     character(len=LINELENGTH) :: longname, varname
 
     if (idt%shape == 'NROW' .or. &

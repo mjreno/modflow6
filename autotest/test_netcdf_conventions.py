@@ -214,6 +214,13 @@ def build_models(test, fmt, ncf_config):
             ncf_kwargs["crs_wkt"] = WKT2
         elif ncf_config == "geographic_wkt":
             ncf_kwargs["wkt"] = WKT1_GEO
+        elif ncf_config == "latlon":
+            # explicit ncpl works around a flopy bug: without it, flopy
+            # infers NCPL as NROW instead of NROW*NCOL for structured
+            # latitude/longitude griddata, corrupting the written .ncf file
+            ncf_kwargs["ncpl"] = NROW * NCOL
+            ncf_kwargs["latitude"] = np.linspace(40.0, 40.02, NROW * NCOL)
+            ncf_kwargs["longitude"] = np.linspace(-75.0, -74.98, NROW * NCOL)
 
         flopy.mf6.ModflowUtlncf(dis, **ncf_kwargs)
 
@@ -829,11 +836,53 @@ def _check_geo_crs_output(test, fmt):
         )
 
 
+def _check_latlon_output(test):
+    """latitude/longitude griddata: coordinates = "lon lat z", no grid_mapping."""
+    name = test.name
+    ws = test.workspace
+    with nc.Dataset(ws / f"{name}.nc") as ds:
+        _check_global_attrs(ds, name, "structured", "latlon", label="latlon_output")
+        _check_layer_coord(ds, label="latlon_output")
+        _check_z_coord(ds, "structured", label="latlon_output")
+
+        assert "lat" in ds.variables, "lat variable missing"
+        assert "lon" in ds.variables, "lon variable missing"
+        lat = ds.variables["lat"]
+        lon = ds.variables["lon"]
+        assert lat.getncattr("standard_name") == "latitude", (
+            "lat standard_name must be 'latitude'"
+        )
+        assert lon.getncattr("standard_name") == "longitude", (
+            "lon standard_name must be 'longitude'"
+        )
+        assert lat.getncattr("units") == "degrees_north", (
+            "lat units must be 'degrees_north'"
+        )
+        assert lon.getncattr("units") == "degrees_east", (
+            "lon units must be 'degrees_east'"
+        )
+
+        assert "projection" not in ds.variables, (
+            "projection variable must not be written for latlon config"
+        )
+        head = ds.variables["head"]
+        assert "grid_mapping" not in head.ncattrs(), (
+            "grid_mapping must not be written for latlon config"
+        )
+        coords = head.getncattr("coordinates").split()
+        assert "lon" in coords and "lat" in coords, (
+            f"lon/lat missing from head coordinates: {coords}"
+        )
+        assert "z" in coords, f"z missing from head coordinates: {coords}"
+        assert "x" not in coords and "y" not in coords, (
+            f"x/y must not appear in coordinates for latlon config: {coords}"
+        )
+
+
 cases = ["gwf_cf_conv"]
 
 
 @pytest.mark.netcdf
-@pytest.mark.developmode
 @pytest.mark.parametrize("idx, name", enumerate(cases))
 @pytest.mark.parametrize("fmt", ["structured", "ugrid"])
 @pytest.mark.parametrize("ncf_config", ["none", "wkt_only", "crs_wkt_only", "both"])
@@ -851,7 +900,6 @@ def test_mf6model(idx, name, function_tmpdir, targets, fmt, ncf_config, gridded_
 
 
 @pytest.mark.netcdf
-@pytest.mark.developmode
 @pytest.mark.parametrize("fmt", ["structured", "ugrid"])
 def test_geographic_crs_no_grid_mapping_name(fmt, function_tmpdir, targets):
     """Geographic CRS: projection variable written but grid_mapping_name absent."""
@@ -860,6 +908,21 @@ def test_geographic_crs_no_grid_mapping_name(fmt, function_tmpdir, targets):
         workspace=function_tmpdir,
         build=lambda t: build_models(t, fmt, "geographic_wkt"),
         check=lambda t: _check_geo_crs_output(t, fmt),
+        targets=targets,
+        compare=None,
+    )
+    test.run()
+
+
+@pytest.mark.netcdf
+def test_latlon_griddata(function_tmpdir, targets):
+    """latitude/longitude griddata (structured only): coordinates = "lon lat z",
+    no grid_mapping/projection."""
+    test = TestFramework(
+        name="gwf_latlon",
+        workspace=function_tmpdir,
+        build=lambda t: build_models(t, "structured", "latlon"),
+        check=lambda t: _check_latlon_output(t),
         targets=targets,
         compare=None,
     )

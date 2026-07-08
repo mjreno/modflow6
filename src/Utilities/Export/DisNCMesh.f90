@@ -9,7 +9,7 @@ module MeshDisModelModule
 
   use KindModule, only: DP, I4B, LGP
   use ConstantsModule, only: LINELENGTH, LENBIGLINE, LENCOMPONENTNAME, &
-                             LENMEMPATH, DNODATA, DZERO
+                             LENMEMPATH, DNODATA, DZERO, DHALF
   use SimVariablesModule, only: errmsg
   use SimModule, only: store_error, store_error_filename
   use MemoryManagerModule, only: mem_setptr
@@ -389,6 +389,8 @@ contains
     use ConstantsModule, only: MVALIDATE
     use SimVariablesModule, only: isim_mode
     class(Mesh2dDisExportType), intent(inout) :: this
+    integer(I4B) :: k
+    character(len=LINELENGTH) :: varname
 
     if (isim_mode /= MVALIDATE .or. this%pkglist%Count() > 0) then
       ! time
@@ -440,6 +442,33 @@ contains
                                 'down'), this%nc_fname)
     call nf_verify(nf90_put_att(this%ncid, this%var_ids%layer, 'long_name', &
                                 'model layer'), this%nc_fname)
+
+    ! z_l1, z_l2, ... : per-layer cell center elevation auxiliary
+    ! coordinates -- real vertical position, unlike the discrete layer
+    ! index. Always written, independent of CRS/NCF configuration; split
+    ! per layer since face-indexed variables carry no layer dimension to
+    ! legally reference a combined z(layer, nmesh_face) coordinate
+    ! (CF-1.11 5.2).
+    allocate (this%var_ids%elevation(this%nlay))
+    do k = 1, this%nlay
+      write (varname, '(a,i0)') 'z_l', k
+      call nf_verify(nf90_def_var(this%ncid, trim(varname), NF90_DOUBLE, &
+                                  (/this%dim_ids%nmesh_face/), &
+                                  this%var_ids%elevation(k)), this%nc_fname)
+      call ncvar_chunk(this%ncid, this%var_ids%elevation(k), this%chunk_face, &
+                       this%nc_fname)
+      call ncvar_deflate(this%ncid, this%var_ids%elevation(k), this%deflate, &
+                         this%shuffle, this%nc_fname)
+      call nf_verify(nf90_put_att(this%ncid, this%var_ids%elevation(k), &
+                                  'units', this%lenunits), this%nc_fname)
+      call nf_verify(nf90_put_att(this%ncid, this%var_ids%elevation(k), &
+                                  'standard_name', 'altitude'), this%nc_fname)
+      call nf_verify(nf90_put_att(this%ncid, this%var_ids%elevation(k), &
+                                  'positive', 'up'), this%nc_fname)
+      call nf_verify(nf90_put_att(this%ncid, this%var_ids%elevation(k), &
+                                  'long_name', 'cell center elevation'), &
+                     this%nc_fname)
+    end do
   end subroutine define_dim
 
   !> @brief netcdf export add mesh information
@@ -454,6 +483,7 @@ contains
     real(DP) :: x, y, x_transform, y_transform
     real(DP), dimension(:), allocatable :: node_x, node_y
     real(DP), dimension(:), allocatable :: cell_x, cell_y
+    real(DP), dimension(:), allocatable :: elev_face
 
     ! initialize max vertices required to define cell
     maxvert = 4
@@ -530,6 +560,29 @@ contains
                    this%nc_fname)
     call nf_verify(nf90_put_var(this%ncid, this%var_ids%mesh_face_y, cell_y), &
                    this%nc_fname)
+
+    ! set and write z_l1, z_l2, ... face-flattened cell center elevation
+    ! arrays, reusing the same (row outer, col inner, cnt incrementing)
+    ! face-order convention as cell_x/cell_y above
+    allocate (elev_face((this%dis%ncol * this%dis%nrow)))
+    do k = 1, this%nlay
+      cnt = 1
+      do j = 1, this%dis%nrow
+        do i = 1, this%dis%ncol
+          if (k == 1) then
+            elev_face(cnt) = (this%dis%top2d(i, j) + &
+                              this%dis%bot3d(i, j, k)) * DHALF
+          else
+            elev_face(cnt) = (this%dis%bot3d(i, j, k - 1) + &
+                              this%dis%bot3d(i, j, k)) * DHALF
+          end if
+          cnt = cnt + 1
+        end do
+      end do
+      call nf_verify(nf90_put_var(this%ncid, this%var_ids%elevation(k), &
+                                  elev_face), this%nc_fname)
+    end do
+    deallocate (elev_face)
 
     ! set face nodes array
     cnt = 0
@@ -663,7 +716,7 @@ contains
 
         ! add grid mapping for face-indexed variables
         if (axis_dim == dim_ids%nmesh_face) then
-          call ncvar_gridmap(ncid, var_id(1), gridmap_name, nc_fname)
+          call ncvar_gridmap(ncid, var_id(1), gridmap_name, 0, nc_fname)
         end if
 
         ! add mf6 attr
@@ -719,7 +772,7 @@ contains
                                       longname), nc_fname)
 
           ! add grid mapping and mf6 attr
-          call ncvar_gridmap(ncid, var_id(k), gridmap_name, nc_fname)
+          call ncvar_gridmap(ncid, var_id(k), gridmap_name, k, nc_fname)
           call ncvar_mf6attr(ncid, var_id(k), k, 0, nc_tag, nc_fname)
         end do
 
@@ -792,7 +845,7 @@ contains
                                 longname), nc_fname)
 
     ! add grid mapping and mf6 attr
-    call ncvar_gridmap(ncid, var_id, gridmap_name, nc_fname)
+    call ncvar_gridmap(ncid, var_id, gridmap_name, 0, nc_fname)
     call ncvar_mf6attr(ncid, var_id, 0, 0, nc_tag, nc_fname)
 
     ! exit define mode and write data
@@ -854,7 +907,7 @@ contains
                                   longname), nc_fname)
 
       ! add grid mapping and mf6 attr
-      call ncvar_gridmap(ncid, var_id(k), gridmap_name, nc_fname)
+      call ncvar_gridmap(ncid, var_id(k), gridmap_name, k, nc_fname)
       call ncvar_mf6attr(ncid, var_id(k), k, 0, nc_tag, nc_fname)
     end do
 
@@ -945,7 +998,7 @@ contains
 
         ! add grid mapping for face-indexed variables
         if (axis_dim == dim_ids%nmesh_face) then
-          call ncvar_gridmap(ncid, var_id(1), gridmap_name, nc_fname)
+          call ncvar_gridmap(ncid, var_id(1), gridmap_name, 0, nc_fname)
         end if
 
         ! add mf6 attr
@@ -1004,7 +1057,7 @@ contains
                                       longname), nc_fname)
 
           ! add grid mapping and mf6 attr
-          call ncvar_gridmap(ncid, var_id(k), gridmap_name, nc_fname)
+          call ncvar_gridmap(ncid, var_id(k), gridmap_name, k, nc_fname)
           call ncvar_mf6attr(ncid, var_id(k), k, iaux, nc_tag, nc_fname)
         end do
 
@@ -1079,7 +1132,7 @@ contains
                                 longname), nc_fname)
 
     ! add grid mapping and mf6 attr
-    call ncvar_gridmap(ncid, var_id, gridmap_name, nc_fname)
+    call ncvar_gridmap(ncid, var_id, gridmap_name, 0, nc_fname)
     call ncvar_mf6attr(ncid, var_id, 0, 0, nc_tag, nc_fname)
 
     ! exit define mode and write data
@@ -1144,7 +1197,7 @@ contains
                                   longname), nc_fname)
 
       ! add grid mapping and mf6 attr
-      call ncvar_gridmap(ncid, var_id(k), gridmap_name, nc_fname)
+      call ncvar_gridmap(ncid, var_id(k), gridmap_name, k, nc_fname)
       call ncvar_mf6attr(ncid, var_id(k), k, 0, nc_tag, nc_fname)
     end do
 

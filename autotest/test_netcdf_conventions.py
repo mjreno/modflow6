@@ -35,6 +35,7 @@ MF6 internal: modflow_model, modflow_grid, modflow_input
 """
 
 import flopy
+import numpy as np
 import pytest
 from framework import TestFramework
 
@@ -295,6 +296,74 @@ def _check_layer_coord(ds, label=""):
     )
 
 
+def _check_z_coord(ds, fmt, label=""):
+    """z (structured) / z_l1, z_l2, ... (mesh/UGRID): unconditional
+    auxiliary vertical position coordinate -- distinct from the discrete
+    layer index. Split per layer for mesh since face-indexed variables
+    carry no layer dimension to legally reference a
+    combined z(layer, nmesh_face) coordinate (CF-1.11 5.2)."""
+    ctx = f" [{label}]" if label else ""
+    expected = [
+        (TOP + BOTM[0]) / 2.0,
+        (BOTM[0] + BOTM[1]) / 2.0,
+    ]
+
+    if fmt == "structured":
+        assert "z" in ds.variables, f"z coordinate variable missing{ctx}"
+        z = ds.variables["z"]
+        assert z.dimensions == ("layer", "y", "x"), (
+            f"z must be dimensioned (layer, y, x){ctx}, got {z.dimensions}"
+        )
+        assert "axis" not in z.ncattrs(), (
+            f"z must not carry an axis attribute (layer remains the sole Z axis){ctx}"
+        )
+        assert z.getncattr("standard_name") == "altitude", (
+            f"z standard_name must be 'altitude'{ctx}"
+        )
+        assert z.getncattr("positive") == "up", f"z positive must be 'up'{ctx}"
+        assert z.getncattr("long_name") == "cell center elevation", (
+            f"z long_name must be 'cell center elevation'{ctx}"
+        )
+        assert "units" in z.ncattrs(), f"z units missing{ctx}"
+
+        vals = z[:]
+        for k in range(NLAY):
+            assert np.allclose(vals[k, :, :], expected[k]), (
+                f"z layer {k + 1} value mismatch{ctx}: "
+                f"got {vals[k, :, :]}, expected {expected[k]}"
+            )
+        return
+
+    # mesh/UGRID: z_l1, z_l2, ... one per layer, dimensioned (nmesh_face,)
+    assert "z" not in ds.variables, (
+        f"a bare 'z' variable must not appear in mesh/UGRID output -- "
+        f"mesh format uses per-layer z_lN{ctx}"
+    )
+    for k in range(1, NLAY + 1):
+        vname = f"z_l{k}"
+        assert vname in ds.variables, f"{vname} variable missing{ctx}"
+        z = ds.variables[vname]
+        assert z.dimensions == ("nmesh_face",), (
+            f"{vname} must be dimensioned (nmesh_face,){ctx}, got {z.dimensions}"
+        )
+        assert "axis" not in z.ncattrs(), (
+            f"{vname} must not carry an axis attribute{ctx}"
+        )
+        assert z.getncattr("standard_name") == "altitude", (
+            f"{vname} standard_name must be 'altitude'{ctx}"
+        )
+        assert z.getncattr("positive") == "up", f"{vname} positive must be 'up'{ctx}"
+        assert z.getncattr("long_name") == "cell center elevation", (
+            f"{vname} long_name must be 'cell center elevation'{ctx}"
+        )
+        assert "units" in z.ncattrs(), f"{vname} units missing{ctx}"
+
+        vals = z[:]
+        assert np.allclose(vals, expected[k - 1]), (
+            f"{vname} value mismatch{ctx}: got {vals}, expected {expected[k - 1]}"
+        )
+
+
 def _check_time_coord(ds, label=""):
     ctx = f" [{label}]" if label else ""
     assert "time" in ds.variables, f"time coordinate variable missing{ctx}"
@@ -350,11 +419,38 @@ def _check_projection(ds, fmt, ncf_config, label=""):
         f"{proj.getncattr('grid_mapping_name')!r}"
     )
 
-    # GeoTransform / spatial_ref: Phase 2 — not yet written by MF6
-    # TODO: assert once Phase 2 (GeoTransform from Fortran) is implemented
-    assert "GeoTransform" not in proj.ncattrs(), (
-        f"GeoTransform not expected until Phase 2 — remove when it lands{ctx}"
-    )
+    # GeoTransform / spatial_ref: structured-only, requires WKT1
+    # (this%wkt) since MF6 has no CRS library to derive WKT1 from WKT2, and
+    # only for unrotated grids (this model has ANGROT=0).
+    expect_geotransform = fmt == "structured" and ncf_config in ("wkt_only", "both")
+    if expect_geotransform:
+        assert "GeoTransform" in proj.ncattrs(), (
+            f"GeoTransform missing for {ncf_config!r}{ctx}"
+        )
+        gt = [float(v) for v in proj.getncattr("GeoTransform").split()]
+        assert len(gt) == 6, f"GeoTransform must have 6 values{ctx}: {gt}"
+        expected_gt = [
+            XORIGIN,
+            sum(DELR) / NCOL,
+            0.0,
+            YORIGIN + sum(DELC),
+            0.0,
+            -sum(DELC) / NROW,
+        ]
+        assert np.allclose(gt, expected_gt), (
+            f"GeoTransform value mismatch{ctx}: {gt} != {expected_gt}"
+        )
+        assert "spatial_ref" in proj.ncattrs(), f"spatial_ref missing{ctx}"
+        assert proj.getncattr("spatial_ref") == WKT1, f"spatial_ref must be WKT1{ctx}"
+    else:
+        assert "GeoTransform" not in proj.ncattrs(), (
+            f"GeoTransform must not be written for fmt={fmt!r}, "
+            f"ncf_config={ncf_config!r}{ctx}"
+        )
+        assert "spatial_ref" not in proj.ncattrs(), (
+            f"spatial_ref must not be written for fmt={fmt!r}, "
+            f"ncf_config={ncf_config!r}{ctx}"
+        )
 
 
 def _check_coord_gridmapping(ds, fmt, ncf_config, label=""):
@@ -409,10 +505,62 @@ def _check_data_var(var, vname, fmt, ncf_config, label=""):
             f"grid_mapping must not be written on {vname} without CRS{ctx}"
         )
 
+    # z: structured only, unconditional -- present in
+    # coordinates iff the variable actually carries the layer dimension
+    # (CF-1.11 5.2 subset rule; z's own dims are (layer, y, x)).
+    if fmt == "structured":
+        has_layer = "layer" in var.dimensions
+        coords = (
+            var.getncattr("coordinates").split()
+            if "coordinates" in var.ncattrs()
+            else []
+        )
+        if has_layer:
+            assert "z" in coords, (
+                f"z missing from coordinates on layered var {vname}{ctx}: {coords}"
+            )
+        else:
+            assert "z" not in coords, (
+                f"z must not appear in coordinates on non-layered var "
+                f"{vname}{ctx}: {coords}"
+            )
+        if _has_crs(ncf_config):
+            assert "x" in coords and "y" in coords, (
+                f"x/y missing from coordinates on {vname} with CRS{ctx}: {coords}"
+            )
+        else:
+            assert "x" not in coords and "y" not in coords, (
+                f"x/y must not appear in coordinates on {vname} without "
+                f"CRS{ctx}: {coords}"
+            )
+    else:
+        # z_lN: mesh/UGRID variable names carry their own
+        # layer number as a "_l{k}" suffix (same convention _UGRID_VARS_*
+        # already relies on) -- present in coordinates iff vname is layered,
+        # referencing that specific layer's z_lN, not a generic/wrong one.
+        parts = vname.rsplit("_l", 1)
+        is_layered = len(parts) == 2 and parts[1].isdigit()
+        coords = (
+            var.getncattr("coordinates").split()
+            if "coordinates" in var.ncattrs()
+            else []
+        )
+        if is_layered:
+            expected_z = f"z_l{parts[1]}"
+            assert expected_z in coords, (
+                f"{expected_z} missing from coordinates on {vname}{ctx}: {coords}"
+            )
+        else:
+            assert not any(c.startswith("z_l") for c in coords), (
+                f"no z_lN may appear in coordinates on non-layered var "
+                f"{vname}{ctx}: {coords}"
+            )
+
 
 def _check_output_nc(ds, name, fmt, ncf_config):
     _check_global_attrs(ds, name, fmt, ncf_config, label="output")
     _check_layer_coord(ds, label="output")
+    _check_z_coord(ds, fmt, label="output")
     _check_time_coord(ds, label="output")
     _check_projection(ds, fmt, ncf_config, label="output")
     _check_coord_gridmapping(ds, fmt, ncf_config, label="output")
@@ -545,6 +693,7 @@ def _check_input_var(
 def _check_input_nc(ds, name, fmt, ncf_config):
     _check_global_attrs(ds, name, fmt, ncf_config, label="input")
     _check_layer_coord(ds, label="input")
+    _check_z_coord(ds, fmt, label="input")
     _check_projection(ds, fmt, ncf_config, label="input")
     _check_coord_gridmapping(ds, fmt, ncf_config, label="input")
     # time coord only present on period-data variables; don't require it on input
@@ -658,6 +807,15 @@ def _check_geo_crs_output(test, fmt):
     with nc.Dataset(ws / f"{name}.nc") as ds:
         _check_global_attrs(ds, name, fmt, "geographic_wkt", label="geo_output")
         _check_layer_coord(ds, label="geo_output")
+        _check_z_coord(ds, fmt, label="geo_output")
+        if fmt == "structured":
+            # grid_mapping name (the variable "projection" is still pointed
+            # to) is independent of grid_mapping_name (the CF attribute
+            # value on that variable, empty here since geographic CRS has no
+            # PROJECTION[ keyword) -- head still gets grid_mapping + "x y z".
+            _check_data_var(
+                ds.variables["head"], "head", fmt, "geographic_wkt", label="geo_output"
+            )
         assert "projection" in ds.variables, (
             "projection variable missing for geographic CRS"
         )

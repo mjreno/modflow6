@@ -475,7 +475,7 @@ contains
       call nf_verify(nf90_put_att(this%ncid, this%var_ids%dependent(k), &
                                   '_FillValue', (/DHNOFLO/)), &
                      this%nc_fname)
-      ! cell_methods (CF-1.11 7.3): dependent variable values are the
+      ! cell_methods (CF-1.13 7.3): dependent variable values are the
       ! instantaneous simulated state at each output time, not a time
       ! mean/accumulation over the interval -- an intensive quantity whose
       ! default method is already "point" per CF's own Appendix E, stated
@@ -514,7 +514,7 @@ contains
         call nf_verify(nf90_put_att(this%ncid, var_id, 'wkt', this%wkt), &
                        this%nc_fname)
       end if
-      ! crs_wkt (WKT2, ISO 19162:2019) -- required by CF-1.11
+      ! crs_wkt (WKT2, ISO 19162:2019) -- required by CF-1.13
       if (this%crs_wkt /= '') then
         effective_crs_wkt = this%crs_wkt
       else
@@ -719,7 +719,7 @@ contains
   !! variable (e.g. npf_k_l3), or 0 when it is not layered (e.g. a flat
   !! NCPL-shaped array). z_l{layer} is only referenced from coordinates
   !! when layer > 0, since it is the only case where z_l{layer} shares
-  !! nmesh_face with varid (CF-1.11 5.2 subset rule).
+  !! nmesh_face with varid (CF-1.13 5.2 subset rule).
   !<
   subroutine ncvar_gridmap(ncid, varid, gridmap_name, layer, nc_fname)
     integer(I4B), intent(in) :: ncid

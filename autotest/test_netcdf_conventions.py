@@ -22,7 +22,7 @@ round-trip correctness is covered by other tests.
 
 Conventions
 -----------
-CF-1.11  (https://cfconventions.org/cf-conventions/cf-conventions.html)
+CF-1.13  (https://cfconventions.org/cf-conventions/cf-conventions.html)
   5.6  grid_mapping, crs_wkt, grid_mapping_name on the projection variable
   4.3  vertical (layer) coordinate: axis, positive, units
   4.4  time coordinate: standard_name, units, calendar
@@ -264,8 +264,8 @@ def _check_global_attrs(ds, name, fmt, ncf_config, label=""):
         )
 
     conventions = ds.getncattr("Conventions")
-    assert "CF-1.11" in conventions, (
-        f"Conventions must include CF-1.11{ctx}: {conventions!r}"
+    assert "CF-1.13" in conventions, (
+        f"Conventions must include CF-1.13{ctx}: {conventions!r}"
     )
     if fmt == "ugrid":
         assert "UGRID-1.0" in conventions, (
@@ -314,7 +314,7 @@ def _check_z_coord(ds, fmt, label=""):
     auxiliary vertical position coordinate -- distinct from the discrete
     layer index. Split per layer for mesh since face-indexed variables
     carry no layer dimension to legally reference a
-    combined z(layer, nmesh_face) coordinate (CF-1.11 5.2)."""
+    combined z(layer, nmesh_face) coordinate (CF-1.13 5.2)."""
     ctx = f" [{label}]" if label else ""
     expected = [
         (TOP + BOTM[0]) / 2.0,
@@ -524,7 +524,7 @@ def _check_data_var(var, vname, fmt, ncf_config, label=""):
 
     # z: structured only, unconditional -- present in
     # coordinates iff the variable actually carries the layer dimension
-    # (CF-1.11 5.2 subset rule; z's own dims are (layer, y, x)).
+    # (CF-1.13 5.2 subset rule; z's own dims are (layer, y, x)).
     if fmt == "structured":
         has_layer = "layer" in var.dimensions
         coords = (
@@ -543,7 +543,7 @@ def _check_data_var(var, vname, fmt, ncf_config, label=""):
             )
         # x/y are never listed here, CRS or not -- they are true CF
         # dimension coordinates, already discoverable by dimension-name
-        # matching alone (CF-1.11 Ch.5 preamble), unlike lon/lat (real 2D
+        # matching alone (CF-1.13 Ch.5 preamble), unlike lon/lat (real 2D
         # auxiliary coordinates, which do need to be listed).
         assert "x" not in coords and "y" not in coords, (
             f"x/y must never appear in coordinates on {vname}{ctx}: {coords}"
@@ -623,7 +623,7 @@ def _check_output_nc(ds, name, fmt, ncf_config):
 # grid_mapping is only meaningful on variables whose dimensions include the full
 # horizontal spatial extent (nrow x ncol or nlay x nrow x ncol). 1D dimension arrays
 # (delr=ncol, delc=nrow) define grid geometry but are not georeferenced fields,
-# so grid_mapping does not apply — consistent with CF-1.11 §5.6.
+# so grid_mapping does not apply — consistent with CF-1.13 5.6.
 _STRUCTURED_VARS_NONSPATIAL = [
     "dis_delr",  # 1D (ncol) — grid spacing, not a georeferenced field
     "dis_delc",  # 1D (nrow) — grid spacing, not a georeferenced field

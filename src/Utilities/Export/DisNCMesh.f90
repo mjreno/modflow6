@@ -17,7 +17,7 @@ module MeshDisModelModule
   use CharacterStringModule, only: CharacterStringType
   use MeshModelModule, only: Mesh2dModelType, MeshNCDimIdType, MeshNCVarIdType, &
                              ncvar_chunk, ncvar_deflate, ncvar_gridmap, &
-                             ncvar_mf6attr
+                             ncvar_mf6attr, ncvar_layer
   use NCModelExportModule, only: export_longname, export_varname
   use DisModule, only: DisType
   use NetCDFCommonModule, only: nf_verify
@@ -468,6 +468,7 @@ contains
       call nf_verify(nf90_put_att(this%ncid, this%var_ids%elevation(k), &
                                   'long_name', 'cell center elevation'), &
                      this%nc_fname)
+      call ncvar_layer(this%ncid, this%var_ids%elevation(k), k, this%nc_fname)
     end do
   end subroutine define_dim
 

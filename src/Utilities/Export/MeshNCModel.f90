@@ -27,6 +27,7 @@ module MeshModelModule
   public :: ncvar_deflate
   public :: ncvar_gridmap
   public :: ncvar_mf6attr
+  public :: ncvar_layer
 
   !> @brief type for storing model export dimension ids
   !<
@@ -478,6 +479,10 @@ contains
       ! add grid mapping (mesh, location, coordinates, grid_mapping)
       call ncvar_gridmap(this%ncid, this%var_ids%dependent(k), &
                          this%gridmap_name, k, this%nc_fname)
+
+      ! add layer attribute
+      call ncvar_layer(this%ncid, this%var_ids%dependent(k), k, &
+                       this%nc_fname)
     end do
   end subroutine define_dependent
 
@@ -743,15 +748,29 @@ contains
     if (nc_tag /= '') then
       call nf_verify(nf90_put_att(ncid, varid, 'modflow_input', &
                                   nc_tag), nc_fname)
-      if (layer > 0) then
-        call nf_verify(nf90_put_att(ncid, varid, 'layer', &
-                                    layer), nc_fname)
-      end if
+      call ncvar_layer(ncid, varid, layer, nc_fname)
       if (iaux > 0) then
         call nf_verify(nf90_put_att(ncid, varid, 'modflow_iaux', &
                                     iaux), nc_fname)
       end if
     end if
   end subroutine ncvar_mf6attr
+
+  !> @brief put the layer attribute (only when layer > 0)
+  !!
+  !! layer identifies which layer a per-layer-split mesh variable belongs
+  !! to (e.g. head_l3, npf_k_l3) -- distinct from the layer dimension
+  !! coordinate. Not a CF/UGRID attribute; MF6-internal. Applies to every
+  !! per-layer-split variable.
+  !<
+  subroutine ncvar_layer(ncid, varid, layer, nc_fname)
+    integer(I4B), intent(in) :: ncid
+    integer(I4B), intent(in) :: varid
+    integer(I4B), intent(in) :: layer
+    character(len=*), intent(in) :: nc_fname
+    if (layer > 0) then
+      call nf_verify(nf90_put_att(ncid, varid, 'layer', layer), nc_fname)
+    end if
+  end subroutine ncvar_layer
 
 end module MeshModelModule

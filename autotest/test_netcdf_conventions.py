@@ -364,6 +364,10 @@ def _check_z_coord(ds, fmt, label=""):
             f"{vname} long_name must be 'cell center elevation'{ctx}"
         )
         assert "units" in z.ncattrs(), f"{vname} units missing{ctx}"
+        assert "layer" in z.ncattrs(), f"layer attr missing on {vname}{ctx}"
+        assert z.getncattr("layer") == k, (
+            f"layer attr must be {k} on {vname}{ctx}: {z.getncattr('layer')}"
+        )
 
         vals = z[:]
         assert np.allclose(vals, expected[k - 1]), (
@@ -541,19 +545,17 @@ def _check_data_var(var, vname, fmt, ncf_config, label=""):
                 f"CRS{ctx}: {coords}"
             )
     else:
-        # z_lN: mesh/UGRID variable names carry their own
-        # layer number as a "_l{k}" suffix (same convention _UGRID_VARS_*
-        # already relies on) -- present in coordinates iff vname is layered,
-        # referencing that specific layer's z_lN, not a generic/wrong one.
-        parts = vname.rsplit("_l", 1)
-        is_layered = len(parts) == 2 and parts[1].isdigit()
+        # z_lN: the layer attribute (not the variable name) identifies
+        # whether vname is a per-layer-split variable, and which layer it
+        # belongs to
+        is_layered = "layer" in var.ncattrs()
         coords = (
             var.getncattr("coordinates").split()
             if "coordinates" in var.ncattrs()
             else []
         )
         if is_layered:
-            expected_z = f"z_l{parts[1]}"
+            expected_z = f"z_l{var.getncattr('layer')}"
             assert expected_z in coords, (
                 f"{expected_z} missing from coordinates on {vname}{ctx}: {coords}"
             )
@@ -581,6 +583,14 @@ def _check_output_nc(ds, name, fmt, ncf_config):
             assert vname in ds.variables, f"{vname} missing from UGRID output"
             head = ds.variables[vname]
             _check_data_var(head, vname, fmt, ncf_config, label="output")
+
+            # layer attribute must match this variable's actual layer, not
+            # just be present -- independent check against the known k,
+            # not derived from the attribute itself
+            assert "layer" in head.ncattrs(), f"layer attr missing on {vname}"
+            assert head.getncattr("layer") == k, (
+                f"layer attr must be {k} on {vname}: {head.getncattr('layer')}"
+            )
 
             # UGRID topology attrs always present on face vars regardless of CRS
             assert head.getncattr("mesh") == "mesh", f"{vname} mesh attr must be 'mesh'"

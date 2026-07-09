@@ -905,7 +905,7 @@ contains
                                 this%annotation%longname), this%nc_fname)
     call nf_verify(nf90_put_att(this%ncid, this%var_ids%dependent, '_FillValue', &
                                 (/DHNOFLO/)), this%nc_fname)
-    ! cell_methods (CF-1.11 7.3): dependent variable values are the
+    ! cell_methods (CF-1.13 7.3): dependent variable values are the
     ! instantaneous simulated state at each output time, not a time
     ! mean/accumulation over the interval -- an intensive quantity whose
     ! default method is already "point" per CF's own Appendix E, stated
@@ -938,7 +938,7 @@ contains
         call nf_verify(nf90_put_att(this%ncid, var_id, 'wkt', this%wkt), &
                        this%nc_fname)
       end if
-      ! crs_wkt (WKT2, ISO 19162:2019) -- required by CF-1.11
+      ! crs_wkt (WKT2, ISO 19162:2019) -- required by CF-1.13
       if (this%crs_wkt /= '') then
         effective_crs_wkt = this%crs_wkt
       else
@@ -1178,7 +1178,7 @@ contains
   !! has_layer must be true only for variables carrying the layer, y, and x
   !! dimensions -- z(layer, y, x) can only be legally referenced via
   !! `coordinates` from a variable whose dimensions are a superset of its
-  !! own (CF-1.11 5.2). 2D (y, x)-only variables such as dis_top must pass
+  !! own (CF-1.13 5.2). 2D (y, x)-only variables such as dis_top must pass
   !! has_layer=.false. z is written unconditionally, independent of
   !! gridmap_name/latlon.
   !<
@@ -1195,7 +1195,7 @@ contains
     ! NOTE: x/y are not listed here even when gridmap_name is set -- unlike
     ! lon/lat (real 2D auxiliary coordinates), x/y are true CF dimension
     ! coordinates already discoverable by dimension-name matching alone, so
-    ! listing them in 'coordinates' is redundant (CF-1.11 Ch.5 preamble).
+    ! listing them in 'coordinates' is redundant (CF-1.13 Ch.5 preamble).
     if (latlon) then
       coords = 'lon lat'
     end if

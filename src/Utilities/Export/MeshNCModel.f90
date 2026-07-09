@@ -475,6 +475,15 @@ contains
       call nf_verify(nf90_put_att(this%ncid, this%var_ids%dependent(k), &
                                   '_FillValue', (/DHNOFLO/)), &
                      this%nc_fname)
+      ! cell_methods (CF-1.11 7.3): dependent variable values are the
+      ! instantaneous simulated state at each output time, not a time
+      ! mean/accumulation over the interval -- an intensive quantity whose
+      ! default method is already "point" per CF's own Appendix E, stated
+      ! explicitly here per CF's recommendation to do so for every
+      ! spatio-temporal dimension.
+      call nf_verify(nf90_put_att(this%ncid, this%var_ids%dependent(k), &
+                                  'cell_methods', 'time: point'), &
+                     this%nc_fname)
 
       ! add grid mapping (mesh, location, coordinates, grid_mapping)
       call ncvar_gridmap(this%ncid, this%var_ids%dependent(k), &

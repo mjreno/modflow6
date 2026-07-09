@@ -9,7 +9,7 @@ module DisNCStructuredModule
 
   use KindModule, only: DP, I4B, LGP
   use ConstantsModule, only: LINELENGTH, LENBIGLINE, LENCOMPONENTNAME, &
-                             LENMEMPATH, DNODATA, DZERO, DHALF
+                             LENMEMPATH, DNODATA, DZERO, DHALF, DPIO180
   use SimVariablesModule, only: errmsg, warnmsg
   use SimModule, only: store_error, store_warning, store_error_filename
   use MemoryManagerModule, only: mem_setptr
@@ -43,7 +43,6 @@ module DisNCStructuredModule
     integer(I4B) :: dependent !< dependent variable
     integer(I4B) :: x_bnds !< x boundaries 2D array
     integer(I4B) :: y_bnds !< y boundaries 2D array
-    integer(I4B) :: z_bnds !< z boundaries 2D array
     integer(I4B) :: latitude !< latitude 2D array
     integer(I4B) :: longitude !< longitude 2D array
     integer(I4B) :: export !< in scope export
@@ -173,7 +172,12 @@ contains
       if (this%gridmap_name /= '') then
         if (this%dis%angrot /= DZERO) then
           write (warnmsg, '(a)') 'CRS parameter set with structured rotated &
-            &grid. Projected coordinates will have grid local values. &
+            &grid. The x/y coordinate variables have grid-local, not &
+            &real-world, values, so deriving real longitude/latitude from &
+            &grid_mapping via these coordinates will be incorrect. This &
+            &does not affect the projection variable''s GeoTransform &
+            &attribute (if written), which is computed independently of &
+            &x/y and remains correct for GDAL-based raster placement. &
             &Applies to file "'//trim(nc_fname)//'".'
           call store_warning(warnmsg)
         end if
@@ -799,13 +803,6 @@ contains
                    this%nc_fname)
     call nf_verify(nf90_put_att(this%ncid, this%var_ids%z, 'long_name', &
                                 'model layer'), this%nc_fname)
-    !call nf_verify(nf90_put_att(this%ncid, this%var_ids%z, 'bounds', 'z_bnds'), &
-    !               this%nc_fname)
-    !call nf_verify(nf90_def_var(this%ncid, 'z_bnds', NF90_DOUBLE, &
-    !                            (/this%dim_ids%bnd, this%dim_ids%z/), &
-    !                            this%var_ids%z_bnds), this%nc_fname)
-    !call nf_verify(nf90_put_var(this%ncid, this%var_ids%z_bnds, &
-    !                            this%elev_bnds), this%nc_fname)
 
     ! Y dimension
     call nf_verify(nf90_def_dim(this%ncid, 'y', this%dis%nrow, this%dim_ids%y), &
@@ -922,7 +919,7 @@ contains
     character(len=LINELENGTH) :: gmname
     character(len=LENBIGLINE) :: effective_crs_wkt
     character(len=LINELENGTH) :: geotransform
-    real(DP) :: x_left, y_top, dx_eff, dy_eff
+    real(DP) :: dx_eff, dy_eff, ang, gt0, gt1, gt2, gt3, gt4, gt5
 
     if (this%wkt /= '' .or. this%crs_wkt /= '') then
       call nf_verify(nf90_redef(this%ncid), this%nc_fname)
@@ -947,22 +944,30 @@ contains
         call nf_verify(nf90_put_att(this%ncid, var_id, 'grid_mapping_name', &
                                     trim(gmname)), this%nc_fname)
       end if
-      ! GeoTransform/spatial_ref (GDAL raster placement) -- unrotated grids
-      ! only.  When angrot /= 0, add_grid_data() already zeroes xoff/yoff so
-      ! the exported x/y are grid-local, not real-world; a GeoTransform
-      ! derived from xorigin/yorigin would misplace the raster.  Also
-      ! requires WKT1 (this%wkt): MF6 has no CRS library to convert WKT2 to
-      ! WKT1, so CRS_WKT-only input does not produce GeoTransform/
-      ! spatial_ref.  dx/dy are effective (average) pixel sizes over the
-      ! full grid extent -- a GDAL limitation for variable-spacing grids,
-      ! not an MF6 one.
-      if (this%dis%angrot == DZERO .and. this%wkt /= '') then
-        x_left = this%dis%xorigin
-        y_top = this%dis%yorigin + sum(this%dis%delc)
+      ! GeoTransform/spatial_ref (GDAL raster placement).  Rotation-aware:
+      ! GDAL's affine model supports planar rotation via the GT[2]/GT[4]
+      ! shear terms, independent of the x/y coordinate arrays -- unlike x/y
+      ! (true CF dimension coordinates, which cannot represent a rotated
+      ! position without becoming 2D auxiliary coordinates), GeoTransform
+      ! is computed directly from xorigin/yorigin/angrot/delr/delc, so it
+      ! remains correct even though add_grid_data() keeps x/y grid-local
+      ! for rotated grids.  Formula reduces exactly to the unrotated case
+      ! when angrot == 0.  Also requires WKT1 (this%wkt): MF6 has no CRS
+      ! library to convert WKT2 to WKT1, so CRS_WKT-only input does not
+      ! produce GeoTransform/spatial_ref.  dx/dy are effective (average)
+      ! pixel sizes over the full grid extent -- a GDAL limitation for
+      ! variable-spacing grids, not an MF6 one.
+      if (this%wkt /= '') then
+        ang = this%dis%angrot * DPIO180
         dx_eff = sum(this%dis%delr) / size(this%dis%cellx)
         dy_eff = -sum(this%dis%delc) / size(this%dis%celly)
-        write (geotransform, '(6(1x,es16.8))') x_left, dx_eff, DZERO, &
-          y_top, DZERO, dy_eff
+        gt0 = this%dis%xorigin - sum(this%dis%delc) * sin(ang)
+        gt1 = dx_eff * cos(ang)
+        gt2 = -dy_eff * sin(ang)
+        gt3 = this%dis%yorigin + sum(this%dis%delc) * cos(ang)
+        gt4 = dx_eff * sin(ang)
+        gt5 = dy_eff * cos(ang)
+        write (geotransform, '(6(1x,es16.8))') gt0, gt1, gt2, gt3, gt4, gt5
         call nf_verify(nf90_put_att(this%ncid, var_id, 'GeoTransform', &
                                     trim(adjustl(geotransform))), &
                        this%nc_fname)
@@ -1179,9 +1184,11 @@ contains
     character(len=*), intent(in) :: nc_fname
     character(len=LINELENGTH) :: coords
     coords = ''
-    if (gridmap_name /= '') then
-      coords = 'x y'
-    else if (latlon) then
+    ! NOTE: x/y are not listed here even when gridmap_name is set -- unlike
+    ! lon/lat (real 2D auxiliary coordinates), x/y are true CF dimension
+    ! coordinates already discoverable by dimension-name matching alone, so
+    ! listing them in 'coordinates' is redundant (CF-1.11 Ch.5 preamble).
+    if (latlon) then
       coords = 'lon lat'
     end if
     if (has_layer) then

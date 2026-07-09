@@ -107,6 +107,7 @@ SS = 1e-5
 SY = 0.15
 XORIGIN = 500_000.0
 YORIGIN = 100_000_000.0
+ANGROT_ROTATED = 15.0
 
 # two stress periods: steady then transient
 NPER = 2
@@ -161,6 +162,7 @@ def build_models(test, fmt, ncf_config):
         botm=BOTM,
         xorigin=XORIGIN,
         yorigin=YORIGIN,
+        angrot=ANGROT_ROTATED if ncf_config == "rotated" else 0.0,
     )
 
     flopy.mf6.ModflowGwfic(gwf, strt=STRT)
@@ -214,6 +216,8 @@ def build_models(test, fmt, ncf_config):
             ncf_kwargs["crs_wkt"] = WKT2
         elif ncf_config == "geographic_wkt":
             ncf_kwargs["wkt"] = WKT1_GEO
+        elif ncf_config == "rotated":
+            ncf_kwargs["wkt"] = WKT1
         elif ncf_config == "latlon":
             # explicit ncpl works around a flopy bug: without it, flopy
             # infers NCPL as NROW instead of NROW*NCOL for structured
@@ -535,15 +539,13 @@ def _check_data_var(var, vname, fmt, ncf_config, label=""):
                 f"z must not appear in coordinates on non-layered var "
                 f"{vname}{ctx}: {coords}"
             )
-        if _has_crs(ncf_config):
-            assert "x" in coords and "y" in coords, (
-                f"x/y missing from coordinates on {vname} with CRS{ctx}: {coords}"
-            )
-        else:
-            assert "x" not in coords and "y" not in coords, (
-                f"x/y must not appear in coordinates on {vname} without "
-                f"CRS{ctx}: {coords}"
-            )
+        # x/y are never listed here, CRS or not -- they are true CF
+        # dimension coordinates, already discoverable by dimension-name
+        # matching alone (CF-1.11 Ch.5 preamble), unlike lon/lat (real 2D
+        # auxiliary coordinates, which do need to be listed).
+        assert "x" not in coords and "y" not in coords, (
+            f"x/y must never appear in coordinates on {vname}{ctx}: {coords}"
+        )
     else:
         # z_lN: the layer attribute (not the variable name) identifies
         # whether vname is a per-layer-split variable, and which layer it
@@ -829,7 +831,8 @@ def _check_geo_crs_output(test, fmt):
             # grid_mapping name (the variable "projection" is still pointed
             # to) is independent of grid_mapping_name (the CF attribute
             # value on that variable, empty here since geographic CRS has no
-            # PROJECTION[ keyword) -- head still gets grid_mapping + "x y z".
+            # PROJECTION[ keyword) -- head still gets grid_mapping + "z"
+            # (x/y are never listed in coordinates, CRS or not).
             _check_data_var(
                 ds.variables["head"], "head", fmt, "geographic_wkt", label="geo_output"
             )
@@ -889,6 +892,94 @@ def _check_latlon_output(test):
         )
 
 
+def _rotated_geotransform_corners(gt):
+    """Real-world (x, y) at the four pixel-grid corners implied by a
+    6-element GDAL GeoTransform."""
+    corners = []
+    for xpixel in (0, NCOL):
+        for yline in (0, NROW):
+            xg = gt[0] + xpixel * gt[1] + yline * gt[2]
+            yg = gt[3] + xpixel * gt[4] + yline * gt[5]
+            corners.append((xg, yg))
+    return corners
+
+
+def _check_rotated_output(test, fmt):
+    """Rotated structured grid: GeoTransform must be present and correct
+    (rotation-aware formula, DELR/DELC uniform in this model so the
+    effective-pixel-size approximation is exact, not just close). x/y
+    dimension coordinates remain grid-local regardless (CF dimension
+    coordinates cannot represent a rotated position) -- unaffected by this
+    change, not re-checked here."""
+    name = test.name
+    ws = test.workspace
+    with nc.Dataset(ws / f"{name}.nc") as ds:
+        proj = ds.variables["projection"]
+        if fmt == "structured":
+            assert "GeoTransform" in proj.ncattrs(), (
+                "GeoTransform missing for rotated structured grid"
+            )
+            gt = [float(v) for v in proj.getncattr("GeoTransform").split()]
+            assert len(gt) == 6, f"GeoTransform must have 6 values: {gt}"
+
+            ang = np.radians(ANGROT_ROTATED)
+            dx_eff = sum(DELR) / NCOL
+            dy_eff = -sum(DELC) / NROW
+            expected_gt = [
+                XORIGIN - sum(DELC) * np.sin(ang),
+                dx_eff * np.cos(ang),
+                -dy_eff * np.sin(ang),
+                YORIGIN + sum(DELC) * np.cos(ang),
+                dx_eff * np.sin(ang),
+                dy_eff * np.cos(ang),
+            ]
+            assert np.allclose(gt, expected_gt), (
+                f"rotated GeoTransform value mismatch: {gt} != {expected_gt}"
+            )
+            assert "spatial_ref" in proj.ncattrs(), "spatial_ref missing"
+            assert proj.getncattr("spatial_ref") == WKT1, "spatial_ref must be WKT1"
+        else:
+            # mesh format already handled rotation correctly before this
+            # change (via dis_transform_xy) -- confirm unaffected/unchanged
+            assert "GeoTransform" not in proj.ncattrs(), (
+                "GeoTransform must never be written for mesh format"
+            )
+            assert "spatial_ref" not in proj.ncattrs(), (
+                "spatial_ref must never be written for mesh format"
+            )
+
+
+def _check_rotated_cross_format(struct_test, ugrid_test):
+    """Strong cross-check: verify structured's new GeoTransform-implied grid
+    corners (a newly-Fortran-implemented rotation formula) against mesh
+    format's independently-implemented, already-shipped, real-world node
+    coordinates (dis_transform_xy) -- both generated by real MF6 runs of the
+    identical rotated grid, not just checked against a Python derivation."""
+    with nc.Dataset(struct_test.workspace / f"{struct_test.name}.nc") as ds:
+        gt = [
+            float(v)
+            for v in ds.variables["projection"].getncattr("GeoTransform").split()
+        ]
+    expected_corners = _rotated_geotransform_corners(gt)
+
+    with nc.Dataset(ugrid_test.workspace / f"{ugrid_test.name}.nc") as ds:
+        node_x = ds.variables["mesh_node_x"][:]
+        node_y = ds.variables["mesh_node_y"][:]
+
+    # tolerance reflects GeoTransform's ES16.8 text-formatting precision
+    # (9 significant digits) at YORIGIN's ~1e8 magnitude, i.e. ~0.1 unit --
+    # not the underlying formula's precision, which matches exactly (see
+    # test_rotated_geotransform's direct np.allclose check on the raw GT
+    # values, unaffected by this compounding-corner-arithmetic concern)
+    for xg, yg in expected_corners:
+        dist = np.sqrt((node_x - xg) ** 2 + (node_y - yg) ** 2)
+        assert dist.min() < 1.0, (
+            f"structured GeoTransform corner ({xg}, {yg}) has no matching "
+            f"mesh node (closest distance {dist.min()!r}) -- structured "
+            f"and mesh rotation implementations disagree"
+        )
+
+
 cases = ["gwf_cf_conv"]
 
 
@@ -937,3 +1028,55 @@ def test_latlon_griddata(function_tmpdir, targets):
         compare=None,
     )
     test.run()
+
+
+@pytest.mark.netcdf
+@pytest.mark.parametrize("fmt", ["structured", "ugrid"])
+def test_rotated_geotransform(fmt, function_tmpdir, targets):
+    """Rotated grid (ANGROT != 0) with a CRS configured: structured now gets
+    a rotation-aware GeoTransform (reopened 2026-07-09 -- previously
+    withheld entirely for rotated grids); mesh format is unaffected (it
+    already handled rotation correctly via dis_transform_xy)."""
+    test = TestFramework(
+        name="gwf_rotated",
+        workspace=function_tmpdir,
+        build=lambda t: build_models(t, fmt, "rotated"),
+        check=lambda t: _check_rotated_output(t, fmt),
+        targets=targets,
+        compare=None,
+    )
+    test.run()
+
+
+@pytest.mark.netcdf
+def test_rotated_geotransform_matches_mesh(function_tmpdir, targets):
+    """Strong cross-check: build the identical rotated grid in both
+    structured and mesh format, and confirm structured's new
+    GeoTransform-implied corner coordinates match mesh's independently
+    computed, already-shipped real-world node coordinates -- validates the
+    new Fortran implementation against a second, trusted code path, not
+    just a Python-side derivation."""
+    (function_tmpdir / "structured").mkdir()
+    (function_tmpdir / "ugrid").mkdir()
+
+    struct_test = TestFramework(
+        name="gwf_rotated",
+        workspace=function_tmpdir / "structured",
+        build=lambda t: build_models(t, "structured", "rotated"),
+        check=lambda t: _check_rotated_output(t, "structured"),
+        targets=targets,
+        compare=None,
+    )
+    struct_test.run()
+
+    ugrid_test = TestFramework(
+        name="gwf_rotated",
+        workspace=function_tmpdir / "ugrid",
+        build=lambda t: build_models(t, "ugrid", "rotated"),
+        check=lambda t: _check_rotated_output(t, "ugrid"),
+        targets=targets,
+        compare=None,
+    )
+    ugrid_test.run()
+
+    _check_rotated_cross_format(struct_test, ugrid_test)

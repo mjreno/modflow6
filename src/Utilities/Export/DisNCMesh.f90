@@ -448,7 +448,7 @@ contains
     ! index. Always written, independent of CRS/NCF configuration; split
     ! per layer since face-indexed variables carry no layer dimension to
     ! legally reference a combined z(layer, nmesh_face) coordinate
-    ! (CF-1.11 5.2).
+    ! (CF-1.13 5.2).
     allocate (this%var_ids%elevation(this%nlay))
     do k = 1, this%nlay
       write (varname, '(a,i0)') 'z_l', k

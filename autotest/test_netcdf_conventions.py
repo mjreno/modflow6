@@ -26,6 +26,8 @@ CF-1.11  (https://cfconventions.org/cf-conventions/cf-conventions.html)
   5.6  grid_mapping, crs_wkt, grid_mapping_name on the projection variable
   4.3  vertical (layer) coordinate: axis, positive, units
   4.4  time coordinate: standard_name, units, calendar
+  7.3  cell_methods on the dependent variable ("time: point" -- an
+       instantaneous state, not a time mean/accumulation)
 
 UGRID-1.0  (https://ugrid-conventions.github.io/ugrid-conventions/)
   mesh topology variable; face-indexed data variables carrying mesh,
@@ -579,12 +581,21 @@ def _check_output_nc(ds, name, fmt, ncf_config):
     if fmt == "structured":
         assert "head" in ds.variables, "head variable missing from structured output"
         _check_data_var(ds.variables["head"], "head", fmt, ncf_config, label="output")
+        # cell_methods (item 8): dependent variable is an instantaneous
+        # state at each output time, not a time mean/accumulation
+        assert ds.variables["head"].getncattr("cell_methods") == "time: point", (
+            "head cell_methods must be 'time: point'"
+        )
     else:
         for k in range(1, NLAY + 1):
             vname = f"head_l{k}"
             assert vname in ds.variables, f"{vname} missing from UGRID output"
             head = ds.variables[vname]
             _check_data_var(head, vname, fmt, ncf_config, label="output")
+
+            assert head.getncattr("cell_methods") == "time: point", (
+                f"{vname} cell_methods must be 'time: point'"
+            )
 
             # layer attribute must match this variable's actual layer, not
             # just be present -- independent check against the known k,

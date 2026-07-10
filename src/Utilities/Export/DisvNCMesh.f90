@@ -370,6 +370,7 @@ contains
     integer(I4B), dimension(:), contiguous, pointer :: ncvert
     integer(I4B) :: k
     character(len=LINELENGTH) :: varname
+    character(len=LINELENGTH) :: elev_longname
 
     ! set pointers to input context
     call mem_setptr(ncvert, 'NCVERT', this%dis_mempath)
@@ -440,8 +441,10 @@ contains
                                   'standard_name', 'altitude'), this%nc_fname)
       call nf_verify(nf90_put_att(this%ncid, this%var_ids%elevation(k), &
                                   'positive', 'up'), this%nc_fname)
+      write (elev_longname, '(a,i0,a)') 'cell center elevation (layer ', &
+        k, ')'
       call nf_verify(nf90_put_att(this%ncid, this%var_ids%elevation(k), &
-                                  'long_name', 'cell center elevation'), &
+                                  'long_name', trim(elev_longname)), &
                      this%nc_fname)
       call ncvar_layer(this%ncid, this%var_ids%elevation(k), k, this%nc_fname)
     end do

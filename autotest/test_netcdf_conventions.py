@@ -366,8 +366,8 @@ def _check_z_coord(ds, fmt, label=""):
             f"{vname} standard_name must be 'altitude'{ctx}"
         )
         assert z.getncattr("positive") == "up", f"{vname} positive must be 'up'{ctx}"
-        assert z.getncattr("long_name") == "cell center elevation", (
-            f"{vname} long_name must be 'cell center elevation'{ctx}"
+        assert z.getncattr("long_name") == f"cell center elevation (layer {k})", (
+            f"{vname} long_name must be 'cell center elevation (layer {k})'{ctx}"
         )
         assert "units" in z.ncattrs(), f"{vname} units missing{ctx}"
         assert "layer" in z.ncattrs(), f"layer attr missing on {vname}{ctx}"

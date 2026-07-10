@@ -391,6 +391,7 @@ contains
     class(Mesh2dDisExportType), intent(inout) :: this
     integer(I4B) :: k
     character(len=LINELENGTH) :: varname
+    character(len=LINELENGTH) :: elev_longname
 
     if (isim_mode /= MVALIDATE .or. this%pkglist%Count() > 0) then
       ! time
@@ -465,8 +466,10 @@ contains
                                   'standard_name', 'altitude'), this%nc_fname)
       call nf_verify(nf90_put_att(this%ncid, this%var_ids%elevation(k), &
                                   'positive', 'up'), this%nc_fname)
+      write (elev_longname, '(a,i0,a)') 'cell center elevation (layer ', &
+        k, ')'
       call nf_verify(nf90_put_att(this%ncid, this%var_ids%elevation(k), &
-                                  'long_name', 'cell center elevation'), &
+                                  'long_name', trim(elev_longname)), &
                      this%nc_fname)
       call ncvar_layer(this%ncid, this%var_ids%elevation(k), k, this%nc_fname)
     end do

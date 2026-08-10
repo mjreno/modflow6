@@ -1,5 +1,6 @@
 """
-NetCDF CF/UGRID/MF6 convention attribute verification test.
+NetCDF structured/mesh format, attribute, and CF/UGRID/MF6 convention
+verification test.
 
 Builds a minimal transient GWF model (DIS, IC, NPF, STO, CHD, WEL, OC) and
 verifies that both OUTPUT and INPUT NetCDF files carry the expected convention

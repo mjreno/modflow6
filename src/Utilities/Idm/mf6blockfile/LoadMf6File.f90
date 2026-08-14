@@ -642,6 +642,8 @@ contains
         nrows = sum(int1d)
         nullify (int1d)
       end if
+      ! -- else: shape variable not found or unsupported rank; nrows stays
+      !    at its initial -1, so the block falls back to deferred sizing
     end if
 
     ! create a structured array; use a larger deferred init for blocks with no

@@ -157,26 +157,19 @@ contains
 
   !> @brief Advance the package one time step
   !!
-  !! Syncs featureauxvar from the PACKAGEDATA AUX and advances
-  !! observations.  Only run if pkg_auxvar previously set in
-  !! allocate_featureauxvar().
+  !! For advanced packages with TS6 files active, resets featureauxvar to
+  !! the PACKAGEDATA AUX baseline and re-applies PERIOD AUXILIARY overrides,
+  !! so a time-series-linked AUXVAL is picked up each timestep. Does not
+  !! call this%TsManager%ad()/this%TasManager%ad() -- those managers are
+  !! unused by this type (see bndext_df).
   !<
   subroutine bndext_ad(this)
     ! -- dummy
     class(BndExtType) :: this
-    ! -- local
-    integer(I4B) :: n, ifeat, jj
     !
     ! -- when TS files are active, re-sync featureauxvar each timestep
     if (this%ts_active .and. this%isadvpak /= 0) then
-      if (this%naux > 0 .and. associated(this%pkg_auxvar)) then
-        do n = 1, size(this%pkg_ifno)
-          ifeat = this%pkg_ifno(n)
-          do jj = 1, this%naux
-            this%featureauxvar(jj, ifeat) = this%pkg_auxvar(jj, n)
-          end do
-        end do
-      end if
+      call this%set_auxvar_baseline()
       call this%sync_auxvar()
     end if
     !
@@ -233,10 +226,11 @@ contains
     end if
   end subroutine bndext_rp_log
 
-  !> @brief Reset featureauxvar to PACKAGEDATA AUX baseline at period start
+  !> @brief Reset featureauxvar to PACKAGEDATA AUX baseline
   !!
-  !! Advanced package copy of current pkg_auxvar values into featureauxvar
-  !! to resets any PERIOD override from a prior period.
+  !! Copies current pkg_auxvar values into featureauxvar, resetting any
+  !! PERIOD override from a prior period. Called at period start, and each
+  !! timestep from bndext_ad when TS6 files are active.
   !<
   subroutine set_auxvar_baseline(this)
     ! -- dummy

@@ -101,7 +101,10 @@ contains
     if (struct_array%nrow == -1) then
       struct_array%nrow = 0
       struct_array%deferred_shape = .true.
-      if (present(size_init)) struct_array%deferred_size_init = size_init
+      if (present(size_init)) then
+        ! ignore a non-sensible value and keep the default deferred_size_init
+        if (size_init >= 1) struct_array%deferred_size_init = size_init
+      end if
     end if
 
     ! set blocknum
@@ -428,8 +431,12 @@ contains
         call mem_setptr(nseg_1, 'NSEG_1', this%mempath)
       end if
 
-      ! allocate; use sv%size for deferred-compatible initial row count
-      call mem_allocate(dbl2d, nseg_1, sv%size, sv%idt%mf6varname, this%mempath)
+      if (this%deferred_shape) then
+        ! deferred: plain allocate so check_reallocate can grow it safely
+        allocate (dbl2d(nseg_1, sv%size))
+      else
+        call mem_allocate(dbl2d, nseg_1, sv%size, sv%idt%mf6varname, this%mempath)
+      end if
 
       ! initialize
       do m = 1, sv%size
@@ -564,8 +571,8 @@ contains
 
         if (overwrite) then
           if (this%nrow > isize) then
-            call mem_reallocate(p_charstr1d, LINELENGTH, this%nrow, varname, &
-                                this%mempath)
+            call mem_reallocate(p_charstr1d, this%struct_vectors(icol)%charlen, &
+                                this%nrow, varname, this%mempath)
           end if
 
           do i = 1, this%nrow
@@ -578,15 +585,15 @@ contains
             end do
           end if
         else
-          call mem_reallocate(p_charstr1d, LINELENGTH, this%nrow + isize, &
-                              varname, this%mempath)
+          call mem_reallocate(p_charstr1d, this%struct_vectors(icol)%charlen, &
+                              this%nrow + isize, varname, this%mempath)
           do i = 1, this%nrow
             p_charstr1d(isize + i) = this%struct_vectors(icol)%charstr1d(i)
           end do
         end if
       else
-        call mem_allocate(p_charstr1d, LINELENGTH, this%nrow, varname, &
-                          this%mempath)
+        call mem_allocate(p_charstr1d, this%struct_vectors(icol)%charlen, &
+                          this%nrow, varname, this%mempath)
         do i = 1, this%nrow
           p_charstr1d(i) = this%struct_vectors(icol)%charstr1d(i)
           call this%struct_vectors(icol)%charstr1d(i)%destroy()

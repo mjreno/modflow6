@@ -64,6 +64,8 @@ module BndExtModule
     procedure :: bnd_rp_log => bndext_rp_log
     procedure :: set_auxvar_baseline
     procedure :: sync_auxvar
+    procedure :: validate_ifno
+    procedure :: report_ifno_coverage
   end type BndExtType
 
   !> @ brief BndExtFoundType
@@ -249,7 +251,8 @@ contains
 
   !> @brief Re-apply PERIOD AUXILIARY overrides to featureauxvar each timestep
   !!
-  !! Sync updated ts step data from input context to auxvar staging array.
+  !! Reads updated time series values from the input context and applies
+  !! them to the auxvar staging array.
   !<
   subroutine sync_auxvar(this)
     ! -- modules
@@ -298,6 +301,71 @@ contains
       end do
     end do
   end subroutine sync_auxvar
+
+  !> @ brief Validate a list-input row's IFNO and update the per-feature
+  !!  coverage counter
+  !!
+  !! Returns the validated feature index, or 0 if out of range (an error is
+  !! logged; the caller should skip further processing for the row).
+  !<
+  function validate_ifno(this, ifno_val, nfeatures, nboundchk, &
+                         feature_label, blockname) result(idx)
+    ! -- dummy
+    class(BndExtType), intent(inout) :: this
+    integer(I4B), intent(in) :: ifno_val
+    integer(I4B), intent(in) :: nfeatures
+    integer(I4B), dimension(:), intent(inout) :: nboundchk
+    character(len=*), intent(in) :: feature_label
+    character(len=*), intent(in) :: blockname
+    ! -- return
+    integer(I4B) :: idx
+    !
+    idx = ifno_val
+    if (idx < 1 .or. idx > nfeatures) then
+      write (errmsg, '(a,1x,a,1x,a,i0,a,1x,i0,a)') &
+        trim(blockname), trim(feature_label), '(', idx, &
+        ') must be greater than 0 and less than or equal to', nfeatures, '.'
+      call store_error(errmsg)
+      idx = 0
+      return
+    end if
+    nboundchk(idx) = nboundchk(idx) + 1
+  end function validate_ifno
+
+  !> @ brief Report missing or duplicate list-input rows for each feature
+  !!
+  !! Set check_missing=.false. for an optional block where not every
+  !! feature is expected to have a row (duplicates are still reported).
+  !<
+  subroutine report_ifno_coverage(this, nboundchk, nfeatures, feature_label, &
+                                  blockname, check_missing)
+    ! -- dummy
+    class(BndExtType), intent(inout) :: this
+    integer(I4B), dimension(:), intent(in) :: nboundchk
+    integer(I4B), intent(in) :: nfeatures
+    character(len=*), intent(in) :: feature_label
+    character(len=*), intent(in) :: blockname
+    logical(LGP), intent(in), optional :: check_missing
+    ! -- local
+    integer(I4B) :: n
+    logical(LGP) :: do_check_missing
+    !
+    do_check_missing = .true.
+    if (present(check_missing)) do_check_missing = check_missing
+    !
+    do n = 1, nfeatures
+      if (do_check_missing .and. nboundchk(n) == 0) then
+        write (errmsg, '(a,1x,a,1x,a,1x,i0,a)') &
+          trim(blockname), 'no data specified for', trim(feature_label), n, '.'
+        call store_error(errmsg)
+      else if (nboundchk(n) > 1) then
+        write (errmsg, '(a,1x,a,1x,a,1x,i0,1x,a,1x,i0,1x,a)') &
+          trim(blockname), 'data for', trim(feature_label), n, &
+          'specified', nboundchk(n), 'times.'
+        call store_error(errmsg)
+      end if
+    end do
+  end subroutine report_ifno_coverage
 
   !> @ brief Deallocate package memory
   !<

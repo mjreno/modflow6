@@ -114,7 +114,7 @@ contains
     integer(I4B) :: n
     ! define tsmanager (TDIS is now available)
     call this%tsmanager%tsmanager_df()
-    ! register static TS links; mark as static so they survive Reset()
+    ! register static TS links; mark as static so they survive reset()
     do n = 1, this%static_loader%ts_sa_count()
       sa => this%static_loader%get_ts_sa(n)
       if (associated(sa)) then

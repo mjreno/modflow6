@@ -372,7 +372,7 @@ contains
     end do
   end subroutine uzf_allocate_arrays
 
-  !> @brief Source OPTIONS block from IDM memory
+  !> @brief Source OPTIONS block from input context
   !!
   !! Overrides BndExtType%source_options
   !<
@@ -523,7 +523,7 @@ contains
       'END OF '//trim(adjustl(this%text))//' OPTIONS'
   end subroutine uzf_source_options
 
-  !> @brief Source DIMENSIONS block from IDM memory
+  !> @brief Source DIMENSIONS block from input context
   !!
   !! Overrides BndExtType%source_dimensions
   !<
@@ -618,7 +618,7 @@ contains
     call this%uzf_setup_budobj()
   end subroutine uzf_source_dimensions
 
-  !> @brief Read stress data using IDM
+  !> @brief Read stress data from input context
   !<
   subroutine uzf_rp(this)
     ! -- modules
@@ -655,10 +655,10 @@ contains
     ! -- set steady-state flag based on gwfiss
     this%issflag = this%gwfiss
     !
-    ! -- check if IDM has loaded data for this stress period
+    ! -- check if input has loaded data for this stress period
     if (this%iper == kper) then
       !
-      ! -- get IDM period data arrays
+      ! -- get PERIOD data arrays
       call mem_setptr(nlist, 'NBOUND', this%input_mempath)
       call mem_setptr(ifno, 'IFNO', this%input_mempath)
       call mem_setptr(finf, 'FINF', this%input_mempath)
@@ -848,8 +848,8 @@ contains
     ! -- advance observations; period AUX TS re-sync is handled below
     call this%BndExtType%bnd_ad()
     !
-    ! -- re-sync period data from IDM memory; skip when no TS6 files are
-    !    configured because IDM values are already up to date from uzf_rp.
+    ! -- re-sync period data from input context; skip when no TS6 files are
+    !    configured because input values are already up to date from uzf_rp.
     if (this%ts_active) then
       call mem_setptr(nlist, 'NBOUND', this%input_mempath)
       if (nlist > 0) then
@@ -1747,7 +1747,7 @@ contains
     end do
   end subroutine findcellabove
 
-  !> @brief Source PACKAGEDATA block from IDM memory
+  !> @brief Source PACKAGEDATA block from input context
   !<
   subroutine uzf_source_packagedata(this)
     ! -- modules
@@ -1769,7 +1769,7 @@ contains
       bndname => null()
     character(len=LINELENGTH) :: cellid_str
     integer(I4B) :: ierr
-    integer(I4B) :: iuzf, igwf, n
+    integer(I4B) :: i, igwf, n
     integer(I4B) :: j, jcol
     integer(I4B), dimension(:), allocatable :: rowmaxnnz
     type(sparsematrix) :: sparse
@@ -1778,7 +1778,7 @@ contains
     write (this%iout, '(/1x,3a)') 'PROCESSING ', trim(adjustl(this%text)), &
       ' PACKAGEDATA'
     !
-    ! -- get IDM packagedata arrays
+    ! -- get PACKAGEDATA arrays
     call mem_setptr(ifno, 'PACKAGEDATA_IFNO', this%input_mempath)
     call mem_setptr(cellid_idm, 'CELLID', this%input_mempath)
     call mem_setptr(landflag, 'LANDFLAG', this%input_mempath)
@@ -1805,29 +1805,20 @@ contains
     !
     ! -- loop over packagedata entries
     do n = 1, this%nodes
-      iuzf = ifno(n)
-      !
-      ! -- validate range
-      if (iuzf < 1 .or. iuzf > this%nodes) then
-        write (errmsg, '(2(a,1x),i0,a)') &
-          'IUZNO must be greater than 0 and less than', &
-          'or equal to', this%nodes, '.'
-        call store_error(errmsg)
-        cycle
-      end if
-      !
-      nboundchk(iuzf) = nboundchk(iuzf) + 1
+      i = this%validate_ifno(ifno(n), this%nodes, nboundchk, &
+                             'IUZNO', 'PACKAGEDATA')
+      if (i == 0) cycle
       !
       ! -- convert CELLID to node number
       write (cellid_str, '(10(i0,1x))') cellid_idm(1:this%dis%ndim, n)
       igwf = this%dis%noder_from_cellid(cellid_str, this%inunit, this%iout)
-      this%igwfnode(iuzf) = igwf
+      this%igwfnode(i) = igwf
       rowmaxnnz(igwf) = rowmaxnnz(igwf) + 1
       !
       ! -- validate landflag
       if (landflag(n) < 0 .OR. landflag(n) > 1) then
         write (errmsg, '(a,1x,i0,1x,a,1x,i0,a)') &
-          'LANDFLAG for uzf cell', iuzf, &
+          'LANDFLAG for uzf cell', i, &
           'must be 0 or 1 (specified value is', landflag(n), ').'
         call store_error(errmsg)
       end if
@@ -1835,7 +1826,7 @@ contains
       ! -- validate ivertcon
       if (ivertcon(n) < 0 .OR. ivertcon(n) > this%nodes) then
         write (errmsg, '(a,1x,i0,1x,a,1x,i0,a)') &
-          'IVERTCON for uzf cell', iuzf, &
+          'IVERTCON for uzf cell', i, &
           'must be 0 or less than NUZFCELLS (specified value is', &
           ivertcon(n), ').'
         call store_error(errmsg)
@@ -1844,13 +1835,13 @@ contains
       ! -- validate surfdep
       if (surfdep(n) <= DZERO .and. landflag(n) > 0) then
         write (errmsg, '(a,1x,i0,1x,a,1x,g0,a)') &
-          'SURFDEP for uzf cell', iuzf, &
+          'SURFDEP for uzf cell', i, &
           'must be greater than 0 (specified value is', surfdep(n), ').'
         call store_error(errmsg)
       end if
       if (surfdep(n) >= this%dis%top(igwf) - this%dis%bot(igwf)) then
         write (errmsg, '(a,1x,i0,1x,a)') &
-          'SURFDEP for uzf cell', iuzf, &
+          'SURFDEP for uzf cell', i, &
           'cannot be greater than the cell thickness.'
         call store_error(errmsg)
       end if
@@ -1858,7 +1849,7 @@ contains
       ! -- validate vks
       if (vks(n) <= DZERO) then
         write (errmsg, '(a,1x,i0,1x,a,1x,g0,a)') &
-          'VKS for uzf cell', iuzf, &
+          'VKS for uzf cell', i, &
           'must be greater than 0 (specified value ia', vks(n), ').'
         call store_error(errmsg)
       end if
@@ -1866,7 +1857,7 @@ contains
       ! -- validate thtr
       if (thtr(n) <= DZERO) then
         write (errmsg, '(a,1x,i0,1x,a,1x,g0,a)') &
-          'THTR for uzf cell', iuzf, &
+          'THTR for uzf cell', i, &
           'must be greater than 0 (specified value is', thtr(n), ').'
         call store_error(errmsg)
       end if
@@ -1874,7 +1865,7 @@ contains
       ! -- validate thts
       if (thts(n) <= thtr(n)) then
         write (errmsg, '(a,1x,i0,1x,a,1x,g0,a)') &
-          'THTS for uzf cell', iuzf, &
+          'THTS for uzf cell', i, &
           'must be greater than THTR (specified value is', thts(n), ').'
         call store_error(errmsg)
       end if
@@ -1882,7 +1873,7 @@ contains
       ! -- validate thti
       if (thti(n) < thtr(n) .OR. thti(n) > thts(n)) then
         write (errmsg, '(a,1x,i0,1x,a,1x,a,1x,g0,a)') &
-          'THTI for uzf cell', iuzf, &
+          'THTI for uzf cell', i, &
           'must be greater than or equal to THTR AND less than THTS', &
           '(specified value is', thti(n), ').'
         call store_error(errmsg)
@@ -1891,19 +1882,19 @@ contains
       ! -- validate eps
       if (eps(n) < 3.5 .OR. eps(n) > 14) then
         write (errmsg, '(a,1x,i0,1x,a,1x,g0,a)') &
-          'EPSILON for uzf cell', iuzf, &
+          'EPSILON for uzf cell', i, &
           'must be between 3.5 and 14.0 (specified value is', eps(n), ').'
         call store_error(errmsg)
       end if
       !
       ! -- boundname
       if (this%inamedbound == 1) then
-        this%uzfname(iuzf) = bndname(n)
+        this%uzfname(i) = bndname(n)
       end if
       !
       ! -- set data if no errors
       if (count_errors() == 0) then
-        call this%uzfobj%setdata(iuzf, this%dis%area(igwf), &
+        call this%uzfobj%setdata(i, this%dis%area(igwf), &
                                  this%dis%top(igwf), this%dis%bot(igwf), &
                                  surfdep(n), vks(n), thtr(n), thts(n), &
                                  thti(n), eps(n), this%ntrail_pvar, &
@@ -1917,17 +1908,8 @@ contains
       'END OF ', trim(adjustl(this%text)), ' PACKAGEDATA'
     !
     ! -- check for duplicate or missing uzf cells
-    do iuzf = 1, this%nodes
-      if (nboundchk(iuzf) == 0) then
-        write (errmsg, '(a,1x,i0,a)') &
-          'No data specified for uzf cell', iuzf, '.'
-        call store_error(errmsg)
-      else if (nboundchk(iuzf) > 1) then
-        write (errmsg, '(a,1x,i0,1x,a,1x,i0,1x,a)') &
-          'Data for uzf cell', iuzf, 'specified', nboundchk(iuzf), 'times.'
-        call store_error(errmsg)
-      end if
-    end do
+    call this%report_ifno_coverage(nboundchk, this%nodes, 'uzf cell', &
+                                   'PACKAGEDATA')
     if (count_errors() > 0) then
       call store_error_filename(this%input_fname)
     end if
@@ -1935,18 +1917,18 @@ contains
     ! -- setup sparse for connectivity used to identify multiple uzf cells
     !    per GWF model cell
     call sparse%init(this%dis%nodes, this%dis%nodes, rowmaxnnz)
-    do iuzf = 1, this%nodes
-      igwf = this%igwfnode(iuzf)
-      call sparse%addconnection(igwf, iuzf, 1)
+    do i = 1, this%nodes
+      igwf = this%igwfnode(i)
+      call sparse%addconnection(igwf, i, 1)
     end do
     !
     ! -- create ia and ja from sparse
     call sparse%filliaja(this%ia, this%ja, ierr)
     !
     ! -- set imaxcellcnt
-    do iuzf = 1, this%dis%nodes
+    do i = 1, this%dis%nodes
       jcol = 0
-      do j = this%ia(iuzf), this%ia(iuzf + 1) - 1
+      do j = this%ia(i), this%ia(i + 1) - 1
         jcol = jcol + 1
       end do
       if (jcol > this%imaxcellcnt) then

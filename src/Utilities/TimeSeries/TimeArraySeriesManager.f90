@@ -4,6 +4,7 @@ module TimeArraySeriesManagerModule
   use SimVariablesModule, only: errmsg
   use ConstantsModule, only: DZERO, LENTIMESERIESNAME, LINELENGTH, &
                              LENHUGELINE, LENMODELNAME
+  use InputOutputModule, only: same_word
   use ListModule, only: ListType
   use SimModule, only: store_error, store_error_unit
   use TdisModule, only: delt, totimc, kper, kstp
@@ -41,6 +42,7 @@ module TimeArraySeriesManagerModule
     procedure, public :: GetLink
     procedure, public :: MakeTasLink
     procedure, public :: Reset
+    procedure, public :: remove_existing_link
     ! -- Private procedures
     procedure, private :: tasmgr_add_link
     procedure, private :: tasmgr_convert_flux
@@ -317,6 +319,43 @@ contains
     ! -- Add link to list of links
     call this%tasmgr_add_link(newTasLink)
   end subroutine MakeTasLink
+
+  !> @brief Remove an existing TAS link for pkgName/varName, if one exists.
+  !!
+  !! Unlike TimeSeriesManagerType's remove_existing_link, no row/column
+  !! match is needed: a TAS link always targets an entire array for one
+  !! variable, not an individual element, so (pkgName, varName) uniquely
+  !! identifies it.
+  !<
+  function remove_existing_link(this, pkgName, varName) result(found)
+    ! -- return
+    logical :: found
+    ! -- dummy
+    class(TimeArraySeriesManagerType) :: this
+    character(len=*), intent(in) :: pkgName
+    character(len=*), intent(in) :: varName
+    ! -- local
+    integer(I4B) :: i, nlinks, removeLink
+    type(TimeArraySeriesLinkType), pointer :: tasLinkTemp => null()
+    !
+    nlinks = this%CountLinks()
+    found = .false.
+    removeLink = -1
+    do i = 1, nlinks
+      tasLinkTemp => this%GetLink(i)
+      if (associated(tasLinkTemp)) then
+        if (tasLinkTemp%PackageName == pkgName .and. &
+            same_word(tasLinkTemp%Text, varName)) then
+          found = .true.
+          removeLink = i
+          exit
+        end if
+      end if
+    end do
+    if (removeLink > 0) then
+      call this%boundTasLinks%RemoveNode(removeLink, .true.)
+    end if
+  end function remove_existing_link
 
   !> @brief Get link from the boundtaslinks list
   !<

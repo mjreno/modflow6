@@ -239,16 +239,7 @@ contains
     class(LayerArrayLoadType), intent(inout) :: this
     integer(I4B) :: n
 
-    ! SPCA: PERIOD settings persist across periods unless reissued, so TAS
-    ! links are never cleared here; tas_links_create's own
-    ! remove_existing_link call replaces a link in place when a variable's
-    ! TIMEARRAYSERIES is genuinely reissued.
-    ! Deliberately name-based, not structural: RCHA (which shares this
-    ! loader) documents the identical "retains its value" requirement for
-    ! its own AUX field, so a structural detector here would also match
-    ! RCH/EVT.
-    if (this%tas_active /= 0 .and. &
-        this%mf6_input%subcomponent_type /= 'SPCA') then
+    if (this%tas_active /= 0) then
       ! reset tasmanager
       call this%tasmanager%reset(this%mf6_input%subcomponent_name)
       ! reinitialize tas name arrays
@@ -408,7 +399,6 @@ contains
     character(len=LENTIMESERIESNAME) :: tas_name
     character(len=LENAUXNAME) :: aux_name
     logical :: convertFlux
-    logical :: found
     integer(I4B) :: n
 
     ! initialize
@@ -424,10 +414,6 @@ contains
         ! set auxvar pointer
         auxArrayPtr => this%ctx%auxvar(n, :)
         aux_name = this%ctx%auxname_cst(n)
-        ! remove any prior link for this variable before adding the new
-        ! one, since reset() leaves prior links in place for SPCA
-        found = this%tasmanager%remove_existing_link( &
-                this%mf6_input%subcomponent_name, aux_name)
         call this%tasmanager%MakeTasLink(this%mf6_input%subcomponent_name, &
                                          auxArrayPtr, this%ctx%iprpak, &
                                          tas_name, aux_name, convertFlux, &
@@ -449,10 +435,6 @@ contains
           call mem_setptr(bound, idt%mf6varname, this%mf6_input%mempath)
           ! set bound pointer
           bndArrayPtr => bound(:)
-          ! remove any prior link for this variable before adding the new
-          ! one, since reset() leaves prior links in place for SPCA
-          found = this%tasmanager%remove_existing_link( &
-                  this%mf6_input%subcomponent_name, idt%mf6varname)
           call this%tasmanager%MakeTasLink(this%mf6_input%subcomponent_name, &
                                            bndArrayPtr, &
                                            this%ctx%iprpak, &

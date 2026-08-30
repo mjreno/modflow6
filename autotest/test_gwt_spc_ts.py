@@ -1,12 +1,14 @@
-"""An SPC CONCENTRATION value linked to a time series for BNDNO 1
-continues tracking that series in a later period whose own PERIOD
-block reappears (setting BNDNO 2) without repeating BNDNO 1.
+"""SPC CONCENTRATION persistence, covering: a value linked to a time
+series for BNDNO 1 continuing to track that series in a later period
+whose own PERIOD block reappears (setting BNDNO 2) without repeating
+BNDNO 1 (spccontinue); and a plain (non-TS) value for BNDNO 1 persisting
+across a later, present-but-empty PERIOD block (spcempty).
 
 SPC's BNDNO is period-relative -- tied to whatever order the flow
 package's own list happens to be in for that period, not a stable
 identity like IFNO or a grid node number. This test uses a WEL list
 that stays identical and in the same order across all periods, so the
-TS-continuity check isn't confounded by BNDNO reordering.
+persistence check isn't confounded by BNDNO reordering.
 """
 
 import re
@@ -16,17 +18,16 @@ import numpy as np
 import pytest
 from framework import TestFramework
 
-cases = ["spccontinue"]
+cases = ["spccontinue", "spcempty"]
 
 TS_VAL_P1 = 10.0
 TS_VAL_P2 = 20.0
 TS_VAL_P3 = 30.0
 BNDNO2_LITERAL = 99.0
+EMPTY_CONC_VAL = 10.0
 
 
-def build_models(idx, test):
-    name = cases[idx]
-    ws = test.workspace
+def _build_base(name, ws):
     nlay, nrow, ncol = 1, 1, 5
     delr, delc = 1.0, 1.0
     top, botm = 0.0, [-1.0]
@@ -98,31 +99,55 @@ def build_models(idx, test):
     flopy.mf6.ModflowGwtadv(gwt, scheme="UPSTREAM")
     flopy.mf6.ModflowGwtmst(gwt, porosity=0.30)
 
-    spc = flopy.mf6.ModflowUtlspc(
-        gwt,
-        print_input=True,
-        maxbound=2,
-        perioddata={
-            0: [(0, "concentration", "conc_ts")],
-            # period 1: SPC's own PERIOD block reappears (setting BNDNO 2,
-            # literal) without repeating BNDNO 1's TS-linked setting
-            1: [(1, "concentration", BNDNO2_LITERAL)],
-            2: [(1, "concentration", BNDNO2_LITERAL)],
-        },
-        filename=f"{gwtname}.wel1.spc",
-    )
-    ts_data = [
-        (0.0, TS_VAL_P1),
-        (1.0, TS_VAL_P2),
-        (2.0, TS_VAL_P3),
-        (3.0, TS_VAL_P3),
-    ]
-    spc.ts.initialize(
-        filename="conc.ts",
-        timeseries=ts_data,
-        time_series_namerecord="conc_ts",
-        interpolation_methodrecord="stepwise",
-    )
+    return sim, gwf, gwt, gwfname, gwtname
+
+
+def build_models(idx, test):
+    name = cases[idx]
+    ws = test.workspace
+    sim, gwf, gwt, gwfname, gwtname = _build_base(name, ws)
+
+    if name == "spccontinue":
+        spc = flopy.mf6.ModflowUtlspc(
+            gwt,
+            print_input=True,
+            maxbound=2,
+            perioddata={
+                0: [(0, "concentration", "conc_ts")],
+                # period 1: SPC's own PERIOD block reappears (setting
+                # BNDNO 2, literal) without repeating BNDNO 1's TS-linked
+                # setting
+                1: [(1, "concentration", BNDNO2_LITERAL)],
+                2: [(1, "concentration", BNDNO2_LITERAL)],
+            },
+            filename=f"{gwtname}.wel1.spc",
+        )
+        ts_data = [
+            (0.0, TS_VAL_P1),
+            (1.0, TS_VAL_P2),
+            (2.0, TS_VAL_P3),
+            (3.0, TS_VAL_P3),
+        ]
+        spc.ts.initialize(
+            filename="conc.ts",
+            timeseries=ts_data,
+            time_series_namerecord="conc_ts",
+            interpolation_methodrecord="stepwise",
+        )
+    else:  # spcempty
+        flopy.mf6.ModflowUtlspc(
+            gwt,
+            print_input=True,
+            maxbound=2,
+            # periods 1, 2: SPC's own PERIOD block reappears present but
+            # empty, without repeating BNDNO 1's plain (non-TS) setting
+            perioddata={
+                0: [(0, "concentration", EMPTY_CONC_VAL)],
+                1: [],
+                2: [],
+            },
+            filename=f"{gwtname}.wel1.spc",
+        )
 
     flopy.mf6.ModflowGwtssm(
         gwt,
@@ -170,26 +195,42 @@ def check_output(idx, test):
             i += 1
 
     print(f"SPC BNDNO 1 concentration values, in order: {bndno1_vals}")
-    assert len(bndno1_vals) == 15, (
-        f"Expected 15 applied-value blocks (5/period, 3 periods), "
-        f"got {len(bndno1_vals)}: {bndno1_vals}"
-    )
 
-    period1 = bndno1_vals[:5]
-    period2 = bndno1_vals[5:10]
-    period3 = bndno1_vals[10:]
-
-    assert np.allclose(period1, TS_VAL_P1), (
-        f"Period 1 BNDNO 1 concentration expected {TS_VAL_P1}, got {period1}"
-    )
-    assert np.allclose(period2, TS_VAL_P2), (
-        f"Period 2 BNDNO 1 concentration expected {TS_VAL_P2} (TS should "
-        f"still be tracked even though period 2's SPC PERIOD block "
-        f"reappears for BNDNO 2 without repeating BNDNO 1), got {period2}"
-    )
-    assert np.allclose(period3, TS_VAL_P3), (
-        f"Period 3 BNDNO 1 concentration expected {TS_VAL_P3}, got {period3}"
-    )
+    if name == "spccontinue":
+        # TS-linked: apply_input_values() re-evaluates every timestep
+        assert len(bndno1_vals) == 15, (
+            f"Expected 15 applied-value blocks (5/period, 3 periods), "
+            f"got {len(bndno1_vals)}: {bndno1_vals}"
+        )
+        period1, period2, period3 = (
+            bndno1_vals[:5],
+            bndno1_vals[5:10],
+            bndno1_vals[10:],
+        )
+        assert np.allclose(period1, TS_VAL_P1), (
+            f"Period 1 BNDNO 1 concentration expected {TS_VAL_P1}, got {period1}"
+        )
+        assert np.allclose(period2, TS_VAL_P2), (
+            f"Period 2 BNDNO 1 concentration expected {TS_VAL_P2} (TS should "
+            f"still be tracked even though period 2's SPC PERIOD block "
+            f"reappears for BNDNO 2 without repeating BNDNO 1), got {period2}"
+        )
+        assert np.allclose(period3, TS_VAL_P3), (
+            f"Period 3 BNDNO 1 concentration expected {TS_VAL_P3}, got {period3}"
+        )
+    else:  # spcempty
+        # plain value: apply_input_values() only echoes once per period,
+        # not per timestep, since there's no series to re-evaluate
+        assert len(bndno1_vals) == 3, (
+            f"Expected 3 applied-value blocks (1/period, 3 periods), "
+            f"got {len(bndno1_vals)}: {bndno1_vals}"
+        )
+        assert np.allclose(bndno1_vals, EMPTY_CONC_VAL), (
+            f"BNDNO 1 concentration expected {EMPTY_CONC_VAL} in every "
+            f"period -- plain (non-TS) value did not persist across "
+            f"periods 2/3's present-but-empty PERIOD blocks, "
+            f"got {bndno1_vals}"
+        )
 
 
 @pytest.mark.parametrize("idx, name", enumerate(cases))

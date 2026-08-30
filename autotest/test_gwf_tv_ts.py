@@ -1,9 +1,9 @@
-"""TVK/TVS PERIOD values linked to a time series, covering two scenarios
-that share TvBase.f90: a value continuing to track its series when a
-later PERIOD block reappears only for a different, unrelated cell
-(tvkcontinue, tvscontinue), and a value switching cleanly between two
-different series across periods with no leftover value from the prior
-one (tvkswitch).
+"""TVK/TVS PERIOD values, covering: a TS-linked value continuing to track
+its series when a later PERIOD block reappears only for a different,
+unrelated cell (tvkcontinue, tvscontinue); a TS-linked value switching
+cleanly between two different series across periods with no leftover
+value from the prior one (tvkswitch); and a plain (non-TS) value
+persisting across a later, present-but-empty PERIOD block (tvkempty).
 """
 
 import re
@@ -13,7 +13,7 @@ import numpy as np
 import pytest
 from framework import TestFramework
 
-cases = ["tvkcontinue", "tvkswitch", "tvscontinue"]
+cases = ["tvkcontinue", "tvkswitch", "tvscontinue", "tvkempty"]
 
 # tvkcontinue / tvscontinue: TS-linked cell (0,0,1) must keep tracking its
 # series across periods 2/3, whose own PERIOD blocks reappear only for a
@@ -30,6 +30,10 @@ CONTINUE_TS_VALS = {
 TS_A_VALS = {0.0: 10.0, 1.0: 999.0, 2.0: 25.0, 3.0: 25.0}
 TS_B_VALS = {0.0: 888.0, 1.0: 900.0, 2.0: 888.0, 3.0: 888.0}
 SWITCH_EXPECTED = (TS_A_VALS[0.0], TS_B_VALS[1.0], TS_A_VALS[2.0])
+
+# tvkempty: a plain (non-TS) K value set once in period 1 must persist
+# across periods 2/3, whose own PERIOD blocks reappear present but empty.
+EMPTY_K_VAL = 5.0
 
 
 def _build_base(name, ws):
@@ -109,6 +113,13 @@ def build_models(idx, test):
             timeseries=ts_data,
             time_series_namerecord=ts_names,
             interpolation_methodrecord=["stepwise"] * len(ts_names),
+        )
+    elif name == "tvkempty":
+        flopy.mf6.ModflowUtltvk(
+            npf,
+            print_input=True,
+            perioddata={0: [((0, 0, 1), "K", EMPTY_K_VAL)], 1: [], 2: []},
+            filename=f"{name}.tvk",
         )
     else:  # tvscontinue
         sto = flopy.mf6.ModflowGwfsto(
@@ -196,6 +207,23 @@ def check_output(idx, test):
         assert 3 in vals_by_period, f"No {field} applications logged for period 3"
         assert np.allclose(vals_by_period[3], p3), (
             f"Period 3 {field} expected {p3}, got {vals_by_period[3]}"
+        )
+    elif name == "tvkempty":
+        assert 1 in vals_by_period, "No K applications logged for period 1"
+        assert np.allclose(vals_by_period[1], EMPTY_K_VAL), (
+            f"Period 1 K expected {EMPTY_K_VAL}, got {vals_by_period[1]}"
+        )
+        assert 2 in vals_by_period, (
+            f"No K applications logged for period 2 -- plain (non-TS) K "
+            f"did not persist across period 2's present-but-empty PERIOD "
+            f"block. vals_by_period={vals_by_period}"
+        )
+        assert np.allclose(vals_by_period[2], EMPTY_K_VAL), (
+            f"Period 2 K expected {EMPTY_K_VAL}, got {vals_by_period[2]}"
+        )
+        assert 3 in vals_by_period, "No K applications logged for period 3"
+        assert np.allclose(vals_by_period[3], EMPTY_K_VAL), (
+            f"Period 3 K expected {EMPTY_K_VAL}, got {vals_by_period[3]}"
         )
     else:  # tvkswitch
         p1, p2, p3 = SWITCH_EXPECTED

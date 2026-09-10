@@ -76,14 +76,12 @@ module SfrModule
     type(CharacterStringType), dimension(:), pointer, &
       contiguous :: setting => null()
     integer(I4B), dimension(:), pointer, contiguous :: idv => null()
-    real(DP), dimension(:), pointer, contiguous :: divflow => null()
     real(DP), dimension(:), pointer, contiguous :: upstream_frac => null()
     type(CharacterStringType), dimension(:), pointer, &
       contiguous :: tab6_filename => null()
     type(CharacterStringType), dimension(:), pointer, &
       contiguous :: auxname => null()
-    type(CharacterStringType), dimension(:), pointer, &
-      contiguous :: auxval => null()
+    real(DP), dimension(:), pointer, contiguous :: auxval => null()
   contains
     procedure :: init => sfr_input_init
     procedure :: destroy => sfr_input_destroy
@@ -580,7 +578,6 @@ contains
     ! -- diversion variables
     call mem_allocate(this%iadiv, this%maxbound + 1, 'IADIV', this%memoryPath)
     call mem_allocate(this%divreach, 0, 'DIVREACH', this%memoryPath)
-    call mem_allocate(this%divflow, 0, 'DIVFLOW', this%memoryPath)
     call mem_allocate(this%divq, 0, 'DIVQ', this%memoryPath)
     !
     ! -- cross-section data
@@ -1422,9 +1419,8 @@ contains
       call mem_reallocate(this%divreach, ndiversions, 'DIVREACH', &
                           this%memoryPath)
       allocate (this%divcprior(ndiversions))
-      call mem_reallocate(this%divflow, ndiversions, 'DIVFLOW', this%memoryPath)
+      call mem_setptr(this%divflow, 'DIVFLOW_RESOLVED', this%input_mempath)
       call mem_reallocate(this%divq, ndiversions, 'DIVQ', this%memoryPath)
-      this%divflow = DZERO
       this%divq = DZERO
     end if
     !
@@ -1716,7 +1712,7 @@ contains
     ! -- local
     character(len=LINELENGTH) :: crossfile
     character(len=LINELENGTH) :: str
-    character(len=LINELENGTH) :: auxvalstr
+    real(DP) :: auxvaldbl
     character(len=LINELENGTH) :: title
     character(len=LINELENGTH) :: text
     character(len=LENVARNAME) :: setting
@@ -1823,9 +1819,6 @@ contains
               call store_error(errmsg)
             else
               ii = this%iadiv(n) + idiv - 1
-              if (this%input%divflow(i) /= DNODATA) then
-                this%divflow(ii) = this%input%divflow(i)
-              end if
               ! -- if cprior is 'FRACTION', check 0.0 <= divflow <= 1.0
               cp = this%divcprior(ii)
               if (cp == 'FRACTION' .and. &
@@ -1845,13 +1838,12 @@ contains
           call cross_data%read_table(n, this%width(n), trim(adjustl(crossfile)))
         end if
         !
-        ! -- AUXILIARY (compound group); apply_period_auxiliary() has already
-        ! -- written the current value into the live-aliased featureauxvar --
-        ! -- only extract auxname here for echoing this period's row below
+        ! -- AUXILIARY (compound group): featureauxvar already holds the
+        ! -- current value; only extract auxname for echoing this row
         if (this%naux > 0) then
-          if (trim(setting) == 'AUXILIARY') then
+          if (trim(setting) == 'PERIOD_AUXILIARY') then
             str = this%input%auxname(i)
-            auxvalstr = this%input%auxval(i)
+            auxvaldbl = this%input%auxval(i)
           end if
         end if
         !
@@ -1893,9 +1885,9 @@ contains
           case ('CROSS_SECTION')
             call this%inputtab%add_term(trim(crossfile))
             call this%inputtab%add_term(' ')
-          case ('AUXILIARY')
+          case ('PERIOD_AUXILIARY')
             call this%inputtab%add_term(trim(str))
-            call this%inputtab%add_term(trim(auxvalstr))
+            call this%inputtab%add_term(auxvaldbl)
           case default
             call this%inputtab%add_term(' ')
             call this%inputtab%add_term(' ')
@@ -2006,8 +1998,6 @@ contains
               idiv = this%input%idv(i)
               if (idiv >= 1 .and. idiv <= this%ndiv(n)) then
                 ii = this%iadiv(n) + idiv - 1
-                if (this%input%divflow(i) /= DNODATA) &
-                  this%divflow(ii) = this%input%divflow(i)
               end if
             end if
           end if
@@ -2863,7 +2853,7 @@ contains
     if (associated(this%divcprior)) then
       deallocate (this%divcprior)
     end if
-    call mem_deallocate(this%divflow)
+    nullify (this%divflow)
     call mem_deallocate(this%divq)
     call mem_deallocate(this%ndiv)
     !
@@ -4895,13 +4885,13 @@ contains
     !
     select case (trim(setting))
     case ('BEDK')
-      this%hk(n) = this%input%bedk(i)
+      this%hk(n) = this%input%bedk(n)
       this%bedk_set(n) = .true.
     case ('MANNING')
-      this%rough(n) = this%input%manning(i)
+      this%rough(n) = this%input%manning(n)
       this%manning_set(n) = .true.
     case ('UPSTREAM_FRAC')
-      this%ustrf(n) = this%input%upstream_frac(i)
+      this%ustrf(n) = this%input%upstream_frac(n)
       this%ustrf_set(n) = .true.
     end select
   end subroutine sfr_set_period_value
@@ -5773,7 +5763,6 @@ contains
     call mem_setptr(this%bedk, 'BEDK', mempath)
     call mem_setptr(this%manning, 'MANNING', mempath)
     call mem_setptr(this%idv, 'IDV', mempath)
-    call mem_setptr(this%divflow, 'DIVFLOW', mempath)
     call mem_setptr(this%upstream_frac, 'UPSTREAM_FRAC', mempath)
     call mem_setptr(this%tab6_filename, 'TAB6_FILENAME', mempath)
     if (naux > 0) then
@@ -5796,7 +5785,6 @@ contains
     nullify (this%manning)
     nullify (this%setting)
     nullify (this%idv)
-    nullify (this%divflow)
     nullify (this%upstream_frac)
     nullify (this%tab6_filename)
     nullify (this%auxname)

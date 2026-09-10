@@ -372,8 +372,7 @@ contains
     !
     if (this%isadvpak /= 0) then
       !
-      ! -- advanced package (MAW, SFR, LAK, UZF): allocate BndType arrays for
-      !    the connections-level arrays (nodelist, bound, auxvar, hcof, rhs, etc.)
+      ! -- advanced package (MAW, SFR, LAK, UZF): allocate connections-level BndType arrays
       call this%BndType%allocate_arrays(nodelist, auxvar)
       call mem_checkin(this%auxvar, 'AUXVAR_IDM', this%memoryPath, 'AUXVAR', &
                        this%memoryPath)
@@ -409,14 +408,9 @@ contains
   end subroutine bndext_allocate_arrays
 
   !> @brief Point the per-feature auxiliary variable array at the input
-  !! context's permanent, feature-indexed AUX array
-  !!
-  !! Call only from packages supporting PACKAGEDATA AUX variables. AUX is
-  !! kept current by the loader (PACKAGEDATA at load time, PERIOD AUXILIARY
-  !! overrides thereafter), so featureauxvar is a live alias, not a copy.
-  !! Also permutes AUX from row order to IFNO order, since PACKAGEDATA
-  !! rows may not be in IFNO order. An out-of-range IFNO is skipped;
-  !! validate_ifno reports it.
+  !! context's permanent, feature-indexed AUX array.
+  !! For packages with PACKAGEDATA AUX variables only. A live alias,
+  !! permuted from row order to IFNO order, skipping out-of-range IFNO.
   !<
   subroutine allocate_featureauxvar(this)
     ! -- modules

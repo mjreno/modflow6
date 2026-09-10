@@ -24,9 +24,8 @@ module LoadContextModule
   public :: ReadStateVarType
   public :: rsv_name
   public :: is_keystring_period
-  public :: is_advanced_package
-  public :: has_dimensions_block
-  public :: is_cellid_addressed
+  public :: is_id_addressed_keystring
+  public :: is_advanced
 
   enum, bind(C)
     enumerator :: LOAD_UNDEF = 0 !< undefined load type
@@ -70,17 +69,17 @@ module LoadContextModule
     logical(LGP) :: set_scalars = .false. !< .true. when dimension scalars must be set
     logical(LGP) :: set_mshape = .false. !< .true. when model shape is load dependency
     logical(LGP) :: is_exchange = .false. !< .true. for exchange contexts
-    logical(LGP) :: is_advanced = .false. !< .true. for advanced package (PACKAGEDATA-paired) KEYSTRING loadtype
-    logical(LGP) :: is_dimensions_scoped = .false. !< .true. for DIMENSIONS-block-paired (e.g. SPC) KEYSTRING loadtype
-    logical(LGP) :: is_cellid_scoped = .false. !< .true. for CELLID-addressed (e.g. TVK/TVS) KEYSTRING loadtype
-    logical(LGP) :: is_feature_indexed = .false. !< .true. when is_advanced .or. is_dimensions_scoped
-    logical(LGP) :: has_setting_dispatch = .false. !< .true. when is_feature_indexed .or. is_cellid_scoped
+    logical(LGP) :: keystring_by_id = .false. !< .true. for identifier-addressed (IFNO/NUMBER/BNDNO) KEYSTRING loadtype
+    logical(LGP) :: keystring_by_node = .false. !< .true. for CELLID-addressed (e.g. TVK/TVS) KEYSTRING loadtype
+    logical(LGP) :: has_setting_dispatch = .false. !< .true. when keystring_by_id .or. keystring_by_node
+    logical(LGP) :: is_advanced = .false. !< .true. for an advanced package, any loadtype
     type(InputParamDefinitionType), pointer :: setting_idt => null() !< internal idt for SETTING column
     character(len=LENVARNAME) :: blockname !< load block name
     character(len=LENVARNAME) :: named_bound !< name of dimension variable for maxbound; defaults to MAXBOUND
     integer(I4B) :: nleading = 0 !< count of leading (pre-keystring) columns
     character(len=LINELENGTH), dimension(:), allocatable :: params !< in-scope param tagnames
     integer(I4B), allocatable :: member_nsubs(:) !< nsub per member (1..nmembers)
+    logical(LGP), allocatable :: member_is_follower(:) !< .true. if a non-head RECORD sub-member
     type(ModflowInputType) :: mf6_input !< description of input
   contains
     ! --- public interface ---
@@ -99,6 +98,7 @@ module LoadContextModule
     procedure, private :: allocate_param
     procedure :: check_developmode
     procedure, private :: in_scope
+    procedure :: record_dependency
     procedure, private :: option_check
   end type LoadContextType
 
@@ -173,10 +173,12 @@ contains
   !> @brief Determine loadtype from block and param definitions.
   !<
   subroutine resolve_loadtype(this)
-    use DefinitionSelectModule, only: idt_default
+    use DefinitionSelectModule, only: idt_default, idt_parse_rectype, &
+                                      get_aggregate_definition_type
     class(LoadContextType) :: this
-    type(InputParamDefinitionType), pointer :: idt
-    integer(I4B) :: n
+    type(InputParamDefinitionType), pointer :: idt, aidt
+    character(len=LINELENGTH), dimension(:), allocatable :: cols
+    integer(I4B) :: n, nparam
 
     this%loadtype = LOAD_UNDEF
 
@@ -195,23 +197,24 @@ contains
       end if
     end do
 
-    ! mutually exclusive KEYSTRING package subtypes
+    this%is_advanced = is_advanced(this%mf6_input)
+
+    ! classify by the KEYSTRING aggregate's own leading column
     if (this%loadtype == KEYSTRING) then
-      this%is_advanced = is_advanced_package(this%mf6_input)
-      this%is_dimensions_scoped = has_dimensions_block(this%mf6_input)
-      this%is_cellid_scoped = is_cellid_addressed(this%mf6_input)
-      this%is_feature_indexed = this%is_advanced .or. this%is_dimensions_scoped
-      ! is_cellid_scoped has no exclusion guard of its own; without this
-      ! check, both flags true would silently double-allocate a permanent
-      ! array in Mf6FileKeystring.f90
-      if (this%is_feature_indexed .and. this%is_cellid_scoped) then
-        errmsg = 'LoadContext: is_feature_indexed and is_cellid_scoped &
-                 &cannot both be true for mempath: '// &
-                 trim(this%mf6_input%mempath)
-        call store_error(errmsg, .true.)
+      aidt => &
+        get_aggregate_definition_type(this%mf6_input%aggregate_dfns, &
+                                      this%mf6_input%component_type, &
+                                      this%mf6_input%subcomponent_type, &
+                                      this%blockname)
+      call idt_parse_rectype(aidt, cols, nparam)
+      if (is_id_colname(cols(1))) then
+        this%keystring_by_id = .true.
+      else if (cols(1) == 'CELLID') then
+        this%keystring_by_node = .true.
       end if
+      if (allocated(cols)) deallocate (cols)
       this%has_setting_dispatch = &
-        this%is_feature_indexed .or. this%is_cellid_scoped
+        this%keystring_by_id .or. this%keystring_by_node
       if (this%has_setting_dispatch) then
         this%setting_idt => &
           idt_default(this%mf6_input%component_type, &
@@ -289,11 +292,10 @@ contains
 
     if (nmembers > 0) then
       if (this%maxbound == 0) then
-        if (.not. this%is_feature_indexed) then
+        if (.not. this%keystring_by_id) then
           this%maxbound = this%nodes * nmembers
         end if
-        ! else: feature-indexed packages with a genuinely zero count stay
-        ! at 0 rather than falling back to node count
+        ! else: identifier-addressed, genuinely zero stays 0
       else
         this%maxbound = this%maxbound * nmembers
       end if
@@ -302,11 +304,9 @@ contains
 
   !> @brief allocate arrays
   !!
-  !! call this routine after input parameters have been allocated,
-  !! e.g. after load_params() with create has been called for array
-  !! based loaders or after all mem_create_vector() calls have
-  !! been made for list based load.
-  !!
+  !! Call after input parameters are allocated: after load_params() with
+  !! create for array-based loaders, or after all mem_create_vector()
+  !! calls for list-based load.
   !<
   subroutine allocate_arrays(this)
     use MemoryManagerModule, only: mem_allocate, mem_setptr, get_isize
@@ -421,13 +421,9 @@ contains
   end subroutine allocate_params
 
   !> @brief Return .true. if an optional parameter is active for this load.
-  !!
-  !! Required and structural (KEYSTRING/RECARRAY/RECORD) params are handled
-  !! by the caller; this routine only evaluates optional leaf params.
-  !!
-  !! Generic conditions (AUX, BOUNDNAME, readarray indicator) are checked
-  !! first.  Package-specific conditions follow via a select on
-  !! subcomponent_type; unrecognized types return .false. (conservative).
+  !! Required/structural params are handled by the caller; generic
+  !! conditions are checked first, then package-specific ones by
+  !! subcomponent_type.
   !<
   function in_scope(this, tagname)
     use DefinitionSelectModule, only: get_param_definition_type, idt_datatype
@@ -454,6 +450,12 @@ contains
     if (datatype == 'KEYSTRING' .or. &
         datatype == 'RECARRAY' .or. &
         datatype == 'RECORD') return
+
+    ! advanced packages: every optional leaf param is in scope
+    if (this%is_advanced) then
+      in_scope = .true.
+      return
+    end if
 
     ! --- generic conditions ---
     if (tagname == 'AUXVAR' .or. tagname == 'AUX') then
@@ -492,17 +494,39 @@ contains
       if (tagname == 'MIXED') in_scope = .true.
     case ('SPC', 'SPCA')
       in_scope = .true.
-    case ('LAK', 'MAW', 'SFR')
-      in_scope = .true.
     case default
-      ! Unrecognized subcomponent with an optional param not handled above.
-      ! This is a development error — abort with message so developer knows
-      ! which package needs a new case.
+      ! unrecognized subcomponent with an optional param not handled
+      ! above is a development error -- abort so the gap is visible
       errmsg = 'LoadContext in_scope needs new case for: '// &
                trim(this%mf6_input%subcomponent_type)//'/'//trim(tagname)
       call store_error(errmsg, .true.)
     end select
   end function in_scope
+
+  !> @brief Hardcoded per-package dependency for a record-follower param
+  !! with no SHAPE of its own -- same category of special-casing as
+  !! in_scope, for a dimension name and sibling index field instead.
+  !<
+  function record_dependency(this, tagname, dimname, index_tagname) &
+    result(found)
+    class(LoadContextType) :: this
+    character(len=*), intent(in) :: tagname
+    character(len=LENVARNAME), intent(out) :: dimname
+    character(len=LENVARNAME), intent(out) :: index_tagname
+    logical(LGP) :: found
+
+    found = .false.
+    dimname = ''
+    index_tagname = ''
+    select case (this%mf6_input%subcomponent_type)
+    case ('SFR')
+      if (tagname == 'DIVFLOW') then
+        dimname = 'NDV'
+        index_tagname = 'IDV'
+        found = .true.
+      end if
+    end select
+  end function record_dependency
 
   !> @brief Return .true. if a memory-manager integer option variable exceeds a threshold.
   !<
@@ -535,6 +559,7 @@ contains
     character(len=LINELENGTH), dimension(:), allocatable :: cols
     character(len=LINELENGTH), allocatable :: member_names(:)
     integer(I4B), allocatable :: member_nsubs(:)
+    logical(LGP), allocatable :: member_is_follower(:)
     integer(I4B) :: keepcnt, iparam, nparam, nmembers, n
     logical(LGP) :: keep, tag_found
 
@@ -591,16 +616,20 @@ contains
 
     ! for keystring packages: append member names and store associated metadata
     if (this%loadtype == KEYSTRING) then
-      call this%keystring_member_names(member_names, member_nsubs, nmembers)
+      call this%keystring_member_names(member_names, member_nsubs, &
+                                       member_is_follower, nmembers)
       do n = 1, nmembers
         keepcnt = keepcnt + 1
         call expandarray(param_buf)
         param_buf(keepcnt) = trim(member_names(n))
       end do
       if (allocated(this%member_nsubs)) deallocate (this%member_nsubs)
+      if (allocated(this%member_is_follower)) deallocate (this%member_is_follower)
       if (nmembers > 0) then
         allocate (this%member_nsubs(nmembers))
         this%member_nsubs = member_nsubs
+        allocate (this%member_is_follower(nmembers))
+        this%member_is_follower = member_is_follower
       end if
     end if
 
@@ -645,6 +674,7 @@ contains
     class(LoadContextType) :: this
 
     if (allocated(this%member_nsubs)) deallocate (this%member_nsubs)
+    if (allocated(this%member_is_follower)) deallocate (this%member_is_follower)
     if (associated(this%setting_idt)) then
       deallocate (this%setting_idt)
       nullify (this%setting_idt)
@@ -770,80 +800,68 @@ contains
     if (allocated(cols)) deallocate (cols)
   end function is_keystring_period
 
-  !> @brief Return .true. if mf6_input is an advanced package: a keystring
-  !! PERIOD dispatch paired with a PACKAGEDATA block.
+  !> @brief .true. if mf6_input's PERIOD block is identifier-addressed
+  !! (see is_id_colname). Block-independent, unlike LoadContextType's own
+  !! keystring_by_id, which is only valid for a PERIOD-scoped instance.
   !<
-  function is_advanced_package(mf6_input) result(res)
+  function is_id_addressed_keystring(mf6_input) result(res)
+    use DefinitionSelectModule, only: get_aggregate_definition_type, &
+                                      idt_parse_rectype
     type(ModflowInputType), intent(in) :: mf6_input
     logical(LGP) :: res
-    integer(I4B) :: n
+    type(InputParamDefinitionType), pointer :: aidt
+    character(len=LINELENGTH), allocatable :: cols(:)
+    integer(I4B) :: ncol
     res = .false.
     if (.not. is_keystring_period(mf6_input)) return
-    do n = 1, size(mf6_input%block_dfns)
-      if (mf6_input%block_dfns(n)%blockname == 'PACKAGEDATA') then
-        res = .true.
-        exit
-      end if
-    end do
-  end function is_advanced_package
+    aidt => get_aggregate_definition_type(mf6_input%aggregate_dfns, &
+                                          mf6_input%component_type, &
+                                          mf6_input%subcomponent_type, &
+                                          'PERIOD')
+    call idt_parse_rectype(aidt, cols, ncol)
+    res = is_id_colname(cols(1))
+    if (allocated(cols)) deallocate (cols)
+  end function is_id_addressed_keystring
 
-  !> @brief Return .true. if mf6_input is a keystring PERIOD dispatch paired
-  !! with a DIMENSIONS block (e.g. SPC) rather than PACKAGEDATA.
-  !!
-  !! Only checks that the block exists, not that it declares a usable
-  !! feature-count field -- that resolution is KeystringLoadType%ainit's
-  !! named_bound (first DIMENSIONS parameter found, whatever its name).
+  !> @brief .true. if tagname is a record's leading id column (IFNO and
+  !! its legacy package-specific aliases). Single source for both
+  !! resolve_loadtype and is_id_addressed_keystring.
   !<
-  function has_dimensions_block(mf6_input) result(res)
+  function is_id_colname(tagname) result(res)
+    character(len=*), intent(in) :: tagname
+    logical(LGP) :: res
+    select case (tagname)
+    case ('IFNO', 'NUMBER', 'BNDNO', 'RNO', 'LAKENO', 'MAWNO', 'UZFNO')
+      res = .true.
+    case default
+      res = .false.
+    end select
+  end function is_id_colname
+
+  !> @brief Return .true. if mf6_input is an advanced package (PERIOD
+  !! settings persist until reissued). Hardcoded against each package's
+  !! own "# package-type advanced-stress-package" dfn marker, pending a
+  !! dfn2f90.py-generated attribute for this.
+  !<
+  function is_advanced(mf6_input) result(res)
     type(ModflowInputType), intent(in) :: mf6_input
     logical(LGP) :: res
-    integer(I4B) :: n
-    logical(LGP) :: has_dimensions
-    res = .false.
-    if (.not. is_keystring_period(mf6_input)) return
-    has_dimensions = .false.
-    do n = 1, size(mf6_input%block_dfns)
-      if (mf6_input%block_dfns(n)%blockname == 'DIMENSIONS') then
-        has_dimensions = .true.
-      end if
-      ! PACKAGEDATA-paired (e.g. LAK/MAW/SFR/UZF) takes precedence over a
-      ! coincidental DIMENSIONS block (e.g. NOUTLETS, NTABLES)
-      if (mf6_input%block_dfns(n)%blockname == 'PACKAGEDATA') return
-    end do
-    res = has_dimensions
-  end function has_dimensions_block
+    select case (mf6_input%subcomponent_type)
+    case ('LAK', 'MAW', 'SFR', 'UZF', &
+          'LKT', 'MWT', 'SFT', 'UZT', &
+          'LKE', 'MWE', 'SFE', 'UZE')
+      res = .true.
+    case default
+      res = .false.
+    end select
+  end function is_advanced
 
-  !> @brief Return .true. if mf6_input is a keystring PERIOD dispatch whose
-  !! leading column is CELLID (e.g. TVK/TVS) rather than a stable integer
-  !! feature number.
+  !> @brief Return keystring member column names, nsub counts, and
+  !! follower flags. A RECORD group's trailing sub-members are
+  !! followers; its header and any direct-dispatch param are not.
   !<
-  function is_cellid_addressed(mf6_input) result(res)
-    type(ModflowInputType), intent(in) :: mf6_input
-    logical(LGP) :: res
-    integer(I4B) :: n
-    res = .false.
-    if (.not. is_keystring_period(mf6_input)) return
-    do n = 1, size(mf6_input%param_dfns)
-      if (mf6_input%param_dfns(n)%blockname == 'PERIOD' .and. &
-          mf6_input%param_dfns(n)%tagname == 'CELLID') then
-        res = .true.
-        exit
-      end if
-    end do
-  end function is_cellid_addressed
-
-  !> @brief Return keystring member column names and nsub counts.
-  !!
-  !! Private helper called from set_params. Results are returned via
-  !! output parameters; the caller is responsible for storing them.
-  !! Column order follows the KEYSTRING aggregate definition token list.
-  !! For each token in the aggregate:
-  !!   - RECORD compound group: sub-members expanded in RECORD order;
-  !!     first entry (KEYWORD dispatch header) gets nsub = sub-member count,
-  !!     remaining entries get nsub = 0.
-  !!   - direct-dispatch param: appended with nsub = 0.
-  !<
-  subroutine keystring_member_names(this, member_names, member_nsubs, nmembers)
+  subroutine keystring_member_names(this, member_names, member_nsubs, &
+                                    member_is_follower, nmembers)
     use InputOutputModule, only: upcase
     use ArrayHandlersModule, only: expandarray
     use DefinitionSelectModule, only: idt_parse_rectype, idt_datatype, &
@@ -851,6 +869,7 @@ contains
     class(LoadContextType) :: this
     character(len=LINELENGTH), allocatable, intent(out) :: member_names(:)
     integer(I4B), allocatable, intent(out) :: member_nsubs(:)
+    logical(LGP), allocatable, intent(out) :: member_is_follower(:)
     integer(I4B), intent(out) :: nmembers
     type(InputParamDefinitionType), pointer :: aidt, ks_aidt, idt
     character(len=LINELENGTH), allocatable :: rec_cols(:), ks_cols(:)
@@ -895,10 +914,13 @@ contains
           ! first added entry is the KEYWORD header; remaining are sub-members
           do k = nmembers0 + 1, nmembers
             call expandarray(member_nsubs)
+            call expandarray(member_is_follower)
             if (k == nmembers0 + 1) then
               member_nsubs(k) = nmembers - nmembers0 - 1
+              member_is_follower(k) = .false.
             else
               member_nsubs(k) = 0
+              member_is_follower(k) = .true.
             end if
           end do
         else
@@ -906,8 +928,10 @@ contains
           nmembers = nmembers + 1
           call expandarray(member_names)
           call expandarray(member_nsubs)
+          call expandarray(member_is_follower)
           member_names(nmembers) = trim(this%mf6_input%param_dfns(n)%tagname)
           member_nsubs(nmembers) = 0
+          member_is_follower(nmembers) = .false.
         end if
         exit
       end do

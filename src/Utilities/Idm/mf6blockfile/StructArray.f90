@@ -9,14 +9,17 @@ module StructArrayModule
 
   use KindModule, only: I4B, DP, LGP
   use ConstantsModule, only: DZERO, IZERO, DNODATA, &
-                             LINELENGTH, LENMEMPATH, LENVARNAME, LENBOUNDNAME
+                             LINELENGTH, LENMEMPATH, LENVARNAME, LENBOUNDNAME, &
+                             IDM_INPUT_SUFFIX
   use SimVariablesModule, only: errmsg
   use SimModule, only: store_error, count_errors, store_error_filename
   use StructVectorModule, only: StructVectorType, TSStringLocType, &
                                 MTYPE_UNDEF, MTYPE_INT, MTYPE_DBL, MTYPE_STR, &
                                 MTYPE_INTVEC, MTYPE_INT2D, MTYPE_DBL2D
   use TimeSeriesManagerModule, only: TimeSeriesManagerType, &
-                                     read_value_or_time_series
+                                     read_value_or_time_series, &
+                                     read_value_or_time_series_adv, &
+                                     remove_existing_link
   use TimeSeriesLinkModule, only: TimeSeriesLinkType
   use InputDefinitionModule, only: InputParamDefinitionType
   use MemoryManagerModule, only: mem_allocate, mem_reallocate, mem_setptr
@@ -30,6 +33,9 @@ module StructArrayModule
   private
   public :: StructArrayType
   public :: constructStructArray, destructStructArray
+  public :: idm_input_varname
+  public :: is_auxval
+  public :: find_auxname_index
 
   !> @brief type for structured array
   !!
@@ -69,6 +75,9 @@ module StructArrayModule
     procedure :: log_structarray_vars
     procedure :: check_reallocate
     procedure :: ts_update
+    procedure :: ts_update_adv
+    procedure :: ts_update_indexed
+    procedure, private :: ts_update_dedup
 
   end type StructArrayType
 
@@ -137,11 +146,12 @@ contains
 
   !> @brief create new vector in StructArrayType
   !<
-  subroutine mem_create_vector(this, icol, idt, charlen)
+  subroutine mem_create_vector(this, icol, idt, charlen, varname)
     class(StructArrayType) :: this !< StructArrayType
     integer(I4B), intent(in) :: icol !< column to create
     type(InputParamDefinitionType), pointer :: idt
     integer(I4B), optional, intent(in) :: charlen !< override character length for charstr1d
+    character(len=*), optional, intent(in) :: varname !< override the memory-manager name (default idt%mf6varname)
     type(StructVectorType) :: sv
     integer(I4B) :: numcol
 
@@ -150,6 +160,7 @@ contains
     sv%idt => idt
     sv%icol = icol
     if (present(charlen)) sv%charlen = charlen
+    if (present(varname)) sv%varname_override = varname
 
     ! set size
     if (this%deferred_shape) then
@@ -220,6 +231,24 @@ contains
     end if
   end subroutine mem_create_metadata_vector
 
+  !> @brief Derive a TS-capable setting's raw input array name, distinct
+  !! from its persistent array (allocated under mf6varname itself).
+  !<
+  function idm_input_varname(idt) result(varname)
+    type(InputParamDefinitionType), intent(in) :: idt
+    character(len=LENVARNAME) :: varname
+
+    if (len_trim(idt%mf6varname) + len(IDM_INPUT_SUFFIX) > LENVARNAME) then
+      write (errmsg, '(*(G0))') &
+        'IDM mf6internal "', trim(idt%mf6varname), '" exceeds ', &
+        LENVARNAME - len(IDM_INPUT_SUFFIX), ' characters (IDM reserves ', &
+        len(IDM_INPUT_SUFFIX), ' for the internal input-array suffix "', &
+        IDM_INPUT_SUFFIX, '").'
+      call store_error(errmsg, terminate=.TRUE.)
+    end if
+    varname = trim(idt%mf6varname)//IDM_INPUT_SUFFIX
+  end function idm_input_varname
+
   function count(this)
     class(StructArrayType) :: this !< StructArrayType
     integer(I4B) :: count
@@ -272,7 +301,11 @@ contains
     class(StructArrayType) :: this !< StructArrayType
     type(StructVectorType), intent(inout) :: sv
     real(DP), dimension(:), pointer, contiguous :: dbl1d
+    character(len=LENVARNAME) :: varname
     integer(I4B) :: j, nrow
+
+    varname = sv%idt%mf6varname
+    if (len_trim(sv%varname_override) > 0) varname = sv%varname_override
 
     if (this%deferred_shape) then
       ! shape not known, allocate locally
@@ -281,7 +314,7 @@ contains
     else
       ! shape known, allocate in managed memory
       nrow = this%nrow
-      call mem_allocate(dbl1d, this%nrow, sv%idt%mf6varname, this%mempath)
+      call mem_allocate(dbl1d, this%nrow, varname, this%mempath)
     end if
 
     ! initialize
@@ -874,7 +907,7 @@ contains
     end do
   end subroutine check_reallocate
 
-  subroutine read_param(this, parser, sv_col, irow, timeseries, iout, auxcol)
+  subroutine read_param(this, parser, sv_col, irow, timeseries, iout)
     use InputOutputModule, only: upcase
     class(StructArrayType) :: this !< StructArrayType
     type(BlockParserType), intent(inout) :: parser !< block parser to read from
@@ -882,7 +915,6 @@ contains
     integer(I4B), intent(in) :: irow
     logical(LGP), intent(in) :: timeseries
     integer(I4B), intent(in) :: iout !< unit number for output
-    integer(I4B), optional, intent(in) :: auxcol
     integer(I4B) :: n, intval, numval, icol
     character(len=LINELENGTH) :: str
     character(len=:), allocatable :: line
@@ -906,14 +938,9 @@ contains
     case (MTYPE_DBL)
       if (this%struct_vectors(sv_col)%idt%timeseries .and. timeseries) then
         call parser%GetString(str)
-        if (present(auxcol)) then
-          icol = auxcol
-        else
-          icol = 1
-        end if
         this%struct_vectors(sv_col)%dbl1d(irow) = &
           this%struct_vectors(sv_col)%read_token(str, this%startidx(sv_col), &
-                                                 icol, irow)
+                                                 1, irow)
       else if (sv_col == this%ncol .and. &
                .not. this%struct_vectors(sv_col)%idt%required) then
         call parser%TryGetDouble(this%struct_vectors(sv_col)%dbl1d(irow), success)
@@ -977,6 +1004,12 @@ contains
         else
           ! first token already read as str; parse as integer and read the rest
           read (str, *, iostat=numval) intval
+          if (numval /= 0) then
+            write (errmsg, '(a,a,a)') &
+              'CELLID must be an integer or the keyword NONE, got: ', &
+              trim(str), '.'
+            call store_error(errmsg, terminate=.TRUE.)
+          end if
           this%struct_vectors(sv_col)%int2d(1, irow) = intval
           do n = 2, this%struct_vectors(sv_col)%intshape
             this%struct_vectors(sv_col)%int2d(n, irow) = parser%GetInteger()
@@ -1001,6 +1034,36 @@ contains
       end do
     end select
   end subroutine read_param
+
+  !> @brief True if idt is AUXVAL: its AUX index is resolved dynamically
+  !! from a sibling AUXNAME, not feature-indexed by its own mf6varname.
+  !<
+  function is_auxval(idt) result(res)
+    type(InputParamDefinitionType), intent(in) :: idt
+    logical(LGP) :: res
+
+    res = (trim(idt%tagname) == 'AUXVAL')
+  end function is_auxval
+
+  !> @brief Find the AUX array position matching auxname, 0 if none.
+  !<
+  function find_auxname_index(auxname, auxnames, naux) result(jj)
+    character(len=*), intent(in) :: auxname
+    type(CharacterStringType), dimension(:), intent(in) :: auxnames
+    integer(I4B), intent(in) :: naux
+    integer(I4B) :: jj
+    character(len=LINELENGTH) :: thisauxname
+    integer(I4B) :: n
+
+    jj = 0
+    do n = 1, naux
+      thisauxname = auxnames(n)
+      if (trim(auxname) == trim(thisauxname)) then
+        jj = n
+        return
+      end if
+    end do
+  end function find_auxname_index
 
   !> @brief read from the block parser to fill the StructArrayType
   !<
@@ -1143,9 +1206,8 @@ contains
       call parser%GetString(keyword)
       call upcase(keyword)
 
-      ! find the matching keystring-member column (skip SETTING column, and
-      ! skip a KEYWORD header's own sub-members -- those are only reachable
-      ! through their header, never as a top-level dispatch keyword)
+      ! match the keystring-member column, skipping SETTING and a KEYWORD
+      ! header's own sub-members (reachable only through their header)
       found_col = 0
       icol = nleading + 1
       do while (icol <= this%ncol)
@@ -1173,10 +1235,11 @@ contains
         cycle
       end if
 
-      ! write dispatch keyword as tagname to SETTING column when present
+      ! write mf6varname, not tagname, since SETTING is also used as
+      ! a memory-manager name and tagname can exceed LENVARNAME
       if (setting_icol > 0) then
         this%struct_vectors(setting_icol)%charstr1d(irow) = &
-          trim(this%struct_vectors(found_col)%idt%tagname)
+          trim(this%struct_vectors(found_col)%idt%mf6varname)
       end if
 
       ! determine dispatch mode and set/read matched column(s)
@@ -1184,9 +1247,8 @@ contains
         (this%struct_vectors(found_col)%idt%datatype == 'KEYWORD')
 
       if (is_keyword_dispatch) then
-        ! Compound or no-value KEYWORD dispatch:
-        ! found_col is a metadata vector (MTYPE_UNDEF) — no data to write.
-        ! Read sub-members starting at isubmember for nsubmembers columns.
+        ! compound/no-value KEYWORD dispatch has no data of its own;
+        ! read its sub-members starting at isubmember instead
         last_set_col = found_col
         if (this%struct_vectors(found_col)%isubmember > 0) then
           do icol = this%struct_vectors(found_col)%isubmember, &
@@ -1378,9 +1440,8 @@ contains
         select case (this%struct_vectors(m)%memtype)
         case (MTYPE_DBL) ! dbl1d (BND)
           bndElem => this%struct_vectors(m)%dbl1d(ts_strloc%row)
-          ! -- JCol=0, matching apply_setting_value's own fixed JCol for
-          ! -- generic BND PERIOD settings, so a stale PACKAGEDATA-level
-          ! -- link is found and cleared the same way AUX's is
+          ! -- JCol=0, consistent with ts_update_indexed, so a stale
+          ! -- PACKAGEDATA-level link is found and cleared like AUX's
           call read_value_or_time_series(ts_strloc%token, irow, &
                                          0, bndElem, &
                                          subcomp_name, 'BND', tsmanager, &
@@ -1397,11 +1458,8 @@ contains
           if (.not. present(auxname_cst)) cycle
           if (.not. associated(auxname_cst)) cycle
           bndElem => this%struct_vectors(m)%dbl2d(ts_strloc%col, ts_strloc%row)
-          ! -- JCol must be the position within the AUX array (ts_strloc%col),
-          ! -- not the absolute row-schema column (structarray_col), so that
-          ! -- apply_period_auxiliary's remove_existing_link search (which
-          ! -- addresses AUX columns by their 1..naux position) can find and
-          ! -- clear this link when a PERIOD AUXILIARY override supersedes it
+          ! -- JCol is the AUX array position (ts_strloc%col), not the
+          ! -- row-schema column, so remove_existing_link can find it
           call read_value_or_time_series(ts_strloc%token, irow, &
                                          ts_strloc%col, bndElem, &
                                          subcomp_name, 'AUX', tsmanager, &
@@ -1423,5 +1481,120 @@ contains
       call store_error_filename(input_name)
     end if
   end subroutine ts_update
+
+  !> @brief Shared dedup-aware TS resolution for one PERIOD-block column:
+  !! TS-linked rows resolve via their preserved token, remaining literal
+  !! rows via remove_existing_link, then clear(). naux=1 (via both rank
+  !! remaps in ts_update_indexed) covers the single-column BND case.
+  !<
+  subroutine ts_update_dedup(this, icol, tsmanager, subcomp_name, iprpak, &
+                             nrows, addr_map, category, names, featarr2d, &
+                             raw2d)
+    class(StructArrayType), intent(inout) :: this
+    integer(I4B), intent(in) :: icol
+    type(TimeSeriesManagerType), pointer, intent(inout) :: tsmanager
+    character(len=*), intent(in) :: subcomp_name
+    character(len=*), intent(in) :: category !< 'AUX' or 'BND'
+    integer(I4B), intent(in) :: iprpak
+    integer(I4B), intent(in) :: nrows !< rows read this period
+    integer(I4B), dimension(:), intent(in) :: addr_map !< PERIOD row -> feature index
+    character(len=LENVARNAME), dimension(:), intent(in) :: names !< size naux
+    real(DP), dimension(:, :), pointer, intent(in) :: featarr2d !< (naux, nfeatures) permanent target
+    real(DP), dimension(:, :), pointer, intent(in) :: raw2d !< (naux, nrows) raw column source
+    type(TSStringLocType), pointer :: ts_strloc
+    real(DP), pointer :: bndElem
+    logical(LGP) :: found
+    integer(I4B) :: n, j, k, nts, i, naux
+    logical(LGP), dimension(:, :), allocatable :: handled2
+
+    naux = size(names)
+    allocate (handled2(naux, nrows))
+    handled2 = .false.
+
+    ! time-series-linked rows: resolve via their preserved token
+    nts = this%struct_vectors(icol)%ts_strlocs%count()
+    do k = 1, nts
+      ts_strloc => this%struct_vectors(icol)%get_ts_strloc(k)
+      i = addr_map(ts_strloc%row)
+      if (i < 1 .or. i > size(featarr2d, 2)) cycle
+      bndElem => featarr2d(ts_strloc%col, i)
+      call read_value_or_time_series_adv( &
+        ts_strloc%token, i, ts_strloc%col, bndElem, subcomp_name, &
+        category, tsmanager, iprpak, trim(names(ts_strloc%col)))
+      handled2(ts_strloc%col, ts_strloc%row) = .true.
+    end do
+
+    ! literal rows: clear any stale link, then assign; DNODATA means
+    ! unset this row -- leave the value and any link untouched
+    do n = 1, nrows
+      i = addr_map(n)
+      if (i < 1 .or. i > size(featarr2d, 2)) cycle
+      do j = 1, naux
+        if (handled2(j, n)) cycle
+        if (raw2d(j, n) == DNODATA) cycle
+        found = remove_existing_link(tsmanager, i, j, subcomp_name, &
+                                     category, trim(names(j)))
+        featarr2d(j, i) = raw2d(j, n)
+      end do
+    end do
+    deallocate (handled2)
+
+    ! clear strlocs so a later period's parse (different row indexing)
+    ! doesn't reprocess these against a mismatched addr_map
+    call this%struct_vectors(icol)%clear()
+  end subroutine ts_update_dedup
+
+  !> @brief Dedup-aware counterpart to ts_update for one MTYPE_DBL2D
+  !! (AUX) PERIOD-block column.
+  !<
+  subroutine ts_update_adv(this, icol, tsmanager, subcomp_name, iprpak, &
+                           nrows, ifno_map, auxname_cst, featarr2d)
+    class(StructArrayType), intent(inout) :: this
+    integer(I4B), intent(in) :: icol
+    type(TimeSeriesManagerType), pointer, intent(inout) :: tsmanager
+    character(len=*), intent(in) :: subcomp_name
+    integer(I4B), intent(in) :: iprpak
+    integer(I4B), intent(in) :: nrows !< rows read this period
+    integer(I4B), dimension(:), intent(in) :: ifno_map !< PERIOD row -> feature index
+    type(CharacterStringType), dimension(:), pointer, intent(in) :: auxname_cst !< AUX column names, indexed 1..naux
+    real(DP), dimension(:, :), pointer, intent(in) :: featarr2d !< permanent dbl2d (AUX) target
+    character(len=LENVARNAME) :: names(size(auxname_cst))
+    integer(I4B) :: j
+
+    do j = 1, size(auxname_cst)
+      names(j) = auxname_cst(j)
+    end do
+    call this%ts_update_dedup(icol, tsmanager, subcomp_name, iprpak, &
+                              nrows, ifno_map, 'AUX', names, featarr2d, &
+                              this%struct_vectors(icol)%dbl2d)
+  end subroutine ts_update_adv
+
+  !> @brief Dedup-aware resolution of one MTYPE_DBL PERIOD-block column
+  !! into its permanent array, shared by both loaders. nrows is explicit
+  !! since the list loader's row_addr is a permanent, maxbound-sized
+  !! array, not sized to nrows.
+  !<
+  subroutine ts_update_indexed(this, icol, tsmanager, subcomp_name, &
+                               iprpak, nrows, row_addr, varname, featarr)
+    class(StructArrayType), intent(inout) :: this
+    integer(I4B), intent(in) :: icol
+    type(TimeSeriesManagerType), pointer, intent(inout) :: tsmanager
+    character(len=*), intent(in) :: subcomp_name
+    integer(I4B), intent(in) :: iprpak
+    integer(I4B), intent(in) :: nrows !< rows to process this period
+    integer(I4B), dimension(:), intent(in) :: row_addr
+    character(len=*), intent(in) :: varname
+    real(DP), dimension(:), pointer, contiguous, intent(in) :: featarr
+    real(DP), dimension(:, :), pointer :: featarr2d, raw2d
+    character(len=LENVARNAME) :: names(1)
+
+    ! naux=1 rank remaps onto the shared 2D core; neither is a copy
+    featarr2d(1:1, 1:size(featarr)) => featarr
+    raw2d(1:1, 1:nrows) => this%struct_vectors(icol)%dbl1d(1:nrows)
+    names(1) = varname
+    call this%ts_update_dedup(icol, tsmanager, subcomp_name, iprpak, &
+                              nrows, row_addr, 'BND', names, featarr2d, &
+                              raw2d)
+  end subroutine ts_update_indexed
 
 end module StructArrayModule

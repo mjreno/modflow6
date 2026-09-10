@@ -563,7 +563,7 @@ contains
   !<
   subroutine parse_structarray_block(this, iblk)
     use StructArrayModule, only: StructArrayType, constructStructArray
-    use LoadContextModule, only: LoadContextType, is_advanced_package
+    use LoadContextModule, only: LoadContextType, is_id_addressed_keystring
     class(LoadMf6FileType) :: this
     integer(I4B), intent(in) :: iblk
     type(LoadContextType) :: ctx
@@ -617,6 +617,15 @@ contains
                                   this%mf6_input%subcomponent_type, &
                                   'DIMENSIONS', idt%shape, this%filename, &
                                   found=shape_found)
+      if (.not. shape_found) then
+        ! also allow a per-row PACKAGEDATA field (e.g. LAK's NLAKECONN)
+        shape_idt => &
+          get_param_definition_type(this%mf6_input%param_dfns, &
+                                    this%mf6_input%component_type, &
+                                    this%mf6_input%subcomponent_type, &
+                                    'PACKAGEDATA', idt%shape, this%filename, &
+                                    found=shape_found)
+      end if
       if (shape_found) then
         call get_isize(shape_idt%mf6varname, this%mf6_input%mempath, isize)
         if (isize < 0) then
@@ -636,9 +645,8 @@ contains
         call mem_setptr(nrow, shape_idt%mf6varname, this%mf6_input%mempath)
         nrows = nrow
       else if (mem_rank == 1) then
-        ! 1D integer array shape variable (e.g. NLAKECONN) — sum elements
-        ! to get total row count; allows DFN shape (nlakeconn) in place of
-        ! the non-evaluable sum(nlakeconn) expression.
+        ! 1D array shape (e.g. NLAKECONN): sum elements for total row
+        ! count, since sum(nlakeconn) itself isn't DFN-evaluable
         call mem_setptr(int1d, shape_idt%mf6varname, this%mf6_input%mempath)
         nrows = sum(int1d)
         nullify (int1d)
@@ -706,12 +714,10 @@ contains
       if (this%ts_active) call this%save_ts_sa()
     end if
 
-    ! for an advanced package's PACKAGEDATA block, publish its row count
-    ! as MAXBOUND -- the feature count the PERIOD block's own load context
-    ! looks for, regardless of whether the shape came from a DIMENSIONS
-    ! value or was deferred to a paired flow package or FMI budget file
+    ! an advanced package's PACKAGEDATA row count is published as
+    ! MAXBOUND, the feature count the PERIOD block's load context needs
     if (this%mf6_input%block_dfns(iblk)%blockname == 'PACKAGEDATA' .and. &
-        is_advanced_package(this%mf6_input)) then
+        is_id_addressed_keystring(this%mf6_input) .and. ctx%is_advanced) then
       call get_isize('MAXBOUND', this%mf6_input%mempath, isize)
       if (isize < 0) then
         call mem_allocate(pkgdata_maxbound, 'MAXBOUND', this%mf6_input%mempath)

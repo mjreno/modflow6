@@ -81,11 +81,11 @@ module GwfSfrInputModule
     logical :: status = .false.
     logical :: bedk = .false.
     logical :: manning = .false.
-    logical :: stage_in = .false.
-    logical :: inflow_in = .false.
-    logical :: rainfall_in = .false.
-    logical :: evaporation_in = .false.
-    logical :: runoff_in = .false.
+    logical :: stage = .false.
+    logical :: inflow = .false.
+    logical :: rainfall = .false.
+    logical :: evaporation = .false.
+    logical :: runoff = .false.
     logical :: diversionrecord = .false.
     logical :: diversion = .false.
     logical :: idv = .false.
@@ -1423,14 +1423,14 @@ module GwfSfrInputModule
     )
 
   type(InputParamDefinitionType), parameter :: &
-    gwfsfr_stage_in = InputParamDefinitionType &
+    gwfsfr_stage = InputParamDefinitionType &
     ( &
     'GWF', & ! component
     'SFR', & ! subcomponent
     'PERIOD', & ! block
     'STAGE', & ! tag name
-    'STAGE_IN', & ! fortran variable
-    'STRING', & ! type
+    'STAGE', & ! fortran variable
+    'DOUBLE', & ! type
     'NREACHES', & ! shape
     'reach stage', & ! longname
     .true., & ! required
@@ -1442,14 +1442,14 @@ module GwfSfrInputModule
     )
 
   type(InputParamDefinitionType), parameter :: &
-    gwfsfr_inflow_in = InputParamDefinitionType &
+    gwfsfr_inflow = InputParamDefinitionType &
     ( &
     'GWF', & ! component
     'SFR', & ! subcomponent
     'PERIOD', & ! block
     'INFLOW', & ! tag name
-    'INFLOW_IN', & ! fortran variable
-    'STRING', & ! type
+    'INFLOW', & ! fortran variable
+    'DOUBLE', & ! type
     'NREACHES', & ! shape
     'inflow rate', & ! longname
     .true., & ! required
@@ -1461,14 +1461,14 @@ module GwfSfrInputModule
     )
 
   type(InputParamDefinitionType), parameter :: &
-    gwfsfr_rainfall_in = InputParamDefinitionType &
+    gwfsfr_rainfall = InputParamDefinitionType &
     ( &
     'GWF', & ! component
     'SFR', & ! subcomponent
     'PERIOD', & ! block
     'RAINFALL', & ! tag name
-    'RAINFALL_IN', & ! fortran variable
-    'STRING', & ! type
+    'RAINFALL', & ! fortran variable
+    'DOUBLE', & ! type
     'NREACHES', & ! shape
     'rainfall rate', & ! longname
     .true., & ! required
@@ -1480,14 +1480,14 @@ module GwfSfrInputModule
     )
 
   type(InputParamDefinitionType), parameter :: &
-    gwfsfr_evaporation_in = InputParamDefinitionType &
+    gwfsfr_evaporation = InputParamDefinitionType &
     ( &
     'GWF', & ! component
     'SFR', & ! subcomponent
     'PERIOD', & ! block
     'EVAPORATION', & ! tag name
-    'EVAPORATION_IN', & ! fortran variable
-    'STRING', & ! type
+    'EVAPORATION', & ! fortran variable
+    'DOUBLE', & ! type
     'NREACHES', & ! shape
     'evaporation rate', & ! longname
     .true., & ! required
@@ -1499,14 +1499,14 @@ module GwfSfrInputModule
     )
 
   type(InputParamDefinitionType), parameter :: &
-    gwfsfr_runoff_in = InputParamDefinitionType &
+    gwfsfr_runoff = InputParamDefinitionType &
     ( &
     'GWF', & ! component
     'SFR', & ! subcomponent
     'PERIOD', & ! block
     'RUNOFF', & ! tag name
-    'RUNOFF_IN', & ! fortran variable
-    'STRING', & ! type
+    'RUNOFF', & ! fortran variable
+    'DOUBLE', & ! type
     'NREACHES', & ! shape
     'runoff rate', & ! longname
     .true., & ! required
@@ -1772,7 +1772,7 @@ module GwfSfrInputModule
     'PERIOD', & ! block
     'AUXVAL', & ! tag name
     'AUXVAL', & ! fortran variable
-    'STRING', & ! type
+    'DOUBLE', & ! type
     '', & ! shape
     'auxiliary variable value', & ! longname
     .true., & ! required
@@ -1780,7 +1780,7 @@ module GwfSfrInputModule
     .true., & ! multi-record
     .false., & ! preserve case
     .false., & ! layered
-    .false. & ! timeseries
+    .true. & ! timeseries
     )
 
   type(InputParamDefinitionType), parameter :: &
@@ -1855,11 +1855,11 @@ module GwfSfrInputModule
     gwfsfr_status, &
     gwfsfr_bedk, &
     gwfsfr_manning, &
-    gwfsfr_stage_in, &
-    gwfsfr_inflow_in, &
-    gwfsfr_rainfall_in, &
-    gwfsfr_evaporation_in, &
-    gwfsfr_runoff_in, &
+    gwfsfr_stage, &
+    gwfsfr_inflow, &
+    gwfsfr_rainfall, &
+    gwfsfr_evaporation, &
+    gwfsfr_runoff, &
     gwfsfr_diversionrecord, &
     gwfsfr_diversion, &
     gwfsfr_idv, &

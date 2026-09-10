@@ -13,7 +13,12 @@ series keeps driving the value every timestep until an override is given.
   sfr-manning-ts     same check for MANNING
   sfr-ustrf-ts       same check for UPSTREAM_FRAC, using a reach that
                       splits flow between two downstream reaches
+  sfr-man-pgap       a single-row PERIOD block for reach 2 only must
+                      not misapply its value to reach 1
+  sfr-ustrf-pgap     same check for UPSTREAM_FRAC
 """
+
+import re
 
 import flopy
 import numpy as np
@@ -27,6 +32,8 @@ cases = [
     "sfr-rhkts-nstp",
     "sfr-manning-ts",
     "sfr-ustrf-ts",
+    "sfr-man-pgap",
+    "sfr-ustrf-pgap",
 ]
 
 
@@ -306,6 +313,50 @@ def _ustrf_model(ws, name):
     return sim
 
 
+def _get_periodgap_model(setting, value, ws, name):
+    """A PERIOD row for reach 2 only must not misapply its value to
+    reach 1's slot."""
+    sim = flopy.mf6.MFSimulation(sim_name=name, sim_ws=ws, exe_name="mf6")
+    flopy.mf6.ModflowTdis(sim, nper=1, perioddata=[(1.0, 1, 1.0)])
+    flopy.mf6.ModflowIms(sim, outer_dvclose=1e-5, inner_dvclose=1e-6)
+    gwf = flopy.mf6.ModflowGwf(sim, modelname=name)
+    flopy.mf6.ModflowGwfdis(
+        gwf, nlay=1, nrow=1, ncol=1, delr=1.0, delc=1.0, top=0.0, botm=-100.0
+    )
+    flopy.mf6.ModflowGwfnpf(gwf, icelltype=1)
+    flopy.mf6.ModflowGwfic(gwf, strt=1.0)
+    flopy.mf6.ModflowGwfghb(gwf, stress_period_data=[((0, 0, 0), 1.0, 1e6)])
+
+    packagedata = [
+        (0, (0, 0, 0), 1.0, 1.0, 1e-3, 0.0, 1.0, 1e-5, 0.03, 0, 0.5, 0),
+        (1, (0, 0, 0), 1.0, 1.0, 1e-3, 0.0, 1.0, 1e-5, 0.03, 0, 0.5, 0),
+    ]
+    connectiondata = [(0,), (1,)]
+    flopy.mf6.ModflowGwfsfr(
+        gwf,
+        print_input=True,
+        nreaches=2,
+        packagedata=packagedata,
+        connectiondata=connectiondata,
+        perioddata={0: [(1, setting, value)]},
+        pname="SFR-1",
+    )
+    flopy.mf6.ModflowGwfoc(gwf, printrecord=[("budget", "all")])
+    return sim
+
+
+def _check_periodgap(keyword, value, test):
+    """Reach 2's echoed value must match the PERIOD input, not reach 1's
+    untouched default."""
+    lst_path = test.workspace / f"{test.name}.lst"
+    with open(lst_path) as f:
+        text = f.read()
+    match = re.search(rf"\n\s*2\s+{keyword}\s+([-\d.Ee+]+)", text)
+    assert match, f"no {keyword} row found for reach 2 in the listing file"
+    got = float(match.group(1))
+    assert np.isclose(got, value), f"{keyword} for reach 2 expected {value}, got {got}"
+
+
 def build_models(idx, test):
     ws = test.workspace
     name = cases[idx]
@@ -313,11 +364,22 @@ def build_models(idx, test):
         return _bedk_model(idx, ws, name), None
     elif idx == 4:
         return _manning_model(ws, name), None
-    else:
+    elif idx == 5:
         return _ustrf_model(ws, name), None
+    elif idx == 6:
+        return _get_periodgap_model("manning", 0.5, ws, name), None
+    else:
+        return _get_periodgap_model("upstream_fraction", 0.9, ws, name), None
 
 
 def check_output(idx, test):
+    if idx == 6:
+        _check_periodgap("MANNING", 0.5, test)
+        return
+    if idx == 7:
+        _check_periodgap("UPSTREAM_FRAC", 0.9, test)
+        return
+
     sim = flopy.mf6.MFSimulation.load(sim_ws=test.workspace)
     gwf = sim.get_model()
     sfr = gwf.get_package("SFR-1")
@@ -363,7 +425,7 @@ def check_output(idx, test):
             f"{gwfr1[2]:.6g} == {gwfr1[3]:.6g}; MANNING_SET baseline "
             "resync in sfr_ad may have failed"
         )
-    else:
+    elif idx == 5:
         usflow1 = obs_data["USFLOW1"]
         # 2 periods x nstp=2 -> 4 records; USTRF1 ramps in period 1
         # (t=1->2: 0.5->0.2), so reach 1's upstream-flow share must differ

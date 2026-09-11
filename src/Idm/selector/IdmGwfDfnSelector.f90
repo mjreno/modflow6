@@ -32,6 +32,7 @@ module IdmGwfDfnSelectorModule
   use GwfVscInputModule
   use GwfWelInputModule
   use GwfWelgInputModule
+  use GwfUzfInputModule
 
   implicit none
   private
@@ -122,6 +123,8 @@ contains
       call set_param_pointer(input_definition, gwf_wel_param_definitions)
     case ('WELG')
       call set_param_pointer(input_definition, gwf_welg_param_definitions)
+    case ('UZF')
+      call set_param_pointer(input_definition, gwf_uzf_param_definitions)
     case default
     end select
     return
@@ -186,6 +189,8 @@ contains
       call set_param_pointer(input_definition, gwf_wel_aggregate_definitions)
     case ('WELG')
       call set_param_pointer(input_definition, gwf_welg_aggregate_definitions)
+    case ('UZF')
+      call set_param_pointer(input_definition, gwf_uzf_aggregate_definitions)
     case default
     end select
     return
@@ -250,6 +255,8 @@ contains
       call set_block_pointer(input_definition, gwf_wel_block_definitions)
     case ('WELG')
       call set_block_pointer(input_definition, gwf_welg_block_definitions)
+    case ('UZF')
+      call set_block_pointer(input_definition, gwf_uzf_block_definitions)
     case default
     end select
     return
@@ -313,6 +320,8 @@ contains
       multi_package = gwf_wel_multi_package
     case ('WELG')
       multi_package = gwf_welg_multi_package
+    case ('UZF')
+      multi_package = gwf_uzf_multi_package
     case default
       call store_error('Idm selector subcomponent not found; '//&
                        &'component="GWF"'//&
@@ -445,6 +454,8 @@ contains
       call set_subpkg_pointer(subpackages, gwf_wel_subpackages)
     case ('WELG')
       call set_subpkg_pointer(subpackages, gwf_welg_subpackages)
+    case ('UZF')
+      call set_subpkg_pointer(subpackages, gwf_uzf_subpackages)
     case default
     end select
     return
@@ -508,6 +519,8 @@ contains
     case ('WEL')
       integrated = .true.
     case ('WELG')
+      integrated = .true.
+    case ('UZF')
       integrated = .true.
     case default
     end select

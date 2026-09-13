@@ -50,7 +50,7 @@ module GwfSfrInputModule
     logical :: storage_weight = .false.
     logical :: icheck = .false.
     logical :: iconvchk = .false.
-    logical :: nreaches = .false.
+    logical :: maxbound = .false.
     logical :: packagedata_ifno = .false.
     logical :: cellid = .false.
     logical :: rlen = .false.
@@ -834,13 +834,13 @@ module GwfSfrInputModule
     )
 
   type(InputParamDefinitionType), parameter :: &
-    gwfsfr_nreaches = InputParamDefinitionType &
+    gwfsfr_maxbound = InputParamDefinitionType &
     ( &
     'GWF', & ! component
     'SFR', & ! subcomponent
     'DIMENSIONS', & ! block
     'NREACHES', & ! tag name
-    'NREACHES', & ! fortran variable
+    'MAXBOUND', & ! fortran variable
     'INTEGER', & ! type
     '', & ! shape
     'maximum number reaches', & ! longname
@@ -1431,7 +1431,7 @@ module GwfSfrInputModule
     'STAGE', & ! tag name
     'STAGE', & ! fortran variable
     'DOUBLE', & ! type
-    'NREACHES', & ! shape
+    '', & ! shape
     'reach stage', & ! longname
     .true., & ! required
     .false., & ! developmode
@@ -1450,7 +1450,7 @@ module GwfSfrInputModule
     'INFLOW', & ! tag name
     'INFLOW', & ! fortran variable
     'DOUBLE', & ! type
-    'NREACHES', & ! shape
+    '', & ! shape
     'inflow rate', & ! longname
     .true., & ! required
     .false., & ! developmode
@@ -1469,7 +1469,7 @@ module GwfSfrInputModule
     'RAINFALL', & ! tag name
     'RAINFALL', & ! fortran variable
     'DOUBLE', & ! type
-    'NREACHES', & ! shape
+    '', & ! shape
     'rainfall rate', & ! longname
     .true., & ! required
     .false., & ! developmode
@@ -1488,7 +1488,7 @@ module GwfSfrInputModule
     'EVAPORATION', & ! tag name
     'EVAPORATION', & ! fortran variable
     'DOUBLE', & ! type
-    'NREACHES', & ! shape
+    '', & ! shape
     'evaporation rate', & ! longname
     .true., & ! required
     .false., & ! developmode
@@ -1507,7 +1507,7 @@ module GwfSfrInputModule
     'RUNOFF', & ! tag name
     'RUNOFF', & ! fortran variable
     'DOUBLE', & ! type
-    'NREACHES', & ! shape
+    '', & ! shape
     'runoff rate', & ! longname
     .true., & ! required
     .false., & ! developmode
@@ -1824,7 +1824,7 @@ module GwfSfrInputModule
     gwfsfr_storage_weight, &
     gwfsfr_icheck, &
     gwfsfr_iconvchk, &
-    gwfsfr_nreaches, &
+    gwfsfr_maxbound, &
     gwfsfr_packagedata_ifno, &
     gwfsfr_cellid, &
     gwfsfr_rlen, &

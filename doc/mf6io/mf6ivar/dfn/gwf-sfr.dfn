@@ -390,6 +390,7 @@ description keyword that deactivates the final convergence check of the change i
 block dimensions
 name nreaches
 type integer
+mf6internal maxbound
 reader urword
 optional false
 longname maximum number reaches
@@ -824,7 +825,6 @@ block period
 name stage
 type double precision
 shape
-mf6dimension (nreaches)
 tagged true
 in_record true
 reader urword
@@ -836,7 +836,6 @@ block period
 name inflow
 type double precision
 shape
-mf6dimension (nreaches)
 tagged true
 in_record true
 reader urword
@@ -848,7 +847,6 @@ block period
 name rainfall
 type double precision
 shape
-mf6dimension (nreaches)
 tagged true
 in_record true
 reader urword
@@ -860,7 +858,6 @@ block period
 name evaporation
 type double precision
 shape
-mf6dimension (nreaches)
 tagged true
 in_record true
 reader urword
@@ -872,7 +869,6 @@ block period
 name runoff
 type double precision
 shape
-mf6dimension (nreaches)
 tagged true
 in_record true
 reader urword

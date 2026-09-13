@@ -46,7 +46,7 @@ module GwfMawInputModule
     logical :: obs6_filename = .false.
     logical :: mover = .false.
     logical :: ieffradopt = .false.
-    logical :: nmawwells = .false.
+    logical :: maxbound = .false.
     logical :: packagedata_ifno = .false.
     logical :: radius = .false.
     logical :: bottom = .false.
@@ -745,13 +745,13 @@ module GwfMawInputModule
     )
 
   type(InputParamDefinitionType), parameter :: &
-    gwfmaw_nmawwells = InputParamDefinitionType &
+    gwfmaw_maxbound = InputParamDefinitionType &
     ( &
     'GWF', & ! component
     'MAW', & ! subcomponent
     'DIMENSIONS', & ! block
     'NMAWWELLS', & ! tag name
-    'NMAWWELLS', & ! fortran variable
+    'MAXBOUND', & ! fortran variable
     'INTEGER', & ! type
     '', & ! shape
     'number of MAW wells', & ! longname
@@ -1266,7 +1266,7 @@ module GwfMawInputModule
     'RATE', & ! tag name
     'RATE', & ! fortran variable
     'DOUBLE', & ! type
-    'NMAWWELLS', & ! shape
+    '', & ! shape
     'well pumping rate', & ! longname
     .true., & ! required
     .false., & ! developmode
@@ -1285,7 +1285,7 @@ module GwfMawInputModule
     'WELL_HEAD', & ! tag name
     'WELL_HEAD', & ! fortran variable
     'DOUBLE', & ! type
-    'NMAWWELLS', & ! shape
+    '', & ! shape
     'well head', & ! longname
     .true., & ! required
     .false., & ! developmode
@@ -1304,7 +1304,7 @@ module GwfMawInputModule
     'HEAD_LIMIT', & ! tag name
     'HEAD_LIMIT', & ! fortran variable
     'STRING', & ! type
-    'NMAWWELLS', & ! shape
+    '', & ! shape
     'head limit', & ! longname
     .true., & ! required
     .false., & ! developmode
@@ -1579,7 +1579,7 @@ module GwfMawInputModule
     gwfmaw_obs6_filename, &
     gwfmaw_mover, &
     gwfmaw_ieffradopt, &
-    gwfmaw_nmawwells, &
+    gwfmaw_maxbound, &
     gwfmaw_packagedata_ifno, &
     gwfmaw_radius, &
     gwfmaw_bottom, &

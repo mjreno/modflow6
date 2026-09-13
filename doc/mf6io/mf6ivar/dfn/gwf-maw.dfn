@@ -349,6 +349,7 @@ mf6internal ieffradopt
 block dimensions
 name nmawwells
 type integer
+mf6internal maxbound
 reader urword
 optional false
 longname number of MAW wells
@@ -701,7 +702,6 @@ block period
 name rate
 type double precision
 shape
-mf6dimension (nmawwells)
 tagged true
 in_record true
 reader urword
@@ -713,7 +713,6 @@ block period
 name well_head
 type double precision
 shape
-mf6dimension (nmawwells)
 tagged true
 in_record true
 reader urword
@@ -725,7 +724,6 @@ block period
 name head_limit
 type string
 shape
-mf6dimension (nmawwells)
 tagged true
 in_record true
 reader urword

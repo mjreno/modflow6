@@ -756,9 +756,9 @@ contains
       'PROCESSING '//trim(adjustl(this%text))//' DIMENSIONS'
     !
     ! -- read NMAWWELLS
-    call mem_set_value(this%nmawwells, 'NMAWWELLS', this%input_mempath, &
-                       found%nmawwells, release=.false.)
-    if (found%nmawwells) then
+    call mem_set_value(this%nmawwells, 'MAXBOUND', this%input_mempath, &
+                       found%maxbound, release=.false.)
+    if (found%maxbound) then
       write (this%iout, '(4x,a,i0)') 'NMAWWELLS = ', this%nmawwells
     end if
     !

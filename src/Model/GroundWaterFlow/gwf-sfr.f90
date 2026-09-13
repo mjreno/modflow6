@@ -900,9 +900,8 @@ contains
     write (this%iout, '(/1x,a)') &
       'PROCESSING '//trim(adjustl(this%text))//' DIMENSIONS'
     !
-    ! -- source NREACHES; kept in the input context (not released) since
-    !    PERIOD settings resolve it by name via SHAPE
-    call mem_set_value(this%maxbound, 'NREACHES', this%input_mempath, found, &
+    ! -- source NREACHES
+    call mem_set_value(this%maxbound, 'MAXBOUND', this%input_mempath, found, &
                        release=.false.)
     if (found) then
       write (this%iout, '(4x,a,i0)') 'NREACHES = ', this%maxbound
@@ -1415,7 +1414,7 @@ contains
       call mem_reallocate(this%divreach, ndiversions, 'DIVREACH', &
                           this%memoryPath)
       allocate (this%divcprior(ndiversions))
-      call mem_setptr(this%divflow, 'DIVFLOW_RESOLVED', this%input_mempath)
+      call mem_setptr(this%divflow, 'DIVFLOW', this%input_mempath)
       call mem_reallocate(this%divq, ndiversions, 'DIVQ', this%memoryPath)
       this%divq = DZERO
     end if

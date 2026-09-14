@@ -9,6 +9,7 @@ module GwfMawInputModule
   public gwf_maw_block_definitions
   public GwfMawParamFoundType
   public gwf_maw_multi_package
+  public gwf_maw_is_advanced
   public gwf_maw_subpackages
 
   type GwfMawParamFoundType
@@ -91,6 +92,7 @@ module GwfMawInputModule
   end type GwfMawParamFoundType
 
   logical :: gwf_maw_multi_package = .true.
+  logical :: gwf_maw_is_advanced = .true.
 
   character(len=16), parameter :: &
     gwf_maw_subpackages(*) = &

@@ -9,6 +9,7 @@ module GwfLakInputModule
   public gwf_lak_block_definitions
   public GwfLakParamFoundType
   public gwf_lak_multi_package
+  public gwf_lak_is_advanced
   public gwf_lak_subpackages
 
   type GwfLakParamFoundType
@@ -98,6 +99,7 @@ module GwfLakInputModule
   end type GwfLakParamFoundType
 
   logical :: gwf_lak_multi_package = .true.
+  logical :: gwf_lak_is_advanced = .true.
 
   character(len=16), parameter :: &
     gwf_lak_subpackages(*) = &

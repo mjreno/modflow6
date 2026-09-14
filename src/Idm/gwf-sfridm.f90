@@ -9,6 +9,7 @@ module GwfSfrInputModule
   public gwf_sfr_block_definitions
   public GwfSfrParamFoundType
   public gwf_sfr_multi_package
+  public gwf_sfr_is_advanced
   public gwf_sfr_subpackages
 
   type GwfSfrParamFoundType
@@ -103,6 +104,7 @@ module GwfSfrInputModule
   end type GwfSfrParamFoundType
 
   logical :: gwf_sfr_multi_package = .true.
+  logical :: gwf_sfr_is_advanced = .true.
 
   character(len=16), parameter :: &
     gwf_sfr_subpackages(*) = &

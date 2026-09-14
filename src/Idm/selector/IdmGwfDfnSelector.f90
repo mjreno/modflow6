@@ -29,10 +29,10 @@ module IdmGwfDfnSelectorModule
   use GwfRivInputModule
   use GwfRivgInputModule
   use GwfStoInputModule
+  use GwfUzfInputModule
   use GwfVscInputModule
   use GwfWelInputModule
   use GwfWelgInputModule
-  use GwfUzfInputModule
 
   implicit none
   private
@@ -117,14 +117,14 @@ contains
       call set_param_pointer(input_definition, gwf_rivg_param_definitions)
     case ('STO')
       call set_param_pointer(input_definition, gwf_sto_param_definitions)
+    case ('UZF')
+      call set_param_pointer(input_definition, gwf_uzf_param_definitions)
     case ('VSC')
       call set_param_pointer(input_definition, gwf_vsc_param_definitions)
     case ('WEL')
       call set_param_pointer(input_definition, gwf_wel_param_definitions)
     case ('WELG')
       call set_param_pointer(input_definition, gwf_welg_param_definitions)
-    case ('UZF')
-      call set_param_pointer(input_definition, gwf_uzf_param_definitions)
     case default
     end select
     return
@@ -183,14 +183,14 @@ contains
       call set_param_pointer(input_definition, gwf_rivg_aggregate_definitions)
     case ('STO')
       call set_param_pointer(input_definition, gwf_sto_aggregate_definitions)
+    case ('UZF')
+      call set_param_pointer(input_definition, gwf_uzf_aggregate_definitions)
     case ('VSC')
       call set_param_pointer(input_definition, gwf_vsc_aggregate_definitions)
     case ('WEL')
       call set_param_pointer(input_definition, gwf_wel_aggregate_definitions)
     case ('WELG')
       call set_param_pointer(input_definition, gwf_welg_aggregate_definitions)
-    case ('UZF')
-      call set_param_pointer(input_definition, gwf_uzf_aggregate_definitions)
     case default
     end select
     return
@@ -249,14 +249,14 @@ contains
       call set_block_pointer(input_definition, gwf_rivg_block_definitions)
     case ('STO')
       call set_block_pointer(input_definition, gwf_sto_block_definitions)
+    case ('UZF')
+      call set_block_pointer(input_definition, gwf_uzf_block_definitions)
     case ('VSC')
       call set_block_pointer(input_definition, gwf_vsc_block_definitions)
     case ('WEL')
       call set_block_pointer(input_definition, gwf_wel_block_definitions)
     case ('WELG')
       call set_block_pointer(input_definition, gwf_welg_block_definitions)
-    case ('UZF')
-      call set_block_pointer(input_definition, gwf_uzf_block_definitions)
     case default
     end select
     return
@@ -314,14 +314,14 @@ contains
       multi_package = gwf_rivg_multi_package
     case ('STO')
       multi_package = gwf_sto_multi_package
+    case ('UZF')
+      multi_package = gwf_uzf_multi_package
     case ('VSC')
       multi_package = gwf_vsc_multi_package
     case ('WEL')
       multi_package = gwf_wel_multi_package
     case ('WELG')
       multi_package = gwf_welg_multi_package
-    case ('UZF')
-      multi_package = gwf_uzf_multi_package
     case default
       call store_error('Idm selector subcomponent not found; '//&
                        &'component="GWF"'//&
@@ -382,6 +382,8 @@ contains
       is_advanced = gwf_rivg_is_advanced
     case ('STO')
       is_advanced = gwf_sto_is_advanced
+    case ('UZF')
+      is_advanced = gwf_uzf_is_advanced
     case ('VSC')
       is_advanced = gwf_vsc_is_advanced
     case ('WEL')
@@ -448,14 +450,14 @@ contains
       call set_subpkg_pointer(subpackages, gwf_rivg_subpackages)
     case ('STO')
       call set_subpkg_pointer(subpackages, gwf_sto_subpackages)
+    case ('UZF')
+      call set_subpkg_pointer(subpackages, gwf_uzf_subpackages)
     case ('VSC')
       call set_subpkg_pointer(subpackages, gwf_vsc_subpackages)
     case ('WEL')
       call set_subpkg_pointer(subpackages, gwf_wel_subpackages)
     case ('WELG')
       call set_subpkg_pointer(subpackages, gwf_welg_subpackages)
-    case ('UZF')
-      call set_subpkg_pointer(subpackages, gwf_uzf_subpackages)
     case default
     end select
     return
@@ -514,13 +516,13 @@ contains
       integrated = .true.
     case ('STO')
       integrated = .true.
+    case ('UZF')
+      integrated = .true.
     case ('VSC')
       integrated = .true.
     case ('WEL')
       integrated = .true.
     case ('WELG')
-      integrated = .true.
-    case ('UZF')
       integrated = .true.
     case default
     end select

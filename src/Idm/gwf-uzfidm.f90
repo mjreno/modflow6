@@ -9,6 +9,7 @@ module GwfUzfInputModule
   public gwf_uzf_block_definitions
   public GwfUzfParamFoundType
   public gwf_uzf_multi_package
+  public gwf_uzf_is_advanced
   public gwf_uzf_subpackages
 
   type GwfUzfParamFoundType
@@ -72,6 +73,7 @@ module GwfUzfInputModule
   end type GwfUzfParamFoundType
 
   logical :: gwf_uzf_multi_package = .true.
+  logical :: gwf_uzf_is_advanced = .true.
 
   character(len=16), parameter :: &
     gwf_uzf_subpackages(*) = &

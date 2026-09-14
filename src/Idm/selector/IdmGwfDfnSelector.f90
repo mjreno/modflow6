@@ -28,11 +28,11 @@ module IdmGwfDfnSelectorModule
   use GwfRchaInputModule
   use GwfRivInputModule
   use GwfRivgInputModule
+  use GwfSfrInputModule
   use GwfStoInputModule
   use GwfVscInputModule
   use GwfWelInputModule
   use GwfWelgInputModule
-  use GwfSfrInputModule
 
   implicit none
   private
@@ -115,6 +115,8 @@ contains
       call set_param_pointer(input_definition, gwf_riv_param_definitions)
     case ('RIVG')
       call set_param_pointer(input_definition, gwf_rivg_param_definitions)
+    case ('SFR')
+      call set_param_pointer(input_definition, gwf_sfr_param_definitions)
     case ('STO')
       call set_param_pointer(input_definition, gwf_sto_param_definitions)
     case ('VSC')
@@ -123,8 +125,6 @@ contains
       call set_param_pointer(input_definition, gwf_wel_param_definitions)
     case ('WELG')
       call set_param_pointer(input_definition, gwf_welg_param_definitions)
-    case ('SFR')
-      call set_param_pointer(input_definition, gwf_sfr_param_definitions)
     case default
     end select
     return
@@ -181,6 +181,8 @@ contains
       call set_param_pointer(input_definition, gwf_riv_aggregate_definitions)
     case ('RIVG')
       call set_param_pointer(input_definition, gwf_rivg_aggregate_definitions)
+    case ('SFR')
+      call set_param_pointer(input_definition, gwf_sfr_aggregate_definitions)
     case ('STO')
       call set_param_pointer(input_definition, gwf_sto_aggregate_definitions)
     case ('VSC')
@@ -189,8 +191,6 @@ contains
       call set_param_pointer(input_definition, gwf_wel_aggregate_definitions)
     case ('WELG')
       call set_param_pointer(input_definition, gwf_welg_aggregate_definitions)
-    case ('SFR')
-      call set_param_pointer(input_definition, gwf_sfr_aggregate_definitions)
     case default
     end select
     return
@@ -247,6 +247,8 @@ contains
       call set_block_pointer(input_definition, gwf_riv_block_definitions)
     case ('RIVG')
       call set_block_pointer(input_definition, gwf_rivg_block_definitions)
+    case ('SFR')
+      call set_block_pointer(input_definition, gwf_sfr_block_definitions)
     case ('STO')
       call set_block_pointer(input_definition, gwf_sto_block_definitions)
     case ('VSC')
@@ -255,8 +257,6 @@ contains
       call set_block_pointer(input_definition, gwf_wel_block_definitions)
     case ('WELG')
       call set_block_pointer(input_definition, gwf_welg_block_definitions)
-    case ('SFR')
-      call set_block_pointer(input_definition, gwf_sfr_block_definitions)
     case default
     end select
     return
@@ -312,6 +312,8 @@ contains
       multi_package = gwf_riv_multi_package
     case ('RIVG')
       multi_package = gwf_rivg_multi_package
+    case ('SFR')
+      multi_package = gwf_sfr_multi_package
     case ('STO')
       multi_package = gwf_sto_multi_package
     case ('VSC')
@@ -320,8 +322,6 @@ contains
       multi_package = gwf_wel_multi_package
     case ('WELG')
       multi_package = gwf_welg_multi_package
-    case ('SFR')
-      multi_package = gwf_sfr_multi_package
     case default
       call store_error('Idm selector subcomponent not found; '//&
                        &'component="GWF"'//&
@@ -380,6 +380,8 @@ contains
       is_advanced = gwf_riv_is_advanced
     case ('RIVG')
       is_advanced = gwf_rivg_is_advanced
+    case ('SFR')
+      is_advanced = gwf_sfr_is_advanced
     case ('STO')
       is_advanced = gwf_sto_is_advanced
     case ('VSC')
@@ -446,6 +448,8 @@ contains
       call set_subpkg_pointer(subpackages, gwf_riv_subpackages)
     case ('RIVG')
       call set_subpkg_pointer(subpackages, gwf_rivg_subpackages)
+    case ('SFR')
+      call set_subpkg_pointer(subpackages, gwf_sfr_subpackages)
     case ('STO')
       call set_subpkg_pointer(subpackages, gwf_sto_subpackages)
     case ('VSC')
@@ -454,8 +458,6 @@ contains
       call set_subpkg_pointer(subpackages, gwf_wel_subpackages)
     case ('WELG')
       call set_subpkg_pointer(subpackages, gwf_welg_subpackages)
-    case ('SFR')
-      call set_subpkg_pointer(subpackages, gwf_sfr_subpackages)
     case default
     end select
     return
@@ -512,6 +514,8 @@ contains
       integrated = .true.
     case ('RIVG')
       integrated = .true.
+    case ('SFR')
+      integrated = .true.
     case ('STO')
       integrated = .true.
     case ('VSC')
@@ -519,8 +523,6 @@ contains
     case ('WEL')
       integrated = .true.
     case ('WELG')
-      integrated = .true.
-    case ('SFR')
       integrated = .true.
     case default
     end select

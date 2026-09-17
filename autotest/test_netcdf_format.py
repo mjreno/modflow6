@@ -278,13 +278,13 @@ def _check_global_attrs(ds, name, fmt, ncf_config, label=""):
         )
 
     if fmt == "ugrid":
-        assert "mesh" in ds.ncattrs(), f"mesh global attr missing{ctx}"
-        assert ds.getncattr("mesh") == "layered", (
-            f"mesh global attr must be 'layered'{ctx}"
+        assert "modflow_mesh" in ds.ncattrs(), f"modflow_mesh global attr missing{ctx}"
+        assert ds.getncattr("modflow_mesh") == "layered", (
+            f"modflow_mesh global attr must be 'layered'{ctx}"
         )
     else:
-        assert "mesh" not in ds.ncattrs(), (
-            f"Structured format must not carry mesh global attr{ctx}"
+        assert "modflow_mesh" not in ds.ncattrs(), (
+            f"Structured format must not carry modflow_mesh global attr{ctx}"
         )
 
     assert "source" in ds.ncattrs(), f"source global attr missing{ctx}"

@@ -326,7 +326,7 @@ contains
                                 this%annotation%grid), this%nc_fname)
     ! mesh type (MODFLOW 6)
     if (this%annotation%mesh /= '') then
-      call nf_verify(nf90_put_att(this%ncid, NF90_GLOBAL, 'mesh', &
+      call nf_verify(nf90_put_att(this%ncid, NF90_GLOBAL, 'modflow_mesh', &
                                   this%annotation%mesh), this%nc_fname)
 
     end if

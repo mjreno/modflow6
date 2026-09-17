@@ -811,10 +811,17 @@ contains
                                 this%var_ids%y), this%nc_fname)
     call nf_verify(nf90_put_att(this%ncid, this%var_ids%y, 'units', &
                                 this%lenunits), this%nc_fname)
-    call nf_verify(nf90_put_att(this%ncid, this%var_ids%y, 'axis', 'Y'), &
-                   this%nc_fname)
-    call nf_verify(nf90_put_att(this%ncid, this%var_ids%y, 'standard_name', &
-                                'projection_y_coordinate'), this%nc_fname)
+    if (this%dis%angrot == DZERO) then
+      ! axis/standard_name assert that y holds the true projected
+      ! position, which is false for a rotated grid (y is grid-local;
+      ! see add_grid_data) and causes GDAL's netCDF driver to derive an
+      ! incorrect GeoTransform from y instead of using the correct one
+      ! on the projection variable.
+      call nf_verify(nf90_put_att(this%ncid, this%var_ids%y, 'axis', 'Y'), &
+                     this%nc_fname)
+      call nf_verify(nf90_put_att(this%ncid, this%var_ids%y, 'standard_name', &
+                                  'projection_y_coordinate'), this%nc_fname)
+    end if
     call nf_verify(nf90_put_att(this%ncid, this%var_ids%y, 'long_name', &
                                 'Northing'), this%nc_fname)
     if (this%gridmap_name /= '') then
@@ -834,10 +841,13 @@ contains
                                 this%var_ids%x), this%nc_fname)
     call nf_verify(nf90_put_att(this%ncid, this%var_ids%x, 'units', &
                                 this%lenunits), this%nc_fname)
-    call nf_verify(nf90_put_att(this%ncid, this%var_ids%x, 'axis', 'X'), &
-                   this%nc_fname)
-    call nf_verify(nf90_put_att(this%ncid, this%var_ids%x, 'standard_name', &
-                                'projection_x_coordinate'), this%nc_fname)
+    if (this%dis%angrot == DZERO) then
+      ! see matching comment on the Y dimension above
+      call nf_verify(nf90_put_att(this%ncid, this%var_ids%x, 'axis', 'X'), &
+                     this%nc_fname)
+      call nf_verify(nf90_put_att(this%ncid, this%var_ids%x, 'standard_name', &
+                                  'projection_x_coordinate'), this%nc_fname)
+    end if
     call nf_verify(nf90_put_att(this%ncid, this%var_ids%x, 'long_name', &
                                 'Easting'), this%nc_fname)
     if (this%gridmap_name /= '') then

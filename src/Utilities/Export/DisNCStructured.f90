@@ -9,14 +9,18 @@ module DisNCStructuredModule
 
   use KindModule, only: DP, I4B, LGP
   use ConstantsModule, only: LINELENGTH, LENBIGLINE, LENCOMPONENTNAME, &
-                             LENMEMPATH, DNODATA, DZERO, DHALF, DPIO180
+                             LENMEMPATH, DNODATA, DZERO, DHALF
   use SimVariablesModule, only: errmsg, warnmsg
   use SimModule, only: store_error, store_warning, store_error_filename
   use MemoryManagerModule, only: mem_setptr
   use InputDefinitionModule, only: InputParamDefinitionType
   use CharacterStringModule, only: CharacterStringType
   use NCModelExportModule, only: NCBaseModelExportType, export_varname, &
-                                 export_longname, wkt_to_cf_gridmapping
+                                 export_longname, wkt_to_cf_gridmapping, &
+                                 wrap_rotated_crs, &
+                                 wkt_transverse_mercator_params, &
+                                 wkt_lambert_conformal_conic_params, &
+                                 wkt_albers_conical_equal_area_params
   use DisModule, only: DisType
   use NetCDFCommonModule, only: nf_verify
   use netcdf
@@ -158,7 +162,7 @@ contains
         this%latlon = .true.
         if (this%wkt /= '' .or. this%crs_wkt /= '') then
           write (warnmsg, '(a)') 'Ignoring user provided NetCDF wkt/crs_wkt &
-            &parameter(s) as longitude and latitude arrays have been provided. &
+         &parameter(s) as longitude and latitude arrays have been provided. &
             &Applies to file "'//trim(nc_fname)//'".'
           call store_warning(warnmsg)
           this%wkt = ''
@@ -167,6 +171,15 @@ contains
         end if
         call mem_setptr(this%latitude, 'LATITUDE', this%ncf_mempath)
         call mem_setptr(this%longitude, 'LONGITUDE', this%ncf_mempath)
+        if (this%dis%angrot /= DZERO) then
+          write (warnmsg, '(a)') 'Structured rotated grid with &
+            &user-provided latitude/longitude: MF6 cannot verify these &
+            &values correctly account for grid rotation (angrot). They &
+            &must be computed from each cell''s true rotated position, &
+            &not from grid-local x/y. Applies to file "'// &
+            trim(nc_fname)//'".'
+          call store_warning(warnmsg)
+        end if
       end if
 
       if (this%gridmap_name /= '') then
@@ -174,10 +187,7 @@ contains
           write (warnmsg, '(a)') 'CRS parameter set with structured rotated &
             &grid. The x/y coordinate variables have grid-local, not &
             &real-world, values, so deriving real longitude/latitude from &
-            &grid_mapping via these coordinates will be incorrect. This &
-            &does not affect the projection variable''s GeoTransform &
-            &attribute (if written), which is computed independently of &
-            &x/y and remains correct for GDAL-based raster placement. &
+            &grid_mapping via these coordinates will be incorrect. &
             &Applies to file "'//trim(nc_fname)//'".'
           call store_warning(warnmsg)
         end if
@@ -811,12 +821,15 @@ contains
                                 this%var_ids%y), this%nc_fname)
     call nf_verify(nf90_put_att(this%ncid, this%var_ids%y, 'units', &
                                 this%lenunits), this%nc_fname)
-    if (this%dis%angrot == DZERO) then
+    if (this%dis%angrot == DZERO .or. &
+        wrap_rotated_crs(this%crs_wkt, this%dis%xorigin, this%dis%yorigin, &
+                         this%dis%angrot) /= '') then
       ! axis/standard_name assert that y holds the true projected
-      ! position, which is false for a rotated grid (y is grid-local;
-      ! see add_grid_data) and causes GDAL's netCDF driver to derive an
-      ! incorrect GeoTransform from y instead of using the correct one
-      ! on the projection variable.
+      ! position. For a rotated grid this only holds once crs_wkt
+      ! encodes the rotation (see wrap_rotated_crs in define_gridmap);
+      ! otherwise y is grid-local (see add_grid_data) and asserting it
+      ! would cause GDAL's netCDF driver to derive an incorrect,
+      ! unrotated position directly from y's grid-local values.
       call nf_verify(nf90_put_att(this%ncid, this%var_ids%y, 'axis', 'Y'), &
                      this%nc_fname)
       call nf_verify(nf90_put_att(this%ncid, this%var_ids%y, 'standard_name', &
@@ -841,7 +854,9 @@ contains
                                 this%var_ids%x), this%nc_fname)
     call nf_verify(nf90_put_att(this%ncid, this%var_ids%x, 'units', &
                                 this%lenunits), this%nc_fname)
-    if (this%dis%angrot == DZERO) then
+    if (this%dis%angrot == DZERO .or. &
+        wrap_rotated_crs(this%crs_wkt, this%dis%xorigin, this%dis%yorigin, &
+                         this%dis%angrot) /= '') then
       ! see matching comment on the Y dimension above
       call nf_verify(nf90_put_att(this%ncid, this%var_ids%x, 'axis', 'X'), &
                      this%nc_fname)
@@ -935,15 +950,21 @@ contains
     class(DisNCStructuredType), intent(inout) :: this
     integer(I4B) :: var_id
     character(len=LINELENGTH) :: gmname
-    character(len=LENBIGLINE) :: effective_crs_wkt
-    character(len=LINELENGTH) :: geotransform
-    real(DP) :: dx_eff, dy_eff, ang, gt0, gt1, gt2, gt3, gt4, gt5
+    character(len=LENBIGLINE) :: effective_crs_wkt, derived_wkt
+    character(len=100) :: rotinfo
+    real(DP) :: longitude_of_central_meridian, latitude_of_projection_origin
+    real(DP) :: scale_factor_at_central_meridian, false_easting, false_northing
+    real(DP) :: semi_major_axis, inverse_flattening
+    real(DP) :: standard_parallel_1, standard_parallel_2
+    logical(LGP) :: params_found, is_2sp
 
     if (this%wkt /= '' .or. this%crs_wkt /= '') then
       call nf_verify(nf90_redef(this%ncid), this%nc_fname)
       call nf_verify(nf90_def_var(this%ncid, this%gridmap_name, NF90_INT, &
                                   var_id), this%nc_fname)
-      ! wkt (WKT1, OGC 01-009) -- for legacy/QGIS compatibility
+      ! wkt (WKT1, OGC 01-009) -- for legacy/QGIS compatibility.  WKT1
+      ! has no derived-CRS syntax, so it cannot encode grid rotation and
+      ! is always written unmodified.
       if (this%wkt /= '') then
         call nf_verify(nf90_put_att(this%ncid, var_id, 'wkt', this%wkt), &
                        this%nc_fname)
@@ -954,6 +975,43 @@ contains
       else
         effective_crs_wkt = this%wkt
       end if
+      ! For a rotated structured grid, wrap crs_wkt in a derived CRS
+      ! encoding the rotation (see wrap_rotated_crs) so a CRS-aware
+      ! consumer resolves the correct real-world position and shape
+      ! via ordinary reprojection.  Falls back to an unmodified
+      ! crs_wkt, with a warning, if CRS_WKT was not provided or is not
+      ! a recognized WKT2 PROJCRS.
+      if (this%dis%angrot /= DZERO) then
+        if (this%crs_wkt == '') then
+          write (warnmsg, '(a)') 'Structured rotated grid with no CRS_WKT &
+            &input: no rotation-positioning information will be written &
+            &to the output CRS; x/y coordinate values will not reflect &
+            &the true rotated position. Applies to file "'// &
+            trim(this%nc_fname)//'".'
+          call store_warning(warnmsg)
+        else
+          derived_wkt = wrap_rotated_crs(this%crs_wkt, this%dis%xorigin, &
+                                         this%dis%yorigin, this%dis%angrot)
+          if (derived_wkt /= '') then
+            write (rotinfo, '(a,g0,a,g0,a,g0,a)') 'xorigin=', &
+              this%dis%xorigin, ', yorigin=', this%dis%yorigin, &
+              ', angrot=', this%dis%angrot, ' deg'
+            write (warnmsg, '(a)') 'Structured rotated grid: wrapped &
+              &CRS_WKT in a derived CRS to encode grid rotation ('// &
+              trim(rotinfo)//'). Applies to file "'// &
+              trim(this%nc_fname)//'".'
+            call store_warning(warnmsg)
+            effective_crs_wkt = derived_wkt
+          else
+            write (warnmsg, '(a)') 'Structured rotated grid: CRS_WKT is &
+              &not a recognized WKT2 PROJCRS; no rotation-positioning &
+              &information will be written to the output CRS; x/y &
+              &coordinate values will not reflect the true rotated &
+              &position. Applies to file "'//trim(this%nc_fname)//'".'
+            call store_warning(warnmsg)
+          end if
+        end if
+      end if
       call nf_verify(nf90_put_att(this%ncid, var_id, 'crs_wkt', &
                                   trim(effective_crs_wkt)), this%nc_fname)
       ! grid_mapping_name derived from WKT projection keyword
@@ -962,36 +1020,139 @@ contains
         call nf_verify(nf90_put_att(this%ncid, var_id, 'grid_mapping_name', &
                                     trim(gmname)), this%nc_fname)
       end if
-      ! GeoTransform/spatial_ref (GDAL raster placement).  Rotation-aware:
-      ! GDAL's affine model supports planar rotation via the GT[2]/GT[4]
-      ! shear terms, independent of the x/y coordinate arrays -- unlike x/y
-      ! (true CF dimension coordinates, which cannot represent a rotated
-      ! position without becoming 2D auxiliary coordinates), GeoTransform
-      ! is computed directly from xorigin/yorigin/angrot/delr/delc, so it
-      ! remains correct even though add_grid_data() keeps x/y grid-local
-      ! for rotated grids.  Formula reduces exactly to the unrotated case
-      ! when angrot == 0.  Also requires WKT1 (this%wkt): MF6 has no CRS
-      ! library to convert WKT2 to WKT1, so CRS_WKT-only input does not
-      ! produce GeoTransform/spatial_ref.  dx/dy are effective (average)
-      ! pixel sizes over the full grid extent -- a GDAL limitation for
-      ! variable-spacing grids, not an MF6 one.
-      if (this%wkt /= '') then
-        ang = this%dis%angrot * DPIO180
-        dx_eff = sum(this%dis%delr) / size(this%dis%cellx)
-        dy_eff = -sum(this%dis%delc) / size(this%dis%celly)
-        gt0 = this%dis%xorigin - sum(this%dis%delc) * sin(ang)
-        gt1 = dx_eff * cos(ang)
-        gt2 = -dy_eff * sin(ang)
-        gt3 = this%dis%yorigin + sum(this%dis%delc) * cos(ang)
-        gt4 = dx_eff * sin(ang)
-        gt5 = dy_eff * cos(ang)
-        write (geotransform, '(6(1x,es16.8))') gt0, gt1, gt2, gt3, gt4, gt5
-        call nf_verify(nf90_put_att(this%ncid, var_id, 'GeoTransform', &
-                                    trim(adjustl(geotransform))), &
-                       this%nc_fname)
-        call nf_verify(nf90_put_att(this%ncid, var_id, 'spatial_ref', &
-                                    this%wkt), this%nc_fname)
+      ! CF-standard numeric grid_mapping parameters (in addition to
+      ! wkt/crs_wkt): some netCDF readers -- notably ArcGIS's classic
+      ! netCDF connector -- position a projected grid using these
+      ! individual attributes rather than parsing wkt/crs_wkt, and
+      ! default every parameter to 0 if they are absent. Covers
+      ! transverse_mercator, lambert_conformal_conic (2SP only -- CF has
+      ! no scale_factor attribute for this method, so a 1SP/scale-factor
+      ! WKT cannot be exactly represented), and albers_conical_equal_area;
+      ! other grid_mapping_name values are unaffected. Best-effort
+      ! extraction from effective_crs_wkt -- MF6 has no CRS parsing
+      ! library, so this is skipped if any parameter cannot be located.
+      if (trim(gmname) == 'transverse_mercator') then
+        call wkt_transverse_mercator_params(trim(effective_crs_wkt), &
+                                            longitude_of_central_meridian, &
+                                            latitude_of_projection_origin, &
+                                            scale_factor_at_central_meridian, &
+                                            false_easting, false_northing, &
+                                            semi_major_axis, inverse_flattening, &
+                                            params_found)
+        if (params_found) then
+          call nf_verify(nf90_put_att(this%ncid, var_id, &
+                                      'longitude_of_central_meridian', &
+                                      longitude_of_central_meridian), &
+                         this%nc_fname)
+          call nf_verify(nf90_put_att(this%ncid, var_id, &
+                                      'latitude_of_projection_origin', &
+                                      latitude_of_projection_origin), &
+                         this%nc_fname)
+          call nf_verify(nf90_put_att(this%ncid, var_id, &
+                                      'scale_factor_at_central_meridian', &
+                                      scale_factor_at_central_meridian), &
+                         this%nc_fname)
+          call nf_verify(nf90_put_att(this%ncid, var_id, 'false_easting', &
+                                      false_easting), this%nc_fname)
+          call nf_verify(nf90_put_att(this%ncid, var_id, 'false_northing', &
+                                      false_northing), this%nc_fname)
+          call nf_verify(nf90_put_att(this%ncid, var_id, 'semi_major_axis', &
+                                      semi_major_axis), this%nc_fname)
+          call nf_verify(nf90_put_att(this%ncid, var_id, 'inverse_flattening', &
+                                      inverse_flattening), this%nc_fname)
+        else
+          write (warnmsg, '(a)') 'Structured grid: unable to extract CF &
+            &transverse_mercator grid_mapping parameters from CRS_WKT; &
+            &some netCDF readers may not correctly position this grid. &
+            &Applies to file "'//trim(this%nc_fname)//'".'
+          call store_warning(warnmsg)
+        end if
+      else if (trim(gmname) == 'lambert_conformal_conic') then
+        call wkt_lambert_conformal_conic_params(trim(effective_crs_wkt), &
+                                                standard_parallel_1, &
+                                                standard_parallel_2, &
+                                                longitude_of_central_meridian, &
+                                                latitude_of_projection_origin, &
+                                                false_easting, false_northing, &
+                                                semi_major_axis, &
+                                                inverse_flattening, is_2sp, &
+                                                params_found)
+        if (params_found) then
+          call nf_verify(nf90_put_att(this%ncid, var_id, 'standard_parallel', &
+                                      (/standard_parallel_1, &
+                                        standard_parallel_2/)), this%nc_fname)
+          call nf_verify(nf90_put_att(this%ncid, var_id, &
+                                      'longitude_of_central_meridian', &
+                                      longitude_of_central_meridian), &
+                         this%nc_fname)
+          call nf_verify(nf90_put_att(this%ncid, var_id, &
+                                      'latitude_of_projection_origin', &
+                                      latitude_of_projection_origin), &
+                         this%nc_fname)
+          call nf_verify(nf90_put_att(this%ncid, var_id, 'false_easting', &
+                                      false_easting), this%nc_fname)
+          call nf_verify(nf90_put_att(this%ncid, var_id, 'false_northing', &
+                                      false_northing), this%nc_fname)
+          call nf_verify(nf90_put_att(this%ncid, var_id, 'semi_major_axis', &
+                                      semi_major_axis), this%nc_fname)
+          call nf_verify(nf90_put_att(this%ncid, var_id, 'inverse_flattening', &
+                                      inverse_flattening), this%nc_fname)
+        else if (.not. is_2sp) then
+          write (warnmsg, '(a)') 'Structured grid: 1SP lambert_conformal_conic &
+            &variants are not supported for CF grid_mapping parameter &
+            &extraction (CF has no scale_factor attribute for this method); &
+            &some netCDF readers may not correctly position this grid. &
+            &Applies to file "'//trim(this%nc_fname)//'".'
+          call store_warning(warnmsg)
+        else
+          write (warnmsg, '(a)') 'Structured grid: unable to extract CF &
+            &lambert_conformal_conic grid_mapping parameters from CRS_WKT; &
+            &some netCDF readers may not correctly position this grid. &
+            &Applies to file "'//trim(this%nc_fname)//'".'
+          call store_warning(warnmsg)
+        end if
+      else if (trim(gmname) == 'albers_conical_equal_area') then
+        call wkt_albers_conical_equal_area_params(trim(effective_crs_wkt), &
+                                                  standard_parallel_1, &
+                                                  standard_parallel_2, &
+                                                  longitude_of_central_meridian, &
+                                                  latitude_of_projection_origin, &
+                                                  false_easting, false_northing, &
+                                                  semi_major_axis, &
+                                                  inverse_flattening, &
+                                                  params_found)
+        if (params_found) then
+          call nf_verify(nf90_put_att(this%ncid, var_id, 'standard_parallel', &
+                                      (/standard_parallel_1, &
+                                        standard_parallel_2/)), this%nc_fname)
+          call nf_verify(nf90_put_att(this%ncid, var_id, &
+                                      'longitude_of_central_meridian', &
+                                      longitude_of_central_meridian), &
+                         this%nc_fname)
+          call nf_verify(nf90_put_att(this%ncid, var_id, &
+                                      'latitude_of_projection_origin', &
+                                      latitude_of_projection_origin), &
+                         this%nc_fname)
+          call nf_verify(nf90_put_att(this%ncid, var_id, 'false_easting', &
+                                      false_easting), this%nc_fname)
+          call nf_verify(nf90_put_att(this%ncid, var_id, 'false_northing', &
+                                      false_northing), this%nc_fname)
+          call nf_verify(nf90_put_att(this%ncid, var_id, 'semi_major_axis', &
+                                      semi_major_axis), this%nc_fname)
+          call nf_verify(nf90_put_att(this%ncid, var_id, 'inverse_flattening', &
+                                      inverse_flattening), this%nc_fname)
+        else
+          write (warnmsg, '(a)') 'Structured grid: unable to extract CF &
+            &albers_conical_equal_area grid_mapping parameters from &
+            &CRS_WKT; some netCDF readers may not correctly position this &
+            &grid. Applies to file "'//trim(this%nc_fname)//'".'
+          call store_warning(warnmsg)
+        end if
       end if
+      ! GeoTransform/spatial_ref intentionally not written: a GDAL-only,
+      ! non-CF extension ArcGIS does not read, superseded by crs_wkt's
+      ! derived-CRS encoding above, which any CRS-aware consumer resolves
+      ! via ordinary reprojection.
       call nf_verify(nf90_enddef(this%ncid), this%nc_fname)
       call nf_verify(nf90_put_var(this%ncid, var_id, 1), &
                      this%nc_fname)

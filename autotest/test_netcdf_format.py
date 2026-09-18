@@ -99,6 +99,93 @@ WKT2 = (
     'ID["EPSG",26918]]'
 )
 
+# WKT2 for EPSG:3081 (NAD83 / Texas State Mapping System) -- real-world
+# lambert_conformal_conic 2SP CRS, for CF grid_mapping numeric parameter
+# extraction coverage.
+LCC_2SP_WKT2 = (
+    'PROJCRS["NAD83 / Texas State Mapping System",'
+    'BASEGEOGCRS["NAD83",'
+    'DATUM["North American Datum 1983",'
+    'ELLIPSOID["GRS 1980",6378137,298.257222101,LENGTHUNIT["metre",1]]],'
+    'PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],'
+    'ID["EPSG",4269]],'
+    'CONVERSION["Texas State Mapping System (meter)",'
+    'METHOD["Lambert Conic Conformal (2SP)",ID["EPSG",9802]],'
+    'PARAMETER["Latitude of false origin",31.1666666666667,'
+    'ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8821]],'
+    'PARAMETER["Longitude of false origin",-100,'
+    'ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8822]],'
+    'PARAMETER["Latitude of 1st standard parallel",27.4166666666667,'
+    'ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8823]],'
+    'PARAMETER["Latitude of 2nd standard parallel",34.9166666666667,'
+    'ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8824]],'
+    'PARAMETER["Easting at false origin",1000000,'
+    'LENGTHUNIT["metre",1],ID["EPSG",8826]],'
+    'PARAMETER["Northing at false origin",1000000,'
+    'LENGTHUNIT["metre",1],ID["EPSG",8827]]],'
+    "CS[Cartesian,2],"
+    'AXIS["easting (X)",east,ORDER[1],LENGTHUNIT["metre",1]],'
+    'AXIS["northing (Y)",north,ORDER[2],LENGTHUNIT["metre",1]],'
+    'ID["EPSG",3081]]'
+)
+
+# WKT2 for EPSG:5070 (NAD83 / Conus Albers) -- real-world
+# albers_conical_equal_area CRS.
+ALBERS_WKT2 = (
+    'PROJCRS["NAD83 / Conus Albers",'
+    'BASEGEOGCRS["NAD83",'
+    'DATUM["North American Datum 1983",'
+    'ELLIPSOID["GRS 1980",6378137,298.257222101,LENGTHUNIT["metre",1]]],'
+    'PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],'
+    'ID["EPSG",4269]],'
+    'CONVERSION["Conus Albers",'
+    'METHOD["Albers Equal Area",ID["EPSG",9822]],'
+    'PARAMETER["Latitude of false origin",23,'
+    'ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8821]],'
+    'PARAMETER["Longitude of false origin",-96,'
+    'ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8822]],'
+    'PARAMETER["Latitude of 1st standard parallel",29.5,'
+    'ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8823]],'
+    'PARAMETER["Latitude of 2nd standard parallel",45.5,'
+    'ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8824]],'
+    'PARAMETER["Easting at false origin",0,'
+    'LENGTHUNIT["metre",1],ID["EPSG",8826]],'
+    'PARAMETER["Northing at false origin",0,'
+    'LENGTHUNIT["metre",1],ID["EPSG",8827]]],'
+    "CS[Cartesian,2],"
+    'AXIS["easting (X)",east,ORDER[1],LENGTHUNIT["metre",1]],'
+    'AXIS["northing (Y)",north,ORDER[2],LENGTHUNIT["metre",1]],'
+    'ID["EPSG",5070]]'
+)
+
+# WKT2 for EPSG:2062 (Madrid 1870 (Madrid) / Spain LCC) -- real-world
+# lambert_conformal_conic 1SP CRS (scale_factor-based, no standard_parallel
+# attributes at all). CF has no scale_factor attribute for this method, so
+# CF grid_mapping numeric parameter extraction must bail out with a
+# warning rather than write anything.
+LCC_1SP_WKT2 = (
+    'PROJCRS["Madrid 1870 (Madrid) / Spain LCC",'
+    'BASEGEOGCRS["Madrid 1870 (Madrid)",'
+    'DATUM["Madrid 1870 (Madrid)",'
+    'ELLIPSOID["Struve 1860",6378298.3,294.73,LENGTHUNIT["metre",1]]],'
+    'PRIMEM["Madrid",-3.687375,ANGLEUNIT["degree",0.0174532925199433]],'
+    'ID["EPSG",4903]],'
+    'CONVERSION["Spain",'
+    'METHOD["Lambert Conic Conformal (1SP)",ID["EPSG",9801]],'
+    'PARAMETER["Latitude of natural origin",40,'
+    'ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],'
+    'PARAMETER["Longitude of natural origin",0,'
+    'ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],'
+    'PARAMETER["Scale factor at natural origin",0.9988085293,'
+    'SCALEUNIT["unity",1],ID["EPSG",8805]],'
+    'PARAMETER["False easting",600000,LENGTHUNIT["metre",1],ID["EPSG",8806]],'
+    'PARAMETER["False northing",600000,LENGTHUNIT["metre",1],ID["EPSG",8807]]],'
+    "CS[Cartesian,2],"
+    'AXIS["easting (X)",east,ORDER[1],LENGTHUNIT["metre",1]],'
+    'AXIS["northing (Y)",north,ORDER[2],LENGTHUNIT["metre",1]],'
+    'ID["EPSG",2062]]'
+)
+
 # small model appropriate for convention checks
 NLAY, NROW, NCOL = 2, 3, 3
 DELR = DELC = [100.0, 100.0, 100.0]
@@ -165,7 +252,12 @@ def build_models(test, fmt, ncf_config):
         botm=BOTM,
         xorigin=XORIGIN,
         yorigin=YORIGIN,
-        angrot=ANGROT_ROTATED if ncf_config == "rotated" else 0.0,
+        angrot=(
+            ANGROT_ROTATED
+            if ncf_config
+            in ("rotated", "rotated_with_crs_wkt", "rotated_malformed_crs_wkt")
+            else 0.0
+        ),
     )
 
     flopy.mf6.ModflowGwfic(gwf, strt=STRT)
@@ -221,6 +313,20 @@ def build_models(test, fmt, ncf_config):
             ncf_kwargs["wkt"] = WKT1_GEO
         elif ncf_config == "rotated":
             ncf_kwargs["wkt"] = WKT1
+        elif ncf_config == "rotated_with_crs_wkt":
+            ncf_kwargs["wkt"] = WKT1
+            ncf_kwargs["crs_wkt"] = WKT2
+        elif ncf_config == "rotated_malformed_crs_wkt":
+            # WKT1 given where a WKT2 PROJCRS is required -- exercises the
+            # malformed-CRS_WKT fallback in wrap_rotated_crs
+            ncf_kwargs["wkt"] = WKT1
+            ncf_kwargs["crs_wkt"] = WKT1
+        elif ncf_config == "lcc_2sp":
+            ncf_kwargs["crs_wkt"] = LCC_2SP_WKT2
+        elif ncf_config == "albers":
+            ncf_kwargs["crs_wkt"] = ALBERS_WKT2
+        elif ncf_config == "lcc_1sp":
+            ncf_kwargs["crs_wkt"] = LCC_1SP_WKT2
         elif ncf_config == "latlon":
             # explicit ncpl works around a flopy bug: without it, flopy
             # infers NCPL as NROW instead of NROW*NCOL for structured
@@ -437,38 +543,56 @@ def _check_projection(ds, fmt, ncf_config, label=""):
         f"{proj.getncattr('grid_mapping_name')!r}"
     )
 
-    # GeoTransform / spatial_ref: structured-only, requires WKT1
-    # (this%wkt) since MF6 has no CRS library to derive WKT1 from WKT2, and
-    # only for unrotated grids (this model has ANGROT=0).
-    expect_geotransform = fmt == "structured" and ncf_config in ("wkt_only", "both")
-    if expect_geotransform:
-        assert "GeoTransform" in proj.ncattrs(), (
-            f"GeoTransform missing for {ncf_config!r}{ctx}"
+    # GeoTransform/spatial_ref are never written -- superseded by the CF
+    # grid_mapping parameters below and crs_wkt's derived-CRS encoding.
+    assert "GeoTransform" not in proj.ncattrs(), (
+        f"GeoTransform must never be written{ctx}"
+    )
+    assert "spatial_ref" not in proj.ncattrs(), (
+        f"spatial_ref must never be written{ctx}"
+    )
+
+    # CF-standard numeric grid_mapping parameters: structured-format-only
+    # (mesh already positions correctly without them; ArcGIS's classic
+    # netCDF connector needs these individual attributes to position a
+    # projected grid, defaulting every parameter to 0 if absent). This
+    # model uses UTM18N (transverse_mercator); lambert_conformal_conic and
+    # albers_conical_equal_area are covered separately below.
+    if fmt == "structured":
+        assert np.isclose(proj.getncattr("longitude_of_central_meridian"), -75.0), (
+            f"longitude_of_central_meridian mismatch{ctx}"
         )
-        gt = [float(v) for v in proj.getncattr("GeoTransform").split()]
-        assert len(gt) == 6, f"GeoTransform must have 6 values{ctx}: {gt}"
-        expected_gt = [
-            XORIGIN,
-            sum(DELR) / NCOL,
-            0.0,
-            YORIGIN + sum(DELC),
-            0.0,
-            -sum(DELC) / NROW,
-        ]
-        assert np.allclose(gt, expected_gt), (
-            f"GeoTransform value mismatch{ctx}: {gt} != {expected_gt}"
+        assert np.isclose(proj.getncattr("latitude_of_projection_origin"), 0.0), (
+            f"latitude_of_projection_origin mismatch{ctx}"
         )
-        assert "spatial_ref" in proj.ncattrs(), f"spatial_ref missing{ctx}"
-        assert proj.getncattr("spatial_ref") == WKT1, f"spatial_ref must be WKT1{ctx}"
+        assert np.isclose(proj.getncattr("scale_factor_at_central_meridian"), 0.9996), (
+            f"scale_factor_at_central_meridian mismatch{ctx}"
+        )
+        assert np.isclose(proj.getncattr("false_easting"), 500000.0), (
+            f"false_easting mismatch{ctx}"
+        )
+        assert np.isclose(proj.getncattr("false_northing"), 0.0), (
+            f"false_northing mismatch{ctx}"
+        )
+        assert np.isclose(proj.getncattr("semi_major_axis"), 6378137.0), (
+            f"semi_major_axis mismatch{ctx}"
+        )
+        assert np.isclose(proj.getncattr("inverse_flattening"), 298.257222101), (
+            f"inverse_flattening mismatch{ctx}"
+        )
     else:
-        assert "GeoTransform" not in proj.ncattrs(), (
-            f"GeoTransform must not be written for fmt={fmt!r}, "
-            f"ncf_config={ncf_config!r}{ctx}"
-        )
-        assert "spatial_ref" not in proj.ncattrs(), (
-            f"spatial_ref must not be written for fmt={fmt!r}, "
-            f"ncf_config={ncf_config!r}{ctx}"
-        )
+        for attr in (
+            "longitude_of_central_meridian",
+            "latitude_of_projection_origin",
+            "scale_factor_at_central_meridian",
+            "false_easting",
+            "false_northing",
+            "semi_major_axis",
+            "inverse_flattening",
+        ):
+            assert attr not in proj.ncattrs(), (
+                f"{attr} must not be written for fmt={fmt!r}{ctx}"
+            )
 
 
 def _check_coord_gridmapping(ds, fmt, ncf_config, label=""):
@@ -904,89 +1028,212 @@ def _check_latlon_output(test):
         )
 
 
-def _rotated_geotransform_corners(gt):
-    """Real-world (x, y) at the four pixel-grid corners implied by a
-    6-element GDAL GeoTransform."""
-    corners = []
-    for xpixel in (0, NCOL):
-        for yline in (0, NROW):
-            xg = gt[0] + xpixel * gt[1] + yline * gt[2]
-            yg = gt[3] + xpixel * gt[4] + yline * gt[5]
-            corners.append((xg, yg))
-    return corners
-
-
-def _check_rotated_output(test, fmt):
-    """Rotated structured grid: GeoTransform must be present and correct
-    (rotation-aware formula, DELR/DELC uniform in this model so the
-    effective-pixel-size approximation is exact, not just close). x/y
-    dimension coordinates remain grid-local regardless (CF dimension
-    coordinates cannot represent a rotated position) -- unaffected by this
-    change, not re-checked here."""
+def _check_lcc_2sp_output(test):
+    """lambert_conformal_conic (2SP) CRS_WKT: CF grid_mapping_name plus the
+    standard_parallel array and the 6 shared numeric parameters must all be
+    extracted and written (structured format only)."""
     name = test.name
     ws = test.workspace
     with nc.Dataset(ws / f"{name}.nc") as ds:
         proj = ds.variables["projection"]
-        if fmt == "structured":
-            assert "GeoTransform" in proj.ncattrs(), (
-                "GeoTransform missing for rotated structured grid"
-            )
-            gt = [float(v) for v in proj.getncattr("GeoTransform").split()]
-            assert len(gt) == 6, f"GeoTransform must have 6 values: {gt}"
+        assert proj.getncattr("grid_mapping_name") == "lambert_conformal_conic", (
+            "expected lambert_conformal_conic grid_mapping_name"
+        )
+        sp = proj.getncattr("standard_parallel")
+        assert np.allclose(sp, [27.4166666666667, 34.9166666666667]), (
+            f"standard_parallel mismatch: {sp}"
+        )
+        assert np.isclose(proj.getncattr("longitude_of_central_meridian"), -100.0)
+        assert np.isclose(proj.getncattr("latitude_of_projection_origin"), 31.1666666666667)
+        assert np.isclose(proj.getncattr("false_easting"), 1000000.0)
+        assert np.isclose(proj.getncattr("false_northing"), 1000000.0)
+        assert np.isclose(proj.getncattr("semi_major_axis"), 6378137.0)
+        assert np.isclose(proj.getncattr("inverse_flattening"), 298.257222101)
 
-            ang = np.radians(ANGROT_ROTATED)
-            dx_eff = sum(DELR) / NCOL
-            dy_eff = -sum(DELC) / NROW
-            expected_gt = [
-                XORIGIN - sum(DELC) * np.sin(ang),
-                dx_eff * np.cos(ang),
-                -dy_eff * np.sin(ang),
-                YORIGIN + sum(DELC) * np.cos(ang),
-                dx_eff * np.sin(ang),
-                dy_eff * np.cos(ang),
-            ]
-            assert np.allclose(gt, expected_gt), (
-                f"rotated GeoTransform value mismatch: {gt} != {expected_gt}"
+
+def _check_albers_output(test):
+    """albers_conical_equal_area CRS_WKT: CF grid_mapping_name plus the
+    standard_parallel array and the 6 shared numeric parameters must all be
+    extracted and written (structured format only)."""
+    name = test.name
+    ws = test.workspace
+    with nc.Dataset(ws / f"{name}.nc") as ds:
+        proj = ds.variables["projection"]
+        assert proj.getncattr("grid_mapping_name") == "albers_conical_equal_area", (
+            "expected albers_conical_equal_area grid_mapping_name"
+        )
+        sp = proj.getncattr("standard_parallel")
+        assert np.allclose(sp, [29.5, 45.5]), f"standard_parallel mismatch: {sp}"
+        assert np.isclose(proj.getncattr("longitude_of_central_meridian"), -96.0)
+        assert np.isclose(proj.getncattr("latitude_of_projection_origin"), 23.0)
+        assert np.isclose(proj.getncattr("false_easting"), 0.0)
+        assert np.isclose(proj.getncattr("false_northing"), 0.0)
+        assert np.isclose(proj.getncattr("semi_major_axis"), 6378137.0)
+        assert np.isclose(proj.getncattr("inverse_flattening"), 298.257222101)
+
+
+def _check_lcc_1sp_output(test):
+    """lambert_conformal_conic (1SP, scale_factor-based) CRS_WKT: CF has no
+    scale_factor attribute for this method, so grid_mapping_name is still
+    written (from the WKT projection/method name alone) but none of the
+    numeric CF grid_mapping parameters are -- extraction bails out with a
+    warning rather than writing anything."""
+    name = test.name
+    ws = test.workspace
+    with nc.Dataset(ws / f"{name}.nc") as ds:
+        proj = ds.variables["projection"]
+        assert proj.getncattr("grid_mapping_name") == "lambert_conformal_conic", (
+            "expected lambert_conformal_conic grid_mapping_name"
+        )
+        for attr in (
+            "standard_parallel",
+            "longitude_of_central_meridian",
+            "latitude_of_projection_origin",
+            "false_easting",
+            "false_northing",
+            "semi_major_axis",
+            "inverse_flattening",
+        ):
+            assert attr not in proj.ncattrs(), (
+                f"{attr} must not be written for an unsupported 1SP variant"
             )
-            assert "spatial_ref" in proj.ncattrs(), "spatial_ref missing"
-            assert proj.getncattr("spatial_ref") == WKT1, "spatial_ref must be WKT1"
-        else:
-            # mesh format already handled rotation correctly before this
-            # change (via dis_transform_xy) -- confirm unaffected/unchanged
-            assert "GeoTransform" not in proj.ncattrs(), (
-                "GeoTransform must never be written for mesh format"
+
+
+def _check_rotated_output(test, fmt):
+    """Rotated grid with only WKT supplied (no CRS_WKT at all): crs_wkt
+    falls back to the plain wkt value, unwrapped -- no rotation
+    information is encoded anywhere. For structured format, x/y must not
+    carry axis/standard_name (grid rotation cannot be represented without
+    a valid CRS_WKT to wrap). Mesh format is unaffected -- it already
+    stores true node coordinates directly, independent of any of this."""
+    name = test.name
+    ws = test.workspace
+    with nc.Dataset(ws / f"{name}.nc") as ds:
+        proj = ds.variables["projection"]
+        assert proj.getncattr("crs_wkt") == WKT1, (
+            "crs_wkt must fall back to the plain wkt value unmodified"
+        )
+        if fmt == "structured":
+            assert "axis" not in ds.variables["x"].ncattrs(), (
+                "x axis attr must be suppressed with no CRS_WKT input"
             )
-            assert "spatial_ref" not in proj.ncattrs(), (
-                "spatial_ref must never be written for mesh format"
+            assert "axis" not in ds.variables["y"].ncattrs(), (
+                "y axis attr must be suppressed with no CRS_WKT input"
+            )
+
+
+def _check_rotated_crs_wkt_output(test, fmt):
+    """Rotated structured grid with a valid WKT2 PROJCRS CRS_WKT: crs_wkt
+    must be wrapped in a DerivedProjectedCRS encoding the rotation via
+    EPSG:9624 (affine parametric transformation), with A0..B2 matching
+    the world->local rotation computed independently in Python. x/y
+    must retain axis/standard_name (not suppressed), since they are
+    correct native coordinates in the derived CRS."""
+    import re
+
+    name = test.name
+    ws = test.workspace
+    with nc.Dataset(ws / f"{name}.nc") as ds:
+        proj = ds.variables["projection"]
+        crs_wkt = proj.getncattr("crs_wkt")
+        if fmt != "structured":
+            assert not crs_wkt.startswith("DERIVEDPROJCRS["), (
+                "mesh format must never wrap crs_wkt in a derived CRS"
+            )
+            return
+
+        assert crs_wkt.startswith("DERIVEDPROJCRS["), (
+            f"crs_wkt must be wrapped in a DerivedProjectedCRS: {crs_wkt[:80]}"
+        )
+        assert "Affine parametric transformation" in crs_wkt
+        assert 'ID["EPSG",9624]' in crs_wkt
+
+        params = {}
+        for pname in ("A0", "A1", "A2", "B0", "B1", "B2"):
+            m = re.search(rf'PARAMETER\["{pname}",([^,\]]+)', crs_wkt)
+            assert m, f"{pname} parameter not found in crs_wkt"
+            params[pname] = float(m.group(1))
+
+        ang = np.radians(ANGROT_ROTATED)
+        expected = {
+            "A0": -(XORIGIN * np.cos(ang) + YORIGIN * np.sin(ang)),
+            "A1": np.cos(ang),
+            "A2": np.sin(ang),
+            "B0": XORIGIN * np.sin(ang) - YORIGIN * np.cos(ang),
+            "B1": -np.sin(ang),
+            "B2": np.cos(ang),
+        }
+        for pname in expected:
+            assert np.isclose(params[pname], expected[pname], rtol=1e-10), (
+                f"{pname}: {params[pname]} != expected {expected[pname]}"
+            )
+
+        assert "axis" in ds.variables["x"].ncattrs(), (
+            "x axis attr must be present when CRS_WKT wrap succeeds"
+        )
+        assert "axis" in ds.variables["y"].ncattrs(), (
+            "y axis attr must be present when CRS_WKT wrap succeeds"
+        )
+        assert "GeoTransform" not in proj.ncattrs(), (
+            "GeoTransform must never be written"
+        )
+        assert "spatial_ref" not in proj.ncattrs(), "spatial_ref must never be written"
+
+
+def _check_rotated_malformed_crs_wkt_output(test, fmt):
+    """Rotated grid with CRS_WKT set to WKT1 text (not a WKT2 PROJCRS):
+    crs_wkt must be written unmodified, with no attempt to wrap it in a
+    derived CRS. For structured format, x/y must not carry axis/
+    standard_name (same fallback as no CRS_WKT at all)."""
+    name = test.name
+    ws = test.workspace
+    with nc.Dataset(ws / f"{name}.nc") as ds:
+        proj = ds.variables["projection"]
+        assert proj.getncattr("crs_wkt") == WKT1, (
+            "crs_wkt must be written unmodified when malformed"
+        )
+        if fmt == "structured":
+            assert "axis" not in ds.variables["x"].ncattrs(), (
+                "x axis attr must be suppressed when CRS_WKT is malformed"
+            )
+            assert "axis" not in ds.variables["y"].ncattrs(), (
+                "y axis attr must be suppressed when CRS_WKT is malformed"
             )
 
 
 def _check_rotated_cross_format(struct_test, ugrid_test):
-    """Strong cross-check: verify structured's new GeoTransform-implied grid
-    corners (a newly-Fortran-implemented rotation formula) against mesh
-    format's independently-implemented, already-shipped, real-world node
-    coordinates (dis_transform_xy) -- both generated by real MF6 runs of the
-    identical rotated grid, not just checked against a Python derivation."""
+    """Cross-check: reproject structured's wrapped crs_wkt (a
+    DerivedProjectedCRS) via pyproj and compare its grid-edge corners
+    against mesh format's independently-implemented real-world node
+    coordinates (dis_transform_xy) -- both from real MF6 runs of the
+    identical rotated grid, not a Python-side derivation of the formula."""
+    pyproj = pytest.importorskip("pyproj")
+
     with nc.Dataset(struct_test.workspace / f"{struct_test.name}.nc") as ds:
-        gt = [
-            float(v)
-            for v in ds.variables["projection"].getncattr("GeoTransform").split()
-        ]
-    expected_corners = _rotated_geotransform_corners(gt)
+        crs_wkt = ds.variables["projection"].getncattr("crs_wkt")
+    assert crs_wkt.startswith("DERIVEDPROJCRS["), (
+        "structured crs_wkt must be wrapped for this cross-check to be valid"
+    )
+    derived_crs = pyproj.CRS.from_wkt(crs_wkt)
+    base_crs = pyproj.CRS.from_epsg(26918)
+    transformer = pyproj.Transformer.from_crs(derived_crs, base_crs, always_xy=True)
+
+    local_corners = [
+        (0.0, 0.0),
+        (sum(DELR), 0.0),
+        (sum(DELR), sum(DELC)),
+        (0.0, sum(DELC)),
+    ]
+    expected_corners = [transformer.transform(x, y) for x, y in local_corners]
 
     with nc.Dataset(ugrid_test.workspace / f"{ugrid_test.name}.nc") as ds:
         node_x = ds.variables["mesh_node_x"][:]
         node_y = ds.variables["mesh_node_y"][:]
 
-    # tolerance reflects GeoTransform's ES16.8 text-formatting precision
-    # (9 significant digits) at YORIGIN's ~1e8 magnitude, i.e. ~0.1 unit --
-    # not the underlying formula's precision, which matches exactly (see
-    # test_rotated_geotransform's direct np.allclose check on the raw GT
-    # values, unaffected by this compounding-corner-arithmetic concern)
     for xg, yg in expected_corners:
         dist = np.sqrt((node_x - xg) ** 2 + (node_y - yg) ** 2)
-        assert dist.min() < 1.0, (
-            f"structured GeoTransform corner ({xg}, {yg}) has no matching "
+        assert dist.min() < 1e-3, (
+            f"structured wrapped-crs_wkt corner ({xg}, {yg}) has no matching "
             f"mesh node (closest distance {dist.min()!r}) -- structured "
             f"and mesh rotation implementations disagree"
         )
@@ -1043,12 +1290,59 @@ def test_latlon_griddata(function_tmpdir, targets):
 
 
 @pytest.mark.netcdf
+def test_lcc_2sp_griddata(function_tmpdir, targets):
+    """lambert_conformal_conic (2SP) CRS_WKT: CF grid_mapping numeric
+    parameter extraction (structured only)."""
+    test = TestFramework(
+        name="gwf_lcc_2sp",
+        workspace=function_tmpdir,
+        build=lambda t: build_models(t, "structured", "lcc_2sp"),
+        check=lambda t: _check_lcc_2sp_output(t),
+        targets=targets,
+        compare=None,
+    )
+    test.run()
+
+
+@pytest.mark.netcdf
+def test_albers_griddata(function_tmpdir, targets):
+    """albers_conical_equal_area CRS_WKT: CF grid_mapping numeric
+    parameter extraction (structured only)."""
+    test = TestFramework(
+        name="gwf_albers",
+        workspace=function_tmpdir,
+        build=lambda t: build_models(t, "structured", "albers"),
+        check=lambda t: _check_albers_output(t),
+        targets=targets,
+        compare=None,
+    )
+    test.run()
+
+
+@pytest.mark.netcdf
+def test_lcc_1sp_griddata(function_tmpdir, targets):
+    """lambert_conformal_conic (1SP, scale_factor-based) CRS_WKT: not
+    supported for CF grid_mapping numeric parameter extraction -- must
+    warn and write no numeric parameters, while still writing
+    grid_mapping_name."""
+    test = TestFramework(
+        name="gwf_lcc_1sp",
+        workspace=function_tmpdir,
+        build=lambda t: build_models(t, "structured", "lcc_1sp"),
+        check=lambda t: _check_lcc_1sp_output(t),
+        targets=targets,
+        compare=None,
+    )
+    test.run()
+
+
+@pytest.mark.netcdf
 @pytest.mark.parametrize("fmt", ["structured", "ugrid"])
 def test_rotated_geotransform(fmt, function_tmpdir, targets):
-    """Rotated grid (ANGROT != 0) with a CRS configured: structured now gets
-    a rotation-aware GeoTransform (reopened 2026-07-09 -- previously
-    withheld entirely for rotated grids); mesh format is unaffected (it
-    already handled rotation correctly via dis_transform_xy)."""
+    """Rotated grid (ANGROT != 0) with only WKT configured (no CRS_WKT):
+    structured format cannot encode rotation without CRS_WKT, so crs_wkt
+    falls back unwrapped and x/y stay unmarked; mesh format is unaffected
+    (it already handles rotation correctly via dis_transform_xy)."""
     test = TestFramework(
         name="gwf_rotated",
         workspace=function_tmpdir,
@@ -1061,21 +1355,57 @@ def test_rotated_geotransform(fmt, function_tmpdir, targets):
 
 
 @pytest.mark.netcdf
-def test_rotated_geotransform_matches_mesh(function_tmpdir, targets):
-    """Strong cross-check: build the identical rotated grid in both
-    structured and mesh format, and confirm structured's new
-    GeoTransform-implied corner coordinates match mesh's independently
-    computed, already-shipped real-world node coordinates -- validates the
-    new Fortran implementation against a second, trusted code path, not
-    just a Python-side derivation."""
+@pytest.mark.parametrize("fmt", ["structured", "ugrid"])
+def test_rotated_crs_wkt(fmt, function_tmpdir, targets):
+    """Rotated grid with a valid WKT2 PROJCRS CRS_WKT: structured format
+    wraps it in a derived CRS encoding the rotation (the primary
+    mechanism for GDAL-based tools to resolve correct position and
+    shape via reprojection); mesh format is unaffected, since it
+    already stores true node coordinates directly."""
+    test = TestFramework(
+        name="gwf_rotated",
+        workspace=function_tmpdir,
+        build=lambda t: build_models(t, fmt, "rotated_with_crs_wkt"),
+        check=lambda t: _check_rotated_crs_wkt_output(t, fmt),
+        targets=targets,
+        compare=None,
+    )
+    test.run()
+
+
+@pytest.mark.netcdf
+@pytest.mark.parametrize("fmt", ["structured", "ugrid"])
+def test_rotated_malformed_crs_wkt(fmt, function_tmpdir, targets):
+    """Rotated grid with CRS_WKT set to WKT1 text (not a WKT2 PROJCRS):
+    MF6 cannot encode grid rotation in an unrecognized CRS_WKT format, so
+    it must warn and leave crs_wkt unmodified rather than writing an
+    invalid derived CRS."""
+    test = TestFramework(
+        name="gwf_rotated",
+        workspace=function_tmpdir,
+        build=lambda t: build_models(t, fmt, "rotated_malformed_crs_wkt"),
+        check=lambda t: _check_rotated_malformed_crs_wkt_output(t, fmt),
+        targets=targets,
+        compare=None,
+    )
+    test.run()
+
+
+@pytest.mark.netcdf
+def test_rotated_crs_wkt_matches_mesh(function_tmpdir, targets):
+    """Cross-check: build the identical rotated grid in both structured
+    and mesh format, and confirm structured's wrapped crs_wkt (reprojected
+    via pyproj) resolves to the same real-world corner coordinates as
+    mesh's independently computed node coordinates -- validates against a
+    second, trusted code path, not just a Python-side derivation."""
     (function_tmpdir / "structured").mkdir()
     (function_tmpdir / "ugrid").mkdir()
 
     struct_test = TestFramework(
         name="gwf_rotated",
         workspace=function_tmpdir / "structured",
-        build=lambda t: build_models(t, "structured", "rotated"),
-        check=lambda t: _check_rotated_output(t, "structured"),
+        build=lambda t: build_models(t, "structured", "rotated_with_crs_wkt"),
+        check=lambda t: _check_rotated_crs_wkt_output(t, "structured"),
         targets=targets,
         compare=None,
     )
@@ -1084,8 +1414,8 @@ def test_rotated_geotransform_matches_mesh(function_tmpdir, targets):
     ugrid_test = TestFramework(
         name="gwf_rotated",
         workspace=function_tmpdir / "ugrid",
-        build=lambda t: build_models(t, "ugrid", "rotated"),
-        check=lambda t: _check_rotated_output(t, "ugrid"),
+        build=lambda t: build_models(t, "ugrid", "rotated_with_crs_wkt"),
+        check=lambda t: _check_rotated_crs_wkt_output(t, "ugrid"),
         targets=targets,
         compare=None,
     )

@@ -1044,7 +1044,9 @@ def _check_lcc_2sp_output(test):
             f"standard_parallel mismatch: {sp}"
         )
         assert np.isclose(proj.getncattr("longitude_of_central_meridian"), -100.0)
-        assert np.isclose(proj.getncattr("latitude_of_projection_origin"), 31.1666666666667)
+        assert np.isclose(
+            proj.getncattr("latitude_of_projection_origin"), 31.1666666666667
+        )
         assert np.isclose(proj.getncattr("false_easting"), 1000000.0)
         assert np.isclose(proj.getncattr("false_northing"), 1000000.0)
         assert np.isclose(proj.getncattr("semi_major_axis"), 6378137.0)

@@ -183,11 +183,17 @@ def check_output(idx, test, export, gridded_input):
 
         if export == "structured":
             proj = ds.variables["projection"]
-            assert "GeoTransform" in proj.ncattrs()
-            assert "spatial_ref" in proj.ncattrs()
-            assert proj.getncattr("spatial_ref") == WKT1
-            gt = [float(v) for v in proj.getncattr("GeoTransform").split()]
-            assert len(gt) == 6
+            assert "GeoTransform" not in proj.ncattrs()
+            assert "spatial_ref" not in proj.ncattrs()
+            assert proj.getncattr("wkt") == WKT1
+            assert proj.getncattr("grid_mapping_name") == "transverse_mercator"
+            assert proj.getncattr("longitude_of_central_meridian") == -75.0
+            assert proj.getncattr("latitude_of_projection_origin") == 0.0
+            assert proj.getncattr("scale_factor_at_central_meridian") == 0.9996
+            assert proj.getncattr("false_easting") == 500000.0
+            assert proj.getncattr("false_northing") == 0.0
+            assert proj.getncattr("semi_major_axis") == 6378137.0
+            assert proj.getncattr("inverse_flattening") == 298.257222101
 
     fpth = os.path.join(test.workspace, f"{gwtname}.ucn")
     try:

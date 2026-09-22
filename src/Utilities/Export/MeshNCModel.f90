@@ -11,7 +11,7 @@ module MeshModelModule
                              LENMEMPATH, DNODATA, DHNOFLO
   use SimVariablesModule, only: errmsg, warnmsg
   use SimModule, only: store_error, store_warning, store_error_filename
-  use MemoryManagerModule, only: mem_setptr
+  use MemoryManagerModule, only: mem_setptr, get_isize
   use InputDefinitionModule, only: InputParamDefinitionType
   use CharacterStringModule, only: CharacterStringType
   use NCModelExportModule, only: export_longname, export_varname, &
@@ -115,10 +115,24 @@ contains
     integer(I4B), intent(in) :: lenuni
     integer(I4B), intent(in) :: iout
     logical(LGP) :: found
+    integer(I4B) :: latsz, lonsz
 
     ! initialize base class
     call this%NCModelExportType%init(modelname, modeltype, modelfname, nc_fname, &
                                      disenum, nctype, iout)
+
+    if (this%ncf_mempath /= '') then
+      latsz = 0
+      lonsz = 0
+      call get_isize('LATITUDE', this%ncf_mempath, latsz)
+      call get_isize('LONGITUDE', this%ncf_mempath, lonsz)
+      if (latsz > 0 .or. lonsz > 0) then
+        write (warnmsg, '(a)') 'LATITUDE and LONGITUDE griddata are not &
+          &supported for a NETCDF_MESH2D export and will be ignored. &
+          &Applies to file "'//trim(nc_fname)//'".'
+        call store_warning(warnmsg)
+      end if
+    end if
 
     ! allocate and initialize
     allocate (this%chunk_face)

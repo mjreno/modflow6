@@ -32,7 +32,7 @@ module DisNCStructuredModule
   type :: StructuredNCDimIdType
     integer(I4B) :: x !< number of columns
     integer(I4B) :: y !< number of rows
-    integer(I4B) :: z !< number of layers
+    integer(I4B) :: layer !< number of layers
     integer(I4B) :: time !< number of steps
     integer(I4B) :: bnd !< number in boundary
   contains
@@ -41,7 +41,7 @@ module DisNCStructuredModule
   type :: StructuredNCVarIdType
     integer(I4B) :: x !< x coordinate variable
     integer(I4B) :: y !< y coordinate variable
-    integer(I4B) :: z !< layer coordinate variable (holdover name; z is the discrete layer index, not a position)
+    integer(I4B) :: layer !< layer coordinate variable (discrete layer index, not a position)
     integer(I4B) :: elevation !< z auxiliary coordinate variable (cell center elevation, a real vertical position)
     integer(I4B) :: time !< time coordinate variable
     integer(I4B) :: dependent !< dependent variable
@@ -186,8 +186,12 @@ contains
         if (this%dis%angrot /= DZERO) then
           write (warnmsg, '(a)') 'CRS parameter set with structured rotated &
             &grid. The x/y coordinate variables have grid-local, not &
-            &real-world, values, so deriving real longitude/latitude from &
-            &grid_mapping via these coordinates will be incorrect. &
+            &real-world, values. A CRS-aware consumer must apply the full &
+            &crs_wkt (which encodes rotation when a valid WKT2 PROJCRS was &
+            &supplied) via proper reprojection to resolve the true &
+            &position; deriving real longitude/latitude directly from x/y &
+            &and the flat/numeric CF grid_mapping parameters alone will be &
+            &incorrect, since those parameters never encode grid rotation. &
             &Applies to file "'//trim(nc_fname)//'".'
           call store_warning(warnmsg)
         end if
@@ -468,7 +472,7 @@ contains
         call nf_verify(nf90_def_var(this%ncid, varname, NF90_DOUBLE, &
                                     (/this%dim_ids%x, &
                                       this%dim_ids%y, &
-                                      this%dim_ids%z, &
+                                      this%dim_ids%layer, &
                                       this%dim_ids%time/), varid), &
                        this%nc_fname)
       end if
@@ -487,7 +491,7 @@ contains
         call nf_verify(nf90_def_var(this%ncid, varname, NF90_INT, &
                                     (/this%dim_ids%x, &
                                       this%dim_ids%y, &
-                                      this%dim_ids%z, &
+                                      this%dim_ids%layer, &
                                       this%dim_ids%time/), varid), &
                        this%nc_fname)
       end if
@@ -802,16 +806,17 @@ contains
 
     ! Z dimension
     call nf_verify(nf90_def_dim(this%ncid, 'layer', this%dis%nlay, &
-                                this%dim_ids%z), this%nc_fname)
-    call nf_verify(nf90_def_var(this%ncid, 'layer', NF90_INT, this%dim_ids%z, &
-                                this%var_ids%z), this%nc_fname)
-    call nf_verify(nf90_put_att(this%ncid, this%var_ids%z, 'units', '1'), &
+                                this%dim_ids%layer), this%nc_fname)
+    call nf_verify(nf90_def_var(this%ncid, 'layer', NF90_INT, &
+                                this%dim_ids%layer, this%var_ids%layer), &
                    this%nc_fname)
-    call nf_verify(nf90_put_att(this%ncid, this%var_ids%z, 'axis', 'Z'), &
+    call nf_verify(nf90_put_att(this%ncid, this%var_ids%layer, 'units', '1'), &
                    this%nc_fname)
-    call nf_verify(nf90_put_att(this%ncid, this%var_ids%z, 'positive', 'down'), &
+    call nf_verify(nf90_put_att(this%ncid, this%var_ids%layer, 'axis', 'Z'), &
                    this%nc_fname)
-    call nf_verify(nf90_put_att(this%ncid, this%var_ids%z, 'long_name', &
+    call nf_verify(nf90_put_att(this%ncid, this%var_ids%layer, 'positive', &
+                                'down'), this%nc_fname)
+    call nf_verify(nf90_put_att(this%ncid, this%var_ids%layer, 'long_name', &
                                 'model layer'), this%nc_fname)
 
     ! Y dimension
@@ -880,7 +885,7 @@ contains
     ! independent of CRS/NCF configuration.
     call nf_verify(nf90_def_var(this%ncid, 'z', NF90_DOUBLE, &
                                 (/this%dim_ids%x, this%dim_ids%y, &
-                                  this%dim_ids%z/), &
+                                  this%dim_ids%layer/), &
                                 this%var_ids%elevation), this%nc_fname)
     call ncvar_chunk3d(this%ncid, this%var_ids%elevation, this%chunk_x, &
                        this%chunk_y, this%chunk_z, this%nc_fname)
@@ -905,7 +910,7 @@ contains
 
     call nf_verify(nf90_def_var(this%ncid, this%xname, NF90_DOUBLE, &
                                 (/this%dim_ids%x, this%dim_ids%y, &
-                                  this%dim_ids%z, this%dim_ids%time/), &
+                                  this%dim_ids%layer, this%dim_ids%time/), &
                                 this%var_ids%dependent), &
                    this%nc_fname)
 
@@ -1241,7 +1246,7 @@ contains
     call nf_verify(nf90_put_var(this%ncid, this%var_ids%y, y), &
                    this%nc_fname)
     ! TODO see cf-conventions 4.3.3. Parametric Vertical Coordinate
-    call nf_verify(nf90_put_var(this%ncid, this%var_ids%z, this%layers), &
+    call nf_verify(nf90_put_var(this%ncid, this%var_ids%layer, this%layers), &
                    this%nc_fname)
 
     deallocate (x)
@@ -1487,7 +1492,7 @@ contains
         ! reenter define mode and create variable
         call nf_verify(nf90_redef(ncid), nc_fname)
         call nf_verify(nf90_def_var(ncid, varname, NF90_INT, &
-                                    (/dim_ids%x, dim_ids%y, dim_ids%z/), &
+                                    (/dim_ids%x, dim_ids%y, dim_ids%layer/), &
                                     var_id), nc_fname)
 
         ! apply chunking parameters
@@ -1608,8 +1613,8 @@ contains
     ! reenter define mode and create variable
     call nf_verify(nf90_redef(ncid), nc_fname)
     call nf_verify(nf90_def_var(ncid, varname, NF90_INT, &
-                                (/dim_ids%x, dim_ids%y, dim_ids%z/), var_id), &
-                   nc_fname)
+                                (/dim_ids%x, dim_ids%y, dim_ids%layer/), &
+                                var_id), nc_fname)
 
     ! apply chunking parameters
     call ncvar_chunk3d(ncid, var_id, chunk_x, chunk_y, chunk_z, nc_fname)
@@ -1724,7 +1729,7 @@ contains
         ! reenter define mode and create variable
         call nf_verify(nf90_redef(ncid), nc_fname)
         call nf_verify(nf90_def_var(ncid, varname, NF90_DOUBLE, &
-                                    (/dim_ids%x, dim_ids%y, dim_ids%z/), &
+                                    (/dim_ids%x, dim_ids%y, dim_ids%layer/), &
                                     var_id), nc_fname)
 
         ! apply chunking parameters
@@ -1848,8 +1853,8 @@ contains
     ! reenter define mode and create variable
     call nf_verify(nf90_redef(ncid), nc_fname)
     call nf_verify(nf90_def_var(ncid, varname, NF90_DOUBLE, &
-                                (/dim_ids%x, dim_ids%y, dim_ids%z/), var_id), &
-                   nc_fname)
+                                (/dim_ids%x, dim_ids%y, dim_ids%layer/), &
+                                var_id), nc_fname)
 
     ! apply chunking parameters
     call ncvar_chunk3d(ncid, var_id, chunk_x, chunk_y, chunk_z, nc_fname)

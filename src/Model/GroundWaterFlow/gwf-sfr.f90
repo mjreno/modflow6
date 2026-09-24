@@ -7,7 +7,7 @@
 module SfrModule
   !
   use KindModule, only: DP, I4B, LGP
-  use ConstantsModule, only: LINELENGTH, LENBOUNDNAME, LENTIMESERIESNAME, &
+  use ConstantsModule, only: LINELENGTH, LENBOUNDNAME, &
                              MAXADPIT, &
                              DZERO, DPREC, DEM30, DEM6, DEM5, DEM4, DEM2, &
                              DONETHIRD, DHALF, DP6, DTWOTHIRDS, DP7, &
@@ -69,12 +69,9 @@ module SfrModule
     integer(I4B), dimension(:), pointer, contiguous :: ifno => null()
     type(CharacterStringType), dimension(:), pointer, &
       contiguous :: status => null()
-    real(DP), dimension(:), pointer, contiguous :: bedk => null()
-    real(DP), dimension(:), pointer, contiguous :: manning => null()
     type(CharacterStringType), dimension(:), pointer, &
       contiguous :: setting => null()
     integer(I4B), dimension(:), pointer, contiguous :: idv => null()
-    real(DP), dimension(:), pointer, contiguous :: upstream_frac => null()
     type(CharacterStringType), dimension(:), pointer, &
       contiguous :: tab6_filename => null()
     type(CharacterStringType), dimension(:), pointer, &
@@ -502,11 +499,9 @@ contains
     call mem_allocate(this%width, this%maxbound, 'WIDTH', this%memoryPath)
     call mem_allocate(this%strtop, this%maxbound, 'STRTOP', this%memoryPath)
     call mem_allocate(this%bthick, this%maxbound, 'BTHICK', this%memoryPath)
-    call mem_allocate(this%hk, this%maxbound, 'HK', this%memoryPath)
     call mem_allocate(this%slope, this%maxbound, 'SLOPE', this%memoryPath)
     call mem_allocate(this%nconnreach, this%maxbound, 'NCONNREACH', &
                       this%memoryPath)
-    call mem_allocate(this%ustrf, this%maxbound, 'USTRF', this%memoryPath)
     call mem_allocate(this%bedk_set, this%maxbound, 'BEDK_SET', this%memoryPath)
     call mem_allocate(this%manning_set, this%maxbound, 'MANNING_SET', &
                       this%memoryPath)
@@ -561,9 +556,6 @@ contains
     call mem_allocate(this%idiv, 0, 'IDIV', this%memoryPath)
     call mem_allocate(this%qconn, 0, 'QCONN', this%memoryPath)
     !
-    ! -- boundary data
-    call mem_allocate(this%rough, this%maxbound, 'ROUGH', this%memoryPath)
-    !
     ! -- alias into the input context's permanent, feature-indexed arrays
     ! (allocated and DZERO-initialized by the loader)
     call mem_setptr(this%rain, 'RAINFALL', this%input_mempath)
@@ -571,6 +563,9 @@ contains
     call mem_setptr(this%inflow, 'INFLOW', this%input_mempath)
     call mem_setptr(this%runoff, 'RUNOFF', this%input_mempath)
     call mem_setptr(this%sstage, 'STAGE', this%input_mempath)
+    call mem_setptr(this%hk, 'BEDK', this%input_mempath)
+    call mem_setptr(this%rough, 'MANNING', this%input_mempath)
+    call mem_setptr(this%ustrf, 'UPSTREAM_FRAC', this%input_mempath)
     !
     !
     ! -- diversion variables
@@ -2797,10 +2792,8 @@ contains
     call mem_deallocate(this%width)
     call mem_deallocate(this%strtop)
     call mem_deallocate(this%bthick)
-    call mem_deallocate(this%hk)
     call mem_deallocate(this%slope)
     call mem_deallocate(this%nconnreach)
-    call mem_deallocate(this%ustrf)
     call mem_deallocate(this%bedk_set)
     call mem_deallocate(this%manning_set)
     call mem_deallocate(this%ustrf_set)
@@ -2839,13 +2832,14 @@ contains
     call mem_deallocate(this%idiv)
     call mem_deallocate(this%qconn)
     !
-    ! -- deallocate boundary data
-    call mem_deallocate(this%rough)
     nullify (this%rain)
     nullify (this%evap)
     nullify (this%inflow)
     nullify (this%runoff)
     nullify (this%sstage)
+    nullify (this%hk)
+    nullify (this%rough)
+    nullify (this%ustrf)
     !
     ! -- deallocate diversion variables
     call mem_deallocate(this%iadiv)
@@ -4883,13 +4877,10 @@ contains
     !
     select case (trim(setting))
     case ('BEDK')
-      this%hk(n) = this%input%bedk(n)
       this%bedk_set(n) = .true.
     case ('MANNING')
-      this%rough(n) = this%input%manning(n)
       this%manning_set(n) = .true.
     case ('UPSTREAM_FRAC')
-      this%ustrf(n) = this%input%upstream_frac(n)
       this%ustrf_set(n) = .true.
     end select
   end subroutine sfr_set_period_value
@@ -5756,10 +5747,7 @@ contains
     call mem_setptr(this%ifno, 'IFNO', mempath)
     call mem_setptr(this%setting, 'SETTING', mempath)
     call mem_setptr(this%status, 'STATUS', mempath)
-    call mem_setptr(this%bedk, 'BEDK', mempath)
-    call mem_setptr(this%manning, 'MANNING', mempath)
     call mem_setptr(this%idv, 'IDV', mempath)
-    call mem_setptr(this%upstream_frac, 'UPSTREAM_FRAC', mempath)
     call mem_setptr(this%tab6_filename, 'TAB6_FILENAME', mempath)
     if (naux > 0) then
       call mem_setptr(this%auxname, 'AUXNAME', mempath)
@@ -5777,11 +5765,8 @@ contains
     nullify (this%nbound)
     nullify (this%ifno)
     nullify (this%status)
-    nullify (this%bedk)
-    nullify (this%manning)
     nullify (this%setting)
     nullify (this%idv)
-    nullify (this%upstream_frac)
     nullify (this%tab6_filename)
     nullify (this%auxname)
     nullify (this%auxval)

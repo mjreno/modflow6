@@ -1,7 +1,7 @@
 module MawModule
   !
   use KindModule, only: DP, I4B, LGP
-  use ConstantsModule, only: LINELENGTH, LENBOUNDNAME, LENTIMESERIESNAME, &
+  use ConstantsModule, only: LINELENGTH, LENBOUNDNAME, &
                              LENBUDTXT, DZERO, DEM9, DEM6, DEM4, DEM2, DQUARTER, &
                              DHALF, DP7, DP9, DONE, DTWO, DPI, DTWOPI, DEIGHT, &
                              DHUNDRED, DEP20, NAMEDBOUNDFLAG, LENPACKAGENAME, &
@@ -65,8 +65,6 @@ module MawModule
       contiguous :: setting => null()
     type(CharacterStringType), dimension(:), pointer, &
       contiguous :: status => null()
-    real(DP), dimension(:), pointer, contiguous :: rate => null()
-    real(DP), dimension(:), pointer, contiguous :: well_head => null()
     type(CharacterStringType), dimension(:), pointer, &
       contiguous :: head_limit => null()
     real(DP), dimension(:), pointer, contiguous :: fwelev => null()
@@ -807,8 +805,6 @@ contains
     call mem_setptr(this%ifno, 'IFNO', mempath)
     call mem_setptr(this%setting, 'SETTING', mempath)
     call mem_setptr(this%status, 'STATUS', mempath)
-    call mem_setptr(this%rate, 'RATE', mempath)
-    call mem_setptr(this%well_head, 'WELL_HEAD', mempath)
     call mem_setptr(this%head_limit, 'HEAD_LIMIT', mempath)
     call mem_setptr(this%fwelev, 'FWELEV', mempath)
     call mem_setptr(this%fwcond, 'FWCOND', mempath)
@@ -832,8 +828,6 @@ contains
     nullify (this%ifno)
     nullify (this%setting)
     nullify (this%status)
-    nullify (this%rate)
-    nullify (this%well_head)
     nullify (this%head_limit)
     nullify (this%fwelev)
     nullify (this%fwcond)

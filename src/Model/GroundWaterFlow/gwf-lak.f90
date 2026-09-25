@@ -1141,6 +1141,9 @@ contains
       call store_error_filename(this%input_fname)
     end if
     !
+    ! -- release input context tables memory
+    call memorystore_release('TABLES_IFNO', this%input_mempath)
+    !
     ! -- convert laketables to vectors
     call this%laktables_to_vectors(laketables)
     !
@@ -1485,6 +1488,12 @@ contains
     if (count_errors() > 0) then
       call store_error_filename(this%input_fname)
     end if
+    !
+    ! -- release input context outlets memory; OUTLETS_OUTLETNO/INVERT/
+    !    WIDTH/ROUGH/SLOPE excluded (bound by lak_input_init for PERIOD use)
+    call memorystore_release('LAKEIN', this%input_mempath)
+    call memorystore_release('LAKEOUT', this%input_mempath)
+    call memorystore_release('COUTTYPE', this%input_mempath)
   end subroutine lak_source_outlets
 
   !> @brief Source DIMENSIONS block from input context and load static data

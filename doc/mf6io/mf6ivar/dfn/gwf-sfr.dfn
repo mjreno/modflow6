@@ -1,6 +1,7 @@
 # --------------------- gwf sfr options ---------------------
 # flopy multi-package
 # package-type advanced-stress-package
+# mf6 subpackage utl-sfrtab
 
 block options
 name storage
@@ -605,7 +606,7 @@ description keyword to specify that an input filename is expected next.
 
 block crosssections
 name tab6_filename
-mf6internal xs_tab6_filename
+mf6internal sfrtab6_filename
 type string
 preserve_case true
 in_record true

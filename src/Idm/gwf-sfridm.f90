@@ -69,7 +69,7 @@ module GwfSfrInputModule
     logical :: crosssect_ifno = .false.
     logical :: xs_tab6 = .false.
     logical :: xs_filein = .false.
-    logical :: xs_tab6_filename = .false.
+    logical :: sfrtab6_filename = .false.
     logical :: conndata_ifno = .false.
     logical :: ic = .false.
     logical :: diversions_ifno = .false.
@@ -109,7 +109,7 @@ module GwfSfrInputModule
   character(len=16), parameter :: &
     gwf_sfr_subpackages(*) = &
     [ &
-    '                ' &
+    'UTL-SFRTAB      ' &
     ]
 
   type(InputParamDefinitionType), parameter :: &
@@ -1178,13 +1178,13 @@ module GwfSfrInputModule
     )
 
   type(InputParamDefinitionType), parameter :: &
-    gwfsfr_xs_tab6_filename = InputParamDefinitionType &
+    gwfsfr_sfrtab6_filename = InputParamDefinitionType &
     ( &
     'GWF', & ! component
     'SFR', & ! subcomponent
     'CROSSSECTIONS', & ! block
     'TAB6_FILENAME', & ! tag name
-    'XS_TAB6_FILENAME', & ! fortran variable
+    'SFRTAB6_FILENAME', & ! fortran variable
     'STRING', & ! type
     '', & ! shape
     'table file name', & ! longname
@@ -1844,7 +1844,7 @@ module GwfSfrInputModule
     gwfsfr_crosssect_ifno, &
     gwfsfr_xs_tab6, &
     gwfsfr_xs_filein, &
-    gwfsfr_xs_tab6_filename, &
+    gwfsfr_sfrtab6_filename, &
     gwfsfr_conndata_ifno, &
     gwfsfr_ic, &
     gwfsfr_diversions_ifno, &

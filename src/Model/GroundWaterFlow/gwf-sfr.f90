@@ -1109,6 +1109,7 @@ contains
   !<
   subroutine sfr_source_crosssections(this)
     ! -- modules
+    use ConstantsModule, only: LENMEMPATH
     use MemoryManagerModule, only: mem_setptr, mem_reallocate, get_isize
     use CharacterStringModule, only: CharacterStringType
     use sfrCrossSectionManager, only: cross_section_cr, SfrCrossSection
@@ -1118,11 +1119,14 @@ contains
     integer(I4B), dimension(:), pointer, contiguous :: ifno => null()
     type(CharacterStringType), dimension(:), pointer, contiguous :: &
       tab6_filename => null()
+    type(CharacterStringType), dimension(:), pointer, contiguous :: &
+      sfrtab6_mempaths => null()
     type(SfrCrossSection), pointer :: cross_data => null()
     integer(I4B) :: i, n, ncrossptstot
     integer(I4B), allocatable :: nboundchk(:)
     integer(I4B) :: isize
     character(len=LINELENGTH) :: tabfname
+    character(len=LENMEMPATH) :: mempath
     !
     ! -- check if CROSSSECTIONS block was loaded (optional block)
     call get_isize('CROSSSECT_IFNO', this%input_mempath, isize)
@@ -1133,7 +1137,8 @@ contains
     !
     ! -- get input context arrays
     call mem_setptr(ifno, 'CROSSSECT_IFNO', this%input_mempath)
-    call mem_setptr(tab6_filename, 'XS_TAB6_FILENAME', this%input_mempath)
+    call mem_setptr(tab6_filename, 'SFRTAB6_FILENAME', this%input_mempath)
+    call mem_setptr(sfrtab6_mempaths, 'SFRTAB6_MEMPATH', this%input_mempath)
     !
     ! -- create cross-section object
     call cross_section_cr(cross_data, this%iout, this%iprpak, this%maxbound)
@@ -1149,7 +1154,9 @@ contains
                              'reach', 'CROSSSECTIONS')
       if (n == 0) cycle
       tabfname = tab6_filename(i)
-      call cross_data%read_table(n, this%width(n), trim(adjustl(tabfname)))
+      mempath = sfrtab6_mempaths(i)
+      call cross_data%source_table(n, this%width(n), mempath, &
+                                   trim(adjustl(tabfname)))
     end do
     !
     write (this%iout, '(1x,a)') &
@@ -1185,7 +1192,7 @@ contains
     !
     ! -- release input context crosssections memory
     call memorystore_release('CROSSSECT_IFNO', this%input_mempath)
-    call memorystore_release('XS_TAB6_FILENAME', this%input_mempath)
+    call memorystore_release('SFRTAB6_FILENAME', this%input_mempath)
   end subroutine sfr_source_crosssections
 
   !> @brief Source CONNECTIONDATA block from input context

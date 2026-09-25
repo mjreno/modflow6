@@ -1093,7 +1093,7 @@ contains
     end do
     !
     ! -- release input context packagedata memory; PACKAGEDATA_IFNO excluded
-    !    (allocate_featureauxvar); RHK/MAN/USTRF excluded (persistent context)
+    !    (allocate_featureauxvar); RHK/MAN/USTRF excluded
     call memorystore_release('CELLID', this%input_mempath)
     call memorystore_release('RLEN', this%input_mempath)
     call memorystore_release('RWID', this%input_mempath)
@@ -1526,7 +1526,7 @@ contains
       call store_error_filename(this%input_fname)
     end if
     !
-    ! -- release input context diversions memory
+    ! -- release input context diversions memory; DIVFLOW excluded
     call memorystore_release('DIVERSIONS_IFNO', this%input_mempath)
     call memorystore_release('DIVERSIONS_IDV', this%input_mempath)
     call memorystore_release('ICONR', this%input_mempath)

@@ -142,6 +142,7 @@ modflow_sources = files(
     'Idm' / 'prt-ocidm.f90',
     'Idm' / 'prt-prpidm.f90',
     'Idm' / 'utl-hpcidm.f90',
+    'Idm' / 'utl-laktabidm.f90',
     'Idm' / 'utl-ncfidm.f90',
     'Idm' / 'utl-spcidm.f90',
     'Idm' / 'utl-spcaidm.f90',

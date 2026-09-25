@@ -1,7 +1,7 @@
 module LakModule
   !
   use KindModule, only: DP, I4B, LGP
-  use ConstantsModule, only: LINELENGTH, LENBOUNDNAME, LENTIMESERIESNAME, &
+  use ConstantsModule, only: LINELENGTH, LENBOUNDNAME, LENMEMPATH, &
                              IWETLAKE, MAXADPIT, DZERO, DPREC, DEM30, DEM9, &
                              DEM6, DEM5, DEM4, DEM2, DEM1, DHALF, DP7, DP9, &
                              DP999, DONE, DTWO, DPI, DTHREE, DEIGHT, DTEN, &
@@ -31,7 +31,6 @@ module LakModule
                        store_warning, store_error_filename, &
                        deprecation_warning
   use MathUtilModule, only: is_close
-  use BlockParserModule, only: BlockParserType
   use CharacterStringModule, only: CharacterStringType
   use OpenSpecModule, only: access, form
   use SimVariablesModule, only: errmsg, warnmsg
@@ -299,7 +298,7 @@ module LakModule
     procedure, private :: lak_source_connectiondata
     procedure, private :: lak_source_outlets
     procedure, private :: lak_source_tables
-    procedure, private :: lak_read_table
+    procedure, private :: lak_source_table
     procedure, private :: lak_check_valid
     procedure, private :: lak_set_nonneg_value
     procedure, private :: lak_set_attribute_error
@@ -1080,10 +1079,10 @@ contains
     ! -- local
     integer(I4B) :: n, ntabs
     integer(I4B) :: ilak, iconn
-    character(len=LINELENGTH) :: fname
+    character(len=LENMEMPATH) :: mempath
     integer(I4B), dimension(:), pointer, contiguous :: ifno => null()
     type(CharacterStringType), dimension(:), pointer, contiguous :: &
-      tab6_filename => null()
+      laktab6_mempaths => null()
     type(LakTabType), dimension(:), allocatable :: laketables
     integer(I4B), allocatable :: nboundchk(:)
     !
@@ -1103,7 +1102,7 @@ contains
     !
     ! -- set input context pointers
     call mem_setptr(ifno, 'TABLES_IFNO', this%input_mempath)
-    call mem_setptr(tab6_filename, 'TAB6_FILENAME', this%input_mempath)
+    call mem_setptr(laktab6_mempaths, 'LAKTAB6_MEMPATH', this%input_mempath)
     !
     ntabs = size(ifno)
     !
@@ -1116,8 +1115,8 @@ contains
       ilak = this%validate_ifno(ifno(n), this%nlakes, nboundchk, &
                                 'lakeno', 'TABLES')
       if (ilak == 0) cycle
-      fname = tab6_filename(n)
-      call this%lak_read_table(ilak, trim(fname), laketables(ilak))
+      mempath = laktab6_mempaths(n)
+      call this%lak_source_table(ilak, mempath, laketables(ilak))
     end do
     !
     write (this%iout, '(1x,a)') 'END OF '//trim(adjustl(this%text))//' TABLES'
@@ -1209,238 +1208,156 @@ contains
     end do
   end subroutine laktables_to_vectors
 
-  !> @brief Read the lake table for this package
+  !> @brief Source one lake's table from its LAKTAB6 subpackage
   !<
-  subroutine lak_read_table(this, ilak, filename, laketable)
-    use ConstantsModule, only: LINELENGTH
-    use InputOutputModule, only: openfile
-    use SimModule, only: store_error, count_errors
+  subroutine lak_source_table(this, ilak, mempath, laketable)
     ! -- dummy
     class(LakType), intent(inout) :: this
     integer(I4B), intent(in) :: ilak
-    character(len=*), intent(in) :: filename
+    character(len=*), intent(in) :: mempath
     type(LakTabType), intent(inout) :: laketable
     ! -- local
-    character(len=LINELENGTH) :: keyword
-    integer(I4B) :: ierr
-    logical(LGP) :: isfound, endOfBlock
-    integer(I4B) :: iu
-    integer(I4B) :: n
-    integer(I4B) :: ipos
-    integer(I4B) :: j
-    integer(I4B) :: jmin
-    integer(I4B) :: iconn
-    real(DP) :: vol
-    real(DP) :: sa
-    real(DP) :: wa
-    real(DP) :: v
-    real(DP) :: v0
-    type(BlockParserType) :: parser
+    integer(I4B), pointer :: nrow => null()
+    integer(I4B), pointer :: ncol => null()
+    real(DP), dimension(:), pointer, contiguous :: stage => null()
+    real(DP), dimension(:), pointer, contiguous :: volume => null()
+    real(DP), dimension(:), pointer, contiguous :: sarea => null()
+    real(DP), dimension(:), pointer, contiguous :: barea => null()
+    character(len=:), pointer :: tabfname => null()
+    integer(I4B) :: jmin, iconn, n, nerr0
+    real(DP) :: vol, sa, wa, v, v0
     ! -- formats
     character(len=*), parameter :: fmttaberr = &
       &'(a,1x,i0,1x,a,1x,g15.6,1x,a,1x,i0,1x,a,1x,i0,1x,a,1x,g15.6,1x,a)'
     !
-    ! -- initialize locals
-    n = 0
-    j = 0
+    ! -- this table's own input file, for error attribution below
+    call mem_setptr(tabfname, 'INPUT_FNAME', mempath)
+    call mem_setptr(nrow, 'NROW', mempath)
+    call mem_setptr(ncol, 'NCOL', mempath)
     !
-    ! -- open the table file
-    iu = 0
-    call openfile(iu, this%iout, filename, 'LAKE TABLE')
-    call parser%Initialize(iu, this%iout)
+    ! -- errors added below this point belong to this lake's own table
+    nerr0 = count_errors()
     !
-    ! -- get dimensions block
-    call parser%GetBlock('DIMENSIONS', isfound, ierr, supportOpenClose=.true.)
+    if (nrow < 1) then
+      write (errmsg, '(a,1x,i0)') &
+        'LAKE TABLE NROW MUST BE > 0 FOR LAKE', ilak
+      call store_error(errmsg)
+    end if
     !
-    ! -- parse lak table dimensions block if detected
-    if (isfound) then
-      ! -- process the lake table dimension data
-      if (this%iprpak /= 0) then
-        write (this%iout, '(/1x,a)') &
-          'PROCESSING '//trim(adjustl(this%text))//' DIMENSIONS'
-      end if
-      readdims: do
-        call parser%GetNextLine(endOfBlock)
-        if (endOfBlock) exit
-        call parser%GetStringCaps(keyword)
-        select case (keyword)
-        case ('NROW')
-          n = parser%GetInteger()
-
-          if (n < 1) then
-            write (errmsg, '(a)') 'LAKE TABLE NROW MUST BE > 0'
-            call store_error(errmsg)
-          end if
-        case ('NCOL')
-          j = parser%GetInteger()
-
-          if (this%ictype(ilak) == 2 .or. this%ictype(ilak) == 3) then
-            jmin = 4
-          else
-            jmin = 3
-          end if
-          if (j < jmin) then
-            write (errmsg, '(a,1x,i0)') 'LAKE TABLE NCOL MUST BE >= ', jmin
-            call store_error(errmsg)
-          end if
-          !
-        case default
-          write (errmsg, '(a,a)') &
-            'UNKNOWN '//trim(this%text)//' DIMENSIONS KEYWORD: ', trim(keyword)
-          call store_error(errmsg)
-        end select
-      end do readdims
-      if (this%iprpak /= 0) then
-        write (this%iout, '(1x,a)') &
-          'END OF '//trim(adjustl(this%text))//' DIMENSIONS'
-      end if
+    iconn = this%idxlakeconn(ilak)
+    if (this%ictype(iconn) == 2 .or. this%ictype(iconn) == 3) then
+      jmin = 4
     else
-      call store_error('REQUIRED DIMENSIONS BLOCK NOT FOUND.')
+      jmin = 3
     end if
-    !
-    ! -- check that ncol and nrow have been specified
-    if (n < 1) then
-      write (errmsg, '(a)') &
-        'NROW NOT SPECIFIED IN THE LAKE TABLE DIMENSIONS BLOCK'
-      call store_error(errmsg)
-    end if
-    if (j < 1) then
-      write (errmsg, '(a)') &
-        'NCOL NOT SPECIFIED IN THE LAKE TABLE DIMENSIONS BLOCK'
+    if (ncol < jmin) then
+      write (errmsg, '(a,1x,i0,1x,a,1x,i0)') &
+        'LAKE TABLE NCOL MUST BE >=', jmin, 'FOR LAKE', ilak
       call store_error(errmsg)
     end if
     !
-    ! -- only read the lake table data if n and j are specified to be greater
-    !    than zero
-    if (n * j > 0) then
-      !
-      ! -- allocate space
-      this%ntabrow(ilak) = n
-      allocate (laketable%tabstage(n))
-      allocate (laketable%tabvolume(n))
-      allocate (laketable%tabsarea(n))
-      ipos = this%idxlakeconn(ilak)
-      if (this%ictype(ipos) == 2 .or. this%ictype(ipos) == 3) then
-        allocate (laketable%tabwarea(n))
-      end if
-      !
-      ! -- get table block
-      call parser%GetBlock('TABLE', isfound, ierr, supportOpenClose=.true.)
-      !
-      ! -- parse well_connections block if detected
-      if (isfound) then
-        !
-        ! -- process the table data
-        if (this%iprpak /= 0) then
-          write (this%iout, '(/1x,a)') &
-            'PROCESSING '//trim(adjustl(this%text))//' TABLE'
-        end if
-        iconn = this%idxlakeconn(ilak)
-        ipos = 0
-        readtabledata: do
-          call parser%GetNextLine(endOfBlock)
-          if (endOfBlock) exit
-          ipos = ipos + 1
-          if (ipos > this%ntabrow(ilak)) then
-            cycle readtabledata
-          end if
-          laketable%tabstage(ipos) = parser%GetDouble()
-          laketable%tabvolume(ipos) = parser%GetDouble()
-          laketable%tabsarea(ipos) = parser%GetDouble()
-          if (this%ictype(iconn) == 2 .or. this%ictype(iconn) == 3) then
-            laketable%tabwarea(ipos) = parser%GetDouble()
-          end if
-        end do readtabledata
-        !
-        if (this%iprpak /= 0) then
-          write (this%iout, '(1x,a)') &
-            'END OF '//trim(adjustl(this%text))//' TABLE'
-        end if
-      else
-        call store_error('REQUIRED TABLE BLOCK NOT FOUND.')
-      end if
-      !
-      ! -- error condition if number of rows read are not equal to nrow
-      if (ipos /= this%ntabrow(ilak)) then
-        write (errmsg, '(a,1x,i0,1x,a,1x,i0,1x,a)') &
-          'NROW SET TO', this%ntabrow(ilak), 'BUT', ipos, 'ROWS WERE READ'
+    if (count_errors() > nerr0) then
+      call store_error_filename(tabfname, terminate=.false.)
+      call memorystore_release('NROW', mempath)
+      call memorystore_release('NCOL', mempath)
+      call memorystore_release('INPUT_FNAME', mempath)
+      return
+    end if
+    !
+    this%ntabrow(ilak) = nrow
+    allocate (laketable%tabstage(nrow))
+    allocate (laketable%tabvolume(nrow))
+    allocate (laketable%tabsarea(nrow))
+    call mem_setptr(stage, 'STAGE', mempath)
+    call mem_setptr(volume, 'VOLUME', mempath)
+    call mem_setptr(sarea, 'SAREA', mempath)
+    laketable%tabstage = stage
+    laketable%tabvolume = volume
+    laketable%tabsarea = sarea
+    if (this%ictype(iconn) == 2 .or. this%ictype(iconn) == 3) then
+      allocate (laketable%tabwarea(nrow))
+      call mem_setptr(barea, 'BAREA', mempath)
+      laketable%tabwarea = barea
+    end if
+    !
+    ! -- set lake bottom based on table if it is an embedded lake
+    if (this%ictype(iconn) == 2 .or. this%ictype(iconn) == 3) then
+      do n = 1, this%ntabrow(ilak)
+        vol = laketable%tabvolume(n)
+        sa = laketable%tabsarea(n)
+        wa = laketable%tabwarea(n)
+        vol = vol * sa * wa
+        ! -- check if all entries are zero
+        if (vol > DZERO) exit
+        ! -- set lake bottom
+        this%lakebot(ilak) = laketable%tabstage(n)
+        this%belev(ilak) = laketable%tabstage(n)
+      end do
+      ! -- set maximum surface area for rainfall
+      n = this%ntabrow(ilak)
+      this%sareamax(ilak) = laketable%tabsarea(n)
+    end if
+    !
+    ! -- verify the table data
+    do n = 2, this%ntabrow(ilak)
+      v = laketable%tabstage(n)
+      v0 = laketable%tabstage(n - 1)
+      if (v <= v0) then
+        write (errmsg, fmttaberr) &
+          'TABLE STAGE ENTRY', n, '(', laketable%tabstage(n), ') FOR LAKE ', &
+          ilak, 'MUST BE GREATER THAN THE PREVIOUS STAGE ENTRY', &
+          n - 1, '(', laketable%tabstage(n - 1), ')'
         call store_error(errmsg)
       end if
-      !
-      ! -- set lake bottom based on table if it is an embedded lake
-      iconn = this%idxlakeconn(ilak)
-      if (this%ictype(iconn) == 2 .or. this%ictype(iconn) == 3) then
-        do n = 1, this%ntabrow(ilak)
-          vol = laketable%tabvolume(n)
-          sa = laketable%tabsarea(n)
-          wa = laketable%tabwarea(n)
-          vol = vol * sa * wa
-          ! -- check if all entries are zero
-          if (vol > DZERO) exit
-          ! -- set lake bottom
-          this%lakebot(ilak) = laketable%tabstage(n)
-          this%belev(ilak) = laketable%tabstage(n)
-        end do
-        ! -- set maximum surface area for rainfall
-        n = this%ntabrow(ilak)
-        this%sareamax(ilak) = laketable%tabsarea(n)
+      v = laketable%tabvolume(n)
+      v0 = laketable%tabvolume(n - 1)
+      if (v <= v0) then
+        write (errmsg, fmttaberr) &
+          'TABLE VOLUME ENTRY', n, '(', laketable%tabvolume(n), &
+          ') FOR LAKE ', &
+          ilak, 'MUST BE GREATER THAN THE PREVIOUS VOLUME ENTRY', &
+          n - 1, '(', laketable%tabvolume(n - 1), ')'
+        call store_error(errmsg)
       end if
-      !
-      ! -- verify the table data
-      do n = 2, this%ntabrow(ilak)
-        v = laketable%tabstage(n)
-        v0 = laketable%tabstage(n - 1)
-        if (v <= v0) then
-          write (errmsg, fmttaberr) &
-            'TABLE STAGE ENTRY', n, '(', laketable%tabstage(n), ') FOR LAKE ', &
-            ilak, 'MUST BE GREATER THAN THE PREVIOUS STAGE ENTRY', &
-            n - 1, '(', laketable%tabstage(n - 1), ')'
-          call store_error(errmsg)
-        end if
-        v = laketable%tabvolume(n)
-        v0 = laketable%tabvolume(n - 1)
-        if (v <= v0) then
-          write (errmsg, fmttaberr) &
-            'TABLE VOLUME ENTRY', n, '(', laketable%tabvolume(n), &
-            ') FOR LAKE ', &
-            ilak, 'MUST BE GREATER THAN THE PREVIOUS VOLUME ENTRY', &
-            n - 1, '(', laketable%tabvolume(n - 1), ')'
-          call store_error(errmsg)
-        end if
-        v = laketable%tabsarea(n)
-        v0 = laketable%tabsarea(n - 1)
+      v = laketable%tabsarea(n)
+      v0 = laketable%tabsarea(n - 1)
+      if (v < v0) then
+        write (errmsg, fmttaberr) &
+          'TABLE SURFACE AREA ENTRY', n, '(', &
+          laketable%tabsarea(n), ') FOR LAKE ', ilak, &
+          'MUST BE GREATER THAN OR EQUAL TO THE PREVIOUS SURFACE AREA ENTRY', &
+          n - 1, '(', laketable%tabsarea(n - 1), ')'
+        call store_error(errmsg)
+      end if
+      if (this%ictype(iconn) == 2 .or. this%ictype(iconn) == 3) then
+        v = laketable%tabwarea(n)
+        v0 = laketable%tabwarea(n - 1)
         if (v < v0) then
           write (errmsg, fmttaberr) &
-            'TABLE SURFACE AREA ENTRY', n, '(', &
-            laketable%tabsarea(n), ') FOR LAKE ', ilak, &
-            'MUST BE GREATER THAN OR EQUAL TO THE PREVIOUS SURFACE AREA ENTRY', &
-            n - 1, '(', laketable%tabsarea(n - 1), ')'
+            'TABLE EXCHANGE AREA ENTRY', n, '(', &
+            laketable%tabwarea(n), ') FOR LAKE ', ilak, &
+            'MUST BE GREATER THAN OR EQUAL TO THE PREVIOUS EXCHANGE AREA '// &
+            'ENTRY', n - 1, '(', laketable%tabwarea(n - 1), ')'
           call store_error(errmsg)
         end if
-        iconn = this%idxlakeconn(ilak)
-        if (this%ictype(iconn) == 2 .or. this%ictype(iconn) == 3) then
-          v = laketable%tabwarea(n)
-          v0 = laketable%tabwarea(n - 1)
-          if (v < v0) then
-            write (errmsg, fmttaberr) &
-              'TABLE EXCHANGE AREA ENTRY', n, '(', &
-              laketable%tabwarea(n), ') FOR LAKE ', ilak, &
-              'MUST BE GREATER THAN OR EQUAL TO THE PREVIOUS EXCHANGE AREA '// &
-              'ENTRY', n - 1, '(', laketable%tabwarea(n - 1), ')'
-            call store_error(errmsg)
-          end if
-        end if
-      end do
+      end if
+    end do
+    !
+    if (count_errors() > nerr0) then
+      call store_error_filename(tabfname, terminate=.false.)
     end if
     !
-    ! -- write summary of lake table error messages
-    if (count_errors() > 0) then
-      call parser%StoreErrorUnit()
+    ! -- release this table's own input context memory
+    call memorystore_release('NROW', mempath)
+    call memorystore_release('NCOL', mempath)
+    call memorystore_release('STAGE', mempath)
+    call memorystore_release('VOLUME', mempath)
+    call memorystore_release('SAREA', mempath)
+    if (this%ictype(iconn) == 2 .or. this%ictype(iconn) == 3) then
+      call memorystore_release('BAREA', mempath)
     end if
-    !
-    ! Close the table file and clear other parser members
-    call parser%Clear()
-  end subroutine lak_read_table
+    call memorystore_release('INPUT_FNAME', mempath)
+  end subroutine lak_source_table
 
   !> @brief Source OUTLETS block from input context
   !<

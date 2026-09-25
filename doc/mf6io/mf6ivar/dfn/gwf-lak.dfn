@@ -1,6 +1,7 @@
 # --------------------- gwf lak options ---------------------
 # flopy multi-package
 # package-type advanced-stress-package
+# mf6 subpackage utl-laktab
 
 block options
 name auxiliary
@@ -624,7 +625,7 @@ description keyword to specify that an input filename is expected next.
 
 block tables
 name tab6_filename
-mf6internal tab6_filename
+mf6internal laktab6_filename
 type string
 preserve_case true
 in_record true

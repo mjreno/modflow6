@@ -70,7 +70,7 @@ module GwfLakInputModule
     logical :: tables_ifno = .false.
     logical :: tab6 = .false.
     logical :: tables_filein = .false.
-    logical :: tab6_filename = .false.
+    logical :: laktab6_filename = .false.
     logical :: outlets_outletno = .false.
     logical :: lakein = .false.
     logical :: lakeout = .false.
@@ -104,7 +104,7 @@ module GwfLakInputModule
   character(len=16), parameter :: &
     gwf_lak_subpackages(*) = &
     [ &
-    '                ' &
+    'UTL-LAKTAB      ' &
     ]
 
   type(InputParamDefinitionType), parameter :: &
@@ -1192,13 +1192,13 @@ module GwfLakInputModule
     )
 
   type(InputParamDefinitionType), parameter :: &
-    gwflak_tab6_filename = InputParamDefinitionType &
+    gwflak_laktab6_filename = InputParamDefinitionType &
     ( &
     'GWF', & ! component
     'LAK', & ! subcomponent
     'TABLES', & ! block
     'TAB6_FILENAME', & ! tag name
-    'TAB6_FILENAME', & ! fortran variable
+    'LAKTAB6_FILENAME', & ! fortran variable
     'STRING', & ! type
     '', & ! shape
     'table file name', & ! longname
@@ -1745,7 +1745,7 @@ module GwfLakInputModule
     gwflak_tables_ifno, &
     gwflak_tab6, &
     gwflak_tables_filein, &
-    gwflak_tab6_filename, &
+    gwflak_laktab6_filename, &
     gwflak_outlets_outletno, &
     gwflak_lakein, &
     gwflak_lakeout, &

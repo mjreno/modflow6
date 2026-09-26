@@ -16,7 +16,7 @@ module GwfUzfInputModule
     logical :: auxiliary = .false.
     logical :: auxmultname = .false.
     logical :: boundnames = .false.
-    logical :: print_input = .false.
+    logical :: iprpak = .false.
     logical :: print_flows = .false.
     logical :: ipakcb = .false.
     logical :: wc_filerecord = .false.
@@ -139,13 +139,13 @@ module GwfUzfInputModule
     )
 
   type(InputParamDefinitionType), parameter :: &
-    gwfuzf_print_input = InputParamDefinitionType &
+    gwfuzf_iprpak = InputParamDefinitionType &
     ( &
     'GWF', & ! component
     'UZF', & ! subcomponent
     'OPTIONS', & ! block
     'PRINT_INPUT', & ! tag name
-    'PRINT_INPUT', & ! fortran variable
+    'IPRPAK', & ! fortran variable
     'KEYWORD', & ! type
     '', & ! shape
     'print input to listing file', & ! longname
@@ -1171,7 +1171,7 @@ module GwfUzfInputModule
     gwfuzf_auxiliary, &
     gwfuzf_auxmultname, &
     gwfuzf_boundnames, &
-    gwfuzf_print_input, &
+    gwfuzf_iprpak, &
     gwfuzf_print_flows, &
     gwfuzf_ipakcb, &
     gwfuzf_wc_filerecord, &

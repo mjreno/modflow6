@@ -36,6 +36,7 @@ reader urword
 optional true
 longname print input to listing file
 description REPLACE print_input {'{#1}': 'UZF'}
+mf6internal iprpak
 
 block options
 name print_flows

@@ -1,38 +1,21 @@
 """
-Error/edge-case coverage for TspAptType%apt_source_cvs / apt_source_options,
-shared by the 8 GWT/GWE APT (advanced package transport) packages.  None of
-these are exercised by any other regression test, since they are all
-error paths:
+Error/edge-case coverage for the GWT/GWE advanced package transport (APT)
+base class, shared by all 8 packages (LKT/MWT/SFT/UZT, LKE/MWE/SFE/UZE):
 
-  - apt_source_cvs must reject a PACKAGEDATA IFNO outside 1..ncv, and must
-    reject a PACKAGEDATA block that doesn't cover every feature exactly
-    once, instead of silently reading/writing out of bounds.
-  - apt_source_cvs must source STRT by feature number (via PACKAGEDATA_IFNO),
-    not by PACKAGEDATA row order, since rows may be supplied in any order.
-  - find_*_package's "could not find flow package" error must be attributed
-    to the correct input file.
-  - a PERIOD block's keystring dispatch must reject a compound record's own
-    sub-member name (e.g. AUXVAL, a sub-member of the AUXILIARY record) used
-    directly as a top-level dispatch keyword, the same as any other
-    unrecognized keyword, instead of silently accepting it.
+  - PACKAGEDATA IFNO must be in range and cover every feature exactly once.
+  - PACKAGEDATA rows may be supplied in any order; STRT and AUX are sourced
+    by feature number, not row order.
+  - A missing flow package is reported against the correct input file.
+  - A PERIOD block must reject a compound record's own sub-member name
+    (e.g. AUXVAL) used directly as a top-level keyword, and must reject an
+    out-of-range PERIOD IFNO.
+  - FMI-only coupling (flow supplied via a saved budget file) enforces the
+    same PACKAGEDATA/PERIOD validation as a live flow package.
+  - GWE thermal-conduction thickness (RBTHCND/FTHK) must be > 0.
 
-Uses a minimal single-cell-row GWF+LAK / GWT+LKT model; LKT was chosen
-arbitrarily among the 8 APT packages since the code under test is shared
-base-class behavior (TspAptType), not package-specific.  The IFNO/missing-
-feature/row-order cases are also duplicated onto GWE+LKE, since that code
-path is shared but had only ever been exercised via a GWT package.
-
-Also covers two related topics that share this file's run_mf6/run_mf6_error
-helpers:
-
-  - FMI (flow-model-interface) coupling: PACKAGEDATA validation against ncv
-    and PERIOD row-count sizing must hold up the same way when ncv's
-    provenance is a saved flow budget file instead of a live flow package's
-    declared DIMENSIONS value.
-
-  - GWE PACKAGEDATA thermal-conduction thickness (RBTHCND/FTHK) must be > 0
-    for LKE/SFE/MWE, since it is used as a bare divisor in the matrix
-    formulation and budget-term routines.
+Uses a minimal single-cell-row GWF+LAK / GWT+LKT model; most cases are also
+duplicated onto GWE+LKE to confirm the shared base-class behavior holds for
+both model types.
 """
 
 import re

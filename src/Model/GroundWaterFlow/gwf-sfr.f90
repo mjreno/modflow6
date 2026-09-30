@@ -730,9 +730,8 @@ contains
       'PROCESSING '//trim(adjustl(this%text))//' OPTIONS'
     !
     ! -- STORAGE
-    call get_isize('STORAGE', this%input_mempath, isize)
-    if (isize > 0) then
-      this%istorage = 1
+    call mem_set_value(this%istorage, 'STORAGE', this%input_mempath, found)
+    if (found) then
       write (this%iout, '(4x,a)') trim(adjustl(this%text))// &
         ' REACH STORAGE IS ACTIVE.'
     end if
@@ -755,9 +754,8 @@ contains
     end if
     !
     ! -- PRINT_STAGE
-    call get_isize('PRINT_STAGE', this%input_mempath, isize)
-    if (isize > 0) then
-      this%iprhed = 1
+    call mem_set_value(this%iprhed, 'PRINT_STAGE', this%input_mempath, found)
+    if (found) then
       write (this%iout, '(4x,a)') trim(adjustl(this%text))// &
         ' STAGES WILL BE PRINTED TO LISTING FILE.'
     end if
@@ -800,9 +798,8 @@ contains
     end if
     !
     ! -- MOVER
-    call get_isize('MOVER', this%input_mempath, isize)
-    if (isize > 0) then
-      this%imover = 1
+    call mem_set_value(this%imover, 'MOVER', this%input_mempath, found)
+    if (found) then
       write (this%iout, '(4x,A)') 'MOVER OPTION ENABLED'
     end if
     !

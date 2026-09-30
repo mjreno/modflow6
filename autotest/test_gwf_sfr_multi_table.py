@@ -1,8 +1,6 @@
 """Two connected SFR reaches with different static CROSSSECTIONS tables
-(reach 0: 2-column, no MANFRACTION; reach 1: 3-column, non-uniform
-MANFRACTION), verifying per-reach table matching. Since flow is
-conserved between the reaches, expected DEPTH at each is computed
-independently via Manning's equation (cross_section_functions.get_depths).
+(different column counts and MANFRACTION usage), verifying each reach's
+own table is used, not swapped between reaches.
 """
 
 import os

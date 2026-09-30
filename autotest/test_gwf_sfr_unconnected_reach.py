@@ -1,17 +1,8 @@
-"""Regression test for PACKAGEDATA CELLID's documented "unconnected reach"
-syntax: both the literal all-zero cellid ("0 0 0" for a DIS grid, the
-documented/preferred form) and the deprecated "NONE" keyword alias.
-
-flopy's cellid API cannot write either sentinel directly -- a (0, 0, 0)
-tuple is treated as a real cell reference and gets its usual 0-based-to-
-1-based conversion applied, and a raw "0 0 0" string is rejected by
-flopy's formatter. Both cases write a placeholder cellid via flopy, then
-hand-patch it into the file afterward.
-
-Confirms the unconnected reach is absent from the SFR GWF-exchange budget
-record while its connected neighbors report nonzero exchange, matching
-the documented "reach-aquifer flow is not calculated for unconnected
-reaches".
+"""PACKAGEDATA CELLID's unconnected-reach syntax: both the literal
+all-zero cellid ("0 0 0" for a DIS grid) and the deprecated "NONE"
+keyword. Confirms the unconnected reach is absent from the SFR
+GWF-exchange budget while its connected neighbors report nonzero
+exchange.
 """
 
 import re

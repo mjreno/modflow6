@@ -553,7 +553,24 @@ jobs:
         working-directory: modflow6
         env:
           REPOS_PATH: ${{ github.workspace }}
-        run: pixi run autotest -m "${{ steps.set_markers.outputs.markers }} and not external" -k "${{ steps.set_filters.outputs.filters }}"
+        run: pixi run autotest -m "${{ steps.set_markers.outputs.markers }} and not external" -k "${{ steps.set_filters.outputs.filters }}" 2>&1 | tee test_mf6_output.log
+
+      - name: Extract and symbolize any backtrace from test output (Windows)
+        if: always() && runner.os == 'Windows'
+        working-directory: modflow6
+        run: |
+          LOGFILE="autotest/test_mf6_output.log"
+          if [ ! -f "$LOGFILE" ] || ! grep -q "Backtrace for this error" "$LOGFILE"; then
+            echo "No backtrace found in test output."
+            exit 0
+          fi
+          echo "=== found a gfortran backtrace in test output, attempting to symbolize ==="
+          ADDR2LINE="$(dirname "$(which gfortran)")/addr2line.exe"
+          [ -f "$ADDR2LINE" ] || ADDR2LINE=addr2line
+          grep -A 40 "Backtrace for this error" "$LOGFILE" | grep -oE '#[0-9]+ +0x[0-9a-fA-F]+' | while read -r frame addr; do
+            echo "--- $frame $addr (as printed, relative to runtime load address -- may not match the static image base if ASLR relocated the module) ---"
+            "$ADDR2LINE" -e bin/mf6.exe -f -C "$addr" 2>&1 | sed 's/^/    /'
+          done
 
       - name: Analyze crash dump if present (Windows)
         if: always() && runner.os == 'Windows'

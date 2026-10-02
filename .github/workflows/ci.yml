@@ -450,12 +450,25 @@ jobs:
           pixi run setup builddir $MESON_SETUP_ARGS
           pixi run build builddir
 
+      - name: Bundle runtime DLLs for standalone binary (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $gfortran = Get-Command gfortran -ErrorAction SilentlyContinue
+          if (-not $gfortran) {
+            Write-Host "gfortran not found on PATH; cannot locate runtime DLLs."
+          } else {
+            $mingwBin = Split-Path $gfortran.Source -Parent
+            Write-Host "Copying runtime DLLs from $mingwBin"
+            Copy-Item -Path "$mingwBin\*.dll" -Destination "modflow6\bin" -Force
+          }
+
       - name: Upload mf6 binary for offline symbolization (Windows)
         if: runner.os == 'Windows'
         uses: actions/upload-artifact@v7
         with:
           name: mf6-binary-${{ matrix.os }}-${{ matrix.debug }}
-          path: modflow6/bin/mf6.exe
+          path: modflow6/bin
 
       - name: Build mf5to6 converter
         working-directory: modflow6

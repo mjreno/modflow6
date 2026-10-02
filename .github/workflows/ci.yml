@@ -433,11 +433,29 @@ jobs:
           fi
           echo "MESON_SETUP_ARGS=$setupargs" >> $GITHUB_ENV
 
+      - name: Enable crash dumps (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          New-Item -Path "D:\crashdumps" -ItemType Directory -Force | Out-Null
+          $key = "HKLM:\SOFTWARE\Microsoft\Windows\Windows Error Reporting\LocalDumps\mf6.exe"
+          New-Item -Path $key -Force | Out-Null
+          New-ItemProperty -Path $key -Name DumpFolder -PropertyType ExpandString -Value "D:\crashdumps" -Force | Out-Null
+          New-ItemProperty -Path $key -Name DumpType -PropertyType DWord -Value 2 -Force | Out-Null
+          New-ItemProperty -Path $key -Name DumpCount -PropertyType DWord -Value 5 -Force | Out-Null
+
       - name: Build MF6
         working-directory: modflow6
         run: |
           pixi run setup builddir $MESON_SETUP_ARGS
           pixi run build builddir
+
+      - name: Upload mf6 binary for offline symbolization (Windows)
+        if: runner.os == 'Windows'
+        uses: actions/upload-artifact@v7
+        with:
+          name: mf6-binary-${{ matrix.os }}-${{ matrix.debug }}
+          path: modflow6/bin/mf6.exe
 
       - name: Build mf5to6 converter
         working-directory: modflow6
@@ -523,6 +541,34 @@ jobs:
         env:
           REPOS_PATH: ${{ github.workspace }}
         run: pixi run autotest -m "${{ steps.set_markers.outputs.markers }} and not external" -k "${{ steps.set_filters.outputs.filters }}"
+
+      - name: Analyze crash dump if present (Windows)
+        if: always() && runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $dumps = Get-ChildItem -Path "D:\crashdumps" -Filter *.dmp -ErrorAction SilentlyContinue
+          if (-not $dumps) {
+            Write-Host "No crash dumps found."
+          } else {
+            choco install windbg -y --no-progress | Out-Null
+            $cdb = Get-ChildItem -Path "C:\Program Files*" -Filter cdb.exe -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1
+            foreach ($d in $dumps) {
+              Write-Host "=== crash dump: $($d.FullName) ==="
+              if ($cdb) {
+                & $cdb.FullName -z $d.FullName -c "kb; lm; q" 2>&1 | Write-Host
+              } else {
+                Write-Host "cdb.exe not found after install; dump will be uploaded as an artifact instead."
+              }
+            }
+          }
+
+      - name: Upload crash dumps (Windows)
+        if: always() && runner.os == 'Windows'
+        uses: actions/upload-artifact@v7
+        with:
+          name: crash-dumps-${{ matrix.os }}-${{ matrix.debug }}
+          path: D:\crashdumps\*.dmp
+          if-no-files-found: ignore
 
       - name: Test MF6 models
         working-directory: modflow6

@@ -433,42 +433,11 @@ jobs:
           fi
           echo "MESON_SETUP_ARGS=$setupargs" >> $GITHUB_ENV
 
-      - name: Enable crash dumps (Windows)
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          New-Item -Path "D:\crashdumps" -ItemType Directory -Force | Out-Null
-          $key = "HKLM:\SOFTWARE\Microsoft\Windows\Windows Error Reporting\LocalDumps\mf6.exe"
-          New-Item -Path $key -Force | Out-Null
-          New-ItemProperty -Path $key -Name DumpFolder -PropertyType ExpandString -Value "D:\crashdumps" -Force | Out-Null
-          New-ItemProperty -Path $key -Name DumpType -PropertyType DWord -Value 2 -Force | Out-Null
-          New-ItemProperty -Path $key -Name DumpCount -PropertyType DWord -Value 5 -Force | Out-Null
-
       - name: Build MF6
         working-directory: modflow6
         run: |
           pixi run setup builddir $MESON_SETUP_ARGS
           pixi run build builddir
-
-      - name: Bundle runtime DLLs for standalone binary (Windows)
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          $gfortran = Get-Command gfortran -ErrorAction SilentlyContinue
-          if (-not $gfortran) {
-            Write-Host "gfortran not found on PATH; cannot locate runtime DLLs."
-          } else {
-            $mingwBin = Split-Path $gfortran.Source -Parent
-            Write-Host "Copying runtime DLLs from $mingwBin"
-            Copy-Item -Path "$mingwBin\*.dll" -Destination "modflow6\bin" -Force
-          }
-
-      - name: Upload mf6 binary for offline symbolization (Windows)
-        if: runner.os == 'Windows'
-        uses: actions/upload-artifact@v7
-        with:
-          name: mf6-binary-${{ matrix.os }}-${{ matrix.debug }}
-          path: modflow6/bin
 
       - name: Build mf5to6 converter
         working-directory: modflow6
@@ -631,6 +600,27 @@ jobs:
           cp -R bin/* /c/Users/runneradmin/.local/bin/modflow/
           cd ../modflow6-examples/autotest
           pixi run --manifest-path ../../modflow6/pixi.toml pytest -v -n auto test_scripts.py
+
+      - name: Bundle runtime DLLs for standalone binary (Windows)
+        if: always() && runner.os == 'Windows'
+        working-directory: modflow6
+        shell: pwsh
+        run: |
+          $gfortran = Get-Command gfortran -ErrorAction SilentlyContinue
+          if (-not $gfortran) {
+            Write-Host "gfortran not found on PATH; cannot locate runtime DLLs."
+          } else {
+            $mingwBin = Split-Path $gfortran.Source -Parent
+            Write-Host "Copying runtime DLLs from $mingwBin"
+            Copy-Item -Path "$mingwBin\*.dll" -Destination "bin" -Force
+          }
+
+      - name: Upload mf6 binary for offline symbolization (Windows)
+        if: always() && runner.os == 'Windows'
+        uses: actions/upload-artifact@v7
+        with:
+          name: mf6-binary-${{ matrix.os }}-${{ matrix.debug }}
+          path: modflow6/bin
 
       - name: Upload failed test output
         if: failure()

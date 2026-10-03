@@ -6348,7 +6348,7 @@ contains
         &option from LAK package '//trim(this%packName)//' to simulate &
         &density.'
       call store_error(errmsg)
-      call this%parser%StoreErrorUnit()
+      call store_error_filename(this%input_fname)
     end if
     !
     ! -- Set idense and reallocate denseterms to be of size MAXBOUND

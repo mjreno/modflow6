@@ -1823,7 +1823,7 @@ module GwfLakInputModule
     'CONNECTIONDATA', & ! fortran variable
     'RECARRAY IFNO ICONN CELLID CLAKTYPE BEDLEAK BELEV TELEV '// &
     'CONNLEN CONNWIDTH', & ! type
-    'NLAKECONN', & ! shape
+    'SUM(NLAKECONN)', & ! shape
     '', & ! longname
     .true., & ! required
     .false., & ! developmode

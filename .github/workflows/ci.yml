@@ -791,6 +791,10 @@ jobs:
         working-directory: modflow6
         run: pixi run install
 
+      - name: Check flopy4 dependencies
+        working-directory: modflow6
+        run: pixi run check-flopy4-deps
+
       - name: Set LDFLAGS (macOS)
         if: runner.os == 'macOS'
         run: |

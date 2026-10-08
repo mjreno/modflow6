@@ -49,7 +49,7 @@ xugrid = "==0.15.3"  # aligned with flopy4
 xmipy = ">=1.4.0"
 
 [pypi-dependencies]
-modflow-devtools = { git = "https://github.com/MODFLOW-ORG/modflow-devtools.git", rev = "805dc6f8be0f2a35180f407881c0234bc035ca6a", extras = ["test", "dfn", "models"] }
+modflow-devtools = { git = "https://github.com/MODFLOW-ORG/modflow-devtools.git", rev = "8fb5dd848088f755285c9de46a54e4b47d47fd0a", extras = ["test", "dfn", "models"] }
 
 # os-specific dependencies
 [target.win-64.dependencies]
@@ -65,8 +65,7 @@ meson = ">=1.7.0,<1.11"
 install-flopy = "pip install --disable-pip-version-check git+https://github.com/modflowpy/flopy.git"
 install-pymake = "pip install --disable-pip-version-check git+https://github.com/modflowpy/pymake.git"
 install-modflowapi = "pip install --disable-pip-version-check git+https://github.com/MODFLOW-ORG/modflowapi.git"
-# TODO: switch to the upstream URL and merged commit before merging
-install-flopy4 = "pip install --disable-pip-version-check --no-deps git+https://github.com/mjreno/pyphoenix-project.git@f7818329a30bb764edab9a5cb6e2597202448357"
+install-flopy4 = "pip install --disable-pip-version-check --no-deps git+https://github.com/modflowpy/pyphoenix-project.git@4f0b8159d7e5f30a8711f56a3c724ec433373e1f"
 install = { depends-on = [
     "install-flopy",
     "install-pymake",

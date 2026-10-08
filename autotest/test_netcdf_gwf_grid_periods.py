@@ -1,7 +1,7 @@
 """
 NetCDF input version of test_gwf_grid_periods: flopy4 re-writes the simulation
-with NetCDF package arrays, and the run is compared to the ASCII run and re-
-checked.
+with NetCDF package arrays, and the run is compared to the ASCII run and
+re-checked.
 """
 
 import pytest

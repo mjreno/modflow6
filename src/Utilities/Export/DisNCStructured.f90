@@ -200,6 +200,8 @@ contains
 
     if (this%dis%lenuni == 1) then
       this%lenunits = 'ft'
+    else if (this%dis%lenuni == 3) then
+      this%lenunits = 'cm'
     else
       this%lenunits = 'm'
     end if

@@ -156,6 +156,8 @@ contains
 
     if (lenuni == 1) then
       this%lenunits = 'ft'
+    else if (lenuni == 3) then
+      this%lenunits = 'cm'
     else
       this%lenunits = 'm'
     end if

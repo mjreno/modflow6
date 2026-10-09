@@ -6,7 +6,6 @@ version = "6.9.0.dev0"
 
 [dependencies]
 appdirs = "*"
-cattrs = "*"  # flopy4
 cffconvert = "*"
 codespell = "*"
 filelock = "*"
@@ -17,7 +16,6 @@ geopandas = "*"
 gitpython = "*"
 jinja2 = ">=3.1.5,<4"
 jupytext = "*"
-lark = "*"  # flopy4
 matplotlib = "*"
 meson = ">=1.7.0"
 netCDF4 = "*"
@@ -41,11 +39,10 @@ requests = "*"
 ruff = "*"
 scipy = "*"
 shapely = "*"
-sparse = "*"  # flopy4
 syrupy = "<5"
 test-drive = "*"
 xarray = "*"
-xugrid = "==0.15.3"  # aligned with flopy4
+xugrid = ">=0.14"
 xmipy = ">=1.4.0"
 
 [pypi-dependencies]
@@ -65,17 +62,14 @@ meson = ">=1.7.0,<1.11"
 install-flopy = "pip install --disable-pip-version-check git+https://github.com/modflowpy/flopy.git"
 install-pymake = "pip install --disable-pip-version-check git+https://github.com/modflowpy/pymake.git"
 install-modflowapi = "pip install --disable-pip-version-check git+https://github.com/MODFLOW-ORG/modflowapi.git"
-install-flopy4 = "pip install --disable-pip-version-check --no-deps git+https://github.com/modflowpy/pyphoenix-project.git@4f0b8159d7e5f30a8711f56a3c724ec433373e1f"
 install = { depends-on = [
     "install-flopy",
     "install-pymake",
     "install-modflowapi",
-    "install-flopy4",
 ] }
 
 # check format
 check-format = "python .github/common/check_format.py"
-check-flopy4-deps = "python .github/common/check_flopy4_deps.py"
 check-vfproj = "python .github/common/check_vfproj.py"
 check-spelling = "codespell"
 check-python-lint = { cmd = "ruff check ." }
@@ -147,9 +141,19 @@ builddir = "echo _builddir_win-64"
 # environments for documentation and extended build testing
 [environments]
 rtd = { features = ["rtd"], solve-group = "default" }
+fp4 = { features = ["fp4"], solve-group = "default" }
 gcc-extended-build = { features = ["gcc-extended-build"] }
 
 # Features
+[feature.fp4.pypi-dependencies]
+# flopy4, and through it its dependencies, for the flopy4 NetCDF input tests
+flopy4 = { git = "https://github.com/modflowpy/pyphoenix-project.git", rev = "4f0b8159d7e5f30a8711f56a3c724ec433373e1f" }
+
+[feature.fp4.tasks]
+# install a local flopy4 checkout over the pinned one: install-flopy4-local <path>
+install-flopy4-local = "pip install --disable-pip-version-check --no-deps -e"
+test-netcdf = { cmd = "pytest -v --durations 0 --netcdf -k test_netcdf", cwd = "autotest" }
+
 [feature.rtd.dependencies]
 numpy = ">=2.2.6,<3"
 bmipy = "*"
@@ -202,3 +206,7 @@ gcc-extended-build-update = { depends-on = [
     "gcc-extended-build-update-pc-files",
 ] }
 
+
+[pypi-options.dependency-overrides]
+# flopy4 requires devtools from git without a commit; use the pinned one
+modflow-devtools = { git = "https://github.com/MODFLOW-ORG/modflow-devtools.git", rev = "8fb5dd848088f755285c9de46a54e4b47d47fd0a", extras = ["test", "dfn", "models"] }

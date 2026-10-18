@@ -5,7 +5,7 @@ import numpy as np
 import pytest
 from framework import TestFramework
 
-cases = ["tvs01", "tvs02", "tvs03", "tvs04"]
+cases = ["tvs01", "tvs02", "tvs03", "tvs04", "tvs05"]
 
 
 def build_models(idx, test):
@@ -33,14 +33,14 @@ def build_models(idx, test):
         tdis_rc.append((perlen[i], nstp[i], tsmult[i]))
 
     name = cases[idx]
-    ts = idx == 1
+    ts = idx in (1, 4)
     disable_sc_int = idx == 2
-    sto_single_period = idx == 3
+    sto_single_period = idx in (3, 4)
 
     transient = {}
     if sto_single_period:
-        # tvs04: STO PERIOD block only in period 1 (TRANSIENT carries forward);
-        # TVS PERIOD blocks in later periods must still be applied
+        # tvs04/tvs05: STO PERIOD block only in period 1 (TRANSIENT carries
+        # forward); later TVS PERIOD blocks must still be applied
         transient[0] = True
     else:
         for i in range(nper):
@@ -219,7 +219,7 @@ def check_output(idx, test):
             )
         return
 
-    # tvs01 / tvs02 / tvs04: Check against manually calculated results
+    # tvs01 / tvs02 / tvs04 / tvs05: Check against manually calculated results
     expected_results = []
     expected_results.append(0.8)  # TVS SP1: No changes. Check initial solution.
     expected_results.append(3000.823)  # TVS SP2: Decrease SY1.

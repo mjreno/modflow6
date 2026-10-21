@@ -208,6 +208,7 @@ module SfrModule
   contains
     procedure :: sfr_allocate_scalars
     procedure :: sfr_allocate_arrays
+    procedure :: sfr_checkin_deprecated_names
     procedure :: source_options => sfr_source_options
     procedure :: source_dimensions => sfr_source_dimensions
 
@@ -692,6 +693,44 @@ contains
     call mem_allocate(this%viscratios, 2, 0, 'VISCRATIOS', this%memoryPath)
   end subroutine sfr_allocate_arrays
 
+  !> @brief Alias deprecated SFR variable names to their current storage
+  !!
+  !! IDM integration moved several reach variables into the input context,
+  !! renaming some. These aliases share memory with the relocated variables so
+  !! that programs addressing them through the API by their old package-path
+  !! names continue to resolve.
+  !<
+  subroutine sfr_checkin_deprecated_names(this)
+    ! -- modules
+    use MemoryManagerModule, only: mem_checkin
+    ! -- dummy
+    class(SfrType), intent(inout) :: this
+    ! -- code
+    !
+    call mem_checkin(this%rain, 'RAIN', this%memoryPath, &
+                     'RAINFALL', this%input_mempath)
+    call mem_checkin(this%evap, 'EVAP', this%memoryPath, &
+                     'EVAPORATION', this%input_mempath)
+    call mem_checkin(this%inflow, 'INFLOW', this%memoryPath, &
+                     'INFLOW', this%input_mempath)
+    call mem_checkin(this%runoff, 'RUNOFF', this%memoryPath, &
+                     'RUNOFF', this%input_mempath)
+    call mem_checkin(this%sstage, 'SSTAGE', this%memoryPath, &
+                     'STAGE', this%input_mempath)
+    call mem_checkin(this%hk, 'HK', this%memoryPath, &
+                     'BEDK', this%input_mempath)
+    call mem_checkin(this%rough, 'ROUGH', this%memoryPath, &
+                     'MANNING', this%input_mempath)
+    call mem_checkin(this%ustrf, 'USTRF', this%memoryPath, &
+                     'UPSTREAM_FRAC', this%input_mempath)
+    !
+    ! -- divflow only exists in the input context when diversions are present
+    if (associated(this%divflow)) then
+      call mem_checkin(this%divflow, 'DIVFLOW', this%memoryPath, &
+                       'DIVFLOW', this%input_mempath)
+    end if
+  end subroutine sfr_checkin_deprecated_names
+
   !> @brief Source OPTIONS from input context
   !<
   subroutine sfr_source_options(this)
@@ -932,6 +971,9 @@ contains
     !
     ! -- source diversions
     call this%sfr_source_diversions()
+    !
+    ! -- alias deprecated variable names
+    call this%sfr_checkin_deprecated_names()
     !
     ! -- source initialstages
     call this%sfr_source_initialstages()

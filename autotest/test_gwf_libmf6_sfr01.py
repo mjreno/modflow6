@@ -14,11 +14,13 @@ A representative subset is checked:
     USTRF     ->  UPSTREAM_FRAC   (renamed)
     INFLOW    ->  INFLOW          (path-only move)
     RAIN      ->  RAINFALL        (renamed)
+    RAUXVAR   ->  AUX             (renamed)
 
 For each: the old name resolves, its value matches the model input, and it
 shares memory with the current input-context variable. Each old name used is
 reported once as deprecated in the simulation listing file; aliases that are
-not used (EVAP, RUNOFF, SSTAGE) are not reported.
+not used (EVAP, RUNOFF, SSTAGE) are not reported. Without diversions DIVFLOW
+still resolves, as an empty package array that is not reported.
 """
 
 import os
@@ -36,7 +38,7 @@ cases = ["libgwf_sfr01"]
 sfr_pname = "SFR-1"
 
 # -- deprecated names read through the API below
-used_old_names = ["HK", "ROUGH", "USTRF", "INFLOW", "RAIN"]
+used_old_names = ["HK", "ROUGH", "USTRF", "INFLOW", "RAIN", "RAUXVAR"]
 
 # -- grid
 nlay, nrow, ncol = 1, 1, 5
@@ -56,6 +58,7 @@ rbth = 1.0
 rhk = 0.1  # -> BEDK (old HK)
 man = 0.035  # -> MANNING (old ROUGH)
 ustrf = 1.0  # -> UPSTREAM_FRAC (old USTRF)
+aux_vals = [10.0 + irch for irch in range(nreaches)]  # -> AUX (old RAUXVAR)
 
 # -- period input values
 inflow_rate = 100.0  # -> INFLOW (old INFLOW)
@@ -120,6 +123,7 @@ def get_model(ws, name):
                 nconn,
                 ustrf,
                 0,
+                aux_vals[irch],
             ]
         )
     connectiondata = []
@@ -141,6 +145,7 @@ def get_model(ws, name):
     flopy.mf6.ModflowGwfsfr(
         gwf,
         save_flows=True,
+        auxiliary=["AUX1"],
         nreaches=nreaches,
         packagedata=packagedata,
         connectiondata=connectiondata,
@@ -264,6 +269,22 @@ def api_func(exe, idx, model_ws=None):
         rainfall_val = mf6.get_value(f"{input_prefix}/RAINFALL")
         assert np.allclose(rain_val, rainfall_val), (
             f"alias 'RAIN' and 'RAINFALL' differ: {rain_val} vs {rainfall_val}"
+        )
+
+        # -- reach auxiliary values: RAUXVAR -> AUX (renamed)
+        rauxvar = mf6.get_value(mf6.get_var_address("RAUXVAR", name, sfr_pname))
+        assert np.allclose(np.ravel(rauxvar), aux_vals), (
+            f"old name 'RAUXVAR' value {np.ravel(rauxvar)} != {aux_vals}"
+        )
+        aux = mf6.get_value(f"{input_prefix}/AUX")
+        assert np.allclose(rauxvar, aux), (
+            f"alias 'RAUXVAR' and 'AUX' differ: {rauxvar} vs {aux}"
+        )
+
+        # -- no diversions: DIVFLOW is an empty package array, as before IDM
+        divflow_tag = mf6.get_var_address("DIVFLOW", name, sfr_pname)
+        assert mf6.get_var_nbytes(divflow_tag) == 0, (
+            "old name 'DIVFLOW' is not an empty array without diversions"
         )
 
     except Exception as e:

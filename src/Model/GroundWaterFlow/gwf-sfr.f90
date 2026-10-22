@@ -698,17 +698,37 @@ contains
   !! IDM integration moved several reach variables into the input context,
   !! renaming some. These aliases share memory with the relocated variables so
   !! that programs addressing them through the API by their old package-path
-  !! names continue to resolve; each use is reported as deprecated. DIVFLOW is
-  !! only aliased when diversions are present.
+  !! names continue to resolve; each use is reported as deprecated. Without
+  !! diversions there is no input-context DIVFLOW, so an empty DIVFLOW is
+  !! allocated at the package path as before IDM integration.
   !<
   subroutine sfr_checkin_deprecated_names(this)
     ! -- modules
+    use MemoryManagerModule, only: mem_allocate, mem_setptr, get_isize
     use MemoryAliasModule, only: mem_alias_deprecated
     ! -- dummy
     class(SfrType), intent(inout) :: this
     ! -- local
     character(len=*), parameter :: version = '6.8.2' !< version the names were deprecated in
+    real(DP), dimension(:, :), pointer, contiguous :: aux => null()
+    integer(I4B) :: isize
     ! -- code
+    !
+    ! -- reach auxiliary values, present (possibly empty) in the input context
+    call get_isize('AUX', this%input_mempath, isize)
+    if (isize >= 0) then
+      call mem_setptr(aux, 'AUX', this%input_mempath)
+      call mem_alias_deprecated(aux, 'RAUXVAR', this%memoryPath, &
+                                'AUX', this%input_mempath, version)
+    end if
+    !
+    ! -- diversion flows
+    if (associated(this%divflow)) then
+      call mem_alias_deprecated(this%divflow, 'DIVFLOW', this%memoryPath, &
+                                'DIVFLOW', this%input_mempath, version)
+    else
+      call mem_allocate(this%divflow, 0, 'DIVFLOW', this%memoryPath)
+    end if
     !
     call mem_alias_deprecated(this%rain, 'RAIN', this%memoryPath, &
                               'RAINFALL', this%input_mempath, version)
@@ -726,8 +746,6 @@ contains
                               'MANNING', this%input_mempath, version)
     call mem_alias_deprecated(this%ustrf, 'USTRF', this%memoryPath, &
                               'UPSTREAM_FRAC', this%input_mempath, version)
-    call mem_alias_deprecated(this%divflow, 'DIVFLOW', this%memoryPath, &
-                              'DIVFLOW', this%input_mempath, version)
   end subroutine sfr_checkin_deprecated_names
 
   !> @brief Source OPTIONS from input context
@@ -2896,7 +2914,12 @@ contains
     if (associated(this%divcprior)) then
       deallocate (this%divcprior)
     end if
-    nullify (this%divflow)
+    ! -- divflow is package-owned only when empty (no diversions)
+    if (size(this%divflow) == 0) then
+      call mem_deallocate(this%divflow)
+    else
+      nullify (this%divflow)
+    end if
     call mem_deallocate(this%divq)
     call mem_deallocate(this%ndiv)
     !

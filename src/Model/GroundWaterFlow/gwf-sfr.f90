@@ -698,37 +698,36 @@ contains
   !! IDM integration moved several reach variables into the input context,
   !! renaming some. These aliases share memory with the relocated variables so
   !! that programs addressing them through the API by their old package-path
-  !! names continue to resolve.
+  !! names continue to resolve; each use is reported as deprecated. DIVFLOW is
+  !! only aliased when diversions are present.
   !<
   subroutine sfr_checkin_deprecated_names(this)
     ! -- modules
-    use MemoryManagerModule, only: mem_checkin
+    use MemoryAliasModule, only: mem_alias_deprecated
     ! -- dummy
     class(SfrType), intent(inout) :: this
+    ! -- local
+    character(len=*), parameter :: version = '6.8.2' !< version the names were deprecated in
     ! -- code
     !
-    call mem_checkin(this%rain, 'RAIN', this%memoryPath, &
-                     'RAINFALL', this%input_mempath)
-    call mem_checkin(this%evap, 'EVAP', this%memoryPath, &
-                     'EVAPORATION', this%input_mempath)
-    call mem_checkin(this%inflow, 'INFLOW', this%memoryPath, &
-                     'INFLOW', this%input_mempath)
-    call mem_checkin(this%runoff, 'RUNOFF', this%memoryPath, &
-                     'RUNOFF', this%input_mempath)
-    call mem_checkin(this%sstage, 'SSTAGE', this%memoryPath, &
-                     'STAGE', this%input_mempath)
-    call mem_checkin(this%hk, 'HK', this%memoryPath, &
-                     'BEDK', this%input_mempath)
-    call mem_checkin(this%rough, 'ROUGH', this%memoryPath, &
-                     'MANNING', this%input_mempath)
-    call mem_checkin(this%ustrf, 'USTRF', this%memoryPath, &
-                     'UPSTREAM_FRAC', this%input_mempath)
-    !
-    ! -- divflow only exists in the input context when diversions are present
-    if (associated(this%divflow)) then
-      call mem_checkin(this%divflow, 'DIVFLOW', this%memoryPath, &
-                       'DIVFLOW', this%input_mempath)
-    end if
+    call mem_alias_deprecated(this%rain, 'RAIN', this%memoryPath, &
+                              'RAINFALL', this%input_mempath, version)
+    call mem_alias_deprecated(this%evap, 'EVAP', this%memoryPath, &
+                              'EVAPORATION', this%input_mempath, version)
+    call mem_alias_deprecated(this%inflow, 'INFLOW', this%memoryPath, &
+                              'INFLOW', this%input_mempath, version)
+    call mem_alias_deprecated(this%runoff, 'RUNOFF', this%memoryPath, &
+                              'RUNOFF', this%input_mempath, version)
+    call mem_alias_deprecated(this%sstage, 'SSTAGE', this%memoryPath, &
+                              'STAGE', this%input_mempath, version)
+    call mem_alias_deprecated(this%hk, 'HK', this%memoryPath, &
+                              'BEDK', this%input_mempath, version)
+    call mem_alias_deprecated(this%rough, 'ROUGH', this%memoryPath, &
+                              'MANNING', this%input_mempath, version)
+    call mem_alias_deprecated(this%ustrf, 'USTRF', this%memoryPath, &
+                              'UPSTREAM_FRAC', this%input_mempath, version)
+    call mem_alias_deprecated(this%divflow, 'DIVFLOW', this%memoryPath, &
+                              'DIVFLOW', this%input_mempath, version)
   end subroutine sfr_checkin_deprecated_names
 
   !> @brief Source OPTIONS from input context

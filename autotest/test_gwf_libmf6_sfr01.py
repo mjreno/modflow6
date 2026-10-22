@@ -16,10 +16,13 @@ A representative subset is checked:
     RAIN      ->  RAINFALL        (renamed)
 
 For each: the old name resolves, its value matches the model input, and it
-shares memory with the current input-context variable.
+shares memory with the current input-context variable. Each old name used is
+reported once as deprecated in the simulation listing file; aliases that are
+not used (EVAP, RUNOFF, SSTAGE) are not reported.
 """
 
 import os
+import re
 
 import flopy
 import numpy as np
@@ -31,6 +34,9 @@ cases = ["libgwf_sfr01"]
 
 # -- SFR package name (as seen in the memory manager / API)
 sfr_pname = "SFR-1"
+
+# -- deprecated names read through the API below
+used_old_names = ["HK", "ROUGH", "USTRF", "INFLOW", "RAIN"]
 
 # -- grid
 nlay, nrow, ncol = 1, 1, 5
@@ -270,7 +276,27 @@ def api_func(exe, idx, model_ws=None):
     except Exception:
         return False, open(output_file_path).readlines()
 
+    # -- each old name used above is reported once; unused aliases are not
+    expected = {f"{old}@{name}/{sfr_pname}": 1 for old in used_old_names}
+    reported = deprecation_warnings(os.path.join(model_ws, "mfsim.lst"))
+    if reported != expected:
+        print(f"deprecation warnings {reported} != expected {expected}")
+        return False, open(output_file_path).readlines()
+
     return True, open(output_file_path).readlines()
+
+
+def deprecation_warnings(lst_path):
+    """Count deprecated-name warnings in a listing file, keyed by name@path."""
+    # warnings wrap across lines, so match on whitespace-collapsed text
+    with open(lst_path) as f:
+        text = " ".join(f.read().split())
+    counts = {}
+    pattern = r"API VARIABLE '(\S+)' IN '(\S+)' WAS DEPRECATED"
+    for var, path in re.findall(pattern, text):
+        key = f"{var}@{path}"
+        counts[key] = counts.get(key, 0) + 1
+    return counts
 
 
 @requires_pkg("modflowapi")

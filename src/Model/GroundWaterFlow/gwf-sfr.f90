@@ -698,9 +698,9 @@ contains
   !! IDM integration moved several reach variables into the input context,
   !! renaming some. These aliases share memory with the relocated variables so
   !! that programs addressing them through the API by their old package-path
-  !! names continue to resolve; each use is reported as deprecated. Without
-  !! diversions there is no input-context DIVFLOW, so an empty DIVFLOW is
-  !! allocated at the package path as before IDM integration.
+  !! names continue to resolve; each use is reported as deprecated. DIVFLOW is
+  !! only set from the input context when diversions are present; otherwise an
+  !! empty DIVFLOW is allocated at the package path, as before IDM integration.
   !<
   subroutine sfr_checkin_deprecated_names(this)
     ! -- modules
@@ -2914,11 +2914,14 @@ contains
     if (associated(this%divcprior)) then
       deallocate (this%divcprior)
     end if
-    ! -- divflow is package-owned only when empty (no diversions)
-    if (size(this%divflow) == 0) then
-      call mem_deallocate(this%divflow)
-    else
-      nullify (this%divflow)
+    ! -- divflow is package-owned only when empty (no diversions); it is not
+    !    associated if the simulation stopped before it was set
+    if (associated(this%divflow)) then
+      if (size(this%divflow) == 0) then
+        call mem_deallocate(this%divflow)
+      else
+        nullify (this%divflow)
+      end if
     end if
     call mem_deallocate(this%divq)
     call mem_deallocate(this%ndiv)

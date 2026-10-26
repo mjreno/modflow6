@@ -652,21 +652,19 @@ contains
     use MemoryAliasModule, only: mem_alias_deprecated
     ! -- dummy
     class(GwtSftType), intent(inout) :: this
-    ! -- local
-    character(len=*), parameter :: version = '6.8.2' !< version the names were deprecated in
     ! -- code
     !
     ! -- names common to all advanced transport packages
     call this%TspAptType%apt_checkin_deprecated_names()
     !
     call mem_alias_deprecated(this%concrain, 'CONCRAIN', this%memoryPath, &
-                              'RAINFALL', this%input_mempath, version)
+                              'RAINFALL', this%input_mempath, '6.8.2')
     call mem_alias_deprecated(this%concevap, 'CONCEVAP', this%memoryPath, &
-                              'EVAPORATION', this%input_mempath, version)
+                              'EVAPORATION', this%input_mempath, '6.8.2')
     call mem_alias_deprecated(this%concroff, 'CONCROFF', this%memoryPath, &
-                              'RUNOFF', this%input_mempath, version)
+                              'RUNOFF', this%input_mempath, '6.8.2')
     call mem_alias_deprecated(this%conciflw, 'CONCIFLW', this%memoryPath, &
-                              'INFLOW', this%input_mempath, version)
+                              'INFLOW', this%input_mempath, '6.8.2')
   end subroutine sft_checkin_deprecated_names
 
   !> @brief Advance sft package routine

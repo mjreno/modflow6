@@ -696,15 +696,13 @@ contains
     use MemoryAliasModule, only: mem_alias_deprecated
     ! -- dummy
     class(GweMweType), intent(inout) :: this
-    ! -- local
-    character(len=*), parameter :: version = '6.8.2' !< version the names were deprecated in
     ! -- code
     !
     ! -- names common to all advanced transport packages
     call this%TspAptType%apt_checkin_deprecated_names()
     !
     call mem_alias_deprecated(this%temprate, 'TEMPRATE', this%memoryPath, &
-                              'RATE', this%input_mempath, version)
+                              'RATE', this%input_mempath, '6.8.2')
   end subroutine mwe_checkin_deprecated_names
 
   !> @brief Deallocate memory associated with MWE package

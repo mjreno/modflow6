@@ -741,21 +741,19 @@ contains
     use MemoryAliasModule, only: mem_alias_deprecated
     ! -- dummy
     class(GweSfeType), intent(inout) :: this
-    ! -- local
-    character(len=*), parameter :: version = '6.8.2' !< version the names were deprecated in
     ! -- code
     !
     ! -- names common to all advanced transport packages
     call this%TspAptType%apt_checkin_deprecated_names()
     !
     call mem_alias_deprecated(this%temprain, 'TEMPRAIN', this%memoryPath, &
-                              'RAINFALL', this%input_mempath, version)
+                              'RAINFALL', this%input_mempath, '6.8.2')
     call mem_alias_deprecated(this%tempevap, 'TEMPEVAP', this%memoryPath, &
-                              'EVAPORATION', this%input_mempath, version)
+                              'EVAPORATION', this%input_mempath, '6.8.2')
     call mem_alias_deprecated(this%temproff, 'TEMPROFF', this%memoryPath, &
-                              'RUNOFF', this%input_mempath, version)
+                              'RUNOFF', this%input_mempath, '6.8.2')
     call mem_alias_deprecated(this%tempiflw, 'TEMPIFLW', this%memoryPath, &
-                              'INFLOW', this%input_mempath, version)
+                              'INFLOW', this%input_mempath, '6.8.2')
   end subroutine sfe_checkin_deprecated_names
 
   !> @brief Advance sfe package routine

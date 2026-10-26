@@ -1195,7 +1195,6 @@ contains
     ! -- dummy
     class(TspAptType), intent(inout) :: this
     ! -- local
-    character(len=*), parameter :: version = '6.8.2' !< version the names were deprecated in
     real(DP), dimension(:, :), pointer, contiguous :: aux => null()
     integer(I4B) :: isize
     ! -- code
@@ -1203,14 +1202,14 @@ contains
     ! -- feature concentration (GWT) or temperature (GWE)
     call mem_alias_deprecated(this%concfeat, 'CONCFEAT', this%memoryPath, &
                               trim(this%depvartype), this%input_mempath, &
-                              version)
+                              '6.8.2')
     !
     ! -- feature auxiliary values, present (possibly empty) in the input context
     call get_isize('AUX', this%input_mempath, isize)
     if (isize >= 0) then
       call mem_setptr(aux, 'AUX', this%input_mempath)
       call mem_alias_deprecated(aux, 'LAUXVAR', this%memoryPath, &
-                                'AUX', this%input_mempath, version)
+                                'AUX', this%input_mempath, '6.8.2')
     end if
   end subroutine apt_checkin_deprecated_names
 

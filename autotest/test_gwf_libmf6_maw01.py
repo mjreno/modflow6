@@ -13,7 +13,9 @@ address these variables by their old names.
 
 For each: the old name resolves, its value matches the model input, and it
 shares memory with the current input-context variable. Each old name used is
-reported once as deprecated in the simulation listing file.
+reported once as deprecated in the simulation listing file. A second case
+without auxiliary variables checks that MAUXVAR still resolves, as an empty
+array (6.8.1 allocated one row of zeros in that case).
 """
 
 import os
@@ -25,7 +27,10 @@ import pytest
 from framework import TestFramework
 from modflow_devtools.markers import requires_pkg
 
-cases = ["libgwf_maw01"]
+cases = ["libgwf_maw01", "libgwf_maw01b"]
+
+# -- case 1 has an auxiliary variable; case 2 has none
+with_aux = [True, False]
 
 # -- MAW package name (as seen in the memory manager / API)
 maw_pname = "MAW-1"
@@ -52,7 +57,7 @@ nouter, ninner = 100, 50
 hclose, rclose, relax = 1e-6, 1e-6, 1.0
 
 
-def get_model(ws, name):
+def get_model(ws, name, aux):
     sim = flopy.mf6.MFSimulation(
         sim_name=name,
         version="mf6",
@@ -91,7 +96,8 @@ def get_model(ws, name):
 
     # -- MAW: one connection per well, in columns 2 and 4
     packagedata = [
-        [n, radius, botm, strt, "THIEM", 1, aux_vals[n]] for n in range(nwells)
+        [n, radius, botm, strt, "THIEM", 1] + ([aux_vals[n]] if aux else [])
+        for n in range(nwells)
     ]
     connectiondata = [
         [n, 0, (0, 0, 1 + 2 * n), top, botm, -999.0, -999.0] for n in range(nwells)
@@ -105,7 +111,7 @@ def get_model(ws, name):
     }
     flopy.mf6.ModflowGwfmaw(
         gwf,
-        auxiliary=["AUX1"],
+        auxiliary=["AUX1"] if aux else None,
         nmawwells=nwells,
         packagedata=packagedata,
         connectiondata=connectiondata,
@@ -122,9 +128,9 @@ def get_model(ws, name):
 
 def build_models(idx, test):
     name = cases[idx]
-    sim = get_model(test.workspace, name)
+    sim = get_model(test.workspace, name, with_aux[idx])
     # comparison sim in a "libmf6" subdir: the framework runs this one via the API
-    sim_api = get_model(os.path.join(test.workspace, "libmf6"), name)
+    sim_api = get_model(os.path.join(test.workspace, "libmf6"), name, with_aux[idx])
     return sim, sim_api
 
 
@@ -202,11 +208,15 @@ def api_func(exe, idx, model_ws=None):
             "alias 'WELL_HEAD' differs from input-context 'WELL_HEAD'"
         )
 
-        # -- well auxiliary values: MAUXVAR -> AUX (renamed)
+        # -- well auxiliary values: MAUXVAR -> AUX (renamed); empty without
+        #    auxiliary variables
         mauxvar = mf6.get_value(mf6.get_var_address("MAUXVAR", name, maw_pname))
-        assert np.allclose(np.ravel(mauxvar), aux_vals), (
-            f"old name 'MAUXVAR' value {np.ravel(mauxvar)} != {aux_vals}"
-        )
+        if with_aux[idx]:
+            assert np.allclose(np.ravel(mauxvar), aux_vals), (
+                f"old name 'MAUXVAR' value {np.ravel(mauxvar)} != {aux_vals}"
+            )
+        else:
+            assert mauxvar.size == 0, f"old name 'MAUXVAR' is not empty: {mauxvar}"
         aux = mf6.get_value(f"{input_prefix}/AUX")
         assert np.allclose(mauxvar, aux), (
             f"alias 'MAUXVAR' and 'AUX' differ: {mauxvar} vs {aux}"

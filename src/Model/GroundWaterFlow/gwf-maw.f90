@@ -638,7 +638,9 @@ contains
     call mem_alias_deprecated(this%well_head, 'WELL_HEAD', this%memoryPath, &
                               'WELL_HEAD', this%input_mempath, version)
     !
-    ! -- well auxiliary values, present (possibly empty) in the input context
+    ! -- well auxiliary values, present (possibly empty) in the input context;
+    !    without auxiliary variables MAUXVAR is empty, where 6.8.1 allocated
+    !    one row of zeros
     call get_isize('AUX', this%input_mempath, isize)
     if (isize >= 0) then
       call mem_setptr(aux, 'AUX', this%input_mempath)

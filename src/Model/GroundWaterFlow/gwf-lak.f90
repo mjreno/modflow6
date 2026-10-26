@@ -588,54 +588,53 @@ contains
     ! -- dummy
     class(LakType), intent(inout) :: this
     ! -- local
-    character(len=*), parameter :: version = '6.8.2' !< version the names were deprecated in
     real(DP), dimension(:, :), pointer, contiguous :: aux => null()
     integer(I4B) :: isize
     ! -- code
     !
     ! -- lake period data
     call mem_alias_deprecated(this%stage, 'STAGE', this%memoryPath, &
-                              'STAGE', this%input_mempath, version)
+                              'STAGE', this%input_mempath, '6.8.2')
     call mem_alias_deprecated(this%rainfall, 'RAINFALL', this%memoryPath, &
-                              'RAINFALL', this%input_mempath, version)
+                              'RAINFALL', this%input_mempath, '6.8.2')
     call mem_alias_deprecated(this%evaporation, 'EVAPORATION', &
                               this%memoryPath, 'EVAPORATION', &
-                              this%input_mempath, version)
+                              this%input_mempath, '6.8.2')
     call mem_alias_deprecated(this%runoff, 'RUNOFF', this%memoryPath, &
-                              'RUNOFF', this%input_mempath, version)
+                              'RUNOFF', this%input_mempath, '6.8.2')
     call mem_alias_deprecated(this%inflow, 'INFLOW', this%memoryPath, &
-                              'INFLOW', this%input_mempath, version)
+                              'INFLOW', this%input_mempath, '6.8.2')
     call mem_alias_deprecated(this%withdrawal, 'WITHDRAWAL', this%memoryPath, &
-                              'WITHDRAWAL', this%input_mempath, version)
+                              'WITHDRAWAL', this%input_mempath, '6.8.2')
     !
     ! -- outlet period data
     call mem_alias_deprecated(this%outrate, 'OUTRATE', this%memoryPath, &
-                              'RATE', this%input_mempath, version)
+                              'RATE', this%input_mempath, '6.8.2')
     call mem_alias_deprecated(this%outinvert, 'OUTINVERT', this%memoryPath, &
-                              'INVERT', this%input_mempath, version)
+                              'INVERT', this%input_mempath, '6.8.2')
     call mem_alias_deprecated(this%outwidth, 'OUTWIDTH', this%memoryPath, &
-                              'WIDTH', this%input_mempath, version)
+                              'WIDTH', this%input_mempath, '6.8.2')
     call mem_alias_deprecated(this%outslope, 'OUTSLOPE', this%memoryPath, &
-                              'SLOPE', this%input_mempath, version)
+                              'SLOPE', this%input_mempath, '6.8.2')
     call mem_alias_deprecated(this%outrough, 'OUTROUGH', this%memoryPath, &
-                              'ROUGH', this%input_mempath, version)
+                              'ROUGH', this%input_mempath, '6.8.2')
     !
     ! -- lake auxiliary values, present (possibly empty) in the input context
     call get_isize('AUX', this%input_mempath, isize)
     if (isize >= 0) then
       call mem_setptr(aux, 'AUX', this%input_mempath)
       call mem_alias_deprecated(aux, 'LAUXVAR', this%memoryPath, &
-                                'AUX', this%input_mempath, version)
+                                'AUX', this%input_mempath, '6.8.2')
     end if
     !
     ! -- renamed at the package path: CELLID by IDM integration (#3021),
     !    IFALLBACK and IFORCEFB by the legacy solver refactor (#2976)
     call mem_alias_deprecated(this%gwfconn, 'CELLID', this%memoryPath, &
-                              'GWFCONN', this%memoryPath, version)
+                              'GWFCONN', this%memoryPath, '6.8.2')
     call mem_alias_deprecated(this%ilegacy, 'IFALLBACK', this%memoryPath, &
-                              'ILEGACY', this%memoryPath, version)
+                              'ILEGACY', this%memoryPath, '6.8.2')
     call mem_alias_deprecated(this%iforceleg, 'IFORCEFB', this%memoryPath, &
-                              'IFORCELEG', this%memoryPath, version)
+                              'IFORCELEG', this%memoryPath, '6.8.2')
   end subroutine lak_checkin_deprecated_names
 
   !> @brief Source PACKAGEDATA block from input context

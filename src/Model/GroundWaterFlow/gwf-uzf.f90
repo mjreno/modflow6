@@ -377,29 +377,27 @@ contains
     use MemoryAliasModule, only: mem_alias_deprecated
     ! -- dummy
     class(UzfType), intent(inout) :: this
-    ! -- local
-    character(len=*), parameter :: version = '6.8.2' !< version the names were deprecated in
     ! -- code
     !
     call mem_alias_deprecated(this%sinf_pvar, 'SINF_PVAR', this%memoryPath, &
-                              'FINF', this%input_mempath, version)
+                              'FINF', this%input_mempath, '6.8.2')
     call mem_alias_deprecated(this%pet_pvar, 'PET_PVAR', this%memoryPath, &
-                              'PET', this%input_mempath, version)
+                              'PET', this%input_mempath, '6.8.2')
     call mem_alias_deprecated(this%extdp, 'EXDP_PVAR', this%memoryPath, &
-                              'EXTDP', this%input_mempath, version)
+                              'EXTDP', this%input_mempath, '6.8.2')
     call mem_alias_deprecated(this%extwc_pvar, 'EXTWC_PVAR', this%memoryPath, &
-                              'EXTWC', this%input_mempath, version)
+                              'EXTWC', this%input_mempath, '6.8.2')
     call mem_alias_deprecated(this%ha_pvar, 'HA_PVAR', this%memoryPath, &
-                              'HA', this%input_mempath, version)
+                              'HA', this%input_mempath, '6.8.2')
     call mem_alias_deprecated(this%hroot_pvar, 'HROOT_PVAR', this%memoryPath, &
-                              'HROOT', this%input_mempath, version)
+                              'HROOT', this%input_mempath, '6.8.2')
     call mem_alias_deprecated(this%rootact_pvar, 'ROOTACT_PVAR', &
                               this%memoryPath, 'ROOTACT', this%input_mempath, &
-                              version)
+                              '6.8.2')
     !
     ! -- cell auxiliary values, empty without auxiliary variables
     call mem_alias_deprecated(this%uauxvar, 'UAUXVAR', this%memoryPath, &
-                              'AUXVAR', this%input_mempath, version)
+                              'AUXVAR', this%input_mempath, '6.8.2')
   end subroutine uzf_checkin_deprecated_names
 
   !> @brief Source OPTIONS block from input context

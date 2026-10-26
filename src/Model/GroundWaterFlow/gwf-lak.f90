@@ -573,13 +573,13 @@ contains
 
   !> @brief Alias deprecated LAK variable names to their current storage
   !!
-  !! IDM integration moved several lake and outlet variables into the input
-  !! context, renaming some, and renamed the lake connection cell array. The
-  !! legacy solver refactor renamed the fallback variables. These aliases share
-  !! memory with the current variables so that programs addressing them
-  !! through the API by their old package-path names continue to resolve; each
-  !! use is reported as deprecated. Outlet names are only aliased when outlets
-  !! are present.
+  !! IDM integration (#3021) moved several lake and outlet variables into the
+  !! input context, renaming some, and renamed the lake connection cell array.
+  !! The legacy solver refactor (#2976) renamed the fallback variables. These
+  !! aliases share memory with the current variables so that programs
+  !! addressing them through the API by their old package-path names continue
+  !! to resolve; each use is reported as deprecated. Outlet names are only
+  !! aliased when outlets are present.
   !<
   subroutine lak_checkin_deprecated_names(this)
     ! -- modules
@@ -628,7 +628,8 @@ contains
                                 'AUX', this%input_mempath, version)
     end if
     !
-    ! -- renamed at the package path
+    ! -- renamed at the package path: CELLID by IDM integration (#3021),
+    !    IFALLBACK and IFORCEFB by the legacy solver refactor (#2976)
     call mem_alias_deprecated(this%gwfconn, 'CELLID', this%memoryPath, &
                               'GWFCONN', this%memoryPath, version)
     call mem_alias_deprecated(this%ilegacy, 'IFALLBACK', this%memoryPath, &

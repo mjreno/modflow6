@@ -6,11 +6,14 @@ memory path into the input context, renaming the outlet variables and the
 auxiliary array, and renamed the lake connection cell array. The legacy solver
 refactor renamed the fallback variables. LAK registers aliases at the package
 path so external programs (modflowapi, coupled models) can still address these
-variables by their old names. A representative subset is checked:
+variables by their old names. All aliases are checked:
 
     old name    ->  current name
     STAGE       ->  STAGE      (input context, path-only move)
     RAINFALL    ->  RAINFALL   (input context, path-only move)
+    EVAPORATION ->  EVAPORATION (input context, path-only move)
+    RUNOFF      ->  RUNOFF     (input context, path-only move)
+    INFLOW      ->  INFLOW     (input context, path-only move)
     WITHDRAWAL  ->  WITHDRAWAL (input context, path-only move)
     OUTRATE     ->  RATE       (input context, renamed)
     OUTINVERT   ->  INVERT     (input context, renamed)
@@ -53,6 +56,9 @@ outlet_names = ["OUTRATE", "OUTINVERT", "OUTWIDTH", "OUTROUGH", "OUTSLOPE"]
 renames = [
     ("STAGE", "STAGE", True),
     ("RAINFALL", "RAINFALL", True),
+    ("EVAPORATION", "EVAPORATION", True),
+    ("RUNOFF", "RUNOFF", True),
+    ("INFLOW", "INFLOW", True),
     ("WITHDRAWAL", "WITHDRAWAL", True),
     ("OUTRATE", "RATE", True),
     ("OUTINVERT", "INVERT", True),
@@ -77,6 +83,9 @@ k11 = 1.0
 lake_strt = 9.0
 lake_col = 2  # lake connects horizontally to this column
 rainfall = 0.5
+evaporation = 0.25
+runoff = 3.0
+inflow = 4.0
 withdrawal = 1.5
 aux_val = 7.0  # -> AUX (old LAUXVAR)
 invert, width, rough, slope = 8.5, 2.0, 0.03, 0.001
@@ -137,7 +146,13 @@ def get_model(ws, name, extras):
         if extras
         else None,
         perioddata={
-            0: [[0, "rainfall", rainfall], [0, "withdrawal", withdrawal]],
+            0: [
+                [0, "rainfall", rainfall],
+                [0, "evaporation", evaporation],
+                [0, "runoff", runoff],
+                [0, "inflow", inflow],
+                [0, "withdrawal", withdrawal],
+            ],
         },
         pname=lak_pname,
     )
@@ -218,6 +233,9 @@ def api_func(exe, idx, model_ws=None):
         # -- old names carry the model input
         expected = {
             "RAINFALL": rainfall,
+            "EVAPORATION": evaporation,
+            "RUNOFF": runoff,
+            "INFLOW": inflow,
             "WITHDRAWAL": withdrawal,
             "CELLID": lake_col + 1,  # reduced node number of the connected cell
             "IFORCEFB": 0,

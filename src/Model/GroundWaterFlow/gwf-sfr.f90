@@ -709,7 +709,6 @@ contains
     ! -- dummy
     class(SfrType), intent(inout) :: this
     ! -- local
-    character(len=*), parameter :: version = '6.8.2' !< version the names were deprecated in
     real(DP), dimension(:, :), pointer, contiguous :: aux => null()
     integer(I4B) :: isize
     ! -- code
@@ -719,33 +718,33 @@ contains
     if (isize >= 0) then
       call mem_setptr(aux, 'AUX', this%input_mempath)
       call mem_alias_deprecated(aux, 'RAUXVAR', this%memoryPath, &
-                                'AUX', this%input_mempath, version)
+                                'AUX', this%input_mempath, '6.8.2')
     end if
     !
     ! -- diversion flows
     if (associated(this%divflow)) then
       call mem_alias_deprecated(this%divflow, 'DIVFLOW', this%memoryPath, &
-                                'DIVFLOW', this%input_mempath, version)
+                                'DIVFLOW', this%input_mempath, '6.8.2')
     else
       call mem_allocate(this%divflow, 0, 'DIVFLOW', this%memoryPath)
     end if
     !
     call mem_alias_deprecated(this%rain, 'RAIN', this%memoryPath, &
-                              'RAINFALL', this%input_mempath, version)
+                              'RAINFALL', this%input_mempath, '6.8.2')
     call mem_alias_deprecated(this%evap, 'EVAP', this%memoryPath, &
-                              'EVAPORATION', this%input_mempath, version)
+                              'EVAPORATION', this%input_mempath, '6.8.2')
     call mem_alias_deprecated(this%inflow, 'INFLOW', this%memoryPath, &
-                              'INFLOW', this%input_mempath, version)
+                              'INFLOW', this%input_mempath, '6.8.2')
     call mem_alias_deprecated(this%runoff, 'RUNOFF', this%memoryPath, &
-                              'RUNOFF', this%input_mempath, version)
+                              'RUNOFF', this%input_mempath, '6.8.2')
     call mem_alias_deprecated(this%sstage, 'SSTAGE', this%memoryPath, &
-                              'STAGE', this%input_mempath, version)
+                              'STAGE', this%input_mempath, '6.8.2')
     call mem_alias_deprecated(this%hk, 'HK', this%memoryPath, &
-                              'BEDK', this%input_mempath, version)
+                              'BEDK', this%input_mempath, '6.8.2')
     call mem_alias_deprecated(this%rough, 'ROUGH', this%memoryPath, &
-                              'MANNING', this%input_mempath, version)
+                              'MANNING', this%input_mempath, '6.8.2')
     call mem_alias_deprecated(this%ustrf, 'USTRF', this%memoryPath, &
-                              'UPSTREAM_FRAC', this%input_mempath, version)
+                              'UPSTREAM_FRAC', this%input_mempath, '6.8.2')
   end subroutine sfr_checkin_deprecated_names
 
   !> @brief Source OPTIONS from input context

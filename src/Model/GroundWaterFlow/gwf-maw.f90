@@ -628,15 +628,14 @@ contains
     ! -- dummy
     class(MawType), intent(inout) :: this
     ! -- local
-    character(len=*), parameter :: version = '6.8.2' !< version the names were deprecated in
     real(DP), dimension(:, :), pointer, contiguous :: aux => null()
     integer(I4B) :: isize
     ! -- code
     !
     call mem_alias_deprecated(this%rate, 'RATE', this%memoryPath, &
-                              'RATE', this%input_mempath, version)
+                              'RATE', this%input_mempath, '6.8.2')
     call mem_alias_deprecated(this%well_head, 'WELL_HEAD', this%memoryPath, &
-                              'WELL_HEAD', this%input_mempath, version)
+                              'WELL_HEAD', this%input_mempath, '6.8.2')
     !
     ! -- well auxiliary values, present (possibly empty) in the input context;
     !    without auxiliary variables MAUXVAR is empty, where 6.8.1 allocated
@@ -645,7 +644,7 @@ contains
     if (isize >= 0) then
       call mem_setptr(aux, 'AUX', this%input_mempath)
       call mem_alias_deprecated(aux, 'MAUXVAR', this%memoryPath, &
-                                'AUX', this%input_mempath, version)
+                                'AUX', this%input_mempath, '6.8.2')
     end if
   end subroutine maw_checkin_deprecated_names
 

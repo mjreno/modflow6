@@ -929,8 +929,8 @@ contains
     call mem_setptr(radius, 'RADIUS', this%input_mempath)
     call mem_setptr(bottom, 'BOTTOM', this%input_mempath)
     call mem_setptr(this%input%strt, 'STRT', this%input_mempath)
-    call mem_setptr(tslink, 'TSLINK', this%input_mempath)
-    call mem_setptr(tslinkvars, 'TSLINKVARS', this%input_mempath)
+    call mem_setptr(tslink, 'TSLINK_PD', this%input_mempath)
+    call mem_setptr(tslinkvars, 'TSLINKVARS_PD', this%input_mempath)
     do n = 1, size(tslinkvars)
       if (tslinkvars(n) == 'STRT') this%input%strt_tslink => tslink(n, :)
     end do

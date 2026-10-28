@@ -731,7 +731,7 @@ contains
     end if
 
     ! record which rows of time series capable columns are linked
-    call this%alloc_tslink()
+    call this%alloc_tslink(iblk)
 
     ! save structarray for deferred TS linking in df() if any strlocs were stored
     if (ibinary == 0 .and. this%ts_active) call this%save_ts_sa()
@@ -1354,21 +1354,26 @@ contains
 
   !> @brief Allocate time series link flags for a static block
   !!
-  !! For a block with time series capable double columns, allocate TSLINK,
-  !! an integer array (ncol, nrow) that is nonzero where a row's value is
-  !! linked to a time series, and TSLINKVARS, the names of its columns.
-  !! Packages use these to apply time series updates to linked values only.
+  !! For a block with time series capable double columns, allocate
+  !! TSLINK_<id>, an integer array (ncol, nrow) that is nonzero where a row's
+  !! value is linked to a time series, and TSLINKVARS_<id>, the names of its
+  !! columns, where <id> identifies the block (see tslink_id). Packages use
+  !! these to apply time series updates to linked values only.
   !<
-  subroutine alloc_tslink(this)
+  subroutine alloc_tslink(this, iblk)
     use CharacterStringModule, only: CharacterStringType
+    use LoadContextModule, only: tslink_id
     use StructVectorModule, only: MTYPE_DBL, TSStringLocType
     class(LoadMf6FileType), intent(inout) :: this
+    integer(I4B), intent(in) :: iblk
     type(StructVectorType), pointer :: svect
     type(TSStringLocType), pointer :: ts_strloc
     integer(I4B), dimension(:, :), pointer, contiguous :: tslink
     type(CharacterStringType), dimension(:), pointer, contiguous :: tslinkvars
     integer(I4B), dimension(:), allocatable :: icols
-    integer(I4B) :: m, n, ncol, nrow, isize
+    character(len=LINELENGTH) :: blockname
+    character(len=2) :: id
+    integer(I4B) :: m, n, ncol, nrow
 
     ! find time series capable double columns
     allocate (icols(0))
@@ -1381,11 +1386,12 @@ contains
     ncol = size(icols)
     if (ncol == 0) return
 
-    ! one block per package
-    call get_isize('TSLINK', this%mf6_input%mempath, isize)
-    if (isize >= 0) then
-      write (errmsg, '(a)') 'Time series capable static input found in &
-        &more than one block.'
+    ! block identifier
+    blockname = this%mf6_input%block_dfns(iblk)%blockname
+    id = tslink_id(blockname)
+    if (id == '') then
+      write (errmsg, '(a)') 'Time series link identifier not defined for &
+        &block "'//trim(blockname)//'".'
       call store_error(errmsg)
       call this%parser%StoreErrorUnit()
       return
@@ -1394,8 +1400,8 @@ contains
     ! allocate
     svect => this%structarray%get(icols(1))
     nrow = size(svect%dbl1d)
-    call mem_allocate(tslink, ncol, nrow, 'TSLINK', this%mf6_input%mempath)
-    call mem_allocate(tslinkvars, LENVARNAME, ncol, 'TSLINKVARS', &
+    call mem_allocate(tslink, ncol, nrow, 'TSLINK_'//id, this%mf6_input%mempath)
+    call mem_allocate(tslinkvars, LENVARNAME, ncol, 'TSLINKVARS_'//id, &
                       this%mf6_input%mempath)
 
     ! set column names and linked rows

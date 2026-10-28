@@ -3178,8 +3178,8 @@ contains
       call mem_setptr(this%outlets_width, 'OUTLETS_WIDTH', mempath)
       call mem_setptr(this%outlets_rough, 'OUTLETS_ROUGH', mempath)
       call mem_setptr(this%outlets_slope, 'OUTLETS_SLOPE', mempath)
-      call mem_setptr(tslink, 'TSLINK', mempath)
-      call mem_setptr(tslinkvars, 'TSLINKVARS', mempath)
+      call mem_setptr(tslink, 'TSLINK_OL', mempath)
+      call mem_setptr(tslinkvars, 'TSLINKVARS_OL', mempath)
       do n = 1, size(tslinkvars)
         if (tslinkvars(n) == 'OUTLETS_INVERT') &
           this%invert_tslink => tslink(n, :)

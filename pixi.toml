@@ -147,8 +147,10 @@ gcc-extended-build = { features = ["gcc-extended-build"] }
 
 # Features
 [feature.fp4.pypi-dependencies]
-# flopy4, and through it its dependencies, for the flopy4 NetCDF input tests
-flopy4 = { git = "https://github.com/modflowpy/pyphoenix-project.git", rev = "258ad12e9f9ec37a5b59d27c2519818c76f22f49" }
+# DISPOSABLE, test-branch-only: pinned to mjreno/pyphoenix-project@devmode_test_prt
+# to test whether preserving DEV_FORCETERNARY (via --developmode sync) fixes the
+# Windows-only prtdisv1trts track-count mismatch. Not for merging.
+flopy4 = { git = "https://github.com/mjreno/pyphoenix-project.git", rev = "ae4431b4154e4939eb08d146bff2b0fd842f2d28" }
 
 [feature.fp4.tasks]
 # install a local flopy4 checkout over the pinned one: install-flopy4-local <path>

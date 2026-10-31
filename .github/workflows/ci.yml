@@ -905,15 +905,20 @@ jobs:
             exit 0
           }
           Write-Host "Inspecting: $($failedDir.FullName)"
-          Get-ChildItem -Path $failedDir.FullName -Filter "*.prp" -File | ForEach-Object { Write-Host $_.FullName }
-          Get-ChildItem -Path $failedDir.FullName -Filter "*.prp" -File | ForEach-Object {
-            $base = $_.Name
-            $rewritten = Join-Path $failedDir.FullName "fp4_ascii/$base"
+          # the PRT sim (and its .prp input) lives under a "prt" subdir of
+          # the workspace, not at the top level -- search recursively, but
+          # skip the fp4_ascii rewrite tree itself when finding natives.
+          $nativeFiles = Get-ChildItem -Path $failedDir.FullName -Filter "*.prp" -File -Recurse |
+            Where-Object { $_.FullName -notmatch '\\fp4_ascii\\' }
+          $nativeFiles | ForEach-Object { Write-Host $_.FullName }
+          $nativeFiles | ForEach-Object {
+            $relPath = $_.FullName.Substring($failedDir.FullName.Length).TrimStart('\')
+            $rewritten = Join-Path (Join-Path $failedDir.FullName "fp4_ascii") $relPath
             if (Test-Path $rewritten) {
-              Write-Host "=== diff: $base (native vs fp4_ascii rewrite) ==="
+              Write-Host "=== diff: $relPath (native vs fp4_ascii rewrite) ==="
               git diff --no-index -- $_.FullName $rewritten
             } else {
-              Write-Host "=== no fp4_ascii counterpart found for $base at $rewritten ==="
+              Write-Host "=== no fp4_ascii counterpart found for $relPath at $rewritten ==="
             }
           }
           exit 0

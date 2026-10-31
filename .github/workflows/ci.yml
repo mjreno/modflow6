@@ -542,7 +542,15 @@ jobs:
       # on every regular platform/compiler combo, not just the extended build's.
       - name: Install fp4 pixi environment
         working-directory: modflow6
-        run: pixi install -e fp4
+        run: pixi run -e fp4 install
+
+      # fp4 is a separate pixi env/install, so it needs its own flopy MF6
+      # class regen (matches what test-extended/test-extended-win already do)
+      # -- otherwise models using classes not yet in upstream flopy (CHF/OLF,
+      # etc.) fail with AttributeError here even though they pass natively.
+      - name: Update flopy (fp4 env)
+        working-directory: modflow6
+        run: pixi run -e fp4 update-flopy
 
       - name: Test MF6 (flopy4 ASCII-only comparisons)
         working-directory: modflow6
@@ -735,7 +743,15 @@ jobs:
       # Supersedes the earlier Windows-only prtdisv1trts diagnostic steps.
       - name: Install fp4 pixi environment
         working-directory: modflow6
-        run: pixi install -e fp4
+        run: pixi run -e fp4 install
+
+      # fp4 is a separate pixi env/install, so it needs its own flopy MF6
+      # class regen (matches what test-extended/test-extended-win already do)
+      # -- otherwise models using classes not yet in upstream flopy (CHF/OLF,
+      # etc.) fail with AttributeError here even though they pass natively.
+      - name: Update flopy (fp4 env)
+        working-directory: modflow6
+        run: pixi run -e fp4 update-flopy
 
       - name: Test MF6 (flopy4 ASCII-only comparisons)
         working-directory: modflow6

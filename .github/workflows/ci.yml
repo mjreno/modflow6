@@ -890,6 +890,11 @@ jobs:
       - name: Diagnostic - diff native vs flopy4-rewritten PRP input (Windows)
         if: runner.os == 'Windows' && (success() || failure())
         working-directory: modflow6/autotest
+        # the PETSc/Cygwin setup earlier in this job hijacks the job-level
+        # default `bash` resolution on PATH -- pin to git-bash explicitly
+        # (same shell test_intel_fortran's steps use) instead of Cygwin's,
+        # which chokes on the CRLF line endings in this run: block.
+        shell: 'C:\Program Files\Git\bin\bash.exe --noprofile --norc -e -o pipefail {0}'
         run: |
           failed_dir=$( { find .failed -maxdepth 1 -mindepth 1 -type d -iname "*prtdisv1trts*" 2>/dev/null || true; } | head -n1)
           if [ -z "$failed_dir" ]; then

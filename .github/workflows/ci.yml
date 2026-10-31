@@ -887,33 +887,36 @@ jobs:
       # DISPOSABLE diagnostic, Windows only: diff the native vs
       # flopy4-rewritten PRP input for the known-failing prtdisv1trts case,
       # byte-for-byte. Runs regardless of pass/fail. Not for merging.
+      #
+      # Implemented in pwsh rather than bash: the PETSc/Cygwin setup earlier
+      # in this job hijacks the job-level default `bash` resolution on PATH,
+      # and pinning `shell:` to an explicit git-bash.exe path hit a separate
+      # runner bug ("Second path fragment must not be a drive or UNC name")
+      # when resolving a drive-letter shell executable path. pwsh avoids
+      # both problems.
       - name: Diagnostic - diff native vs flopy4-rewritten PRP input (Windows)
         if: runner.os == 'Windows' && (success() || failure())
         working-directory: modflow6/autotest
-        # the PETSc/Cygwin setup earlier in this job hijacks the job-level
-        # default `bash` resolution on PATH -- pin to git-bash explicitly
-        # (same shell test_intel_fortran's steps use) instead of Cygwin's,
-        # which chokes on the CRLF line endings in this run: block.
-        shell: 'C:\Program Files\Git\bin\bash.exe --noprofile --norc -e -o pipefail {0}'
+        shell: pwsh
         run: |
-          failed_dir=$( { find .failed -maxdepth 1 -mindepth 1 -type d -iname "*prtdisv1trts*" 2>/dev/null || true; } | head -n1)
-          if [ -z "$failed_dir" ]; then
-            echo "No matching .failed directory found for prtdisv1trts - nothing to diff."
+          $failedDir = Get-ChildItem -Path ".failed" -Directory -Filter "*prtdisv1trts*" -ErrorAction SilentlyContinue | Select-Object -First 1
+          if (-not $failedDir) {
+            Write-Host "No matching .failed directory found for prtdisv1trts - nothing to diff."
             exit 0
-          fi
-          echo "Inspecting: $failed_dir"
-          find "$failed_dir" -maxdepth 2 -iname "*.prp" -print
-          for f in "$failed_dir"/*.prp; do
-            [ -e "$f" ] || continue
-            base=$(basename "$f")
-            rewritten="$failed_dir/fp4_ascii/$base"
-            if [ -f "$rewritten" ]; then
-              echo "=== diff: $base (native vs fp4_ascii rewrite) ==="
-              diff -u "$f" "$rewritten" || true
-            else
-              echo "=== no fp4_ascii counterpart found for $base at $rewritten ==="
-            fi
-          done
+          }
+          Write-Host "Inspecting: $($failedDir.FullName)"
+          Get-ChildItem -Path $failedDir.FullName -Filter "*.prp" -File | ForEach-Object { Write-Host $_.FullName }
+          Get-ChildItem -Path $failedDir.FullName -Filter "*.prp" -File | ForEach-Object {
+            $base = $_.Name
+            $rewritten = Join-Path $failedDir.FullName "fp4_ascii/$base"
+            if (Test-Path $rewritten) {
+              Write-Host "=== diff: $base (native vs fp4_ascii rewrite) ==="
+              git diff --no-index -- $_.FullName $rewritten
+            } else {
+              Write-Host "=== no fp4_ascii counterpart found for $base at $rewritten ==="
+            }
+          }
+          exit 0
 
       - name: Upload failed test output
         if: failure()

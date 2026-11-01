@@ -17,6 +17,9 @@ on:
       - "doc/**.xlsx"
       - ".hpc/**"
   pull_request:
+    # DISPOSABLE (prt_newton_disv1_fp4_gap): "labeled" added so applying the
+    # run-fp4 label actually re-triggers a run that picks it up.
+    types: [opened, synchronize, reopened, labeled]
     branches:
       - master
       - develop
@@ -36,12 +39,69 @@ on:
       - "doc/**.xlsx"
       - ".hpc/**"
   workflow_dispatch:
+    inputs:
+      force_fp4:
+        description: "Force flopy4 (fp4) comparisons to run"
+        type: boolean
+        default: false
+      # DISPOSABLE (prt_newton_disv1_fp4_gap), testing only: lets us exercise
+      # the cron-only trimmed job set without waiting for a real schedule
+      # firing, which only runs off the default branch. Drop before migrating.
+      simulate_cron:
+        description: "Simulate a cron-only run (testing only)"
+        type: boolean
+        default: false
+  # DISPOSABLE (prt_newton_disv1_fp4_gap): run flopy4 (fp4) comparisons once a
+  # day instead of on every push/PR, since they aren't a meaningful merge gate
+  # yet. 10:30 UTC is a low-traffic window for US and European contributors
+  # (5:30 AM EST / 6:30 AM EDT -- GitHub Actions cron is UTC and doesn't shift
+  # for DST, so this drifts by an hour across the year).
+  schedule:
+    - cron: "30 10 * * *"
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 env:
   PIXI_BETA_WARNING_OFF: true
 jobs:
+  # DISPOSABLE (prt_newton_disv1_fp4_gap): single place that decides whether
+  # this run should exercise flopy4 (fp4) comparisons at all (run_fp4), and
+  # whether it should additionally skip everything unrelated to fp4 (cron_only,
+  # used only by the scheduled daily run so it doesn't also redo external
+  # model/example/distribution testing that already happens on every push/PR).
+  gate:
+    name: Determine fp4 run mode
+    runs-on: ubuntu-22.04
+    outputs:
+      run_fp4: ${{ steps.compute.outputs.run_fp4 }}
+      cron_only: ${{ steps.compute.outputs.cron_only }}
+    steps:
+      - name: Compute fp4 run gates
+        id: compute
+        env:
+          HAS_LABEL: ${{ contains(github.event.pull_request.labels.*.name, 'run-fp4') }}
+          FORCE_FP4_INPUT: ${{ github.event.inputs.force_fp4 }}
+          SIMULATE_CRON_INPUT: ${{ github.event.inputs.simulate_cron }}
+        run: |
+          run_fp4=false
+          cron_only=false
+          if [[ "${{ github.event_name }}" == "schedule" ]]; then
+            run_fp4=true
+            cron_only=true
+          fi
+          if [[ "$HAS_LABEL" == "true" ]]; then
+            run_fp4=true
+          fi
+          if [[ "$FORCE_FP4_INPUT" == "true" ]]; then
+            run_fp4=true
+          fi
+          if [[ "$SIMULATE_CRON_INPUT" == "true" ]]; then
+            run_fp4=true
+            cron_only=true
+          fi
+          echo "run_fp4=$run_fp4" >> "$GITHUB_OUTPUT"
+          echo "cron_only=$cron_only" >> "$GITHUB_OUTPUT"
+
   lint:
     name: Check format
     runs-on: ubuntu-latest
@@ -121,6 +181,10 @@ jobs:
 
   pixi-gcc-extended-build:
     name: Pixi gcc-extended-build environment testing
+    needs: gate
+    # DISPOSABLE (prt_newton_disv1_fp4_gap): unrelated to fp4, so skip entirely
+    # on the cron-only run.
+    if: needs.gate.outputs.cron_only != 'true'
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -164,6 +228,10 @@ jobs:
         
   build-static:
     name: Static gcc build
+    needs: gate
+    # DISPOSABLE (prt_newton_disv1_fp4_gap): unrelated to fp4, so skip entirely
+    # on the cron-only run.
+    if: needs.gate.outputs.cron_only != 'true'
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -320,6 +388,7 @@ jobs:
   test_gfortran:
     name: Test GNU fortran
     needs:
+      - gate
       - lint
       - build
       - smoke_test
@@ -530,7 +599,11 @@ jobs:
           fi
           echo "filters=$filters" >> $GITHUB_OUTPUT
 
+      # DISPOSABLE (prt_newton_disv1_fp4_gap): skipped on the cron-only run --
+      # this native pass isn't needed to verify fp4 comparisons specifically,
+      # and already runs on every regular push/PR.
       - name: Test MF6
+        if: needs.gate.outputs.cron_only != 'true'
         working-directory: modflow6
         env:
           REPOS_PATH: ${{ github.workspace }}
@@ -540,7 +613,10 @@ jobs:
       # (fp4 mark, no netcdf/parallel mark of their own) here too, not just in
       # extended_test -- they don't need PETSc/MPI/NetCDF, so they should run
       # on every regular platform/compiler combo, not just the extended build's.
+      # Only on a cron run, a forced workflow_dispatch, or a PR carrying the
+      # run-fp4 label -- not a merge gate for the typical PR yet.
       - name: Install fp4 pixi environment
+        if: needs.gate.outputs.run_fp4 == 'true'
         working-directory: modflow6
         run: pixi run -e fp4 install
 
@@ -549,33 +625,42 @@ jobs:
       # -- otherwise models using classes not yet in upstream flopy (CHF/OLF,
       # etc.) fail with AttributeError here even though they pass natively.
       - name: Update flopy (fp4 env)
+        if: needs.gate.outputs.run_fp4 == 'true'
         working-directory: modflow6
         run: pixi run -e fp4 update-flopy
 
       - name: Test MF6 (flopy4 ASCII-only comparisons)
+        if: needs.gate.outputs.run_fp4 == 'true'
         working-directory: modflow6
         env:
           REPOS_PATH: ${{ github.workspace }}
         run: pixi run -e fp4 autotest -m "${{ steps.set_markers.outputs.markers }} and fp4 and not netcdf and not parallel and not external" -k "${{ steps.set_filters.outputs.filters }}" --fp4
 
+      # DISPOSABLE (prt_newton_disv1_fp4_gap): the rest of this job (external
+      # models, converter models, examples, distribution scripts) is unrelated
+      # to fp4 and already covered by every regular push/PR run, so it's
+      # skipped on the cron-only run to keep that run focused on fp4.
       - name: Test MF6 models
+        if: needs.gate.outputs.cron_only != 'true'
         working-directory: modflow6
         env:
           REPOS_PATH: ${{ github.workspace }}
         run: pixi run autotest -m "${{ steps.set_markers.outputs.markers }} and external" -k "${{ steps.set_filters.outputs.filters }}" --models-path ../../modflow6-testmodels/mf6
 
       - name: Test converter models
+        if: needs.gate.outputs.cron_only != 'true'
         working-directory: modflow6
         env:
           REPOS_PATH: ${{ github.workspace }}
         run: pixi run autotest -m "${{ steps.set_markers.outputs.markers }} and external" -k "${{ steps.set_filters.outputs.filters }}" --models-path ../../modflow6-testmodels/mf5to6 --namefile-pattern "*.nam"
 
       - name: Install executables
+        if: needs.gate.outputs.cron_only != 'true'
         uses: modflowpy/install-modflow-action@v1
 
       - name: Test examples
         working-directory: modflow6
-        if: runner.os != 'Windows'
+        if: needs.gate.outputs.cron_only != 'true' && runner.os != 'Windows'
         shell: pixi run bash -e {0}
         run: |
           cp -R bin/* ~/.local/bin/modflow/
@@ -584,7 +669,7 @@ jobs:
 
       - name: Test examples
         working-directory: modflow6
-        if: runner.os == 'Windows'
+        if: needs.gate.outputs.cron_only != 'true' && runner.os == 'Windows'
         run: |
           cp -R bin/* /c/Users/runneradmin/.local/bin/modflow/
           cd ../modflow6-examples/autotest
@@ -598,14 +683,14 @@ jobs:
           path: modflow6/autotest/.failed
 
       - name: Checkout usgslatex
-        if: runner.os == 'Linux'
+        if: needs.gate.outputs.cron_only != 'true' && runner.os == 'Linux'
         uses: actions/checkout@v7
         with:
           repository: MODFLOW-ORG/usgslatex
           path: usgslatex
 
       - name: Install TeX Live
-        if: runner.os == 'Linux'
+        if: needs.gate.outputs.cron_only != 'true' && runner.os == 'Linux'
         run: |
           sudo apt-get update
           sudo apt install texlive-science \
@@ -615,11 +700,12 @@ jobs:
             texlive-fonts-extra
 
       - name: Install USGS LaTeX style files and Univers font
-        if: runner.os == 'Linux'
+        if: needs.gate.outputs.cron_only != 'true' && runner.os == 'Linux'
         working-directory: usgslatex/usgsLaTeX
         run: sudo ./install.sh --all-users
 
       - name: Test distribution scripts
+        if: needs.gate.outputs.cron_only != 'true'
         working-directory: modflow6
         env:
           GITHUB_TOKEN: ${{ github.token }}
@@ -628,6 +714,7 @@ jobs:
   test_intel_fortran:
     name: Test Intel fortran
     needs:
+      - gate
       - lint
       - build
       - smoke_test
@@ -730,7 +817,11 @@ jobs:
           fi
           echo "markers=$markers" >> $GITHUB_OUTPUT
 
+      # DISPOSABLE (prt_newton_disv1_fp4_gap): skipped on the cron-only run --
+      # this native pass isn't needed to verify fp4 comparisons specifically,
+      # and already runs on every regular push/PR.
       - name: Test MF6
+        if: needs.gate.outputs.cron_only != 'true'
         working-directory: modflow6
         env:
           REPOS_PATH: ${{ github.workspace }}
@@ -741,7 +832,10 @@ jobs:
       # extended_test -- they don't need PETSc/MPI/NetCDF, so they should run
       # on every regular platform/compiler combo, not just the extended build's.
       # Supersedes the earlier Windows-only prtdisv1trts diagnostic steps.
+      # Only on a cron run, a forced workflow_dispatch, or a PR carrying the
+      # run-fp4 label -- not a merge gate for the typical PR yet.
       - name: Install fp4 pixi environment
+        if: needs.gate.outputs.run_fp4 == 'true'
         working-directory: modflow6
         run: pixi run -e fp4 install
 
@@ -750,22 +844,30 @@ jobs:
       # -- otherwise models using classes not yet in upstream flopy (CHF/OLF,
       # etc.) fail with AttributeError here even though they pass natively.
       - name: Update flopy (fp4 env)
+        if: needs.gate.outputs.run_fp4 == 'true'
         working-directory: modflow6
         run: pixi run -e fp4 update-flopy
 
       - name: Test MF6 (flopy4 ASCII-only comparisons)
+        if: needs.gate.outputs.run_fp4 == 'true'
         working-directory: modflow6
         env:
           REPOS_PATH: ${{ github.workspace }}
         run: pixi run -e fp4 autotest -m "${{ steps.set_markers.outputs.markers }} and fp4 and not netcdf and not parallel and not external" --fp4
 
+      # DISPOSABLE (prt_newton_disv1_fp4_gap): the rest of this job (external
+      # models, converter models, examples, distribution scripts) is unrelated
+      # to fp4 and already covered by every regular push/PR run, so it's
+      # skipped on the cron-only run to keep that run focused on fp4.
       - name: Test MF6 models
+        if: needs.gate.outputs.cron_only != 'true'
         working-directory: modflow6
         env:
           REPOS_PATH: ${{ github.workspace }}
         run: pixi run autotest -m "${{ steps.set_markers.outputs.markers }} and external" --models-path ../../modflow6-testmodels/mf6
 
       - name: Test converter models
+        if: needs.gate.outputs.cron_only != 'true'
         working-directory: modflow6
         env:
           REPOS_PATH: ${{ github.workspace }}
@@ -773,11 +875,11 @@ jobs:
 
       # if on linux, test example models too
       - name: Install executables
-        if: runner.os == 'Linux'
+        if: needs.gate.outputs.cron_only != 'true' && runner.os == 'Linux'
         uses: modflowpy/install-modflow-action@v1
 
       - name: Test MF6 examples
-        if: runner.os == 'Linux'
+        if: needs.gate.outputs.cron_only != 'true' && runner.os == 'Linux'
         working-directory: modflow6
         shell: pixi run bash -e {0}
         run: |
@@ -793,6 +895,7 @@ jobs:
           path: modflow6/autotest/.failed
 
       - name: Test scripts
+        if: needs.gate.outputs.cron_only != 'true'
         working-directory: modflow6
         env:
           GITHUB_TOKEN: ${{ github.token }}
@@ -801,6 +904,7 @@ jobs:
   extended_test:
     name: Extended testing
     needs:
+      - gate
       - lint
       - build
       - smoke_test
@@ -872,11 +976,16 @@ jobs:
         id: set_filters
         run: echo "filters=" >> $GITHUB_OUTPUT
 
+      # DISPOSABLE (prt_newton_disv1_fp4_gap): enable-fp4 gates only the
+      # --fp4 flag on the pytest invocation inside these composite actions --
+      # the netcdf/parallel native tests above still run on every push/PR
+      # either way, since they have no flopy4 dependency of their own.
       - name: Test extended MF6
         if: runner.os != 'Windows'
         uses: ./modflow6/.github/actions/test-extended
         with:
           pixi-environment: fp4
+          enable-fp4: ${{ needs.gate.outputs.run_fp4 }}
         env:
           MARKERS: ${{ steps.set_markers.outputs.markers }}
           FILTERS: ${{ steps.set_filters.outputs.filters }}
@@ -886,6 +995,7 @@ jobs:
         uses: ./modflow6/.github/actions/test-extended-win
         with:
           pixi-environment: fp4
+          enable-fp4: ${{ needs.gate.outputs.run_fp4 }}
         env:
           MARKERS: ${{ steps.set_markers.outputs.markers }}
           FILTERS: ${{ steps.set_filters.outputs.filters }}

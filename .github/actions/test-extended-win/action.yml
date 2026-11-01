@@ -5,6 +5,12 @@ inputs:
   pixi-environment:
     description: pixi environment to build and test in
     default: default
+  enable-fp4:
+    # DISPOSABLE (prt_newton_disv1_fp4_gap): gates whether --fp4 is passed to
+    # the pytest invocation in test_modflow6_extended.bat. Not a real input
+    # anywhere else.
+    description: whether to pass --fp4 to the autotest run
+    default: "false"
 runs:
   using: "composite"
   steps:
@@ -40,5 +46,6 @@ runs:
         MARKERS: ${{ env.MARKERS }}
         FILTERS: ${{ env.FILTERS }}
         PIXI_ENV: ${{ inputs.pixi-environment }}
+        ENABLE_FP4: ${{ inputs.enable-fp4 }}
       run: |
         "%ONEAPI_ROOT%\setvars.bat" intel64 vs2022 && "%TEMP%\test_modflow6_extended.bat"

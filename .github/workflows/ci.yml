@@ -798,11 +798,10 @@ jobs:
         with:
           pixi-version: v0.82.1
           manifest-path: "modflow6/pixi.toml"
-          environments: fp4
 
       - name: Custom pixi install
         working-directory: modflow6
-        run: pixi run -e fp4 install
+        run: pixi run install
 
       - name: Set LDFLAGS (macOS)
         if: runner.os == 'macOS'
@@ -812,30 +811,15 @@ jobs:
 
       - name: Set markers
         id: set_markers
-        # marker-based, not a -k name filter: a netcdf/parallel fp4 comparison
-        # can be folded into any base test file, whose name won't match "test_netcdf"/"test_par".
-        # DISPOSABLE change (prt_newton_disv1_fp4_gap): dropped the bare "or fp4"
-        # clause. ascii-only fp4 comparisons (fp4 mark with no netcdf/parallel mark
-        # of their own) no longer need to run here -- test_gfortran/test_intel_fortran
-        # now run them directly, across more platform/compiler combos, instead of
-        # forcing them through this job's PETSc/MPI/NetCDF-linked build for no
-        # functional reason. netcdf/parallel-based fp4 comparisons are already
-        # covered by "netcdf or parallel" since they carry those marks too.
-        run: echo "markers=(netcdf or parallel) and not large" >> $GITHUB_OUTPUT
+        run: echo "markers=not large" >> $GITHUB_OUTPUT
 
       - name: Set filters
         id: set_filters
-        run: echo "filters=" >> $GITHUB_OUTPUT
+        run: echo "filters=test_par or test_netcdf" >> $GITHUB_OUTPUT
 
-      # DISPOSABLE (prt_newton_disv1_fp4_gap): enable-fp4 defaults to false
-      # (not passed here), so this job only ever runs the netcdf/parallel
-      # native tests -- the fp4 comparison variant of this same build now
-      # lives in fp4.yml instead.
       - name: Test extended MF6
         if: runner.os != 'Windows'
         uses: ./modflow6/.github/actions/test-extended
-        with:
-          pixi-environment: fp4
         env:
           MARKERS: ${{ steps.set_markers.outputs.markers }}
           FILTERS: ${{ steps.set_filters.outputs.filters }}
@@ -843,50 +827,9 @@ jobs:
       - name: Test extended MF6
         if: runner.os == 'Windows'
         uses: ./modflow6/.github/actions/test-extended-win
-        with:
-          pixi-environment: fp4
         env:
           MARKERS: ${{ steps.set_markers.outputs.markers }}
           FILTERS: ${{ steps.set_filters.outputs.filters }}
-
-      # DISPOSABLE diagnostic, Windows only: diff the native vs
-      # flopy4-rewritten PRP input for the known-failing prtdisv1trts case,
-      # byte-for-byte. Runs regardless of pass/fail. Not for merging.
-      #
-      # Implemented in pwsh rather than bash: the PETSc/Cygwin setup earlier
-      # in this job hijacks the job-level default `bash` resolution on PATH,
-      # and pinning `shell:` to an explicit git-bash.exe path hit a separate
-      # runner bug ("Second path fragment must not be a drive or UNC name")
-      # when resolving a drive-letter shell executable path. pwsh avoids
-      # both problems.
-      - name: Diagnostic - diff native vs flopy4-rewritten PRP input (Windows)
-        if: runner.os == 'Windows' && (success() || failure())
-        working-directory: modflow6/autotest
-        shell: pwsh
-        run: |
-          $failedDir = Get-ChildItem -Path ".failed" -Directory -Filter "*prtdisv1trts*" -ErrorAction SilentlyContinue | Select-Object -First 1
-          if (-not $failedDir) {
-            Write-Host "No matching .failed directory found for prtdisv1trts - nothing to diff."
-            exit 0
-          }
-          Write-Host "Inspecting: $($failedDir.FullName)"
-          # the PRT sim (and its .prp input) lives under a "prt" subdir of
-          # the workspace, not at the top level -- search recursively, but
-          # skip the fp4_ascii rewrite tree itself when finding natives.
-          $nativeFiles = Get-ChildItem -Path $failedDir.FullName -Filter "*.prp" -File -Recurse |
-            Where-Object { $_.FullName -notmatch '\\fp4_ascii\\' }
-          $nativeFiles | ForEach-Object { Write-Host $_.FullName }
-          $nativeFiles | ForEach-Object {
-            $relPath = $_.FullName.Substring($failedDir.FullName.Length).TrimStart('\')
-            $rewritten = Join-Path (Join-Path $failedDir.FullName "fp4_ascii") $relPath
-            if (Test-Path $rewritten) {
-              Write-Host "=== diff: $relPath (native vs fp4_ascii rewrite) ==="
-              git diff --no-index -- $_.FullName $rewritten
-            } else {
-              Write-Host "=== no fp4_ascii counterpart found for $relPath at $rewritten ==="
-            }
-          }
-          exit 0
 
       - name: Upload failed test output
         if: failure()

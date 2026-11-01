@@ -312,6 +312,12 @@ jobs:
           ldflags="$LDFLAGS -Wl,-ld_classic -static-libgcc"
           echo "LDFLAGS=$ldflags" >> $GITHUB_ENV
 
+      # marker-based, not a -k name filter: an fp4 netcdf/parallel comparison
+      # can be folded into any base test file, whose name won't match
+      # "test_netcdf"/"test_par" -- only this job needs this, since it's the
+      # only one that passes --fp4 and needs to find those comparisons
+      # wherever they live. ci.yml's extended_test (no --fp4) uses develop's
+      # plain -k filter instead, since it never looks for fp4 comparisons.
       - name: Set markers
         id: set_markers
         run: echo "markers=(netcdf or parallel) and not large" >> $GITHUB_OUTPUT

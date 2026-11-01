@@ -3,8 +3,16 @@ on:
   # DISPOSABLE (prt_newton_disv1_fp4_gap): alternative to the gate-job approach
   # in ci.yml (kept there for comparison) -- mirrors the existing large.yml
   # pattern (separate workflow, schedule + workflow_dispatch) instead of
-  # bolting fp4 on/off switches onto ci.yml's jobs. fp4 comparisons aren't a
-  # meaningful merge gate yet, so this never runs on a plain push/PR.
+  # bolting fp4 on/off switches onto ci.yml's jobs.
+  #
+  # Covers the comparisons that aren't a meaningful merge gate yet, so this
+  # never runs on a plain push/PR: the ASCII-only, general flopy4 round-trip
+  # comparisons (fp4_gfortran/fp4_intel_fortran), and parallel-based fp4
+  # comparisons (fp4_parallel, e.g. Comparison.FP4_ASCII on a test carrying
+  # pytest.mark.parallel). The original fp4_extended job (netcdf+parallel
+  # combined) was removed: flopy4 is now required to generate NetCDF input
+  # at all, so ci.yml's extended_test runs netcdf-based comparisons on every
+  # push instead -- only the parallel-based ones stay here.
   schedule:
     # 10:30 UTC is a low-traffic window for US and European contributors
     # (5:30 AM EST / 6:30 AM EDT -- GitHub Actions cron is UTC and doesn't
@@ -259,8 +267,10 @@ jobs:
           name: failed-fp4-${{ matrix.os }}-${{ env.FC }}-${{ env.FC_V }}
           path: modflow6/autotest/.failed
 
-  fp4_extended:
-    name: fp4 comparisons (extended)
+  fp4_parallel:
+    name: fp4 comparisons (parallel)
+    # DISPOSABLE (prt_newton_disv1_fp4_gap): only run for an actual run-fp4
+    # label on a pull_request event -- schedule/workflow_dispatch always run.
     if: github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'run-fp4')
     runs-on: ${{ matrix.os }}
     strategy:
@@ -312,28 +322,24 @@ jobs:
           ldflags="$LDFLAGS -Wl,-ld_classic -static-libgcc"
           echo "LDFLAGS=$ldflags" >> $GITHUB_ENV
 
-      # marker-based, not a -k name filter: an fp4 netcdf/parallel comparison
-      # can be folded into any base test file, whose name won't match
-      # "test_netcdf"/"test_par" -- only this job needs this, since it's the
-      # only one that passes --fp4 and needs to find those comparisons
-      # wherever they live. ci.yml's extended_test (no --fp4) uses develop's
-      # plain -k filter instead, since it never looks for fp4 comparisons.
+      # a parallel-based fp4 comparison carries both marks together: parallel
+      # (applied at the test function level) and fp4 (applied on the specific
+      # Comparison.FP4_ASCII param) -- "parallel and fp4" finds exactly those,
+      # wherever they live, without touching the always-on native parallel
+      # tests or the netcdf-based comparisons (handled elsewhere).
       - name: Set markers
         id: set_markers
-        run: echo "markers=(netcdf or parallel) and not large" >> $GITHUB_OUTPUT
+        run: echo "markers=parallel and fp4 and not large" >> $GITHUB_OUTPUT
 
       - name: Set filters
         id: set_filters
         run: echo "filters=" >> $GITHUB_OUTPUT
 
-      # enable-fp4 hardcoded true here -- the plain (no-fp4) variant of this
-      # same build is extended_test in ci.yml, which runs on every push/PR.
       - name: Test extended MF6
         if: runner.os != 'Windows'
         uses: ./modflow6/.github/actions/test-extended
         with:
           pixi-environment: fp4
-          enable-fp4: "true"
         env:
           MARKERS: ${{ steps.set_markers.outputs.markers }}
           FILTERS: ${{ steps.set_filters.outputs.filters }}
@@ -343,7 +349,6 @@ jobs:
         uses: ./modflow6/.github/actions/test-extended-win
         with:
           pixi-environment: fp4
-          enable-fp4: "true"
         env:
           MARKERS: ${{ steps.set_markers.outputs.markers }}
           FILTERS: ${{ steps.set_filters.outputs.filters }}
@@ -352,5 +357,6 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v7
         with:
-          name: failed-fp4-${{ matrix.os }}-ext
+          name: failed-fp4-${{ matrix.os }}-par
           path: modflow6/autotest/.failed
+

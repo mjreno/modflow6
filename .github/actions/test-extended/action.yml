@@ -4,11 +4,6 @@ inputs:
   pixi-environment:
     description: pixi environment to build and test in
     default: default
-  enable-fp4:
-    # DISPOSABLE (prt_newton_disv1_fp4_gap): gates whether --fp4 is passed to
-    # the pytest invocation below. Not a real input anywhere else.
-    description: whether to pass --fp4 to the autotest run
-    default: "false"
 runs:
   using: "composite"
   steps:
@@ -193,10 +188,11 @@ runs:
         MARKERS: ${{ env.MARKERS }}
         FILTERS: ${{ env.FILTERS }}
       run: |
-        cmd="pixi run -e ${{ inputs.pixi-environment }} autotest --parallel --netcdf"
-        if [[ "${{ inputs.enable-fp4 }}" == "true" ]]; then
-          cmd="$cmd --fp4"
-        fi
+        # DISPOSABLE (prt_newton_disv1_fp4_gap): --fp4 is now unconditional --
+        # netcdf-marked tests need flopy4 to generate their NetCDF input at
+        # all, not just for the optional ASCII round-trip comparisons, so
+        # this is no longer something to gate behind a toggle.
+        cmd="pixi run -e ${{ inputs.pixi-environment }} autotest --parallel --netcdf --fp4"
         if [[ "${{ env.MARKERS }}" != "" ]]; then
           cmd="$cmd -m '$MARKERS'"
         fi

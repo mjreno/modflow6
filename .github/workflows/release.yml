@@ -267,15 +267,25 @@ jobs:
           compiler: ${{ matrix.compiler }}
           version: ${{ matrix.version }}
 
+      # DISPOSABLE (prt_newton_disv1_fp4_gap): netcdf-marked tests now need
+      # flopy4 to generate their NetCDF input at all (not just for the
+      # optional ASCII round-trip comparisons elsewhere), so the extended
+      # matrix entry needs the fp4 pixi environment too.
       - name: Setup pixi
         uses: prefix-dev/setup-pixi@v0.11.2
         with:
           pixi-version: v0.82.1
           manifest-path: "modflow6/pixi.toml"
+          environments: ${{ matrix.extended && 'default fp4' || 'default' }}
 
       - name: Custom pixi install
         working-directory: modflow6
         run: pixi run install
+
+      - name: Custom pixi install (fp4)
+        if: matrix.extended
+        working-directory: modflow6
+        run: pixi run -e fp4 install
 
       - name: Set version number
         id: set_version
@@ -317,6 +327,18 @@ jobs:
           if [[ "${{ inputs.releasemode }}" == "true" ]]; then
             markers="$markers and not developmode"
           fi
+          if [[ "${{ matrix.extended }}" == "true" ]] && [[ "${{ inputs.releasemode }}" != "true" ]]; then
+            # run only parallel/netcdf tests in developmode, run all tests in releasemode.
+            # marker-based, not a -k name filter: a netcdf/parallel test (fp4 or
+            # otherwise) can be folded into any base test file, whose name won't
+            # match "test_netcdf"/"test_par". "parallel and not fp4" (rather than
+            # bare "parallel") so a plain parallel test still always runs here,
+            # but a parallel-based fp4 *comparison* (if one is ever added) stays
+            # excluded from developmode -- deferred to fp4.yml's cron/dispatch/
+            # label-gated schedule, same as the ASCII comparisons. releasemode's
+            # "run everything" (above) is intentionally not scoped this way.
+            markers="$markers and (netcdf or (parallel and not fp4))"
+          fi
           echo "markers=$markers" >> $GITHUB_OUTPUT
 
       - name: Set filters
@@ -324,17 +346,9 @@ jobs:
         id: set_filters
         run: |
           filters=""
-          if [[ "${{ matrix.extended }}" == "true" ]] && [[ "${{ inputs.releasemode }}" != "true" ]]; then
-            # run only parallel/extended tests in developmode, run all tests in releasemode
-            filters="test_par or test_netcdf"
-          fi
           # sfr rewet comparison fails on macos
           if [[ "${{ runner.os }}" == "macOS" ]]; then
-            if [[ "$filters" != "" ]]; then
-              filters="$filters and not test028_sfr_rewet"
-            else
-              filters="not test028_sfr_rewet"
-            fi
+            filters="not test028_sfr_rewet"
           fi
           echo "filters=$filters" >> $GITHUB_OUTPUT
 
@@ -448,6 +462,8 @@ jobs:
       - name: Build and test binaries (Windows)
         if: runner.os == 'Windows' && matrix.extended && inputs.run_tests
         uses: ./modflow6/.github/actions/test-extended-win
+        with:
+          pixi-environment: fp4
         env:
           RELEASEMODE: ${{ inputs.releasemode }}
           MARKERS: ${{ steps.set_markers.outputs.markers }}

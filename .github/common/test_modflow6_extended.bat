@@ -7,7 +7,7 @@ copy /Y "%GITHUB_WORKSPACE%\netcdf\netCDF4.9.3-NC4-64\bin\zlib1.dll"   "%GITHUB_
 copy /Y "%GITHUB_WORKSPACE%\netcdf\netCDF4.9.3-NC4-64\bin\libcurl.dll" "%GITHUB_WORKSPACE%\modflow6\bin\"
 copy /Y "%GITHUB_WORKSPACE%\netcdf\netcdf-fortran-4.6.2\build\fortran\netcdff.dll" "%GITHUB_WORKSPACE%\modflow6\bin\"
 cd "%GITHUB_WORKSPACE%\modflow6\autotest"
-:: DISPOSABLE (prt_newton_disv1_fp4_gap): --fp4 only passed when ENABLE_FP4=true.
-set "FP4_FLAG="
-if "%ENABLE_FP4%"=="true" set "FP4_FLAG=--fp4"
-pixi run -e %PIXI_ENV% autotest -m "%MARKERS%" -k "%FILTERS%" --netcdf --parallel %FP4_FLAG%
+:: DISPOSABLE (prt_newton_disv1_fp4_gap): --fp4 is unconditional now -- netcdf-marked
+:: tests need flopy4 to generate their NetCDF input at all, not just for the optional
+:: ASCII round-trip comparisons.
+pixi run -e %PIXI_ENV% autotest -m "%MARKERS%" -k "%FILTERS%" --netcdf --parallel --fp4

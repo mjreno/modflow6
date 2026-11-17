@@ -5,10 +5,10 @@
 !! auxiliary variables it expects, and calls fill() to copy the current
 !! period's values into an array of its own.
 !!
-!! Input is loaded by the Input Data Model grid-array loader, which stores
-!! values compressed: only cells whose value is not DNODATA are kept, with
-!! NODEULIST giving the user node number of each stored entry. fill()
-!! expands that back onto the caller's reduced-node vector.
+!! Input is loaded by the Input Data Model grid-array loader in full-grid
+!! mode: values are stored by user node and persist until changed, and an
+!! array can be given by a time-array series. fill() copies the values
+!! written in the current time step onto the caller's reduced-node vector.
 !<
 module UtlTvgModule
 
@@ -23,7 +23,7 @@ module UtlTvgModule
   use MemoryHelperModule, only: create_mem_path
   use CharacterStringModule, only: CharacterStringType
   use BaseDisModule, only: DisBaseType
-  use TdisModule, only: kper
+  use IdmParamMetaViewModule, only: IdmParamMetaViewType
 
   implicit none
   private
@@ -38,9 +38,9 @@ module UtlTvgModule
       contiguous :: auxname => null() !< vector of auxiliary variable names
     type(CharacterStringType), dimension(:), pointer, &
       contiguous :: auxname_cst => null() !< auxiliary names as loaded from input
-    real(DP), dimension(:, :), pointer, contiguous :: auxvar => null() !< loaded values, dimensioned (nvar, nbound)
-    integer(I4B), dimension(:), pointer, contiguous :: nodeulist => null() !< user node number of each stored entry
-    integer(I4B), pointer :: nbound => null() !< number of stored entries in the current period
+    real(DP), dimension(:, :), pointer, contiguous :: auxvar => null() !< loaded values, dimensioned (nvar, user nodes)
+    type(IdmParamMetaViewType) :: input_meta !< write stamps of the variables
+    logical(LGP) :: meta_ready = .false. !< input_meta initialized
     class(DisBaseType), pointer :: dis => null() !< discretization package
     integer(I4B), pointer :: iout => null() !< unit number for output
     integer(I4B), pointer :: nvar => null() !< number of variables
@@ -157,10 +157,11 @@ contains
 
   !> @brief Fill the passed array with values for the named variable
   !!
-  !! The grid-array loader stores only the cells it read, so values are
-  !! expanded through NODEULIST. Cells the loader did not supply are left
-  !! as the caller had them, which lets a parent package keep its own
-  !! defaults or the values from an earlier period.
+  !! Copies the values written in the current time step: values given in a
+  !! PERIOD block at the time step the block is read, and values from a
+  !! time-array series at each time step. Other cells are left as the
+  !! caller had them, which lets a parent package keep its own defaults or
+  !! earlier values.
   !<
   subroutine fill(this, dblvec, auxname)
     ! dummy
@@ -173,7 +174,6 @@ contains
     integer(I4B) :: nu
     integer(I4B) :: nr
     integer(I4B) :: isize
-    integer(I4B), pointer :: iper
 
     ivar = 0
     do i = 1, this%nvar
@@ -188,27 +188,23 @@ contains
       call store_error(errmsg, terminate=.TRUE.)
     end if
 
-    ! Resolve the loader's arrays on every call rather than caching them at
-    ! initialize: they do not exist until a period block has been read, and
-    ! the loader may reallocate them as later periods are loaded.
     call get_isize('AUXVAR', this%input_mempath, isize)
     if (isize <= 0) return
     call mem_setptr(this%auxvar, 'AUXVAR', this%input_mempath)
-    call mem_setptr(this%nodeulist, 'NODEULIST', this%input_mempath)
-    call mem_setptr(this%nbound, 'NBOUND', this%input_mempath)
 
-    ! Only apply values the loader read for the current stress period. When a
-    ! period block is absent the loader leaves the previous period's data in
-    ! place and IPER no longer matches, so the caller keeps what it had.
-    call mem_setptr(iper, 'IPER', this%input_mempath)
-    if (iper /= kper) return
+    ! write stamps exist once the loader has been defined
+    if (.not. this%meta_ready) then
+      call this%input_meta%init(this%auxname(1:this%nvar), this%input_mempath)
+      this%meta_ready = .true.
+    end if
+    call this%input_meta%update()
 
-    ! expand the stored entries onto the caller's reduced-node vector
-    do i = 1, this%nbound
-      nu = this%nodeulist(i)
+    ! copy the values written in this time step
+    do nu = 1, size(this%auxvar, 2)
+      if (.not. this%input_meta%is_written(ivar, nu)) cycle
       nr = this%dis%get_nodenumber(nu, 0)
       if (nr > 0) then
-        dblvec(nr) = this%auxvar(ivar, i)
+        dblvec(nr) = this%auxvar(ivar, nu)
       end if
     end do
   end subroutine fill
@@ -226,9 +222,8 @@ contains
     call mem_deallocate(this%auxname_cst, 'AUXNAME_CST', this%memoryPath)
 
     nullify (this%auxvar)
-    nullify (this%nodeulist)
-    nullify (this%nbound)
     nullify (this%dis)
+    call this%input_meta%destroy()
   end subroutine tvg_da
 
 end module UtlTvgModule

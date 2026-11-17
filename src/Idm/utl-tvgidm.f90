@@ -17,6 +17,10 @@ module UtlTvgInputModule
     logical :: auxiliary = .false.
     logical :: iprpak = .false.
     logical :: export_nc = .false.
+    logical :: tas_filerecord = .false.
+    logical :: tas6 = .false.
+    logical :: filein = .false.
+    logical :: tas6_filename = .false.
     logical :: auxvar = .false.
   end type UtlTvgParamFoundType
 
@@ -106,6 +110,82 @@ module UtlTvgInputModule
     )
 
   type(InputParamDefinitionType), parameter :: &
+    utltvg_tas_filerecord = InputParamDefinitionType &
+    ( &
+    'UTL', & ! component
+    'TVG', & ! subcomponent
+    'OPTIONS', & ! block
+    'TAS_FILERECORD', & ! tag name
+    'TAS_FILERECORD', & ! fortran variable
+    'RECORD TAS6 FILEIN TAS6_FILENAME', & ! type
+    '', & ! shape
+    '', & ! longname
+    .false., & ! required
+    .false., & ! developmode
+    .false., & ! multi-record
+    .false., & ! preserve case
+    .false., & ! layered
+    .false. & ! timeseries
+    )
+
+  type(InputParamDefinitionType), parameter :: &
+    utltvg_tas6 = InputParamDefinitionType &
+    ( &
+    'UTL', & ! component
+    'TVG', & ! subcomponent
+    'OPTIONS', & ! block
+    'TAS6', & ! tag name
+    'TAS6', & ! fortran variable
+    'KEYWORD', & ! type
+    '', & ! shape
+    'time-array series keyword', & ! longname
+    .true., & ! required
+    .false., & ! developmode
+    .true., & ! multi-record
+    .false., & ! preserve case
+    .false., & ! layered
+    .false. & ! timeseries
+    )
+
+  type(InputParamDefinitionType), parameter :: &
+    utltvg_filein = InputParamDefinitionType &
+    ( &
+    'UTL', & ! component
+    'TVG', & ! subcomponent
+    'OPTIONS', & ! block
+    'FILEIN', & ! tag name
+    'FILEIN', & ! fortran variable
+    'KEYWORD', & ! type
+    '', & ! shape
+    'file keyword', & ! longname
+    .true., & ! required
+    .false., & ! developmode
+    .true., & ! multi-record
+    .false., & ! preserve case
+    .false., & ! layered
+    .false. & ! timeseries
+    )
+
+  type(InputParamDefinitionType), parameter :: &
+    utltvg_tas6_filename = InputParamDefinitionType &
+    ( &
+    'UTL', & ! component
+    'TVG', & ! subcomponent
+    'OPTIONS', & ! block
+    'TAS6_FILENAME', & ! tag name
+    'TAS6_FILENAME', & ! fortran variable
+    'STRING', & ! type
+    '', & ! shape
+    'file name of time series information', & ! longname
+    .true., & ! required
+    .false., & ! developmode
+    .true., & ! multi-record
+    .true., & ! preserve case
+    .false., & ! layered
+    .false. & ! timeseries
+    )
+
+  type(InputParamDefinitionType), parameter :: &
     utltvg_auxvar = InputParamDefinitionType &
     ( &
     'UTL', & ! component
@@ -121,7 +201,7 @@ module UtlTvgInputModule
     .false., & ! multi-record
     .false., & ! preserve case
     .true., & ! layered
-    .false. & ! timeseries
+    .true. & ! timeseries
     )
 
   type(InputParamDefinitionType), parameter :: &
@@ -131,6 +211,10 @@ module UtlTvgInputModule
     utltvg_auxiliary, &
     utltvg_iprpak, &
     utltvg_export_nc, &
+    utltvg_tas_filerecord, &
+    utltvg_tas6, &
+    utltvg_filein, &
+    utltvg_tas6_filename, &
     utltvg_auxvar &
     ]
 

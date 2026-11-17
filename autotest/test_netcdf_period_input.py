@@ -62,6 +62,11 @@ Cases:
     tvkg_ratio: TVKG with NPF K33OVERK, K33 ratio at A in period 1, K at A
         in 2. The export holds the ratio; reading it from NetCDF is an
         input error.
+    tvg_aux: SWI TVG (full-grid) with auxiliary variables TIDE and
+        SALTWATER_HEAD: TIDE at A and a SALTWATER_HEAD series in period 1,
+        empty block in 2, SALTWATER_HEAD at B and the inactive cell in 3
+        (the series link ends), TIDE at B only in 4. The zeta output is
+        also compared.
 """
 
 import re
@@ -97,6 +102,7 @@ cases = {
     "welg_auxts": ("welg", "WEL", "compressed"),
     "tvkg_full": ("tvkg", "CHD", "fullgrid"),
     "tvkg_ratio": ("tvkg", "CHD", "fullgrid"),
+    "tvg_aux": ("swi.tvg", "CHD", "fullgrid"),
 }
 # cases with hand-written grid array package (and series) files
 hand_cases = (
@@ -107,6 +113,7 @@ hand_cases = (
     "welg_auxts",
     "tvkg_full",
     "tvkg_ratio",
+    "tvg_aux",
 )
 # expected input error when reading the exported file
 errors = {
@@ -244,11 +251,14 @@ def add_discretization(gwf, dis, idomain=None):
     )
 
 
-def base_model(ws, name, nper, dis, idomain=None, npf=None):
+def base_model(ws, name, nper, dis, idomain=None, npf=None, newton=False):
     sim = flopy.mf6.MFSimulation(sim_name=name, sim_ws=ws)
     flopy.mf6.ModflowTdis(sim, nper=nper, perioddata=[(1.0, 1, 1.0)] * nper)
-    gwf = flopy.mf6.ModflowGwf(sim, modelname=name, save_flows=True)
-    flopy.mf6.ModflowIms(sim, outer_dvclose=1e-9, inner_dvclose=1e-9)
+    gwf = flopy.mf6.ModflowGwf(
+        sim, modelname=name, save_flows=True, newtonoptions="newton" if newton else None
+    )
+    ims = {"outer_maximum": 200, "linear_acceleration": "bicgstab"} if newton else {}
+    flopy.mf6.ModflowIms(sim, outer_dvclose=1e-9, inner_dvclose=1e-9, **ims)
     add_discretization(gwf, dis, idomain)
     flopy.mf6.ModflowGwfic(gwf, strt=10.0)
     flopy.mf6.ModflowGwfnpf(gwf, **(npf or {"k": 1.0}))
@@ -408,17 +418,17 @@ def build_grid(ws, name, dis):
 
 def build_hand(ws, name, dis):
     """Grid array package with hand-written package (and series) files."""
-    nper = {"welg_tas": 6, "welg_auxts": 3, "tvkg_full": 4}.get(name, 2)
+    nper = {"welg_tas": 6, "welg_auxts": 3, "tvkg_full": 4, "tvg_aux": 4}.get(name, 2)
     idomain = None
-    if name == "tvkg_full":
+    if name in ("tvkg_full", "tvg_aux"):
         idomain = np.ones((nlay, nrow, ncol), dtype=int)
         idomain[cell_inactive] = 0
     npf = None
     if name == "tvkg_ratio":
         npf = {"k": 1.0, "k33": 0.5, "k33overk": True}
-    sim, gwf = base_model(ws, name, nper, dis, idomain, npf)
+    sim, gwf = base_model(ws, name, nper, dis, idomain, npf, newton=name == "tvg_aux")
     chd = [[cellid(cell_chd, dis), 10.0]]
-    if name.startswith("tvkg"):
+    if name.startswith("tv"):
         chd.append([cellid((0, 2, 0), dis), 5.0])
     flopy.mf6.ModflowGwfchd(gwf, stress_period_data={0: chd})
     ext = cases[name][0]
@@ -485,6 +495,22 @@ def build_hand(ws, name, dis):
             3: {"wel_mult": ab(1.5, 1.5)},
         }
         series = {"mts": {0.0: ab(0.5, 2.0), 1.0: ab(1.0, 3.0), 3.0: ab(1.0, 3.0)}}
+    elif name == "tvg_aux":
+        options += ["AUXILIARY TIDE SALTWATER_HEAD", f"TAS6 FILEIN {tas}"]
+        dims = []
+        spec = {
+            1: {
+                "tide": grid_values({cell_a: 1.0}),
+                "saltwater_head": ("series", "hts"),
+            },
+            2: {},
+            3: {"saltwater_head": grid_values({cell_b: 6.0, cell_inactive: 9.0})},
+            4: {"tide": grid_values({cell_b: 2.0})},
+        }
+        full = np.ones((nlay, nrow, ncol))
+        series = {
+            "hts": {t: v * full for t, v in zip(range(5), [6.0, 7.0, 8.0, 8.0, 8.0])}
+        }
     elif name == "tvkg_ratio":
         dims = []
         spec = {
@@ -518,6 +544,13 @@ def build_hand(ws, name, dis):
             cond={0: first},
             rbot={0: first},
             filename=f"{name}.rivg",
+        )
+    elif ext == "swi.tvg":
+        swi = flopy.mf6.ModflowGwfswi(
+            gwf, zeta_filerecord=f"{name}.zta", tvg6_filerecord=f"{name}.{ext}"
+        )
+        swi.tvg.initialize(
+            auxiliary=["tide", "saltwater_head"], aux={0: [first, first]}
         )
     else:
         gwf.npf.tvkg.initialize(filename=f"{name}.tvkg", k={0: first})
@@ -729,6 +762,13 @@ def compare(ws, ref, budtext, label):
     for a, b in zip(q, qref):
         assert np.allclose(a["q"], b["q"], atol=1e-10), (
             f"{label}: {budtext} rates differ"
+        )
+    for zta in ref.glob("*.zta"):
+        z = flopy.utils.HeadFile(ws / zta.name, text="zeta").get_alldata()
+        zref = flopy.utils.HeadFile(zta, text="zeta").get_alldata()
+        assert np.allclose(z, zref, atol=1e-10), (
+            f"{label}: zeta differs from the ASCII run: "
+            f"max diff {np.abs(z - zref).max()}"
         )
 
 
